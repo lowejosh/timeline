@@ -4,6 +4,7 @@ import { useAnimatedViewport } from "./hooks/useAnimatedViewport";
 import { useElementSize } from "./hooks/useElementSize";
 import {
   ROOT_ERA,
+  TIMELINE_DISPLAY,
   findEraById,
   getAncestorChain,
   type Era,
@@ -107,7 +108,10 @@ function App() {
           viewport={animated.viewport}
           width={stageSize.width}
           activeEra={activeEra}
+          activeChain={chain}
           siblingEras={siblingEras}
+          markers={TIMELINE_DISPLAY.markers}
+          overlayBands={TIMELINE_DISPLAY.overlays}
           parentEra={parentEra}
           isAnimating={animated.isAnimating}
           onViewportChange={handleViewportChange}

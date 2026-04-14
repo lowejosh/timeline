@@ -74,6 +74,52 @@ describe("era data", () => {
     expect(rootChildIds).toContain("cenozoic");
   });
 
+  it("uses system-level geological subdivisions where the ICS chart provides them", () => {
+    const hadean = ROOT_ERA.children?.find((era) => era.id === "hadean");
+    const proterozoic = ROOT_ERA.children?.find((era) => era.id === "proterozoic");
+    const paleozoic = ROOT_ERA.children?.find((era) => era.id === "paleozoic");
+    const mesozoic = ROOT_ERA.children?.find((era) => era.id === "mesozoic");
+    const cenozoic = ROOT_ERA.children?.find((era) => era.id === "cenozoic");
+
+    expect(hadean?.children).toBeUndefined();
+    expect(proterozoic?.children?.map((era) => era.id)).toEqual([
+      "siderian",
+      "rhyacian",
+      "orosirian",
+      "statherian",
+      "calymmian",
+      "ectasian",
+      "stenian",
+      "tonian",
+      "cryogenian",
+      "ediacaran",
+    ]);
+    expect(paleozoic?.children?.map((era) => era.id)).toEqual([
+      "cambrian",
+      "ordovician",
+      "silurian",
+      "devonian",
+      "carboniferous",
+      "permian",
+    ]);
+    expect(mesozoic?.children?.map((era) => era.id)).toEqual([
+      "triassic",
+      "jurassic",
+      "cretaceous",
+    ]);
+    expect(cenozoic?.children?.map((era) => era.id)).toEqual([
+      "paleogene",
+      "neogene",
+      "quaternary",
+    ]);
+    expect(mesozoic?.children?.find((era) => era.id === "jurassic")?.name).toBe(
+      "Jurassic",
+    );
+    expect(paleozoic?.children?.find((era) => era.id === "cambrian")?.name).toBe(
+      "Cambrian",
+    );
+  });
+
   it("keeps cosmic phases directly under the root timeline", () => {
     const rootChildIds = ROOT_ERA.children?.map((era) => era.id) ?? [];
 

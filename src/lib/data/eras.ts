@@ -1,32 +1,31 @@
-import type { EraSourceId } from "./eraSources";
+import { COSMIC_ERA_DEFINITIONS } from "./eraTrees/cosmic";
+import { GEOLOGICAL_ERA_DEFINITIONS } from "./eraTrees/geological";
+import { HUMAN_HISTORY_ERA_DEFINITION } from "./eraTrees/humanHistory";
+import { CLASSICAL_ANTIQUITY_MARKERS } from "./markers/classicalAntiquity";
+import { CORE_TIMELINE_MARKERS } from "./markers/core";
+import { HISTORICAL_TURNING_POINT_MARKERS } from "./markers/historicalTurningPoints";
+import { POST_CLASSICAL_MARKERS } from "./markers/postClassical";
+import { ANCIENT_CIVILIZATION_OVERLAYS } from "./overlays/ancientCivilizations";
+import { POST_CLASSICAL_EARLY_MODERN_OVERLAYS } from "./overlays/postClassicalEarlyModern";
+import type {
+  Era,
+  EraDefinition,
+  RootTimelineData,
+  TimelineDisplayConfig,
+  TimelineSourceRef,
+} from "./timelineTypes";
 
-export type EraSourceRef = {
-  sourceId: EraSourceId;
-  note?: string;
-};
+export type {
+  Era,
+  EraDefinition,
+  EraScheme,
+  RootTimelineData,
+  TimelineDisplayConfig,
+  TimelineMarker,
+  TimelineOverlayBand,
+} from "./timelineTypes";
 
-export type EraScheme =
-  | "app-canonical"
-  | "cosmic"
-  | "chronostratigraphic"
-  | "world-history"
-  | "archaeological";
-
-export type Era = {
-  id: string;
-  name: string;
-  startYear: number;
-  endYear: number;
-  color: string;
-  scheme?: EraScheme;
-  sourceRefs?: EraSourceRef[];
-  children?: Era[];
-};
-
-type EraDefinition = Omit<Era, "color" | "children"> & {
-  color?: string;
-  children?: EraDefinition[];
-};
+export type EraSourceRef = TimelineSourceRef;
 
 /** Find an era by id anywhere in the tree */
 export function findEraById(era: Era, id: string): Era | undefined {
@@ -134,300 +133,41 @@ export const ROOT_ERA: Era = materializeEra({
     },
   ],
   children: [
-    {
-      id: "primordial-universe",
-      name: "Primordial Universe",
-      startYear: -13_800_000_000,
-      endYear: -13_600_000_000,
-      scheme: "cosmic",
-      sourceRefs: [
-        {
-          sourceId: "nasaUniverseOverview",
-          note: "Broad app band covering inflation, the big bang, nucleosynthesis, recombination, and the cosmic dark ages up to roughly 200 million years after the Big Bang.",
-        },
-      ],
-    },
-    {
-      id: "cosmic-dawn",
-      name: "Cosmic Dawn",
-      startYear: -13_600_000_000,
-      endYear: -12_800_000_000,
-      scheme: "cosmic",
-      sourceRefs: [
-        {
-          sourceId: "nasaUniverseOverview",
-          note: "NASA places the first stars after about 200 million years and says reionization is largely complete by the time the universe is about 1 billion years old.",
-        },
-        {
-          sourceId: "nasaStarBasics",
-          note: "Adds general context for star formation from collapsing clouds of gas and dust.",
-        },
-      ],
-    },
-    {
-      id: "galaxies-take-shape",
-      name: "Galaxies Take Shape",
-      startYear: -12_800_000_000,
-      endYear: -4_567_000_000,
-      scheme: "cosmic",
-      sourceRefs: [
-        {
-          sourceId: "nasaUniverseOverview",
-          note: "This band begins after reionization, when the universe has become transparent to light in the way we observe today.",
-        },
-        {
-          sourceId: "nasaGalaxyBasics",
-          note: "NASA notes that most galaxies are roughly 10 to 13.6 billion years old; this broad app band covers the long era of galaxy growth and evolution before our solar system forms.",
-        },
-        {
-          sourceId: "nasaSolarSystemFacts",
-          note: "Ends when the solar system forms about 4.6 billion years ago.",
-        },
-      ],
-    },
-    {
-      id: "hadean",
-      name: "Hadean",
-      startYear: -4_567_000_000,
-      endYear: -4_000_000_000,
-      scheme: "chronostratigraphic",
-      sourceRefs: [{ sourceId: "icsChart2024" }],
-    },
-    {
-      id: "archean",
-      name: "Archean",
-      startYear: -4_000_000_000,
-      endYear: -2_500_000_000,
-      scheme: "chronostratigraphic",
-      sourceRefs: [{ sourceId: "icsChart2024" }],
-    },
-    {
-      id: "proterozoic",
-      name: "Proterozoic",
-      startYear: -2_500_000_000,
-      endYear: -538_800_000,
-      scheme: "chronostratigraphic",
-      sourceRefs: [{ sourceId: "icsChart2024" }],
-    },
-    {
-      id: "paleozoic",
-      name: "Paleozoic",
-      startYear: -538_800_000,
-      endYear: -251_902_000,
-      scheme: "chronostratigraphic",
-      sourceRefs: [{ sourceId: "icsChart2024" }],
-    },
-    {
-      id: "mesozoic",
-      name: "Mesozoic",
-      startYear: -251_902_000,
-      endYear: -66_000_000,
-      scheme: "chronostratigraphic",
-      sourceRefs: [{ sourceId: "icsChart2024" }],
-    },
-    {
-      id: "cenozoic",
-      name: "Cenozoic",
-      startYear: -66_000_000,
-      endYear: -300_000,
-      scheme: "chronostratigraphic",
-      sourceRefs: [
-        {
-          sourceId: "icsChart2024",
-          note: "The formal Cenozoic continues to the present; this app-level segment stops at the human-history handoff.",
-        },
-      ],
-    },
-    {
-      id: "human-history",
-      name: "Human History",
-      startYear: -300_000,
-      endYear: CURRENT_YEAR,
-      scheme: "world-history",
-      sourceRefs: [
-        { sourceId: "smithsonianHumanOrigins" },
-        { sourceId: "periodo" },
-        { sourceId: "stearnsPeriodization" },
-        { sourceId: "bentleyEarlyModern" },
-        { sourceId: "brivatiContemporary" },
-      ],
-      children: [
-        {
-          id: "paleolithic",
-          name: "Paleolithic",
-          startYear: -300_000,
-          endYear: -20_000,
-          scheme: "archaeological",
-          sourceRefs: [
-            {
-              sourceId: "khanPaleolithicCulture",
-              note: "Used here in the broad standard Stone Age sense before the Near Eastern Epipaleolithic transition.",
-            },
-            { sourceId: "smithsonianHumanOrigins" },
-          ],
-        },
-        {
-          id: "epipaleolithic",
-          name: "Epipaleolithic",
-          startYear: -20_000,
-          endYear: -10_000,
-          scheme: "archaeological",
-          sourceRefs: [
-            {
-              sourceId: "periodo",
-              note: "Near Eastern archaeology often prefers Epipaleolithic where broader world-history surveys might say Mesolithic.",
-            },
-          ],
-        },
-        {
-          id: "neolithic",
-          name: "Neolithic",
-          startYear: -10_000,
-          endYear: -4_500,
-          scheme: "archaeological",
-          sourceRefs: [
-            { sourceId: "periodo" },
-            {
-              sourceId: "khanNeolithicRevolution",
-              note: "Near Eastern Neolithic examples include Pre-Pottery Neolithic phases such as those attested at Jericho.",
-            },
-          ],
-          children: [
-            {
-              id: "pre-pottery-neolithic-a",
-              name: "Pre-Pottery Neolithic A",
-              startYear: -10_000,
-              endYear: -8_800,
-              scheme: "archaeological",
-              sourceRefs: [{ sourceId: "periodo" }],
-            },
-            {
-              id: "pre-pottery-neolithic-b",
-              name: "Pre-Pottery Neolithic B",
-              startYear: -8_800,
-              endYear: -6_500,
-              scheme: "archaeological",
-              sourceRefs: [{ sourceId: "khanNeolithicRevolution" }],
-            },
-            {
-              id: "pottery-neolithic",
-              name: "Pottery Neolithic",
-              startYear: -6_500,
-              endYear: -4_500,
-              scheme: "archaeological",
-              sourceRefs: [{ sourceId: "periodo" }],
-            },
-          ],
-        },
-        {
-          id: "chalcolithic",
-          name: "Chalcolithic",
-          startYear: -4_500,
-          endYear: -3_300,
-          scheme: "archaeological",
-          sourceRefs: [
-            {
-              sourceId: "britannicaBronzeAge",
-              note: "The Chalcolithic or Copper Age is commonly treated as the transition into the Bronze Age in the ancient Near East.",
-            },
-          ],
-        },
-        {
-          id: "bronze-age",
-          name: "Bronze Age",
-          startYear: -3_300,
-          endYear: -1_200,
-          scheme: "archaeological",
-          sourceRefs: [
-            { sourceId: "britannicaBronzeAge" },
-            { sourceId: "britannicaMiddleEast" },
-          ],
-          children: [
-            {
-              id: "early-bronze-age",
-              name: "Early Bronze Age",
-              startYear: -3_300,
-              endYear: -2_000,
-              scheme: "archaeological",
-              sourceRefs: [{ sourceId: "britannicaBronzeAge" }],
-            },
-            {
-              id: "middle-bronze-age",
-              name: "Middle Bronze Age",
-              startYear: -2_000,
-              endYear: -1_550,
-              scheme: "archaeological",
-              sourceRefs: [{ sourceId: "britannicaBronzeAge" }],
-            },
-            {
-              id: "late-bronze-age",
-              name: "Late Bronze Age",
-              startYear: -1_550,
-              endYear: -1_200,
-              scheme: "archaeological",
-              sourceRefs: [{ sourceId: "britannicaBronzeAge" }],
-            },
-          ],
-        },
-        {
-          id: "iron-age",
-          name: "Iron Age",
-          startYear: -1_200,
-          endYear: -539,
-          scheme: "archaeological",
-          sourceRefs: [
-            {
-              sourceId: "britannicaMiddleEast",
-              note: "Used in the broad ancient Near East sense up to the end of the Neo-Babylonian period and the Achaemenid takeover.",
-            },
-          ],
-        },
-        {
-          id: "classical-antiquity",
-          name: "Classical Antiquity",
-          startYear: -539,
-          endYear: 500,
-          scheme: "world-history",
-          sourceRefs: [{ sourceId: "stearnsPeriodization" }],
-        },
-        {
-          id: "post-classical-history",
-          name: "Post-classical History",
-          startYear: 500,
-          endYear: 1500,
-          scheme: "world-history",
-          sourceRefs: [{ sourceId: "stearnsPeriodization" }],
-        },
-        {
-          id: "early-modern-period",
-          name: "Early Modern Period",
-          startYear: 1500,
-          endYear: 1800,
-          scheme: "world-history",
-          sourceRefs: [{ sourceId: "bentleyEarlyModern" }],
-        },
-        {
-          id: "age-of-industry-and-empire",
-          name: "Age of Industry & Empire",
-          startYear: 1800,
-          endYear: 1945,
-          scheme: "world-history",
-          sourceRefs: [
-            {
-              sourceId: "stearnsPeriodization",
-              note: "The app ends this world-history band at 1945 to keep contemporary history distinct and non-overlapping.",
-            },
-          ],
-        },
-        {
-          id: "contemporary-history",
-          name: "Contemporary History",
-          startYear: 1945,
-          endYear: CURRENT_YEAR,
-          scheme: "world-history",
-          sourceRefs: [{ sourceId: "brivatiContemporary" }],
-        },
-      ],
-    },
+    ...COSMIC_ERA_DEFINITIONS,
+    ...GEOLOGICAL_ERA_DEFINITIONS,
+    HUMAN_HISTORY_ERA_DEFINITION,
   ],
 });
+
+const TIMELINE_MARKERS = [
+  ...CORE_TIMELINE_MARKERS,
+  ...HISTORICAL_TURNING_POINT_MARKERS,
+  ...CLASSICAL_ANTIQUITY_MARKERS,
+  ...POST_CLASSICAL_MARKERS,
+].sort(
+  (left, right) =>
+    left.year - right.year ||
+    (right.priority ?? 0) - (left.priority ?? 0) ||
+    left.id.localeCompare(right.id),
+);
+
+const TIMELINE_OVERLAYS = [
+  ...ANCIENT_CIVILIZATION_OVERLAYS,
+  ...POST_CLASSICAL_EARLY_MODERN_OVERLAYS,
+].sort(
+  (left, right) =>
+    left.startYear - right.startYear ||
+    left.endYear - right.endYear ||
+    (right.priority ?? 0) - (left.priority ?? 0) ||
+    left.id.localeCompare(right.id),
+);
+
+export const TIMELINE_DISPLAY: TimelineDisplayConfig = {
+  markers: TIMELINE_MARKERS,
+  overlays: TIMELINE_OVERLAYS,
+};
+
+export const ROOT_TIMELINE: RootTimelineData = {
+  rootEra: ROOT_ERA,
+  display: TIMELINE_DISPLAY,
+};

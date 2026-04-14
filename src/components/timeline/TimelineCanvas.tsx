@@ -1,10 +1,20 @@
-import { useEffect, useRef, type PointerEvent, type WheelEvent } from "react";
-import { formatTimelineYear, getTimelineTicks } from "../../lib/time/bands";
-import { type Era } from "../../lib/data/eras";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent,
+  type WheelEvent,
+} from "react";
+import { formatTimelineYear } from "../../lib/time/bands";
+import {
+  type Era,
+  type TimelineMarker,
+  type TimelineOverlayBand,
+} from "../../lib/data/eras";
 import {
   getZoomAnchorForCanvasX,
   getVisibleRange,
-  getYearsPerPixel,
   TIMELINE_MAX_YEAR,
   TIMELINE_MIN_YEAR,
   panByPixels,
@@ -14,9 +24,23 @@ import {
   type TimelineViewport,
 } from "../../lib/time/viewport";
 import {
+  getEraChildOpacityTarget,
   getInteractiveDescendantEras,
-  resolveTimelineEraLayers,
+  getPreviewFocusChain,
+  resolveTimelineEraLayersFromOpacityMap,
 } from "../../lib/time/childLayers";
+import {
+  getVisibleTimelineMarkers,
+  resolveTimelineOverlayTracks,
+} from "../../lib/time/overlayTracks";
+import {
+  getVisibleMarkerPositions,
+  resolveMarkerRenderStates,
+} from "../../lib/time/markerGlyphs";
+import {
+  resolveAxisTickRenderStates,
+  type AxisTickRenderState,
+} from "../../lib/time/axisTickStates";
 
 type TimelineCanvasProps = {
   width: number;
@@ -24,8 +48,11 @@ type TimelineCanvasProps = {
   viewport: TimelineViewport;
   /** The currently drilled-into era (or root) */
   activeEra: Era;
+  activeChain: Era[];
   /** Children of the active era's parent (the "base" layer, always visible) */
   siblingEras: Era[];
+  markers: TimelineMarker[];
+  overlayBands: TimelineOverlayBand[];
   parentEra: Era | null;
   isAnimating: boolean;
   onViewportChange: (
@@ -44,35 +71,134 @@ type DragState = {
   lastX: number;
 };
 
+type TimelineCanvasLayout = {
+  breadcrumbY: number;
+  overlayTop: number;
+  overlayHeight: number;
+  overlayBottom: number;
+  axisY: number;
+  markerStemBottom: number;
+  markerLabelY: number;
+  markerDateY: number;
+  majorTickTop: number;
+  yearLabelY: number;
+  nowTop: number;
+};
+
+type AxisLabelCandidate = {
+  x: number;
+  text: string;
+  width: number;
+  alpha: number;
+  step: number;
+  pixelsPerStep: number;
+};
+
+type AnimatedAxisTickState = AxisTickRenderState & {
+  key: string;
+  targetVisibleProgress: number;
+  targetMajorProgress: number;
+  targetLabelOpacity: number;
+};
+
+type AnimatedEraChildState = {
+  current: number;
+  from: number;
+  target: number;
+  startTime: number;
+  duration: number;
+};
+
 const NOW_YEAR = new Date().getFullYear();
 const PAD = 120;
+const OVERLAY_LANE_HEIGHT = 16;
+const OVERLAY_LANE_GAP = 8;
+const OVERLAY_PANEL_GAP = 56;
+const AXIS_LABEL_OCCUPIED_PADDING = 28;
+const AXIS_LABEL_CLEARANCE_FADE_START = -14;
+const AXIS_LABEL_CLEARANCE_FADE_END = 40;
+const AXIS_TICK_ANIMATION_SMOOTHING_MS = 110;
+const ERA_CHILD_TRANSITION_DURATION_MS = 220;
+const AXIS_LABEL_SECONDARY_STEP_RATIO = 0.82;
 
-function getTickOpacity(
-  _tick: number,
-  majorStep: number,
-  zoom: number,
-): number {
-  // Fade ticks in/out near zoom thresholds
-  const ypp = getYearsPerPixel(zoom);
-  const pixelsPerStep = majorStep / ypp;
+function clamp01(value: number) {
+  return Math.min(1, Math.max(0, value));
+}
 
-  if (pixelsPerStep < 40) {
-    return Math.max(0, (pixelsPerStep - 20) / 20);
+function smoothstep01(value: number) {
+  const t = clamp01(value);
+  return t * t * (3 - 2 * t);
+}
+
+function makeAxisTickKey(tick: Pick<AxisTickRenderState, "step" | "year">) {
+  return `${tick.step}:${tick.year.toFixed(8)}`;
+}
+
+function getIntervalClearance(
+  left: number,
+  right: number,
+  bounds: { left: number; right: number },
+) {
+  if (right < bounds.left) {
+    return bounds.left - right;
   }
 
-  return 1;
+  if (left > bounds.right) {
+    return left - bounds.right;
+  }
+
+  return -Math.min(right - bounds.left, bounds.right - left);
 }
 
 function findEraAtYear(eras: Era[], year: number): Era | undefined {
   return eras.find((era) => year >= era.startYear && year <= era.endYear);
 }
 
+function getTimelineLayout(
+  height: number,
+  overlayLaneCount: number,
+): TimelineCanvasLayout {
+  const overlayHeight =
+    overlayLaneCount > 0
+      ? overlayLaneCount * OVERLAY_LANE_HEIGHT +
+        Math.max(overlayLaneCount - 1, 0) * OVERLAY_LANE_GAP
+      : 0;
+  const axisY = Math.max(
+    128 + overlayHeight,
+    Math.min(height * 0.62, height - 96),
+  );
+  const majorTickTop = axisY - 28;
+  const overlayTop =
+    overlayLaneCount > 0
+      ? Math.max(44, majorTickTop - OVERLAY_PANEL_GAP - overlayHeight)
+      : majorTickTop;
+  const overlayBottom = overlayTop + overlayHeight;
+
+  return {
+    breadcrumbY: 14,
+    overlayTop,
+    overlayHeight,
+    overlayBottom,
+    axisY,
+    markerStemBottom: axisY + 14,
+    markerLabelY: axisY + 18,
+    markerDateY: axisY + 34,
+    majorTickTop,
+    yearLabelY: axisY + 68,
+    nowTop: majorTickTop - 18,
+  };
+}
+
+
 export function TimelineCanvas({
   width,
   height,
   viewport,
   activeEra,
+  activeChain,
   siblingEras,
+  markers,
+  overlayBands,
   parentEra,
   isAnimating,
   onViewportChange,
@@ -85,20 +211,314 @@ export function TimelineCanvas({
 }: TimelineCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const dragStateRef = useRef<DragState | null>(null);
-  const resolvedEraLayers = resolveTimelineEraLayers(
-    siblingEras,
-    activeEra.id,
-    viewport,
-    width,
-    PAD,
-    isAnimating,
+  const axisTickAnimationRef = useRef<Map<string, AnimatedAxisTickState>>(new Map());
+  const axisTickAnimationLastTimeRef = useRef(0);
+  const axisTickAnimationFrameRef = useRef(0);
+  const axisTickAnimationInitializedRef = useRef(false);
+  const eraChildAnimationRef = useRef<Map<string, AnimatedEraChildState>>(new Map());
+  const eraChildAnimationFrameRef = useRef(0);
+  const eraChildAnimationInitializedRef = useRef(false);
+  const [axisTickAnimationVersion, setAxisTickAnimationVersion] = useState(0);
+  const [animatedEraChildOpacityById, setAnimatedEraChildOpacityById] = useState<
+    ReadonlyMap<string, number>
+  >(new Map());
+  const resolvedEraLayers = useMemo(
+    () =>
+      resolveTimelineEraLayersFromOpacityMap(
+        siblingEras,
+        activeEra.id,
+        viewport,
+        width,
+        PAD,
+        animatedEraChildOpacityById,
+      ),
+    [activeEra.id, animatedEraChildOpacityById, siblingEras, viewport, width],
   );
   const visibleEraLayers = resolvedEraLayers.filter(
     (layer) => layer.opacity > 0.01,
   );
   const interactiveChildEras = getInteractiveDescendantEras(resolvedEraLayers);
-  const activeChildOpacity =
-    resolvedEraLayers.find((layer) => layer.era.id === activeEra.id)?.childOpacity ?? 0;
+  const visibleMarkers = getVisibleTimelineMarkers(markers, viewport, width, PAD);
+  const resolvedOverlayBands = resolveTimelineOverlayTracks(
+    overlayBands,
+    viewport,
+    width,
+    PAD,
+  );
+  const overlayLaneCount = resolvedOverlayBands[0]?.laneCount ?? 0;
+  const previewCandidates = useMemo(
+    () =>
+      siblingEras.some((era) => era.id === activeEra.id)
+        ? (activeEra.children ?? [])
+        : siblingEras,
+    [activeEra, siblingEras],
+  );
+  const previewFocusChain = useMemo(
+    () => getPreviewFocusChain(previewCandidates, resolvedEraLayers),
+    [previewCandidates, resolvedEraLayers],
+  );
+  const breadcrumbChain = useMemo(() => {
+    const chain = [...activeChain];
+
+    for (const era of previewFocusChain) {
+      if (!chain.some((entry) => entry.id === era.id)) {
+        chain.push(era);
+      }
+    }
+
+    return chain;
+  }, [activeChain, previewFocusChain]);
+  const axisTickTargets = useMemo(() => {
+    if (width <= PAD * 2) {
+      return [] as AxisTickRenderState[];
+    }
+
+    const innerWidth = width - PAD * 2;
+    const [rangeStart, rangeEnd] = getVisibleRange(viewport, innerWidth);
+    const tickStart = Math.max(rangeStart, TIMELINE_MIN_YEAR);
+    const tickEnd = Math.min(rangeEnd, TIMELINE_MAX_YEAR);
+
+    return resolveAxisTickRenderStates(tickStart, tickEnd, innerWidth);
+  }, [viewport, width]);
+
+  useEffect(() => {
+    const animationStates = eraChildAnimationRef.current;
+    const activeIds = new Set<string>();
+    const now = performance.now();
+    const createSnapshot = () => {
+      const snapshot = new Map<string, number>();
+
+      for (const [eraId, state] of animationStates) {
+        snapshot.set(eraId, state.current);
+      }
+
+      return snapshot;
+    };
+
+    const visit = (eras: Era[]) => {
+      for (const era of eras) {
+        if (era.children?.length) {
+          activeIds.add(era.id);
+          const existing = animationStates.get(era.id);
+          const nextTarget = getEraChildOpacityTarget(
+            era,
+            activeEra.id,
+            viewport,
+            width,
+            PAD,
+            isAnimating,
+            existing?.target ?? 0,
+          );
+
+          if (existing) {
+            if (existing.target !== nextTarget) {
+              existing.from = existing.current;
+              existing.target = nextTarget;
+              existing.startTime = now;
+              existing.duration = ERA_CHILD_TRANSITION_DURATION_MS;
+            }
+          } else {
+            animationStates.set(era.id, {
+              current: eraChildAnimationInitializedRef.current ? 0 : nextTarget,
+              from: eraChildAnimationInitializedRef.current ? 0 : nextTarget,
+              target: nextTarget,
+              startTime: now,
+              duration: ERA_CHILD_TRANSITION_DURATION_MS,
+            });
+          }
+
+          visit(era.children);
+        }
+      }
+    };
+
+    visit(siblingEras);
+
+    for (const [eraId, state] of animationStates) {
+      if (!activeIds.has(eraId) && state.target !== 0) {
+        state.from = state.current;
+        state.target = 0;
+        state.startTime = now;
+        state.duration = ERA_CHILD_TRANSITION_DURATION_MS;
+      }
+    }
+
+    eraChildAnimationInitializedRef.current = true;
+    setAnimatedEraChildOpacityById(createSnapshot());
+
+    const stepAnimation = (frameTime: number) => {
+      let hasActiveAnimation = false;
+
+      for (const [eraId, state] of animationStates) {
+        const delta = state.target - state.current;
+
+        if (Math.abs(delta) <= 0.001) {
+          state.current = state.target;
+        } else {
+          const rawT = Math.min(
+            Math.max((frameTime - state.startTime) / state.duration, 0),
+            1,
+          );
+          const t = smoothstep01(rawT);
+
+          state.current = state.from + (state.target - state.from) * t;
+
+          if (rawT < 1) {
+            hasActiveAnimation = true;
+          } else {
+            state.current = state.target;
+          }
+        }
+
+        if (
+          !activeIds.has(eraId) &&
+          state.target <= 0.001 &&
+          state.current <= 0.001
+        ) {
+          animationStates.delete(eraId);
+        }
+      }
+
+      setAnimatedEraChildOpacityById(createSnapshot());
+
+      if (hasActiveAnimation) {
+        eraChildAnimationFrameRef.current = requestAnimationFrame(stepAnimation);
+      } else {
+        eraChildAnimationFrameRef.current = 0;
+      }
+    };
+
+    if (eraChildAnimationFrameRef.current) {
+      cancelAnimationFrame(eraChildAnimationFrameRef.current);
+    }
+
+    eraChildAnimationFrameRef.current = requestAnimationFrame(stepAnimation);
+
+    return () => {
+      if (eraChildAnimationFrameRef.current) {
+        cancelAnimationFrame(eraChildAnimationFrameRef.current);
+        eraChildAnimationFrameRef.current = 0;
+      }
+    };
+  }, [activeEra.id, isAnimating, siblingEras, viewport, width]);
+
+  useEffect(() => {
+    const animationStates = axisTickAnimationRef.current;
+    const activeKeys = new Set<string>();
+
+    for (const target of axisTickTargets) {
+      const key = makeAxisTickKey(target);
+      activeKeys.add(key);
+      const existing = animationStates.get(key);
+
+      if (existing) {
+        existing.year = target.year;
+        existing.step = target.step;
+        existing.pixelsPerStep = target.pixelsPerStep;
+        existing.growthProgress = target.growthProgress;
+        existing.labelStep = target.labelStep;
+        existing.targetVisibleProgress = target.visibleProgress;
+        existing.targetMajorProgress = target.majorProgress;
+        existing.targetLabelOpacity = target.labelOpacity;
+        continue;
+      }
+
+      const useImmediateValues = !axisTickAnimationInitializedRef.current;
+
+      animationStates.set(key, {
+        ...target,
+        key,
+        visibleProgress: useImmediateValues ? target.visibleProgress : 0,
+        majorProgress: useImmediateValues ? target.majorProgress : 0,
+        labelOpacity: useImmediateValues ? target.labelOpacity : 0,
+        targetVisibleProgress: target.visibleProgress,
+        targetMajorProgress: target.majorProgress,
+        targetLabelOpacity: target.labelOpacity,
+      });
+    }
+
+    for (const [key, state] of animationStates) {
+      if (!activeKeys.has(key)) {
+        state.targetVisibleProgress = 0;
+        state.targetMajorProgress = 0;
+        state.targetLabelOpacity = 0;
+      }
+    }
+
+    axisTickAnimationInitializedRef.current = true;
+
+    const stepAnimation = (now: number) => {
+      const lastTime = axisTickAnimationLastTimeRef.current || now;
+      const dt = Math.max(now - lastTime, 0);
+      axisTickAnimationLastTimeRef.current = now;
+      const factor = 1 - Math.exp(-dt / AXIS_TICK_ANIMATION_SMOOTHING_MS);
+      let hasActiveAnimation = false;
+
+      for (const [key, state] of animationStates) {
+        state.visibleProgress +=
+          (state.targetVisibleProgress - state.visibleProgress) * factor;
+        state.majorProgress +=
+          (state.targetMajorProgress - state.majorProgress) * factor;
+        state.labelOpacity +=
+          (state.targetLabelOpacity - state.labelOpacity) * factor;
+
+        const settledVisible =
+          Math.abs(state.targetVisibleProgress - state.visibleProgress) < 0.002;
+        const settledMajor =
+          Math.abs(state.targetMajorProgress - state.majorProgress) < 0.002;
+        const settledLabel =
+          Math.abs(state.targetLabelOpacity - state.labelOpacity) < 0.002;
+
+        if (!settledVisible || !settledMajor || !settledLabel) {
+          hasActiveAnimation = true;
+        }
+
+        if (
+          state.targetVisibleProgress <= 0.001 &&
+          state.targetMajorProgress <= 0.001 &&
+          state.targetLabelOpacity <= 0.001 &&
+          state.visibleProgress <= 0.003 &&
+          state.majorProgress <= 0.003 &&
+          state.labelOpacity <= 0.003
+        ) {
+          animationStates.delete(key);
+        }
+      }
+
+      setAxisTickAnimationVersion((version) => version + 1);
+
+      if (hasActiveAnimation) {
+        axisTickAnimationFrameRef.current = requestAnimationFrame(stepAnimation);
+      } else {
+        axisTickAnimationFrameRef.current = 0;
+      }
+    };
+
+    if (axisTickAnimationFrameRef.current) {
+      cancelAnimationFrame(axisTickAnimationFrameRef.current);
+    }
+
+    axisTickAnimationLastTimeRef.current = performance.now();
+    axisTickAnimationFrameRef.current = requestAnimationFrame(stepAnimation);
+
+    return () => {
+      if (axisTickAnimationFrameRef.current) {
+        cancelAnimationFrame(axisTickAnimationFrameRef.current);
+        axisTickAnimationFrameRef.current = 0;
+      }
+    };
+  }, [axisTickTargets]);
+
+  useEffect(() => {
+    return () => {
+      if (eraChildAnimationFrameRef.current) {
+        cancelAnimationFrame(eraChildAnimationFrameRef.current);
+      }
+      if (axisTickAnimationFrameRef.current) {
+        cancelAnimationFrame(axisTickAnimationFrameRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -129,16 +549,16 @@ export function TimelineCanvas({
     const labelColor = styles.getPropertyValue("--timeline-label").trim();
     const pad = PAD;
     const innerWidth = width - pad * 2;
-    const axisY = height / 2;
-
-    const [rangeStart, rangeEnd] = getVisibleRange(viewport, innerWidth);
-    const tickStart = Math.max(rangeStart, TIMELINE_MIN_YEAR);
-    const tickEnd = Math.min(rangeEnd, TIMELINE_MAX_YEAR);
-    const { major, minor, majorStep } = getTimelineTicks(
-      tickStart,
-      tickEnd,
-      innerWidth,
+    const layout = getTimelineLayout(height, overlayLaneCount);
+    const axisY = layout.axisY;
+    const breadcrumbChainIds = new Set(
+      breadcrumbChain.slice(1).map((era) => era.id),
     );
+    const resolvedAxisTickStates = [...axisTickAnimationRef.current.values()]
+      .filter(
+        (tick) => tick.visibleProgress > 0.01 || tick.labelOpacity > 0.01,
+      )
+      .sort((left, right) => left.step - right.step || left.year - right.year);
 
     // Helper: map world year to canvas x (offset into padded region)
     const toX = (year: number) =>
@@ -180,14 +600,20 @@ export function TimelineCanvas({
       );
       context.restore();
 
-      if (eraWidth > 60) {
+      const shouldHideInlineLabel =
+        breadcrumbChainIds.has(era.id);
+
+      if (eraWidth > 60 && !shouldHideInlineLabel) {
+        const labelX = Math.max(x0, pad) / 2 + Math.min(x1, width - pad) / 2;
+        const labelAlpha =
+          Math.min((eraWidth - 60) / 120, 1) * (0.28 + Math.min(opacity, 1) * 0.22);
+
         context.save();
-        context.globalAlpha = Math.min((eraWidth - 60) / 80, 0.35) * opacity;
+        context.globalAlpha = labelAlpha;
         context.font = "11px var(--font-sans)";
         context.fillStyle = labelColor;
         context.textAlign = "center";
         context.textBaseline = "bottom";
-        const labelX = Math.max(x0, pad) / 2 + Math.min(x1, width - pad) / 2;
         context.fillText(era.name, labelX, axisY - 44);
         context.restore();
       }
@@ -198,24 +624,95 @@ export function TimelineCanvas({
       renderEra(layer.era, layer.opacity);
     }
 
-    // Era label (top center) — always shows active era name; adds breadcrumb when drilled in
-    {
-      context.save();
-      context.font = "13px var(--font-sans)";
-      context.fillStyle = labelColor;
-      context.textAlign = "center";
-      context.textBaseline = "top";
-      if (parentEra && activeChildOpacity > 0.1) {
-        context.globalAlpha = 0.25 * activeChildOpacity;
-        context.fillText(
-          parentEra.name + " › " + activeEra.name,
-          width / 2,
-          16,
-        );
-      } else {
-        context.globalAlpha = 0.25;
-        context.fillText(activeEra.name, width / 2, 16);
+    if (resolvedOverlayBands.length > 0) {
+      for (const overlay of resolvedOverlayBands) {
+        const progress = overlay.visibilityProgress * overlay.renderOpacity;
+
+        if (progress <= 0.01) {
+          continue;
+        }
+
+        const bandWidth = overlay.renderWidth;
+        const y =
+          layout.overlayTop +
+          overlay.laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP);
+
+        context.save();
+        context.globalAlpha = 0.92 * progress;
+        context.fillStyle = overlay.band.color;
+        context.fillRect(overlay.renderX, y, bandWidth, OVERLAY_LANE_HEIGHT);
+        context.strokeStyle = lineSoft;
+        context.lineWidth = 1;
+        context.strokeRect(overlay.renderX, y, bandWidth, OVERLAY_LANE_HEIGHT);
+
+        const fullLabel = overlay.band.label;
+        const shortLabel = overlay.band.shortLabel ?? fullLabel;
+        context.font = "11px var(--font-sans)";
+        const fullLabelWidth = context.measureText(fullLabel).width;
+        const shortLabelWidth = context.measureText(shortLabel).width;
+        const chosenLabel =
+          fullLabelWidth <= Math.max(bandWidth - 10, 0)
+            ? fullLabel
+            : shortLabelWidth <= Math.max(bandWidth - 10, 0)
+              ? shortLabel
+              : "";
+        const chosenLabelWidth =
+          chosenLabel === fullLabel
+            ? fullLabelWidth
+            : chosenLabel === shortLabel
+              ? shortLabelWidth
+              : 0;
+        const labelOpacity =
+          chosenLabelWidth > 0
+            ? clamp01((bandWidth - (chosenLabelWidth + 8)) / 20)
+            : 0;
+
+        if (chosenLabel && labelOpacity > 0.01) {
+          context.fillStyle = labelColor;
+          context.globalAlpha = 0.82 * progress * labelOpacity;
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillText(
+            chosenLabel,
+            overlay.renderX + bandWidth / 2,
+            y + OVERLAY_LANE_HEIGHT / 2,
+          );
+        }
+
+        context.restore();
       }
+    }
+
+    // Timeline breadcrumb (centered)
+    {
+      const rootLabel = breadcrumbChain[0]?.name ?? activeEra.name;
+      const trailLabel = breadcrumbChain
+        .slice(1)
+        .map((era) => era.name)
+        .join(" • ");
+      const trailText = trailLabel ? ` • ${trailLabel}` : "";
+
+      const breadcrumbFont =
+        breadcrumbChain.length > 1
+          ? "600 14px var(--font-sans)"
+          : "500 13px var(--font-sans)";
+      context.save();
+      context.font = breadcrumbFont;
+      context.fillStyle = labelColor;
+      context.textAlign = "left";
+      context.textBaseline = "top";
+      const rootWidth = context.measureText(rootLabel).width;
+      const trailWidth = trailText ? context.measureText(trailText).width : 0;
+      const startX = width / 2 - (rootWidth + trailWidth) / 2;
+
+      context.globalAlpha = breadcrumbChain.length > 1 ? 0.9 : 0.76;
+      context.fillText(rootLabel, startX, layout.breadcrumbY);
+
+      if (trailText) {
+        context.globalAlpha = 0.8;
+        context.fillText(trailText, startX + rootWidth, layout.breadcrumbY);
+      }
+
       context.restore();
     }
 
@@ -226,34 +723,6 @@ export function TimelineCanvas({
     context.moveTo(pad, axisY);
     context.lineTo(width - pad, axisY);
     context.stroke();
-
-    // Minor ticks with fade
-    const minorOpacity = getTickOpacity(0, majorStep / 5, viewport.zoom);
-
-    if (minorOpacity > 0.01) {
-      context.save();
-      context.strokeStyle = lineSoft;
-      context.lineWidth = 1;
-
-      for (const tick of minor) {
-        const x = toX(tick);
-        if (x < pad - 16 || x > width - pad + 16) continue;
-        const edgeFade = Math.min(
-          Math.max(0, (x - pad) / 40),
-          Math.max(0, (width - pad - x) / 40),
-          1,
-        );
-        context.globalAlpha = minorOpacity * edgeFade;
-        if (edgeFade > 0.01) {
-          context.beginPath();
-          context.moveTo(x, axisY - 10);
-          context.lineTo(x, axisY + 10);
-          context.stroke();
-        }
-      }
-
-      context.restore();
-    }
 
     // Edge ticks — always fixed at the padded edges, with labels showing the
     // actual visible years at those positions, clamped to the timeline bounds.
@@ -266,29 +735,18 @@ export function TimelineCanvas({
       TIMELINE_MIN_YEAR,
       Math.min(TIMELINE_MAX_YEAR, fromX(width - pad)),
     );
-    const edgeLeftCutoff = edgeLeftYear + majorStep * 0.5;
-    const edgeRightCutoff = edgeRightYear - majorStep * 0.5;
-
-    // Major ticks with fade
-    const majorOpacity = getTickOpacity(0, majorStep, viewport.zoom);
     const edgeLeftX = pad;
     const edgeRightX = width - pad;
 
-    if (majorOpacity > 0.01) {
+    if (resolvedAxisTickStates.length > 0) {
       context.save();
-      context.strokeStyle = line;
+      context.lineWidth = 1;
+      const majorExtraAbove = axisY - 10 - layout.majorTickTop;
+      const majorExtraBelow = axisY + 28 - (axisY + 10);
 
-      for (const tick of major) {
-        const x = toX(tick);
+      for (const tick of resolvedAxisTickStates) {
+        const x = toX(tick.year);
         if (x < pad - 32 || x > width - pad + 32) continue;
-        if (tick <= edgeLeftCutoff || tick >= edgeRightCutoff) continue;
-
-        // Fade ticks near edge boundary ticks to avoid doubling
-        const distToMin = Math.abs(x - edgeLeftX);
-        const distToMax = Math.abs(x - edgeRightX);
-        const distToBound = Math.min(distToMin, distToMax);
-        const boundFade =
-          distToBound < 40 ? Math.max(0, (distToBound - 4) / 36) : 1;
 
         // Fade at viewport edges
         const edgeFade = Math.min(
@@ -297,11 +755,42 @@ export function TimelineCanvas({
           1,
         );
 
-        context.globalAlpha = majorOpacity * boundFade * edgeFade;
-        if (boundFade * edgeFade > 0.01) {
+        if (edgeFade <= 0.01) {
+          continue;
+        }
+
+        const distToMin = Math.abs(x - edgeLeftX);
+        const distToMax = Math.abs(x - edgeRightX);
+        const distToBound = Math.min(distToMin, distToMax);
+        const boundaryFade =
+          distToBound < 40 ? Math.max(0, (distToBound - 4) / 36) : 1;
+
+        const baseFade =
+          edgeFade *
+          (1 - tick.majorProgress + tick.majorProgress * boundaryFade);
+        const overlayFade = edgeFade * boundaryFade;
+        const minorExtent = 10 * tick.visibleProgress;
+        const top =
+          axisY - minorExtent - majorExtraAbove * tick.majorProgress;
+        const bottom =
+          axisY + minorExtent + majorExtraBelow * tick.majorProgress;
+
+        if (baseFade > 0.01) {
+          context.strokeStyle = lineSoft;
+          context.globalAlpha =
+            (0.18 + tick.visibleProgress * 0.36) * baseFade;
           context.beginPath();
-          context.moveTo(x, axisY - 28);
-          context.lineTo(x, axisY + 28);
+          context.moveTo(x, top);
+          context.lineTo(x, bottom);
+          context.stroke();
+        }
+
+        if (tick.majorProgress > 0.01 && overlayFade > 0.01) {
+          context.strokeStyle = line;
+          context.globalAlpha = 0.88 * tick.majorProgress * overlayFade;
+          context.beginPath();
+          context.moveTo(x, top);
+          context.lineTo(x, bottom);
           context.stroke();
         }
       }
@@ -321,7 +810,7 @@ export function TimelineCanvas({
       context.strokeStyle = line;
       context.lineWidth = 1.5;
       context.beginPath();
-      context.moveTo(x, axisY - 28);
+      context.moveTo(x, layout.majorTickTop);
       context.lineTo(x, axisY + 28);
       context.stroke();
 
@@ -330,7 +819,86 @@ export function TimelineCanvas({
       context.font = "11px var(--font-sans)";
       context.textAlign = align;
       context.textBaseline = "top";
-      context.fillText(edgeLabel, x, axisY + 38);
+      context.fillText(edgeLabel, x, layout.yearLabelY);
+      context.restore();
+    }
+
+    const visibleMarkerPositions = getVisibleMarkerPositions(
+      visibleMarkers,
+      width,
+      pad,
+      toX,
+    );
+    const resolvedMarkerStates = resolveMarkerRenderStates(
+      visibleMarkerPositions,
+      width,
+      pad,
+      (_marker, { fullLabel, shortLabel, dateLabel }) => {
+        context.font = "12px var(--font-sans)";
+        const fullLabelWidth = context.measureText(fullLabel).width;
+        const shortLabelWidth =
+          shortLabel === fullLabel
+            ? fullLabelWidth
+            : context.measureText(shortLabel).width;
+        context.font = "10px var(--font-sans)";
+
+        return {
+          fullLabelWidth,
+          shortLabelWidth,
+          dateLabelWidth: context.measureText(dateLabel).width,
+        };
+      },
+    );
+
+    for (const { marker, x, dotProgress, stemProgress } of resolvedMarkerStates) {
+      const markerColor = marker.color ?? line;
+      const stemStartY = axisY + 2;
+      const stemY =
+        stemStartY +
+        (layout.markerStemBottom - stemStartY) * stemProgress;
+
+      context.save();
+      context.strokeStyle = markerColor;
+      context.fillStyle = markerColor;
+      context.globalAlpha = 0.18 + stemProgress * 0.72;
+      context.lineWidth = 1.5;
+
+      if (stemProgress > 0.001) {
+        context.beginPath();
+        context.moveTo(x, stemStartY);
+        context.lineTo(x, stemY);
+        context.stroke();
+      }
+
+      const dotRadius = 3.5 * dotProgress;
+
+      if (dotRadius > 0.001) {
+        context.globalAlpha = 0.14 + dotProgress * 0.76;
+        context.beginPath();
+        context.arc(x, axisY, dotRadius, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      context.restore();
+    }
+
+    for (const { x, label, dateLabel, labelOpacity } of resolvedMarkerStates) {
+      if (labelOpacity <= 0.01) {
+        continue;
+      }
+
+      context.save();
+      context.font = "12px var(--font-sans)";
+      context.fillStyle = labelColor;
+      context.globalAlpha = 0.78 * labelOpacity;
+      context.textAlign = "center";
+      context.textBaseline = "top";
+      context.fillText(label, x, layout.markerLabelY);
+
+      context.font = "10px var(--font-sans)";
+      context.globalAlpha = 0.62 * labelOpacity;
+      context.textBaseline = "top";
+      context.fillText(dateLabel, x, layout.markerDateY);
       context.restore();
     }
 
@@ -344,7 +912,7 @@ export function TimelineCanvas({
       context.lineWidth = 2;
       context.setLineDash([4, 4]);
       context.beginPath();
-      context.moveTo(nowX, axisY - 40);
+      context.moveTo(nowX, layout.nowTop);
       context.lineTo(nowX, axisY + 40);
       context.stroke();
       context.setLineDash([]);
@@ -353,7 +921,7 @@ export function TimelineCanvas({
       context.font = "10px var(--font-sans)";
       context.textAlign = "center";
       context.textBaseline = "bottom";
-      context.fillText("now", nowX, axisY - 44);
+      context.fillText("now", nowX, layout.nowTop - 4);
       context.restore();
     }
 
@@ -365,18 +933,18 @@ export function TimelineCanvas({
     context.textAlign = "center";
     context.textBaseline = "top";
 
-    let lastLabelRight = -Infinity;
+    const axisLabelCandidates: AxisLabelCandidate[] = [];
 
-    for (const tick of major) {
-      const x = toX(tick);
+    for (const tick of resolvedAxisTickStates) {
+      if (tick.labelOpacity <= 0.01) {
+        continue;
+      }
+
+      const x = toX(tick.year);
       if (x < pad - 80 || x > width - pad + 80) continue;
-      if (tick <= edgeLeftCutoff || tick >= edgeRightCutoff) continue;
 
-      const labelText = formatTimelineYear(tick, majorStep);
+      const labelText = formatTimelineYear(tick.year, tick.labelStep);
       const labelWidth = context.measureText(labelText).width;
-      const labelLeft = x - labelWidth / 2;
-
-      if (labelLeft <= lastLabelRight + 48) continue;
 
       // Fade out labels near edge boundary labels
       const distToMin = Math.abs(x - edgeLabelLeftX);
@@ -392,23 +960,145 @@ export function TimelineCanvas({
         1,
       );
 
-      const labelAlpha = majorOpacity * boundaryFade * labelEdgeFade;
-      context.save();
-      context.globalAlpha = labelAlpha;
+      const labelAlpha = tick.labelOpacity * boundaryFade * labelEdgeFade;
+
       if (labelAlpha > 0.01) {
-        context.fillText(labelText, x, axisY + 38);
+        axisLabelCandidates.push({
+          x,
+          text: labelText,
+          width: labelWidth,
+          alpha: labelAlpha,
+          step: tick.labelStep,
+          pixelsPerStep: tick.pixelsPerStep,
+        });
       }
+    }
+
+    const labelStepScores = new Map<number, number>();
+
+    for (const candidate of axisLabelCandidates) {
+      labelStepScores.set(
+        candidate.step,
+        (labelStepScores.get(candidate.step) ?? 0) + candidate.alpha,
+      );
+    }
+
+    const sortedLabelSteps = [...labelStepScores.entries()].sort(
+      (left, right) => right[1] - left[1] || right[0] - left[0],
+    );
+    const primaryLabelStep = sortedLabelSteps[0];
+    const allowedLabelSteps = new Set<number>();
+
+    if (primaryLabelStep) {
+      allowedLabelSteps.add(primaryLabelStep[0]);
+
+      for (const [step, score] of sortedLabelSteps.slice(1)) {
+        const ratio = score / primaryLabelStep[1];
+        const isAdjacentScale =
+          Math.abs(Math.log(step / primaryLabelStep[0])) <= Math.log(3);
+
+        if (
+          ratio >= AXIS_LABEL_SECONDARY_STEP_RATIO &&
+          isAdjacentScale &&
+          allowedLabelSteps.size < 2
+        ) {
+          allowedLabelSteps.add(step);
+        }
+      }
+    }
+
+    const occupiedLabelBounds: Array<{ left: number; right: number }> = [];
+    const resolvedAxisLabels: AxisLabelCandidate[] = [];
+
+    const edgeLabelEntries = [
+      {
+        x: pad,
+        text: formatTimelineYear(edgeLeftYear, 1),
+        align: "left" as const,
+      },
+      {
+        x: width - pad,
+        text: formatTimelineYear(edgeRightYear, 1),
+        align: "right" as const,
+      },
+    ];
+
+    for (const edgeLabel of edgeLabelEntries) {
+      const labelWidth = context.measureText(edgeLabel.text).width;
+      const left =
+        edgeLabel.align === "left"
+          ? edgeLabel.x - AXIS_LABEL_OCCUPIED_PADDING
+          : edgeLabel.x - labelWidth - AXIS_LABEL_OCCUPIED_PADDING;
+      const right =
+        edgeLabel.align === "left"
+          ? edgeLabel.x + labelWidth + AXIS_LABEL_OCCUPIED_PADDING
+          : edgeLabel.x + AXIS_LABEL_OCCUPIED_PADDING;
+
+      occupiedLabelBounds.push({ left, right });
+    }
+
+    for (const candidate of [...axisLabelCandidates]
+      .filter((candidate) =>
+        allowedLabelSteps.size === 0 || allowedLabelSteps.has(candidate.step),
+      )
+      .sort((left, right) => {
+        return (
+          right.alpha - left.alpha ||
+          right.step - left.step ||
+          left.x - right.x
+        );
+      })) {
+      const dynamicPadding = Math.max(
+        AXIS_LABEL_OCCUPIED_PADDING,
+        Math.min(72, candidate.pixelsPerStep * 0.18),
+      );
+      const left = candidate.x - candidate.width / 2 - dynamicPadding;
+      const right = candidate.x + candidate.width / 2 + dynamicPadding;
+      const nearestClearance = occupiedLabelBounds.reduce(
+        (closest, bounds) =>
+          Math.min(closest, getIntervalClearance(left, right, bounds)),
+        Number.POSITIVE_INFINITY,
+      );
+      const spacingOpacity =
+        nearestClearance === Number.POSITIVE_INFINITY
+          ? 1
+          : clamp01(
+              (nearestClearance - AXIS_LABEL_CLEARANCE_FADE_START) /
+                (AXIS_LABEL_CLEARANCE_FADE_END - AXIS_LABEL_CLEARANCE_FADE_START),
+            );
+      const resolvedAlpha = candidate.alpha * spacingOpacity;
+
+      if (resolvedAlpha <= 0.01) {
+        continue;
+      }
+
+      occupiedLabelBounds.push({ left, right });
+      resolvedAxisLabels.push({
+        ...candidate,
+        alpha: resolvedAlpha,
+      });
+    }
+
+    for (const label of resolvedAxisLabels.sort((left, right) => left.x - right.x)) {
+      context.save();
+      context.globalAlpha = label.alpha;
+      context.fillText(label.text, label.x, layout.yearLabelY);
       context.restore();
-      lastLabelRight = labelLeft + labelWidth;
     }
   }, [
     activeEra,
-    activeChildOpacity,
+    activeChain,
+    breadcrumbChain,
     height,
+    overlayLaneCount,
     parentEra,
+    previewFocusChain,
+    resolvedOverlayBands,
+    visibleMarkers,
     visibleEraLayers,
     viewport,
     width,
+    axisTickAnimationVersion,
   ]);
 
   // Pinch-to-zoom via native gesture events (Safari) and touch events

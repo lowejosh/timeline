@@ -46,6 +46,15 @@ export const ERA_SOURCES = {
     notes:
       "Used for the solar system's formation about 4.6 billion years ago.",
   },
+  usgsAgeOfEarth: {
+    shortTitle: "USGS: Age of Earth",
+    title: "How old is Earth?",
+    organization: "U.S. Geological Survey",
+    citation: "U.S. Geological Survey, \"How old is Earth?\" FAQ.",
+    url: "https://www.usgs.gov/faqs/how-old-earth",
+    notes:
+      "Used for the Earth's formation at about 4.54 billion years ago.",
+  },
   icsChart2024: {
     shortTitle: "ICS Chart v2024/12",
     title: "International Chronostratigraphic Chart v2024/12",
@@ -85,6 +94,51 @@ export const ERA_SOURCES = {
     notes:
       "Used for Near Eastern Neolithic examples such as Pre-Pottery Neolithic B at Jericho.",
   },
+  berkeleyOriginOfLife: {
+    shortTitle: "Berkeley: origin of life",
+    title: "When did life originate?",
+    organization: "Understanding Evolution / UC Museum of Paleontology",
+    citation: 'Understanding Evolution, "When did life originate?" University of California Museum of Paleontology.',
+    url: "https://evolution.berkeley.edu/from-soup-to-cells-the-origin-of-life/when-did-life-originate/",
+    notes:
+      "Used for the cautious estimate that evidence suggests life first evolved around 3.5 billion years ago, based on microfossils and stromatolites.",
+  },
+  britannicaOriginAgriculture: {
+    shortTitle: "Britannica: origins of agriculture",
+    title: "origins of agriculture",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "origins of agriculture."',
+    url: "https://www.britannica.com/topic/agriculture/The-origin-of-agriculture",
+    notes:
+      "Used for the broad estimate that agriculture emerged independently in multiple regions, with early agriculture beginning roughly 15,000–10,000 years before present.",
+  },
+  unescoGobekliTepe: {
+    shortTitle: "UNESCO: Göbekli Tepe",
+    title: "Göbekli Tepe",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Göbekli Tepe."',
+    url: "https://whc.unesco.org/en/list/1572/",
+    notes:
+      "Used for Göbekli Tepe's Pre-Pottery Neolithic monumental structures, dated between 9600 and 8200 BCE.",
+  },
+  unescoCatalhoyuk: {
+    shortTitle: "UNESCO: Çatalhöyük",
+    title: "Neolithic Site of Çatalhöyük",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Neolithic Site of Çatalhöyük."',
+    url: "https://whc.unesco.org/en/list/1405/",
+    notes:
+      "Used for Çatalhöyük's eastern mound occupation between 7400 and 6200 BCE as evidence of early settled agricultural life.",
+  },
+  unescoStonehenge: {
+    shortTitle: "UNESCO: Stonehenge",
+    title: "Stonehenge, Avebury and Associated Sites",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Stonehenge, Avebury and Associated Sites."',
+    url: "https://whc.unesco.org/en/list/373/",
+    notes:
+      "Used for the broader Stonehenge and Avebury ceremonial landscape spanning about 3700 to 1600 BCE, with Stonehenge itself commonly anchored to the late Neolithic around 3000 BCE.",
+  },
   britannicaBronzeAge: {
     shortTitle: "Britannica: Bronze Age",
     title: "Bronze Age",
@@ -111,6 +165,322 @@ export const ERA_SOURCES = {
     url: "https://www.britannica.com/place/Mesopotamia-historical-region-Asia",
     notes:
       "Used for the late 4th-millennium BCE emergence of writing and early urban civilization in Mesopotamia.",
+  },
+  britannicaAncientEgypt: {
+    shortTitle: "Britannica: Ancient Egypt",
+    title: "ancient Egypt",
+    organization: "Encyclopaedia Britannica",
+    citation: "Encyclopaedia Britannica, \"ancient Egypt.\"",
+    url: "https://www.britannica.com/place/ancient-Egypt",
+    notes:
+      "Used for the broad span of ancient Egyptian civilization from dynastic unification to Roman annexation.",
+  },
+  britannicaIndusCivilization: {
+    shortTitle: "Britannica: Indus civilization",
+    title: "Indus civilization",
+    organization: "Encyclopaedia Britannica",
+    citation: "Encyclopaedia Britannica, \"Indus civilization.\"",
+    url: "https://www.britannica.com/topic/Indus-civilization",
+    notes:
+      "Used for the broad Harappan / Indus Valley civilization timeframe in South Asia.",
+  },
+  historyPersianEmpire: {
+    shortTitle: "History: Persian Empire",
+    title: "Persian Empire",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Persian Empire."',
+    url: "https://www.history.com/topics/ancient-middle-east/persian-empire",
+    notes:
+      "Used for the broad Achaemenid Persian Empire span from Cyrus the Great's rise in 550 BCE to Alexander's conquest in 330 BCE.",
+  },
+  britannicaAncientGreece: {
+    shortTitle: "Britannica: ancient Greece",
+    title: "ancient Greek civilization",
+    organization: "Encyclopaedia Britannica",
+    citation:
+      'Encyclopaedia Britannica, "ancient Greek civilization."',
+    url: "https://www.britannica.com/place/ancient-Greece",
+    notes:
+      "Used for the broad ancient Greek civilization span from about 1200 BCE to the death of Alexander in 323 BCE.",
+  },
+  britannicaHellenisticAge: {
+    shortTitle: "Britannica: Hellenistic age",
+    title: "Hellenistic age",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Hellenistic age."',
+    url: "https://www.britannica.com/event/Hellenistic-Age",
+    notes:
+      "Used for the Hellenistic period between Alexander's death in 323 BCE and the Roman conquest of Ptolemaic Egypt in 30 BCE.",
+  },
+  historyAncientRome: {
+    shortTitle: "History: Ancient Rome",
+    title: "Ancient Rome",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Ancient Rome."',
+    url: "https://www.history.com/articles/ancient-rome",
+    notes:
+      "Used for broad Roman political periodization, including the Republic's beginning in 509 BCE, Augustus' accession in 27 BCE, and the western empire's fall in 476 CE.",
+  },
+  khanRomanRepublic: {
+    shortTitle: "Khan: Roman Republic",
+    title: "The Roman Republic",
+    organization: "Khan Academy",
+    citation: 'Khan Academy, "The Roman Republic."',
+    url: "https://www.khanacademy.org/humanities/world-history/ancient-medieval/roman/a/roman-republic",
+    notes:
+      "Used for the conventional 509 BCE start of the Roman Republic and broad republican political framing.",
+  },
+  khanRomanEmpire: {
+    shortTitle: "Khan: Roman Empire",
+    title: "The Roman Empire",
+    organization: "Khan Academy",
+    citation: 'Khan Academy, "The Roman Empire."',
+    url: "https://www.khanacademy.org/humanities/world-history/ancient-medieval/roman/a/roman-empire",
+    notes:
+      "Used for the Roman Empire's conventional start in 27 BCE under Augustus.",
+  },
+  britannicaHanDynasty: {
+    shortTitle: "Britannica: Han dynasty",
+    title: "Han dynasty",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Han dynasty."',
+    url: "https://www.britannica.com/topic/Han-dynasty",
+    notes:
+      "Used for the Han dynasty's standard 206 BCE to 220 CE span in Chinese history surveys.",
+  },
+  britannicaMongolEmpire: {
+    shortTitle: "Britannica: Mongol empire",
+    title: "Mongol empire",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Mongol empire."',
+    url: "https://www.britannica.com/topic/Mongol-empire",
+    notes:
+      "Used for the broad Mongol Empire span of 1206–1368, from Temujin's election as Genghis Khan to the fall of Yuan rule in China under the Ming.",
+  },
+  historyBlackDeath: {
+    shortTitle: "History: Black Death",
+    title: "Black Death",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Black Death."',
+    url: "https://www.history.com/articles/black-death",
+    notes:
+      "Used for the Black Death's arrival in Europe in 1347 as a clean turning-point marker for the mid-14th-century pandemic.",
+  },
+  historyAlexanderGreat: {
+    shortTitle: "History: Alexander the Great",
+    title: "Alexander the Great",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Alexander the Great."',
+    url: "https://www.history.com/articles/alexander-the-great",
+    notes:
+      "Used for Alexander's death in 323 BCE and for the public-history framing that his death opened the Hellenistic period.",
+  },
+  historyByzantineEmpire: {
+    shortTitle: "History: Byzantine Empire",
+    title: "Byzantine Empire",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Byzantine Empire."',
+    url: "https://www.history.com/articles/byzantine-empire",
+    notes:
+      "Used for the fall of Constantinople in 1453, marking the end of the Byzantine Empire.",
+  },
+  historyIslam: {
+    shortTitle: "History: Islam",
+    title: "Islam",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Islam."',
+    url: "https://www.history.com/articles/islam",
+    notes:
+      "Used for Muhammad's revelations beginning in 610, the Hijra in 622, and the public-history framing of Islam's early expansion.",
+  },
+  historyCharlemagne: {
+    shortTitle: "History: Charlemagne",
+    title: "Charlemagne",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Charlemagne."',
+    url: "https://www.history.com/articles/charlemagne",
+    notes:
+      "Used for Charlemagne's reign and especially for his imperial coronation on December 25, 800.",
+  },
+  historyCrusades: {
+    shortTitle: "History: Crusades",
+    title: "Crusades",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Crusades."',
+    url: "https://www.history.com/articles/crusades",
+    notes:
+      "Used for Pope Urban II's 1095 call at Clermont as the conventional beginning of the Crusades in public-history surveys.",
+  },
+  historyGenghisKhan: {
+    shortTitle: "History: Genghis Khan",
+    title: "Genghis Khan",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Genghis Khan."',
+    url: "https://www.history.com/articles/genghis-khan",
+    notes:
+      "Used for Temujin's proclamation as Chinggis Khan in 1206 and the Mongol Empire's early expansion.",
+  },
+  metByzantium: {
+    shortTitle: "Met: Byzantium",
+    title: "Byzantium (ca. 330–1453)",
+    organization: "The Metropolitan Museum of Art",
+    citation: 'The Metropolitan Museum of Art, "Byzantium (ca. 330–1453)."',
+    url: "https://www.metmuseum.org/toah/hd/byza/hd_byza.htm",
+    notes:
+      "Used for the conventional Byzantine span from Constantinople's refounding in 330 CE to the Ottoman conquest in 1453.",
+  },
+  khanGoldenAgeOfIslam: {
+    shortTitle: "Khan: Golden age of Islam",
+    title: "The golden age of Islam",
+    organization: "Khan Academy",
+    citation: 'Khan Academy, "The golden age of Islam."',
+    url: "https://www.khanacademy.org/humanities/world-history/medieval-times/islam-medieval/a/the-golden-age-of-islam",
+    notes:
+      "Used for Abbasid-era Baghdad and Khan Academy's 750–1258 Abbasid political framing in its medieval Islam material.",
+  },
+  khanSongChina: {
+    shortTitle: "Khan: Song China",
+    title: "Prosperity in Song China (960-1279)",
+    organization: "Khan Academy",
+    citation: 'Khan Academy, "Prosperity in Song China (960-1279)."',
+    url: "https://www.khanacademy.org/humanities/world-history/medieval-times/song-china/v/prosperity-in-song-china-960-1279",
+    notes:
+      "Used for the standard Song dynasty span of 960–1279 and for concise context on Song-era prosperity, trade, and innovation.",
+  },
+  historyOttomanEmpire: {
+    shortTitle: "History: Ottoman Empire",
+    title: "Ottoman Empire",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Ottoman Empire."',
+    url: "https://www.history.com/topics/middle-east/ottoman-empire",
+    notes:
+      "Used for the Ottoman state's conventional origin around 1299 and its broader imperial duration to 1922; the app clips the overlay to 1800 for early-modern readability.",
+  },
+  historyMingDynasty: {
+    shortTitle: "History: Ming Dynasty",
+    title: "Ming Dynasty",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Ming Dynasty."',
+    url: "https://www.history.com/topics/china/ming-dynasty",
+    notes:
+      "Used for the conventional Ming dynasty span from 1368 to 1644 in broad public-history surveys.",
+  },
+  historyAztecs: {
+    shortTitle: "History: Aztecs",
+    title: "Aztecs",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Aztecs."',
+    url: "https://www.history.com/topics/ancient-americas/aztecs",
+    notes:
+      "Used for the Aztec Empire's concise imperial span from the 1428 Triple Alliance to the Spanish conquest of Tenochtitlan in 1521.",
+  },
+  historyInca: {
+    shortTitle: "History: Inca",
+    title: "Inca",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Inca."',
+    url: "https://www.history.com/topics/south-america/inca",
+    notes:
+      "Used for the Inca Empire's rise under Pachacuti from about 1438 and the final fall of Vilcabamba in 1572.",
+  },
+  historyChristopherColumbus: {
+    shortTitle: "History: Christopher Columbus",
+    title: "Christopher Columbus",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Christopher Columbus."',
+    url: "https://www.history.com/articles/christopher-columbus",
+    notes:
+      "Used for the 1492 Atlantic landfall that serves as a standard public-history anchor for the Columbian Exchange.",
+  },
+  historyReformation: {
+    shortTitle: "History: Reformation",
+    title: "The Reformation",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "The Reformation."',
+    url: "https://www.history.com/articles/reformation",
+    notes:
+      "Used for the conventional 1517 start of the Protestant Reformation with Martin Luther's 95 Theses.",
+  },
+  historyFrenchRevolution: {
+    shortTitle: "History: French Revolution",
+    title: "French Revolution",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "French Revolution."',
+    url: "https://www.history.com/articles/french-revolution",
+    notes:
+      "Used for the standard 1789 start of the French Revolution.",
+  },
+  historyWorldWarOne: {
+    shortTitle: "History: World War I",
+    title: "World War I",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "World War I."',
+    url: "https://www.history.com/articles/world-war-i-history",
+    notes:
+      "Used for the canonical 1914 start year of World War I.",
+  },
+  historyRussianRevolution: {
+    shortTitle: "History: Russian Revolution",
+    title: "Russian Revolution",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Russian Revolution."',
+    url: "https://www.history.com/articles/russian-revolution",
+    notes:
+      "Used for the Russian Revolution's canonical 1917 date anchor.",
+  },
+  historyWorldWarTwo: {
+    shortTitle: "History: World War II",
+    title: "World War II",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "World War II."',
+    url: "https://www.history.com/articles/world-war-ii-history",
+    notes:
+      "Used for the canonical 1939 start year of World War II.",
+  },
+  historyPrintingPress: {
+    shortTitle: "History: Printing Press",
+    title: "Printing Press",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Printing Press."',
+    url: "https://www.history.com/articles/printing-press",
+    notes:
+      "Used for the Gutenberg press becoming commercially ready by 1450, a clean public-history anchor for print culture's acceleration in Europe.",
+  },
+  historyAmericanRevolution: {
+    shortTitle: "History: Revolutionary War",
+    title: "Revolutionary War",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Revolutionary War."',
+    url: "https://www.history.com/articles/american-revolution-history",
+    notes:
+      "Used for the 1776 Declaration of Independence as a concise marker for the American Revolution's political break with Britain.",
+  },
+  britannicaHaitianRevolution: {
+    shortTitle: "Britannica: Haitian Revolution",
+    title: "Haitian Revolution",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Haitian Revolution."',
+    url: "https://www.britannica.com/event/Haitian-Revolution",
+    notes:
+      "Used for the Haitian Revolution's standard 1791 start, when the major slave uprising began in Saint-Domingue.",
+  },
+  historyMeijiRestoration: {
+    shortTitle: "History: Meiji Restoration",
+    title: "Meiji Restoration",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Meiji Restoration."',
+    url: "https://www.history.com/articles/meiji-restoration",
+    notes:
+      "Used for the canonical 1868 date of the Meiji Restoration and the political overthrow of the Tokugawa shogunate.",
+  },
+  historyMoonLanding: {
+    shortTitle: "History: 1969 Moon Landing",
+    title: "1969 Moon Landing",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "1969 Moon Landing."',
+    url: "https://www.history.com/articles/moon-landing-1969",
+    notes:
+      "Used for the Apollo 11 moon landing on July 20, 1969, the first human landing on the Moon.",
   },
   periodo: {
     shortTitle: "PeriodO",
