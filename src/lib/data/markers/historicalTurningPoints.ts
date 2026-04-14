@@ -87,7 +87,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
   {
     id: "bronze-age-collapse",
     label: "Bronze Age collapse",
-    shortLabel: "Bronze Collapse",
+    shortLabel: "Bronze Age Collapse",
     year: -1_200,
     color: "rgba(168, 98, 58, 0.94)",
     minZoom: 18,
@@ -106,7 +106,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
   {
     id: "augustus-becomes-emperor",
     label: "Augustus becomes first emperor",
-    shortLabel: "Roman Empire Begins",
+    shortLabel: "Augustus becomes emperor",
     year: -27,
     color: "rgba(163, 102, 67, 0.94)",
     minZoom: 18,

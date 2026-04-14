@@ -58,12 +58,13 @@ describe("era data", () => {
     expect(ppnb?.name).toBe("Pre-Pottery Neolithic B");
   });
 
-  it("uses seeded default colors consistently", () => {
+  it("uses seeded colors by default and respects explicit geological overrides", () => {
     const humanHistory = ROOT_ERA.children?.find((era) => era.id === "human-history");
-    const cenozoic = ROOT_ERA.children?.find((era) => era.id === "cenozoic");
+    const cambrian = ROOT_ERA.children?.find((era) => era.id === "cambrian");
 
     expect(humanHistory?.color).toBe(getSeededEraColor("human-history"));
-    expect(cenozoic?.color).toBe(getSeededEraColor("cenozoic"));
+    expect(cambrian?.color).toBe("rgba(127, 160, 86, 0.42)");
+    expect(cambrian?.color).not.toBe(getSeededEraColor("cambrian"));
   });
 
   it("keeps geological eras directly under the root timeline", () => {
@@ -71,18 +72,20 @@ describe("era data", () => {
 
     expect(rootChildIds).not.toContain("earth-life-prehistory");
     expect(rootChildIds).toContain("hadean");
-    expect(rootChildIds).toContain("cenozoic");
+    expect(rootChildIds).toContain("cambrian");
+    expect(rootChildIds).toContain("jurassic");
+    expect(rootChildIds).toContain("quaternary");
   });
 
-  it("uses system-level geological subdivisions where the ICS chart provides them", () => {
+  it("flattens post-archean geological subdivisions directly under the root timeline", () => {
     const hadean = ROOT_ERA.children?.find((era) => era.id === "hadean");
-    const proterozoic = ROOT_ERA.children?.find((era) => era.id === "proterozoic");
-    const paleozoic = ROOT_ERA.children?.find((era) => era.id === "paleozoic");
-    const mesozoic = ROOT_ERA.children?.find((era) => era.id === "mesozoic");
-    const cenozoic = ROOT_ERA.children?.find((era) => era.id === "cenozoic");
+    const archean = ROOT_ERA.children?.find((era) => era.id === "archean");
+    const rootChildIds = ROOT_ERA.children?.map((era) => era.id) ?? [];
+    const quaternary = ROOT_ERA.children?.find((era) => era.id === "quaternary");
 
     expect(hadean?.children).toBeUndefined();
-    expect(proterozoic?.children?.map((era) => era.id)).toEqual([
+    expect(archean?.children).toBeUndefined();
+    expect(rootChildIds).toEqual(expect.arrayContaining([
       "siderian",
       "rhyacian",
       "orosirian",
@@ -93,31 +96,26 @@ describe("era data", () => {
       "tonian",
       "cryogenian",
       "ediacaran",
-    ]);
-    expect(paleozoic?.children?.map((era) => era.id)).toEqual([
       "cambrian",
       "ordovician",
       "silurian",
       "devonian",
       "carboniferous",
       "permian",
-    ]);
-    expect(mesozoic?.children?.map((era) => era.id)).toEqual([
       "triassic",
       "jurassic",
       "cretaceous",
-    ]);
-    expect(cenozoic?.children?.map((era) => era.id)).toEqual([
       "paleogene",
       "neogene",
       "quaternary",
-    ]);
-    expect(mesozoic?.children?.find((era) => era.id === "jurassic")?.name).toBe(
-      "Jurassic",
-    );
-    expect(paleozoic?.children?.find((era) => era.id === "cambrian")?.name).toBe(
-      "Cambrian",
-    );
+    ]));
+    expect(rootChildIds).not.toContain("proterozoic");
+    expect(rootChildIds).not.toContain("paleozoic");
+    expect(rootChildIds).not.toContain("mesozoic");
+    expect(rootChildIds).not.toContain("cenozoic");
+    expect(ROOT_ERA.children?.find((era) => era.id === "jurassic")?.name).toBe("Jurassic");
+    expect(ROOT_ERA.children?.find((era) => era.id === "cambrian")?.name).toBe("Cambrian");
+    expect(quaternary?.sourceRefs?.[0]?.note).toContain("human-history handoff");
   });
 
   it("keeps cosmic phases directly under the root timeline", () => {

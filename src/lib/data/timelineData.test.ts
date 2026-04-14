@@ -105,7 +105,7 @@ describe("root timeline display data", () => {
     ).toBe(true);
   });
 
-  it("keeps the root era child chronology stitched in the expected order", () => {
+  it("keeps the flattened root era child chronology stitched in the expected order", () => {
     expect(ROOT_TIMELINE.rootEra.children?.map((child) => child.id)).toEqual(
       ROOT_ERA.children?.map((child) => child.id),
     );
@@ -115,10 +115,28 @@ describe("root timeline display data", () => {
       "galaxies-take-shape",
       "hadean",
       "archean",
-      "proterozoic",
-      "paleozoic",
-      "mesozoic",
-      "cenozoic",
+      "siderian",
+      "rhyacian",
+      "orosirian",
+      "statherian",
+      "calymmian",
+      "ectasian",
+      "stenian",
+      "tonian",
+      "cryogenian",
+      "ediacaran",
+      "cambrian",
+      "ordovician",
+      "silurian",
+      "devonian",
+      "carboniferous",
+      "permian",
+      "triassic",
+      "jurassic",
+      "cretaceous",
+      "paleogene",
+      "neogene",
+      "quaternary",
       "human-history",
     ]);
   });
