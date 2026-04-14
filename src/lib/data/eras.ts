@@ -3,9 +3,11 @@ import { GEOLOGICAL_ERA_DEFINITIONS } from "./eraTrees/geological";
 import { HUMAN_HISTORY_ERA_DEFINITION } from "./eraTrees/humanHistory";
 import { CLASSICAL_ANTIQUITY_MARKERS } from "./markers/classicalAntiquity";
 import { CORE_TIMELINE_MARKERS } from "./markers/core";
+import { DEEP_TIME_LIFE_MARKERS } from "./markers/deepTimeLife";
 import { HISTORICAL_TURNING_POINT_MARKERS } from "./markers/historicalTurningPoints";
 import { POST_CLASSICAL_MARKERS } from "./markers/postClassical";
 import { ANCIENT_CIVILIZATION_OVERLAYS } from "./overlays/ancientCivilizations";
+import { DEEP_TIME_LIFE_OVERLAYS } from "./overlays/deepTimeLife";
 import { POST_CLASSICAL_EARLY_MODERN_OVERLAYS } from "./overlays/postClassicalEarlyModern";
 import type {
   Era,
@@ -141,6 +143,7 @@ export const ROOT_ERA: Era = materializeEra({
 
 const TIMELINE_MARKERS = [
   ...CORE_TIMELINE_MARKERS,
+  ...DEEP_TIME_LIFE_MARKERS,
   ...HISTORICAL_TURNING_POINT_MARKERS,
   ...CLASSICAL_ANTIQUITY_MARKERS,
   ...POST_CLASSICAL_MARKERS,
@@ -152,6 +155,7 @@ const TIMELINE_MARKERS = [
 );
 
 const TIMELINE_OVERLAYS = [
+  ...DEEP_TIME_LIFE_OVERLAYS,
   ...ANCIENT_CIVILIZATION_OVERLAYS,
   ...POST_CLASSICAL_EARLY_MODERN_OVERLAYS,
 ].sort(

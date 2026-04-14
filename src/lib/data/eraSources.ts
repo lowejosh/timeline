@@ -65,6 +65,104 @@ export const ERA_SOURCES = {
     notes:
       "Used for formal deep-time boundaries. Some app bands are intentionally truncated where the timeline hands off to human-history periods.",
   },
+  smithsonianExtinctionOverTime: {
+    shortTitle: "Smithsonian: Extinction Over Time",
+    title: "Extinction Over Time",
+    organization: "Smithsonian National Museum of Natural History",
+    citation:
+      'Smithsonian National Museum of Natural History, "Extinction Over Time."',
+    url: "https://naturalhistory.si.edu/education/teaching-resources/paleontology/extinction-over-time",
+    notes:
+      "Used for public-facing dates and context for the five major mass extinctions, including the end-Cretaceous asteroid impact and the end-Permian extinction.",
+  },
+  smithsonianTriassicLife: {
+    shortTitle: "Smithsonian: Triassic Life",
+    title: "Triassic Life, Extinction, and Recovery",
+    organization: "Smithsonian National Museum of Natural History",
+    citation:
+      'Smithsonian National Museum of Natural History, "Triassic Life, Extinction, and Recovery."',
+    url: "https://naturalhistory.si.edu/education/teaching-resources/paleontology/triassic-life-extinction-and-recovery",
+    notes:
+      "Used for a concise, museum-grade framing of the Late Triassic extinction, ecological recovery, and the rise of the dinosaurs.",
+  },
+  berkeleyCambrianExplosion: {
+    shortTitle: "Berkeley: Cambrian explosion",
+    title: "The Cambrian explosion",
+    organization: "Understanding Evolution / UC Museum of Paleontology",
+    citation:
+      'Understanding Evolution, "The Cambrian explosion." University of California Museum of Paleontology.',
+    url: "https://evolution.berkeley.edu/what-are-evograms/the-cambrian-explosion/",
+    notes:
+      "Used for the broad 570–530 million-year framing of the Cambrian explosion and its significance as an early burst of animal diversification.",
+  },
+  berkeleyTetrapodOrigin: {
+    shortTitle: "Berkeley: tetrapods",
+    title: "The origin of tetrapods",
+    organization: "Understanding Evolution / UC Museum of Paleontology",
+    citation:
+      'Understanding Evolution, "The origin of tetrapods." University of California Museum of Paleontology.',
+    url: "https://evolution.berkeley.edu/what-are-evograms/the-origin-of-tetrapods/",
+    notes:
+      "Used for the Devonian 390–360 million-year transition in which the tetrapod lineage moved from water onto land.",
+  },
+  berkeleyBirdOrigin: {
+    shortTitle: "Berkeley: origin of birds",
+    title: "The origin of birds",
+    organization: "Understanding Evolution / UC Museum of Paleontology",
+    citation:
+      'Understanding Evolution, "The origin of birds." University of California Museum of Paleontology.',
+    url: "https://evolution.berkeley.edu/what-are-evograms/the-origin-of-birds/",
+    notes:
+      "Used for the Late Jurassic dinosaur-to-bird transition and Archaeopteryx as the first known bird in this public-facing timeline.",
+  },
+  ucmpCyanobacteria: {
+    shortTitle: "UCMP: Cyanobacteria",
+    title: "Introduction to the Cyanobacteria",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "Introduction to the Cyanobacteria."',
+    url: "https://ucmp.berkeley.edu/bacteria/cyanointro.html",
+    notes:
+      "Used for cyanobacteria as very ancient life and for their role in generating Earth's oxygen-rich atmosphere during the Archean and Proterozoic.",
+  },
+  ucmpEukaryota: {
+    shortTitle: "UCMP: Eukaryota",
+    title: "Introduction to the Eukaryota",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "Introduction to the Eukaryota."',
+    url: "https://ucmp.berkeley.edu/alllife/eukaryota.html",
+    notes:
+      "Used for broad public-facing context on what eukaryotic cells are and why they represent a major increase in cellular complexity.",
+  },
+  ucmpPlantae: {
+    shortTitle: "UCMP: Plantae",
+    title: "Introduction to the Plantae",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "Introduction to the Plantae."',
+    url: "https://ucmp.berkeley.edu/plants/plantae.html",
+    notes:
+      "Used for the public-facing timeline framing that plants first appeared in the Ordovician and diversified into recognizably modern-looking forms by the Late Silurian and Devonian.",
+  },
+  ucmpMesozoicLife: {
+    shortTitle: "UCMP: Mesozoic life",
+    title: "Mesozoic Era: Life",
+    organization: "UC Museum of Paleontology",
+    citation: 'University of California Museum of Paleontology, "Mesozoic Era: Life."',
+    url: "https://ucmp.berkeley.edu/mesozoic/mesozoiclife.html",
+    notes:
+      "Used for the public-facing framing that dinosaurs and other archosaurs dominated terrestrial life through much of the Mesozoic.",
+  },
+  britannicaCarboniferousPeriod: {
+    shortTitle: "Britannica: Carboniferous",
+    title: "Carboniferous Period",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Carboniferous Period."',
+    url: "https://www.britannica.com/science/Carboniferous-Period",
+    notes:
+      "Used for Carboniferous coal-swamp environments, giant insects in Pennsylvanian skies, and the earliest reptiles such as Hylonomus.",
+  },
   smithsonianHumanOrigins: {
     shortTitle: "Smithsonian Human Origins",
     title: "Interactive Human Origins Timeline",

@@ -1,0 +1,222 @@
+import type { TimelineMarker } from "../timelineTypes";
+
+export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
+  {
+    id: "great-oxidation-event",
+    label: "Great Oxidation Event",
+    shortLabel: "Oxygen Crisis",
+    year: -2_400_000_000,
+    color: "rgba(94, 132, 154, 0.94)",
+    minZoom: 0,
+    priority: 96,
+    sourceRefs: [
+      {
+        sourceId: "ucmpCyanobacteria",
+        note: "UCMP explains that cyanobacteria generated the oxygen atmosphere during the Archean and Proterozoic; the app uses c. 2.4 billion years ago as the conventional Great Oxidation Event anchor for that planetary shift.",
+      },
+    ],
+  },
+  {
+    id: "first-eukaryotic-cells",
+    label: "First eukaryotic cells",
+    shortLabel: "First Eukaryotes",
+    year: -1_800_000_000,
+    color: "rgba(104, 122, 164, 0.94)",
+    minZoom: 0,
+    priority: 94,
+    sourceRefs: [
+      {
+        sourceId: "ucmpEukaryota",
+        note: "UCMP summarizes eukaryotes as a fundamentally different, more complex cell type; the app uses c. 1.8 billion years ago as a conventional public-facing anchor for the earliest known eukaryotic cells.",
+      },
+    ],
+  },
+  {
+    id: "first-large-multicellular-life",
+    label: "First large multicellular life",
+    shortLabel: "Large Multicellular Life",
+    year: -575_000_000,
+    color: "rgba(88, 140, 122, 0.94)",
+    minZoom: 0,
+    priority: 93,
+    sourceRefs: [
+      {
+        sourceId: "icsChart2024",
+        note: "This marker sits in the late Ediacaran, the interval immediately before the Cambrian explosion; the app uses c. 575 million years ago as a clean public-facing anchor for the first large multicellular organisms commonly highlighted in Earth-history overviews.",
+      },
+    ],
+  },
+  {
+    id: "first-land-plants",
+    label: "First land plants",
+    shortLabel: "Land Plants",
+    year: -470_000_000,
+    color: "rgba(96, 146, 96, 0.94)",
+    minZoom: 0,
+    priority: 92,
+    sourceRefs: [
+      {
+        sourceId: "ucmpPlantae",
+        note: "UCMP says plants first appeared in the Ordovician; the app uses c. 470 million years ago as a clean mid-Ordovician anchor for the earliest land plants.",
+      },
+    ],
+  },
+  {
+    id: "late-ordovician-mass-extinction",
+    label: "Late Ordovician mass extinction",
+    shortLabel: "Ordovician Extinction",
+    year: -447_000_000,
+    color: "rgba(124, 97, 149, 0.94)",
+    minZoom: 0,
+    priority: 94,
+    sourceRefs: [
+      {
+        sourceId: "smithsonianExtinctionOverTime",
+        note: "Smithsonian dates the Late Ordovician mass extinction to 447 million years ago and summarizes it as a global cooling, glaciation, and sea-level crisis affecting marine life.",
+      },
+    ],
+  },
+  {
+    id: "late-devonian-mass-extinction",
+    label: "Late Devonian mass extinction",
+    shortLabel: "Devonian Extinction",
+    year: -378_000_000,
+    color: "rgba(116, 86, 139, 0.94)",
+    minZoom: 0,
+    priority: 93,
+    sourceRefs: [
+      {
+        sourceId: "smithsonianExtinctionOverTime",
+        note: "Smithsonian dates the Late Devonian mass extinction to 378 million years ago and notes that many marine groups, including corals and brachiopods, were heavily affected.",
+      },
+    ],
+  },
+  {
+    id: "first-tetrapods-step-onto-land",
+    label: "Early tetrapods move onto land",
+    shortLabel: "Tetrapods on Land",
+    year: -370_000_000,
+    color: "rgba(84, 124, 96, 0.94)",
+    minZoom: 0,
+    priority: 92,
+    sourceRefs: [
+      {
+        sourceId: "berkeleyTetrapodOrigin",
+        note: "Understanding Evolution describes the tetrapod transition as unfolding between about 390 and 360 million years ago during the Devonian; the app uses c. 370 Ma as a midpoint anchor for the move onto land.",
+      },
+    ],
+  },
+  {
+    id: "first-reptiles-appear",
+    label: "First reptiles appear",
+    shortLabel: "First Reptiles",
+    year: -320_000_000,
+    color: "rgba(142, 111, 74, 0.94)",
+    minZoom: 0,
+    priority: 91,
+    sourceRefs: [
+      {
+        sourceId: "britannicaCarboniferousPeriod",
+        note: "Britannica describes Hylonomus from the Lower Pennsylvanian as the earliest reptile in the fossil record; the app uses c. 320 Ma as a concise anchor within that interval.",
+      },
+    ],
+  },
+  {
+    id: "giant-insects-fill-carboniferous-skies",
+    label: "Giant insects fill Carboniferous skies",
+    shortLabel: "Giant Insects",
+    year: -315_000_000,
+    color: "rgba(98, 128, 74, 0.94)",
+    minZoom: 0,
+    priority: 88,
+    sourceRefs: [
+      {
+        sourceId: "britannicaCarboniferousPeriod",
+        note: "Britannica says that by the Pennsylvanian dragonflies and mayflies were abundant and some ancestors of modern dragonflies had wingspans of about 70 cm; the app uses c. 315 Ma as a mid-Pennsylvanian marker.",
+      },
+    ],
+  },
+  {
+    id: "end-permian-mass-extinction",
+    label: "End-Permian mass extinction",
+    shortLabel: "Permian Extinction",
+    year: -252_000_000,
+    color: "rgba(148, 83, 83, 0.94)",
+    minZoom: 0,
+    priority: 97,
+    sourceRefs: [
+      {
+        sourceId: "smithsonianExtinctionOverTime",
+        note: "Smithsonian dates Earth's largest mass extinction to 252 million years ago and notes that it devastated marine species and many terrestrial groups.",
+      },
+    ],
+  },
+  {
+    id: "first-mammals-appear",
+    label: "First mammals appear",
+    shortLabel: "First Mammals",
+    year: -225_000_000,
+    color: "rgba(126, 109, 148, 0.94)",
+    minZoom: 0,
+    priority: 90,
+    sourceRefs: [
+      {
+        sourceId: "ucmpMesozoicLife",
+        note: "UCMP says the first mammals arrived on the scene in the Mesozoic and highlights Triassic relatives in this early phase; the app uses c. 225 million years ago as a concise Late Triassic anchor for their appearance.",
+      },
+    ],
+  },
+  {
+    id: "end-triassic-mass-extinction",
+    label: "End-Triassic mass extinction",
+    shortLabel: "Triassic Extinction",
+    year: -199_000_000,
+    color: "rgba(156, 96, 75, 0.94)",
+    minZoom: 0,
+    priority: 95,
+    sourceRefs: [
+      {
+        sourceId: "smithsonianExtinctionOverTime",
+        note: "Smithsonian dates the Late Triassic mass extinction to 199 million years ago and links it to widespread losses among marine and terrestrial groups.",
+      },
+      {
+        sourceId: "smithsonianTriassicLife",
+        note: "Smithsonian's Triassic teaching guide frames this crisis as a major extinction-and-recovery interval closely tied to the rise of dinosaurs.",
+      },
+    ],
+  },
+  {
+    id: "archaeopteryx-first-known-bird",
+    label: "Archaeopteryx, first known bird",
+    shortLabel: "Archaeopteryx",
+    year: -150_000_000,
+    color: "rgba(84, 118, 152, 0.94)",
+    minZoom: 0,
+    priority: 89,
+    sourceRefs: [
+      {
+        sourceId: "berkeleyBirdOrigin",
+        note: "Understanding Evolution identifies Archaeopteryx as the first known bird and places the dinosaur-to-bird transition in the Late Jurassic; the app uses c. 150 Ma as a familiar Late Jurassic anchor.",
+      },
+    ],
+  },
+  {
+    id: "k-pg-asteroid-impact",
+    label: "K–Pg asteroid impact",
+    shortLabel: "Dinosaur Asteroid",
+    year: -66_000_000,
+    color: "rgba(168, 88, 68, 0.96)",
+    minZoom: 0,
+    priority: 99,
+    sourceRefs: [
+      {
+        sourceId: "smithsonianExtinctionOverTime",
+        note: "Smithsonian dates the end-Cretaceous mass extinction to 66 million years ago and says the scientific consensus links it to the environmental consequences of a large asteroid impact near what is now Mexico.",
+      },
+      {
+        sourceId: "icsChart2024",
+        note: "The marker aligns to the formal 66.0 Ma Cretaceous-Paleogene boundary on the ICS chart.",
+      },
+    ],
+  },
+];
