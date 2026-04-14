@@ -1,11 +1,15 @@
 import type { EraDefinition } from "../timelineTypes";
 
+export const PRIMORDIAL_UNIVERSE_ID = "primordial-universe";
+export const PRIMORDIAL_UNIVERSE_START_YEAR = -13_800_000_000;
+export const PRIMORDIAL_UNIVERSE_END_YEAR = -13_600_000_000;
+
 export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
   {
-    id: "primordial-universe",
+    id: PRIMORDIAL_UNIVERSE_ID,
     name: "Primordial Universe",
-    startYear: -13_800_000_000,
-    endYear: -13_600_000_000,
+    startYear: PRIMORDIAL_UNIVERSE_START_YEAR,
+    endYear: PRIMORDIAL_UNIVERSE_END_YEAR,
     scheme: "cosmic",
     sourceRefs: [
       {

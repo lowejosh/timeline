@@ -9,6 +9,7 @@ import { POST_CLASSICAL_MARKERS } from "./markers/postClassical";
 import { ANCIENT_CIVILIZATION_OVERLAYS } from "./overlays/ancientCivilizations";
 import { DEEP_TIME_LIFE_OVERLAYS } from "./overlays/deepTimeLife";
 import { POST_CLASSICAL_EARLY_MODERN_OVERLAYS } from "./overlays/postClassicalEarlyModern";
+import { getPresentTimelineYear } from "../time/present";
 import type {
   Era,
   EraDefinition,
@@ -49,7 +50,7 @@ export function getAncestorChain(root: Era, targetId: string): Era[] {
   return [];
 }
 
-const CURRENT_YEAR = new Date().getFullYear();
+const CURRENT_YEAR = getPresentTimelineYear();
 
 function hashString(value: string): number {
   let hash = 2166136261;

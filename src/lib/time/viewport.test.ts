@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getZoomAnchorForCanvasX,
+  getMaxZoomForWidth,
   getVisibleRange,
   getMinZoomForWidth,
   getViewportForRange,
@@ -124,5 +125,25 @@ describe("timeline viewport math", () => {
     const rightAfter = screenToWorld(innerWidth, zoomed, innerWidth);
 
     expect(rightAfter).toBeCloseTo(rightBefore, 3);
+  });
+
+  it("caps max zoom so at least about fourteen days stay in view", () => {
+    const width = 1200;
+    const viewport = normalizeViewport(
+      {
+        centerYear: TIMELINE_MAX_YEAR,
+        zoom: getMaxZoomForWidth(width) + 10,
+      },
+      width,
+    );
+    const [visibleStart, visibleEnd] = getVisibleRange(viewport, width);
+
+    expect(viewport.zoom).toBeCloseTo(getMaxZoomForWidth(width), 6);
+    expect(visibleEnd - visibleStart).toBeGreaterThanOrEqual(14 / 365.2425 - 1e-6);
+  });
+
+  it("tracks the present boundary past January first", () => {
+    expect(TIMELINE_MAX_YEAR).toBeGreaterThan(new Date().getUTCFullYear());
+    expect(TIMELINE_MAX_YEAR).toBeLessThan(new Date().getUTCFullYear() + 1);
   });
 });

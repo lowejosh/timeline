@@ -6,12 +6,23 @@ import {
   type PointerEvent,
   type WheelEvent,
 } from "react";
-import { formatTimelineYear } from "../../lib/time/bands";
+import {
+  formatTimelineDateLabel,
+  formatTimelineElapsedAxisLabel,
+  formatTimelineElapsedLabel,
+  formatTimelineYear,
+  YEARS_AGO_CUTOFF,
+} from "../../lib/time/bands";
 import {
   type Era,
   type TimelineMarker,
   type TimelineOverlayBand,
 } from "../../lib/data/eras";
+import {
+  PRIMORDIAL_UNIVERSE_END_YEAR,
+  PRIMORDIAL_UNIVERSE_ID,
+  PRIMORDIAL_UNIVERSE_START_YEAR,
+} from "../../lib/data/eraTrees/cosmic";
 import {
   getZoomAnchorForCanvasX,
   getVisibleRange,
@@ -81,6 +92,7 @@ type TimelineCanvasLayout = {
   markerLabelY: number;
   markerDateY: number;
   majorTickTop: number;
+  dateLabelY: number;
   yearLabelY: number;
   nowTop: number;
 };
@@ -88,6 +100,7 @@ type TimelineCanvasLayout = {
 type AxisLabelCandidate = {
   x: number;
   text: string;
+  secondaryText?: string;
   width: number;
   alpha: number;
   step: number;
@@ -116,7 +129,6 @@ type RgbaColor = {
   a: number;
 };
 
-const NOW_YEAR = new Date().getFullYear();
 const PAD = 120;
 const OVERLAY_LANE_HEIGHT = 16;
 const OVERLAY_LANE_GAP = 8;
@@ -124,6 +136,7 @@ const OVERLAY_PANEL_GAP = 56;
 const AXIS_LABEL_OCCUPIED_PADDING = 28;
 const AXIS_LABEL_CLEARANCE_FADE_START = -14;
 const AXIS_LABEL_CLEARANCE_FADE_END = 40;
+const AXIS_DUPLICATE_LABEL_MIN_GAP = 18;
 const AXIS_TICK_ANIMATION_SMOOTHING_MS = 110;
 const ERA_CHILD_TRANSITION_DURATION_MS = 220;
 const AXIS_LABEL_SECONDARY_STEP_RATIO = 0.82;
@@ -157,6 +170,97 @@ function getIntervalClearance(
   }
 
   return -Math.min(right - bounds.left, bounds.right - left);
+}
+
+function resolveAxisLabelCandidates(
+  candidates: AxisLabelCandidate[],
+  occupiedSeed: Array<{ left: number; right: number }> = [],
+  options: { dedupeByTextOnly?: boolean } = {},
+) {
+  const occupiedLabelBounds = [...occupiedSeed];
+  const resolvedAxisLabels: AxisLabelCandidate[] = [];
+
+  for (const candidate of [...candidates].sort((left, right) => {
+    return right.alpha - left.alpha || right.step - left.step || left.x - right.x;
+  })) {
+    const dynamicPadding = Math.max(
+      AXIS_LABEL_OCCUPIED_PADDING,
+      Math.min(72, candidate.pixelsPerStep * 0.18),
+    );
+    const left = candidate.x - candidate.width / 2 - dynamicPadding;
+    const right = candidate.x + candidate.width / 2 + dynamicPadding;
+    const nearestClearance = occupiedLabelBounds.reduce(
+      (closest, bounds) =>
+        Math.min(closest, getIntervalClearance(left, right, bounds)),
+      Number.POSITIVE_INFINITY,
+    );
+    const spacingOpacity =
+      nearestClearance === Number.POSITIVE_INFINITY
+        ? 1
+        : clamp01(
+            (nearestClearance - AXIS_LABEL_CLEARANCE_FADE_START) /
+              (AXIS_LABEL_CLEARANCE_FADE_END - AXIS_LABEL_CLEARANCE_FADE_START),
+          );
+    const resolvedAlpha = candidate.alpha * spacingOpacity;
+
+    if (resolvedAlpha <= 0.01) {
+      continue;
+    }
+
+    const hasNearbyDuplicateLabel = resolvedAxisLabels.some((existing) => {
+      if (
+        existing.text !== candidate.text ||
+        existing.secondaryText !== candidate.secondaryText
+      ) {
+        return false;
+      }
+
+      if (options.dedupeByTextOnly) {
+        return true;
+      }
+
+      const duplicateGap =
+        Math.max(existing.width, candidate.width) + AXIS_DUPLICATE_LABEL_MIN_GAP;
+
+      return Math.abs(existing.x - candidate.x) < duplicateGap;
+    });
+
+    if (hasNearbyDuplicateLabel) {
+      continue;
+    }
+
+    occupiedLabelBounds.push({ left, right });
+    resolvedAxisLabels.push({
+      ...candidate,
+      alpha: resolvedAlpha,
+    });
+  }
+
+  return resolvedAxisLabels;
+}
+
+function measureAxisLabelWidth(
+  context: CanvasRenderingContext2D,
+  primaryText: string,
+  primaryFont: string,
+  secondaryText?: string,
+  secondaryFont = primaryFont,
+) {
+  const previousFont = context.font;
+
+  context.font = primaryFont;
+  const primaryWidth = primaryText ? context.measureText(primaryText).width : 0;
+
+  let secondaryWidth = 0;
+
+  if (secondaryText) {
+    context.font = secondaryFont;
+    secondaryWidth = context.measureText(secondaryText).width;
+  }
+
+  context.font = previousFont;
+
+  return Math.max(primaryWidth, secondaryWidth);
 }
 
 function findEraAtYear(eras: Era[], year: number): Era | undefined {
@@ -193,6 +297,7 @@ function getTimelineLayout(
     markerLabelY: axisY + 18,
     markerDateY: axisY + 34,
     majorTickTop,
+    dateLabelY: axisY + 50,
     yearLabelY: axisY + 68,
     nowTop: majorTickTop - 18,
   };
@@ -465,9 +570,27 @@ export function TimelineCanvas({
     const [rangeStart, rangeEnd] = getVisibleRange(viewport, innerWidth);
     const tickStart = Math.max(rangeStart, TIMELINE_MIN_YEAR);
     const tickEnd = Math.min(rangeEnd, TIMELINE_MAX_YEAR);
+    const visibleSpan = Math.max(tickEnd - tickStart, 1e-9);
+    const primordialOverlapStart = Math.max(
+      tickStart,
+      PRIMORDIAL_UNIVERSE_START_YEAR,
+    );
+    const primordialOverlapEnd = Math.min(
+      tickEnd,
+      PRIMORDIAL_UNIVERSE_END_YEAR,
+    );
+    const primordialOverlap = Math.max(
+      0,
+      primordialOverlapEnd - primordialOverlapStart,
+    );
+    const isPrimordialFocused =
+      activeEra.id === PRIMORDIAL_UNIVERSE_ID ||
+      primordialOverlap / visibleSpan >= 0.75;
 
-    return resolveAxisTickRenderStates(tickStart, tickEnd, innerWidth);
-  }, [viewport, width]);
+    return resolveAxisTickRenderStates(tickStart, tickEnd, innerWidth, {
+      elapsedSubYearReference: isPrimordialFocused ? "after-big-bang" : "ago",
+    });
+  }, [activeEra.id, viewport, width]);
 
   useEffect(() => {
     const animationStates = eraChildAnimationRef.current;
@@ -931,6 +1054,71 @@ export function TimelineCanvas({
     );
     const edgeLeftX = pad;
     const edgeRightX = width - pad;
+    const edgeLabelStep = (() => {
+      const labelStepScores = new Map<number, number>();
+
+      for (const tick of resolvedAxisTickStates) {
+        if (tick.labelOpacity <= 0.01) {
+          continue;
+        }
+
+        labelStepScores.set(
+          tick.labelStep,
+          (labelStepScores.get(tick.labelStep) ?? 0) + tick.labelOpacity,
+        );
+      }
+
+      const preferredStep = [...labelStepScores.entries()].sort(
+        (left, right) => right[1] - left[1] || right[0] - left[0],
+      )[0]?.[0];
+
+      if (preferredStep) {
+        return preferredStep;
+      }
+
+      const visibleSpan = Math.max(Math.abs(edgeRightYear - edgeLeftYear), 1);
+      const approximateMajorCount = Math.max(2, Math.floor(innerWidth / 280));
+
+      return Math.max(visibleSpan / approximateMajorCount, 1e-9);
+    })();
+    const fineGrainedAxisMode =
+      edgeLabelStep < 1
+        ? edgeLeftYear >= 1 && edgeRightYear >= 1
+          ? "calendar"
+          : edgeRightYear <= -YEARS_AGO_CUTOFF
+            ? "elapsed"
+            : null
+        : null;
+    const visibleSpan = Math.max(edgeRightYear - edgeLeftYear, 1e-9);
+    const primordialOverlapStart = Math.max(
+      edgeLeftYear,
+      PRIMORDIAL_UNIVERSE_START_YEAR,
+    );
+    const primordialOverlapEnd = Math.min(
+      edgeRightYear,
+      PRIMORDIAL_UNIVERSE_END_YEAR,
+    );
+    const primordialOverlap = Math.max(
+      0,
+      primordialOverlapEnd - primordialOverlapStart,
+    );
+    const useBigBangElapsedLabels =
+      activeEra.id === PRIMORDIAL_UNIVERSE_ID ||
+      primordialOverlap / visibleSpan >= 0.75;
+    const useSubYearAxis = fineGrainedAxisMode !== null;
+    const useCalendarSubYearAxis = fineGrainedAxisMode === "calendar";
+    const useElapsedSubYearAxis = fineGrainedAxisMode === "elapsed";
+    const formatAxisLabel = (year: number, step: number) =>
+      useBigBangElapsedLabels
+        ? formatTimelineElapsedAxisLabel(year, step, "after-big-bang")
+        : formatTimelineYear(year, step, { mode: "axis" });
+    const formatAxisDate = (year: number, step: number) =>
+      formatTimelineDateLabel(year, step);
+    const formatElapsedAxisLabel = (year: number) =>
+      formatTimelineElapsedLabel(
+        year,
+        useBigBangElapsedLabels ? "after-big-bang" : "ago",
+      );
 
     if (resolvedAxisTickStates.length > 0) {
       context.save();
@@ -1008,12 +1196,47 @@ export function TimelineCanvas({
       context.lineTo(x, axisY + 28);
       context.stroke();
 
-      const edgeLabel = formatTimelineYear(year, 1);
       context.fillStyle = labelColor;
-      context.font = "11px var(--font-sans)";
       context.textAlign = align;
       context.textBaseline = "top";
-      context.fillText(edgeLabel, x, layout.yearLabelY);
+
+      if (useCalendarSubYearAxis) {
+        context.globalAlpha = 0.9;
+        context.font = "12px var(--font-sans)";
+        context.fillText(formatAxisDate(year, edgeLabelStep), x, layout.dateLabelY);
+
+        context.globalAlpha = 0.72;
+        context.font = "11px var(--font-sans)";
+        context.fillText(formatTimelineYear(year, 1), x, layout.yearLabelY);
+      } else if (useElapsedSubYearAxis) {
+        const edgeLabel = formatElapsedAxisLabel(year);
+
+        if (!edgeLabel) {
+          context.restore();
+          continue;
+        }
+
+        if (edgeLabel.secondaryText) {
+          context.globalAlpha = 0.9;
+          context.font = "12px var(--font-sans)";
+          context.fillText(edgeLabel.primaryText, x, layout.dateLabelY);
+
+          context.globalAlpha = 0.72;
+          context.font = "11px var(--font-sans)";
+          context.fillText(edgeLabel.secondaryText, x, layout.yearLabelY);
+        } else {
+          context.globalAlpha = 0.86;
+          context.font = "11px var(--font-sans)";
+          context.fillText(edgeLabel.primaryText, x, layout.yearLabelY);
+        }
+      } else {
+        const edgeLabel = formatAxisLabel(year, edgeLabelStep);
+
+        context.globalAlpha = 1;
+        context.font = "11px var(--font-sans)";
+        context.fillText(edgeLabel, x, layout.yearLabelY);
+      }
+
       context.restore();
     }
 
@@ -1097,7 +1320,7 @@ export function TimelineCanvas({
     }
 
     // "Now" indicator
-    const rawNowX = toX(NOW_YEAR);
+    const rawNowX = toX(TIMELINE_MAX_YEAR);
     const nowX = edgeRightYear === TIMELINE_MAX_YEAR ? width - pad : rawNowX;
 
     if (nowX >= pad - 20 && nowX <= width - pad + 20) {
@@ -1123,11 +1346,11 @@ export function TimelineCanvas({
     const edgeLabelLeftX = pad;
     const edgeLabelRightX = width - pad;
     context.fillStyle = labelColor;
-    context.font = "13px var(--font-sans)";
     context.textAlign = "center";
     context.textBaseline = "top";
 
     const axisLabelCandidates: AxisLabelCandidate[] = [];
+    const yearBoundaryCandidates: AxisLabelCandidate[] = [];
 
     for (const tick of resolvedAxisTickStates) {
       if (tick.labelOpacity <= 0.01) {
@@ -1137,8 +1360,37 @@ export function TimelineCanvas({
       const x = toX(tick.year);
       if (x < pad - 80 || x > width - pad + 80) continue;
 
-      const labelText = formatTimelineYear(tick.year, tick.labelStep);
-      const labelWidth = context.measureText(labelText).width;
+      if (useSubYearAxis && tick.labelStep >= 1) {
+        continue;
+      }
+
+      const labelText = useCalendarSubYearAxis
+        ? formatAxisDate(tick.year, tick.labelStep)
+        : useElapsedSubYearAxis
+          ? (formatElapsedAxisLabel(tick.year)?.primaryText ?? "")
+          : formatAxisLabel(tick.year, tick.labelStep);
+      const secondaryText = useElapsedSubYearAxis
+        ? formatElapsedAxisLabel(tick.year)?.secondaryText
+        : undefined;
+
+      if (!labelText) {
+        continue;
+      }
+
+      const labelWidth = useElapsedSubYearAxis
+        ? measureAxisLabelWidth(
+            context,
+            labelText,
+            "12px var(--font-sans)",
+            secondaryText,
+            "11px var(--font-sans)",
+          )
+        : (() => {
+            context.font = useCalendarSubYearAxis
+              ? "12px var(--font-sans)"
+              : "13px var(--font-sans)";
+            return context.measureText(labelText).width;
+          })();
 
       // Fade out labels near edge boundary labels
       const distToMin = Math.abs(x - edgeLabelLeftX);
@@ -1160,6 +1412,7 @@ export function TimelineCanvas({
         axisLabelCandidates.push({
           x,
           text: labelText,
+          secondaryText,
           width: labelWidth,
           alpha: labelAlpha,
           step: tick.labelStep,
@@ -1186,39 +1439,66 @@ export function TimelineCanvas({
     if (primaryLabelStep) {
       allowedLabelSteps.add(primaryLabelStep[0]);
 
-      for (const [step, score] of sortedLabelSteps.slice(1)) {
-        const ratio = score / primaryLabelStep[1];
-        const isAdjacentScale =
-          Math.abs(Math.log(step / primaryLabelStep[0])) <= Math.log(3);
+      if (!useSubYearAxis) {
+        for (const [step, score] of sortedLabelSteps.slice(1)) {
+          const ratio = score / primaryLabelStep[1];
+          const isAdjacentScale =
+            Math.abs(Math.log(step / primaryLabelStep[0])) <= Math.log(3);
 
-        if (
-          ratio >= AXIS_LABEL_SECONDARY_STEP_RATIO &&
-          isAdjacentScale &&
-          allowedLabelSteps.size < 2
-        ) {
-          allowedLabelSteps.add(step);
+          if (
+            ratio >= AXIS_LABEL_SECONDARY_STEP_RATIO &&
+            isAdjacentScale &&
+            allowedLabelSteps.size < 2
+          ) {
+            allowedLabelSteps.add(step);
+          }
         }
       }
     }
 
-    const occupiedLabelBounds: Array<{ left: number; right: number }> = [];
-    const resolvedAxisLabels: AxisLabelCandidate[] = [];
-
-    const edgeLabelEntries = [
+    const primaryEdgeLabelEntries = [
       {
         x: pad,
-        text: formatTimelineYear(edgeLeftYear, 1),
+        text: useCalendarSubYearAxis
+          ? formatAxisDate(edgeLeftYear, edgeLabelStep)
+          : useElapsedSubYearAxis
+            ? (formatElapsedAxisLabel(edgeLeftYear)?.primaryText ?? "")
+          : formatAxisLabel(edgeLeftYear, edgeLabelStep),
+        secondaryText: useElapsedSubYearAxis
+          ? formatElapsedAxisLabel(edgeLeftYear)?.secondaryText
+          : undefined,
         align: "left" as const,
       },
       {
         x: width - pad,
-        text: formatTimelineYear(edgeRightYear, 1),
+        text: useCalendarSubYearAxis
+          ? formatAxisDate(edgeRightYear, edgeLabelStep)
+          : useElapsedSubYearAxis
+            ? (formatElapsedAxisLabel(edgeRightYear)?.primaryText ?? "")
+          : formatAxisLabel(edgeRightYear, edgeLabelStep),
+        secondaryText: useElapsedSubYearAxis
+          ? formatElapsedAxisLabel(edgeRightYear)?.secondaryText
+          : undefined,
         align: "right" as const,
       },
     ];
+    const primaryOccupiedBounds: Array<{ left: number; right: number }> = [];
 
-    for (const edgeLabel of edgeLabelEntries) {
-      const labelWidth = context.measureText(edgeLabel.text).width;
+    for (const edgeLabel of primaryEdgeLabelEntries) {
+      const labelWidth = useElapsedSubYearAxis
+        ? measureAxisLabelWidth(
+            context,
+            edgeLabel.text,
+            "12px var(--font-sans)",
+            edgeLabel.secondaryText,
+            "11px var(--font-sans)",
+          )
+        : (() => {
+            context.font = useCalendarSubYearAxis
+              ? "12px var(--font-sans)"
+              : "13px var(--font-sans)";
+            return context.measureText(edgeLabel.text).width;
+          })();
       const left =
         edgeLabel.align === "left"
           ? edgeLabel.x - AXIS_LABEL_OCCUPIED_PADDING
@@ -1228,56 +1508,123 @@ export function TimelineCanvas({
           ? edgeLabel.x + labelWidth + AXIS_LABEL_OCCUPIED_PADDING
           : edgeLabel.x + AXIS_LABEL_OCCUPIED_PADDING;
 
-      occupiedLabelBounds.push({ left, right });
+      primaryOccupiedBounds.push({ left, right });
     }
 
-    for (const candidate of [...axisLabelCandidates]
-      .filter((candidate) =>
+    const resolvedAxisLabels = resolveAxisLabelCandidates(
+      axisLabelCandidates.filter((candidate) =>
         allowedLabelSteps.size === 0 || allowedLabelSteps.has(candidate.step),
-      )
-      .sort((left, right) => {
-        return (
-          right.alpha - left.alpha ||
-          right.step - left.step ||
-          left.x - right.x
-        );
-      })) {
-      const dynamicPadding = Math.max(
-        AXIS_LABEL_OCCUPIED_PADDING,
-        Math.min(72, candidate.pixelsPerStep * 0.18),
-      );
-      const left = candidate.x - candidate.width / 2 - dynamicPadding;
-      const right = candidate.x + candidate.width / 2 + dynamicPadding;
-      const nearestClearance = occupiedLabelBounds.reduce(
-        (closest, bounds) =>
-          Math.min(closest, getIntervalClearance(left, right, bounds)),
-        Number.POSITIVE_INFINITY,
-      );
-      const spacingOpacity =
-        nearestClearance === Number.POSITIVE_INFINITY
-          ? 1
-          : clamp01(
-              (nearestClearance - AXIS_LABEL_CLEARANCE_FADE_START) /
-                (AXIS_LABEL_CLEARANCE_FADE_END - AXIS_LABEL_CLEARANCE_FADE_START),
-            );
-      const resolvedAlpha = candidate.alpha * spacingOpacity;
-
-      if (resolvedAlpha <= 0.01) {
-        continue;
-      }
-
-      occupiedLabelBounds.push({ left, right });
-      resolvedAxisLabels.push({
-        ...candidate,
-        alpha: resolvedAlpha,
-      });
-    }
+      ),
+      primaryOccupiedBounds,
+      { dedupeByTextOnly: useSubYearAxis },
+    );
 
     for (const label of resolvedAxisLabels.sort((left, right) => left.x - right.x)) {
       context.save();
       context.globalAlpha = label.alpha;
-      context.fillText(label.text, label.x, layout.yearLabelY);
+
+      if (useCalendarSubYearAxis) {
+        context.font = "12px var(--font-sans)";
+        context.fillText(label.text, label.x, layout.dateLabelY);
+      } else if (useElapsedSubYearAxis) {
+        if (label.secondaryText) {
+          context.font = "12px var(--font-sans)";
+          context.fillText(label.text, label.x, layout.dateLabelY);
+
+          context.font = "11px var(--font-sans)";
+          context.fillText(label.secondaryText, label.x, layout.yearLabelY);
+        } else {
+          context.font = "11px var(--font-sans)";
+          context.fillText(label.text, label.x, layout.yearLabelY);
+        }
+      } else {
+        context.font = "13px var(--font-sans)";
+        context.fillText(label.text, label.x, layout.yearLabelY);
+      }
+
       context.restore();
+    }
+
+    if (useCalendarSubYearAxis) {
+      context.font = "11px var(--font-sans)";
+
+      const firstVisibleYear = Math.max(1, Math.ceil(edgeLeftYear));
+      const lastVisibleYear = Math.floor(edgeRightYear);
+
+      for (let year = firstVisibleYear; year <= lastVisibleYear; year += 1) {
+        const x = toX(year);
+
+        if (x < pad - 80 || x > width - pad + 80) {
+          continue;
+        }
+
+        const labelText = formatTimelineYear(year, 1);
+        const labelWidth = context.measureText(labelText).width;
+        const boundaryFade =
+          Math.min(Math.max(0, (x - pad) / 60), Math.max(0, (width - pad - x) / 60), 1) *
+          (Math.min(Math.abs(x - edgeLeftX), Math.abs(x - edgeRightX)) < 100
+            ? Math.max(
+                0,
+                (Math.min(Math.abs(x - edgeLeftX), Math.abs(x - edgeRightX)) - 20) /
+                  80,
+              )
+            : 1);
+
+        if (boundaryFade <= 0.01) {
+          continue;
+        }
+
+        yearBoundaryCandidates.push({
+          x,
+          text: labelText,
+          width: labelWidth,
+          alpha: 0.7 * boundaryFade,
+          step: 1,
+          pixelsPerStep: Math.abs(toX(year + 1) - x),
+        });
+      }
+
+      const yearEdgeLabelEntries = [
+        {
+          x: pad,
+          text: formatTimelineYear(edgeLeftYear, 1),
+          align: "left" as const,
+        },
+        {
+          x: width - pad,
+          text: formatTimelineYear(edgeRightYear, 1),
+          align: "right" as const,
+        },
+      ];
+      const yearOccupiedBounds: Array<{ left: number; right: number }> = [];
+
+      for (const edgeLabel of yearEdgeLabelEntries) {
+        const labelWidth = context.measureText(edgeLabel.text).width;
+        const left =
+          edgeLabel.align === "left"
+            ? edgeLabel.x - AXIS_LABEL_OCCUPIED_PADDING
+            : edgeLabel.x - labelWidth - AXIS_LABEL_OCCUPIED_PADDING;
+        const right =
+          edgeLabel.align === "left"
+            ? edgeLabel.x + labelWidth + AXIS_LABEL_OCCUPIED_PADDING
+            : edgeLabel.x + AXIS_LABEL_OCCUPIED_PADDING;
+
+        yearOccupiedBounds.push({ left, right });
+      }
+
+      const resolvedYearLabels = resolveAxisLabelCandidates(
+        yearBoundaryCandidates,
+        yearOccupiedBounds,
+        { dedupeByTextOnly: true },
+      );
+
+      for (const label of resolvedYearLabels.sort((left, right) => left.x - right.x)) {
+        context.save();
+        context.globalAlpha = label.alpha;
+        context.font = "11px var(--font-sans)";
+        context.fillText(label.text, label.x, layout.yearLabelY);
+        context.restore();
+      }
     }
   }, [
     activeEra,

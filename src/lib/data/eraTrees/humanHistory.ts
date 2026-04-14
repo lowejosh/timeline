@@ -1,6 +1,7 @@
 import type { EraDefinition } from "../timelineTypes";
+import { getPresentTimelineYear } from "../../time/present";
 
-const CURRENT_YEAR = new Date().getFullYear();
+const CURRENT_YEAR = getPresentTimelineYear();
 
 export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
   id: "human-history",

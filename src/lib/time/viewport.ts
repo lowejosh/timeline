@@ -1,14 +1,17 @@
+import { getPresentTimelineYear } from "./present";
+
 export type TimelineViewport = {
   centerYear: number;
   zoom: number;
 };
 
 export const TIMELINE_MIN_YEAR = -13_800_000_000;
-export const TIMELINE_MAX_YEAR = new Date().getFullYear();
+export const TIMELINE_MAX_YEAR = getPresentTimelineYear();
 export const MIN_ZOOM = 0;
-export const MAX_ZOOM = 34;
+export const MAX_ZOOM = 44;
 export const BASE_YEARS_PER_PIXEL = 50_000_000;
 export const HOME_RANGE: [number, number] = [1500, TIMELINE_MAX_YEAR];
+const MIN_VISIBLE_RANGE_YEARS = 14 / 365.2425;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -23,8 +26,17 @@ export function getMinZoomForWidth(width: number) {
   );
 }
 
-export function clampZoom(zoom: number) {
-  return clamp(zoom, MIN_ZOOM, MAX_ZOOM);
+export function getMaxZoomForWidth(width: number) {
+  const safeWidth = Math.max(width, 1);
+  const maxZoomForVisibleRange = Math.log2(
+    (BASE_YEARS_PER_PIXEL * safeWidth) / MIN_VISIBLE_RANGE_YEARS,
+  );
+
+  return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, maxZoomForVisibleRange));
+}
+
+export function clampZoom(zoom: number, width?: number) {
+  return clamp(zoom, MIN_ZOOM, width ? getMaxZoomForWidth(width) : MAX_ZOOM);
 }
 
 export function getYearsPerPixel(zoom: number) {
@@ -50,7 +62,7 @@ export function clampCenter(centerYear: number, zoom: number, width: number) {
 
 export function normalizeViewport(viewport: TimelineViewport, width: number) {
   const minZoom = getMinZoomForWidth(width);
-  const zoom = clamp(viewport.zoom, minZoom, MAX_ZOOM);
+  const zoom = clamp(viewport.zoom, minZoom, getMaxZoomForWidth(width));
 
   return {
     zoom,
@@ -121,7 +133,7 @@ export function zoomAtPosition(
   const safeWidth = Math.max(width, 1);
   const rawYear = screenToWorld(anchorX, viewport, safeWidth);
   const anchoredYear = clamp(rawYear, TIMELINE_MIN_YEAR, TIMELINE_MAX_YEAR);
-  const zoom = clampZoom(nextZoom);
+  const zoom = clampZoom(nextZoom, safeWidth);
   const centerYear =
     anchoredYear - (anchorX - safeWidth / 2) * getYearsPerPixel(zoom);
 
@@ -159,7 +171,10 @@ export function getViewportForRange(
     (maxYear - minYear) / (safeWidth * contentWidth),
     1e-6,
   );
-  const zoom = clampZoom(Math.log2(BASE_YEARS_PER_PIXEL / yearsPerPixel));
+  const zoom = clampZoom(
+    Math.log2(BASE_YEARS_PER_PIXEL / yearsPerPixel),
+    safeWidth,
+  );
 
   return normalizeViewport(
     {

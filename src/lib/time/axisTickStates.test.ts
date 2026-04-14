@@ -1,6 +1,30 @@
 import { describe, expect, it } from "vitest";
 import { resolveAxisTickRenderStates } from "./axisTickStates";
 
+const DAY_IN_MS = 86_400_000;
+
+function createTimelineUtcDate(year: number, month = 0, day = 1) {
+  const date = new Date(Date.UTC(2000, month, day));
+
+  date.setUTCFullYear(year, month, day);
+  date.setUTCHours(0, 0, 0, 0);
+
+  return date;
+}
+
+function getTimelineYearStart(year: number) {
+  return createTimelineUtcDate(year, 0, 1).getTime();
+}
+
+function getTimelineDateFromYear(year: number) {
+  const wholeYear = Math.floor(year);
+  const fraction = year - wholeYear;
+  const start = getTimelineYearStart(wholeYear);
+  const end = getTimelineYearStart(wholeYear + 1);
+
+  return new Date(start + fraction * (end - start));
+}
+
 function getTickStatesAtYear(year: number, span: number, width = 1000) {
   return resolveAxisTickRenderStates(-span, 0, width).filter(
     (state) => Math.abs(state.year - year) < 1e-6,
@@ -107,6 +131,56 @@ describe("axis tick render states", () => {
     for (const labeledTick of [...earlyLabeledTicks, ...boundaryLabeledTicks, ...laterLabeledTicks]) {
       expect(labeledTick.visibleProgress).toBeGreaterThan(0.01);
       expect(labeledTick.step).toBe(labeledTick.labelStep);
+    }
+  });
+
+  it("snaps sub-year ticks to discrete calendar boundaries", () => {
+    const states = resolveAxisTickRenderStates(2025.57, 2025.58, 1_200);
+    const dailyStep = 1 / 365.2425;
+    const dailyLayer = states.filter(
+      (state) => Math.abs(state.step - dailyStep) < 1e-9,
+    );
+
+    expect(dailyLayer.length).toBeGreaterThan(0);
+
+    const dailyDates = dailyLayer.map((state) => getTimelineDateFromYear(state.year));
+
+    for (const date of dailyDates) {
+      expect(date.getUTCHours()).toBe(0);
+      expect(date.getUTCMinutes()).toBe(0);
+      expect(date.getUTCSeconds()).toBe(0);
+      expect(date.getUTCMilliseconds()).toBe(0);
+    }
+
+    const uniqueDayLabels = new Set(
+      dailyDates.map((date) => `${date.getUTCMonth()}-${date.getUTCDate()}`),
+    );
+
+    expect(uniqueDayLabels.size).toBe(dailyDates.length);
+
+    for (let index = 1; index < dailyDates.length; index += 1) {
+      const dayDelta =
+        (dailyDates[index].getTime() - dailyDates[index - 1].getTime()) /
+        DAY_IN_MS;
+
+      expect(dayDelta).toBeCloseTo(1, 6);
+    }
+  });
+
+  it("uses discrete daily steps for long-ago sub-year ranges", () => {
+    const states = resolveAxisTickRenderStates(-54_321.02, -54_320.98, 1_200);
+    const dailyStep = 1 / 365.2425;
+    const dailyLayer = states.filter(
+      (state) => Math.abs(state.step - dailyStep) < 1e-9,
+    );
+
+    expect(dailyLayer.length).toBeGreaterThan(0);
+
+    for (let index = 1; index < dailyLayer.length; index += 1) {
+      expect((dailyLayer[index].year - dailyLayer[index - 1].year) * 365.2425).toBeCloseTo(
+        1,
+        6,
+      );
     }
   });
 });
