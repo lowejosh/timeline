@@ -109,6 +109,13 @@ type AnimatedEraChildState = {
   duration: number;
 };
 
+type RgbaColor = {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+};
+
 const NOW_YEAR = new Date().getFullYear();
 const PAD = 120;
 const OVERLAY_LANE_HEIGHT = 16;
@@ -120,6 +127,8 @@ const AXIS_LABEL_CLEARANCE_FADE_END = 40;
 const AXIS_TICK_ANIMATION_SMOOTHING_MS = 110;
 const ERA_CHILD_TRANSITION_DURATION_MS = 220;
 const AXIS_LABEL_SECONDARY_STEP_RATIO = 0.82;
+const DARK_OVERLAY_LABEL: RgbaColor = { r: 34, g: 26, b: 19, a: 1 };
+const LIGHT_OVERLAY_LABEL: RgbaColor = { r: 252, g: 248, b: 241, a: 1 };
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));
@@ -186,6 +195,185 @@ function getTimelineLayout(
     majorTickTop,
     yearLabelY: axisY + 68,
     nowTop: majorTickTop - 18,
+  };
+}
+
+function getOverlayLaneY(
+  layout: TimelineCanvasLayout,
+  laneIndex: number,
+) {
+  return (
+    layout.overlayBottom -
+    OVERLAY_LANE_HEIGHT -
+    laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP)
+  );
+}
+
+function parseHexColor(color: string): RgbaColor | null {
+  const hex = color.slice(1);
+
+  if (hex.length === 3 || hex.length === 4) {
+    const [r, g, b, a = "f"] = hex.split("");
+
+    return {
+      r: Number.parseInt(`${r}${r}`, 16),
+      g: Number.parseInt(`${g}${g}`, 16),
+      b: Number.parseInt(`${b}${b}`, 16),
+      a: Number.parseInt(`${a}${a}`, 16) / 255,
+    };
+  }
+
+  if (hex.length === 6 || hex.length === 8) {
+    return {
+      r: Number.parseInt(hex.slice(0, 2), 16),
+      g: Number.parseInt(hex.slice(2, 4), 16),
+      b: Number.parseInt(hex.slice(4, 6), 16),
+      a:
+        hex.length === 8
+          ? Number.parseInt(hex.slice(6, 8), 16) / 255
+          : 1,
+    };
+  }
+
+  return null;
+}
+
+function parseRgbColor(color: string): RgbaColor | null {
+  const match = color.match(/rgba?\(([^)]+)\)/i);
+
+  if (!match) {
+    return null;
+  }
+
+  const parts = match[1]
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length < 3) {
+    return null;
+  }
+
+  const [r, g, b, alpha = "1"] = parts;
+
+  return {
+    r: Number.parseFloat(r),
+    g: Number.parseFloat(g),
+    b: Number.parseFloat(b),
+    a: Number.parseFloat(alpha),
+  };
+}
+
+function parseColor(color: string): RgbaColor | null {
+  const normalized = color.trim();
+
+  if (!normalized) {
+    return null;
+  }
+
+  if (normalized.startsWith("#")) {
+    return parseHexColor(normalized);
+  }
+
+  if (normalized.startsWith("rgb")) {
+    return parseRgbColor(normalized);
+  }
+
+  return null;
+}
+
+function withAlpha(color: RgbaColor, alpha: number): RgbaColor {
+  return {
+    ...color,
+    a: clamp01(alpha),
+  };
+}
+
+function blendColors(foreground: RgbaColor, background: RgbaColor): RgbaColor {
+  const alpha = clamp01(foreground.a + background.a * (1 - foreground.a));
+
+  if (alpha <= 0.0001) {
+    return { r: 0, g: 0, b: 0, a: 0 };
+  }
+
+  return {
+    r:
+      (foreground.r * foreground.a +
+        background.r * background.a * (1 - foreground.a)) /
+      alpha,
+    g:
+      (foreground.g * foreground.a +
+        background.g * background.a * (1 - foreground.a)) /
+      alpha,
+    b:
+      (foreground.b * foreground.a +
+        background.b * background.a * (1 - foreground.a)) /
+      alpha,
+    a: alpha,
+  };
+}
+
+function toRelativeLuminanceChannel(channel: number) {
+  const normalized = channel / 255;
+
+  return normalized <= 0.03928
+    ? normalized / 12.92
+    : ((normalized + 0.055) / 1.055) ** 2.4;
+}
+
+function getRelativeLuminance(color: RgbaColor) {
+  return (
+    0.2126 * toRelativeLuminanceChannel(color.r) +
+    0.7152 * toRelativeLuminanceChannel(color.g) +
+    0.0722 * toRelativeLuminanceChannel(color.b)
+  );
+}
+
+function getContrastRatio(left: RgbaColor, right: RgbaColor) {
+  const leftLuminance = getRelativeLuminance(left);
+  const rightLuminance = getRelativeLuminance(right);
+  const lighter = Math.max(leftLuminance, rightLuminance);
+  const darker = Math.min(leftLuminance, rightLuminance);
+
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function toCssColor(color: RgbaColor) {
+  return `rgba(${Math.round(color.r)}, ${Math.round(color.g)}, ${Math.round(color.b)}, ${color.a})`;
+}
+
+function getOverlayLabelPaint(
+  bandColor: string,
+  bandOpacity: number,
+  fallbackLabelColor: string,
+  backgroundColor: string,
+) {
+  const parsedBandColor = parseColor(bandColor);
+  const parsedLabelColor = parseColor(fallbackLabelColor) ?? DARK_OVERLAY_LABEL;
+  const parsedBackgroundColor = parseColor(backgroundColor) ?? {
+    r: 247,
+    g: 240,
+    b: 226,
+    a: 1,
+  };
+
+  if (!parsedBandColor) {
+    return {
+      fillStyle: fallbackLabelColor,
+    };
+  }
+
+  const effectiveBandColor = blendColors(
+    withAlpha(parsedBandColor, parsedBandColor.a * clamp01(bandOpacity)),
+    parsedBackgroundColor,
+  );
+  const darkCandidate = withAlpha(parsedLabelColor, 1);
+  const lightContrast = getContrastRatio(LIGHT_OVERLAY_LABEL, effectiveBandColor);
+  const darkContrast = getContrastRatio(darkCandidate, effectiveBandColor);
+  const useLightLabel = lightContrast >= darkContrast;
+  const fillColor = useLightLabel ? LIGHT_OVERLAY_LABEL : darkCandidate;
+  return {
+    fillStyle: toCssColor(fillColor),
   };
 }
 
@@ -633,9 +821,7 @@ export function TimelineCanvas({
         }
 
         const bandWidth = overlay.renderWidth;
-        const y =
-          layout.overlayTop +
-          overlay.laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP);
+        const y = getOverlayLaneY(layout, overlay.laneIndex);
 
         context.save();
         context.globalAlpha = 0.92 * progress;
@@ -668,7 +854,15 @@ export function TimelineCanvas({
             : 0;
 
         if (chosenLabel && labelOpacity > 0.01) {
-          context.fillStyle = labelColor;
+          const overlayBandOpacity = 0.92 * progress;
+          const overlayLabelPaint = getOverlayLabelPaint(
+            overlay.band.color,
+            overlayBandOpacity,
+            labelColor,
+            paper,
+          );
+
+          context.fillStyle = overlayLabelPaint.fillStyle;
           context.globalAlpha = 0.82 * progress * labelOpacity;
           context.textAlign = "center";
           context.textBaseline = "middle";
