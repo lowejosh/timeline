@@ -107,28 +107,44 @@ describe("axis tick render states", () => {
   });
 
   it("crossfades labels between adjacent scales and only on visible ticks", () => {
-    const earlyLabeledTicks = resolveAxisTickRenderStates(-2_700, 0, 1_000).filter(
-      (state) => state.labelOpacity > 0.01,
+    const earlyLabeledTicks = resolveAxisTickRenderStates(
+      -2_700,
+      0,
+      1_000,
+    ).filter((state) => state.labelOpacity > 0.01);
+    const boundaryLabeledTicks = resolveAxisTickRenderStates(
+      -2_150,
+      0,
+      1_000,
+    ).filter((state) => state.labelOpacity > 0.01);
+    const laterLabeledTicks = resolveAxisTickRenderStates(
+      -1_750,
+      0,
+      1_000,
+    ).filter((state) => state.labelOpacity > 0.01);
+    const earlyLabelSteps = new Set(
+      earlyLabeledTicks.map((state) => state.labelStep),
     );
-    const boundaryLabeledTicks = resolveAxisTickRenderStates(-2_150, 0, 1_000).filter(
-      (state) => state.labelOpacity > 0.01,
-    );
-    const laterLabeledTicks = resolveAxisTickRenderStates(-1_750, 0, 1_000).filter(
-      (state) => state.labelOpacity > 0.01,
-    );
-    const earlyLabelSteps = new Set(earlyLabeledTicks.map((state) => state.labelStep));
     const boundaryLabelSteps = new Set(
       boundaryLabeledTicks.map((state) => state.labelStep),
     );
-    const laterLabelSteps = new Set(laterLabeledTicks.map((state) => state.labelStep));
+    const laterLabelSteps = new Set(
+      laterLabeledTicks.map((state) => state.labelStep),
+    );
 
     expect(earlyLabelSteps.has(1_000)).toBe(true);
     expect(boundaryLabelSteps.size).toBeGreaterThanOrEqual(1);
     expect(boundaryLabelSteps.size).toBeLessThanOrEqual(2);
-    expect(boundaryLabelSteps.has(1_000) || boundaryLabelSteps.has(500)).toBe(true);
+    expect(boundaryLabelSteps.has(1_000) || boundaryLabelSteps.has(500)).toBe(
+      true,
+    );
     expect(laterLabelSteps.has(500)).toBe(true);
 
-    for (const labeledTick of [...earlyLabeledTicks, ...boundaryLabeledTicks, ...laterLabeledTicks]) {
+    for (const labeledTick of [
+      ...earlyLabeledTicks,
+      ...boundaryLabeledTicks,
+      ...laterLabeledTicks,
+    ]) {
       expect(labeledTick.visibleProgress).toBeGreaterThan(0.01);
       expect(labeledTick.step).toBe(labeledTick.labelStep);
     }
@@ -143,7 +159,9 @@ describe("axis tick render states", () => {
 
     expect(dailyLayer.length).toBeGreaterThan(0);
 
-    const dailyDates = dailyLayer.map((state) => getTimelineDateFromYear(state.year));
+    const dailyDates = dailyLayer.map((state) =>
+      getTimelineDateFromYear(state.year),
+    );
 
     for (const date of dailyDates) {
       expect(date.getUTCHours()).toBe(0);
@@ -177,10 +195,9 @@ describe("axis tick render states", () => {
     expect(dailyLayer.length).toBeGreaterThan(0);
 
     for (let index = 1; index < dailyLayer.length; index += 1) {
-      expect((dailyLayer[index].year - dailyLayer[index - 1].year) * 365.2425).toBeCloseTo(
-        1,
-        6,
-      );
+      expect(
+        (dailyLayer[index].year - dailyLayer[index - 1].year) * 365.2425,
+      ).toBeCloseTo(1, 6);
     }
   });
 });

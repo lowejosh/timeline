@@ -18,6 +18,7 @@ export type Era = {
   startYear: number;
   endYear: number;
   color: string;
+  description?: string;
   scheme?: EraScheme;
   sourceRefs?: TimelineSourceRef[];
   children?: Era[];
@@ -37,6 +38,7 @@ type TimelineDecorationBase = TimelineZoomVisibility & {
   id: string;
   label: string;
   shortLabel?: string;
+  description?: string;
   priority?: number;
   sourceRefs?: TimelineSourceRef[];
 };

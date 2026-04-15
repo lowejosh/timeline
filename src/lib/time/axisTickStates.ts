@@ -168,7 +168,10 @@ function getCalendarTicksForStep(
   endYear: number,
   stepDefinition: Extract<AxisStepDefinition, { kind: "calendar" }>,
 ) {
-  const clampedStart = Math.max(Math.min(startYear, endYear), TIMELINE_MIN_YEAR);
+  const clampedStart = Math.max(
+    Math.min(startYear, endYear),
+    TIMELINE_MIN_YEAR,
+  );
   const clampedEnd = Math.min(Math.max(startYear, endYear), TIMELINE_MAX_YEAR);
 
   if (clampedEnd < clampedStart || clampedEnd < 1) {
@@ -191,7 +194,10 @@ function getCalendarTicksForStep(
     while (current.getTime() <= endDate.getTime() + DAY_IN_MS * 0.5) {
       const tickYear = getTimelineYearFromDate(current);
 
-      if (tickYear >= clampedStart - EPSILON && tickYear <= clampedEnd + EPSILON) {
+      if (
+        tickYear >= clampedStart - EPSILON &&
+        tickYear <= clampedEnd + EPSILON
+      ) {
         ticks.push(tickYear);
       }
 
@@ -218,7 +224,10 @@ function getCalendarTicksForStep(
   while (current.getTime() <= endDate.getTime() + DAY_IN_MS * 0.5) {
     const tickYear = getTimelineYearFromDate(current);
 
-    if (tickYear >= clampedStart - EPSILON && tickYear <= clampedEnd + EPSILON) {
+    if (
+      tickYear >= clampedStart - EPSILON &&
+      tickYear <= clampedEnd + EPSILON
+    ) {
       ticks.push(tickYear);
     }
 
@@ -235,7 +244,10 @@ function getElapsedDayTicksForStep(
   stepDefinition: Extract<AxisStepDefinition, { kind: "elapsed-day" }>,
   reference: TimelineElapsedReference,
 ) {
-  const clampedStart = Math.max(Math.min(startYear, endYear), TIMELINE_MIN_YEAR);
+  const clampedStart = Math.max(
+    Math.min(startYear, endYear),
+    TIMELINE_MIN_YEAR,
+  );
   const clampedEnd = Math.min(Math.max(startYear, endYear), TIMELINE_MAX_YEAR);
 
   if (clampedEnd < clampedStart) {
@@ -298,7 +310,10 @@ function getExplicitTicksForStep(
 
   const step = stepDefinition.step;
   const safeStep = Math.max(Math.abs(step), EPSILON);
-  const clampedStart = Math.max(Math.min(startYear, endYear), TIMELINE_MIN_YEAR);
+  const clampedStart = Math.max(
+    Math.min(startYear, endYear),
+    TIMELINE_MIN_YEAR,
+  );
   const clampedEnd = Math.min(Math.max(startYear, endYear), TIMELINE_MAX_YEAR);
 
   if (clampedEnd < clampedStart) {
@@ -330,7 +345,10 @@ function getExplicitTicksForStep(
   return ticks;
 }
 
-function getNumericCandidateSteps(idealMajorStep: number, yearsPerPixel: number) {
+function getNumericCandidateSteps(
+  idealMajorStep: number,
+  yearsPerPixel: number,
+) {
   if (!Number.isFinite(idealMajorStep) || idealMajorStep <= 0) {
     return [];
   }
@@ -460,11 +478,17 @@ export function resolveAxisTickRenderStates(
   options: ResolveAxisTickOptions = {},
 ): AxisTickRenderState[] {
   const safeWidth = Math.max(width, 1);
-  const clampedStart = Math.max(Math.min(startYear, endYear), TIMELINE_MIN_YEAR);
+  const clampedStart = Math.max(
+    Math.min(startYear, endYear),
+    TIMELINE_MIN_YEAR,
+  );
   const clampedEnd = Math.min(Math.max(startYear, endYear), TIMELINE_MAX_YEAR);
   const span = Math.max(clampedEnd - clampedStart, EPSILON);
   const yearsPerPixel = span / safeWidth;
-  const majorCount = Math.max(2, Math.floor(safeWidth / TARGET_MAJOR_SPACING_PX));
+  const majorCount = Math.max(
+    2,
+    Math.floor(safeWidth / TARGET_MAJOR_SPACING_PX),
+  );
   const idealMajorStep = Math.max(span / majorCount, EPSILON);
   const subYearMode =
     idealMajorStep < 1

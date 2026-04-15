@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { TimelineMarker } from "../data/timelineTypes";
 import {
   resolveMarkerRenderStates,
+  type ResolveMarkerRenderOptions,
   type MarkerTextMeasurer,
   type VisibleMarkerPosition,
 } from "./markerGlyphs";
@@ -26,17 +27,18 @@ function resolveStates(
     shortLabelWidth: 1,
     dateLabelWidth: 1,
   }),
+  options: ResolveMarkerRenderOptions = {},
 ) {
   const positions: VisibleMarkerPosition[] = markers.map(({ id, priority, x }) => ({
     marker: makeMarker(id, priority),
     x,
   }));
 
-  return resolveMarkerRenderStates(positions, WIDTH, PAD, measureText);
+  return resolveMarkerRenderStates(positions, WIDTH, PAD, measureText, options);
 }
 
 describe("marker glyph timing", () => {
-  it("grows crowded dots from zero while keeping the stem hidden", () => {
+  it("keeps crowded dots faintly visible while the stem stays hidden", () => {
     const states = resolveStates([
       { id: "anchor", priority: 100, x: 160 },
       { id: "crowded", priority: 10, x: 162 },
@@ -46,7 +48,8 @@ describe("marker glyph timing", () => {
     expect(crowded).toBeDefined();
     expect(crowded?.revealProgress).toBe(0);
     expect(crowded?.timingProgress).toBeCloseTo(0.28, 6);
-    expect(crowded?.dotProgress).toBe(0);
+    expect(crowded?.dotProgress).toBeGreaterThan(0);
+    expect(crowded?.dotProgress ?? 1).toBeLessThan(0.05);
     expect(crowded?.labelOpacity).toBe(0);
     expect(crowded?.stemProgress).toBe(0);
   });
@@ -63,7 +66,8 @@ describe("marker glyph timing", () => {
 
     expect(halfVisible).toBeDefined();
     expect(halfVisible?.revealProgress).toBe(1);
-    expect(halfVisible?.dotProgress).toBe(1);
+  expect(halfVisible?.dotProgress).toBeGreaterThan(0.85);
+  expect(halfVisible?.dotProgress ?? 1).toBeLessThan(1);
     expect(halfVisible?.intrinsicLabelOpacity).toBe(1);
     expect(halfVisible?.labelOpacity).toBeCloseTo(0.5, 6);
     expect(halfVisible?.stemProgress).toBeCloseTo(0.5, 6);
@@ -80,7 +84,8 @@ describe("marker glyph timing", () => {
 
     expect(culled).toBeDefined();
     expect(culled?.revealProgress).toBeCloseTo(0.9375, 6);
-    expect(culled?.dotProgress).toBeGreaterThan(0.98);
+    expect(culled?.dotProgress).toBeGreaterThan(0.4);
+    expect(culled?.dotProgress ?? 1).toBeLessThan(0.5);
     expect(culled?.intrinsicLabelOpacity).toBe(1);
     expect(culled?.labelOpacity).toBe(0);
     expect(culled?.stemProgress).toBe(0);
@@ -108,5 +113,35 @@ describe("marker glyph timing", () => {
     const [state] = resolveMarkerRenderStates(positions, WIDTH, PAD, measureText);
 
     expect(state.label).toBe("wide-short");
+  });
+
+  it("temporarily lets a hovered marker outrank a nearby higher-priority marker", () => {
+    const crowdedStates = resolveStates([
+      { id: "anchor", priority: 100, x: 160 },
+      { id: "hovered", priority: 10, x: 179 },
+    ]);
+    const boostedStates = resolveStates(
+      [
+        { id: "anchor", priority: 100, x: 160 },
+        { id: "hovered", priority: 10, x: 179 },
+      ],
+      undefined,
+      { highlightedMarkerId: "hovered" },
+    );
+
+    const crowdedHovered = crowdedStates.find(
+      (state) => state.marker.id === "hovered",
+    );
+    const boostedHovered = boostedStates.find(
+      (state) => state.marker.id === "hovered",
+    );
+    const boostedAnchor = boostedStates.find(
+      (state) => state.marker.id === "anchor",
+    );
+
+    expect(crowdedHovered?.labelOpacity).toBe(0);
+    expect(boostedHovered?.labelOpacity).toBe(1);
+    expect(boostedHovered?.stemProgress).toBe(1);
+    expect(boostedAnchor?.labelOpacity).toBe(0);
   });
 });

@@ -3,6 +3,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type PointerEvent,
   type WheelEvent,
 } from "react";
@@ -18,6 +19,11 @@ import {
   type TimelineMarker,
   type TimelineOverlayBand,
 } from "../../lib/data/eras";
+import {
+  getMarkerTooltipContent,
+  getOverlayTooltipContent,
+  type TimelineTooltipContent,
+} from "../../lib/data/timelineTooltip";
 import {
   PRIMORDIAL_UNIVERSE_END_YEAR,
   PRIMORDIAL_UNIVERSE_ID,
@@ -46,6 +52,7 @@ import {
 } from "../../lib/time/overlayTracks";
 import {
   getVisibleMarkerPositions,
+  type MarkerTextMeasureInput,
   resolveMarkerRenderStates,
 } from "../../lib/time/markerGlyphs";
 import {
@@ -122,6 +129,32 @@ type AnimatedEraChildState = {
   duration: number;
 };
 
+type HoverRegion = {
+  id: string;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+  anchorX: number;
+  anchorY: number;
+  anchorMode?: "fixed" | "follow-x";
+  placement: "above" | "below";
+  tooltip: TimelineTooltipContent;
+};
+
+type HoveredTooltipState = {
+  id: string;
+  anchorX: number;
+  anchorY: number;
+  placement: "above" | "below";
+  tooltip: TimelineTooltipContent;
+};
+
+type MarkerPriorityBoostState = {
+  current: number;
+  target: number;
+};
+
 type RgbaColor = {
   r: number;
   g: number;
@@ -139,9 +172,13 @@ const AXIS_LABEL_CLEARANCE_FADE_END = 40;
 const AXIS_DUPLICATE_LABEL_MIN_GAP = 18;
 const AXIS_TICK_ANIMATION_SMOOTHING_MS = 110;
 const ERA_CHILD_TRANSITION_DURATION_MS = 220;
+const MARKER_PRIORITY_BOOST_SMOOTHING_MS = 130;
 const AXIS_LABEL_SECONDARY_STEP_RATIO = 0.82;
 const DARK_OVERLAY_LABEL: RgbaColor = { r: 34, g: 26, b: 19, a: 1 };
 const LIGHT_OVERLAY_LABEL: RgbaColor = { r: 252, g: 248, b: 241, a: 1 };
+const TOOLTIP_OFFSET = 3;
+const TOOLTIP_MAX_WIDTH = 280;
+const TOOLTIP_BRIDGE_BASE_HALF_WIDTH = 16;
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));
@@ -181,7 +218,9 @@ function resolveAxisLabelCandidates(
   const resolvedAxisLabels: AxisLabelCandidate[] = [];
 
   for (const candidate of [...candidates].sort((left, right) => {
-    return right.alpha - left.alpha || right.step - left.step || left.x - right.x;
+    return (
+      right.alpha - left.alpha || right.step - left.step || left.x - right.x
+    );
   })) {
     const dynamicPadding = Math.max(
       AXIS_LABEL_OCCUPIED_PADDING,
@@ -220,7 +259,8 @@ function resolveAxisLabelCandidates(
       }
 
       const duplicateGap =
-        Math.max(existing.width, candidate.width) + AXIS_DUPLICATE_LABEL_MIN_GAP;
+        Math.max(existing.width, candidate.width) +
+        AXIS_DUPLICATE_LABEL_MIN_GAP;
 
       return Math.abs(existing.x - candidate.x) < duplicateGap;
     });
@@ -303,15 +343,92 @@ function getTimelineLayout(
   };
 }
 
-function getOverlayLaneY(
-  layout: TimelineCanvasLayout,
-  laneIndex: number,
-) {
+function getOverlayLaneY(layout: TimelineCanvasLayout, laneIndex: number) {
   return (
     layout.overlayBottom -
     OVERLAY_LANE_HEIGHT -
     laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP)
   );
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function isPointInTooltipBridgeTriangle(
+  pointX: number,
+  pointY: number,
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number,
+  endHalfWidth: number,
+) {
+  const dx = endX - startX;
+  const dy = endY - startY;
+  const length = Math.hypot(dx, dy);
+
+  if (length <= 1e-6) {
+    return Math.hypot(pointX - startX, pointY - startY) <= endHalfWidth;
+  }
+
+  const unitX = dx / length;
+  const unitY = dy / length;
+  const offsetX = pointX - startX;
+  const offsetY = pointY - startY;
+  const distanceAlong = offsetX * unitX + offsetY * unitY;
+
+  if (distanceAlong < 0 || distanceAlong > length) {
+    return false;
+  }
+
+  const perpendicularDistance = Math.abs(
+    offsetX * -unitY + offsetY * unitX,
+  );
+  const allowedHalfWidth = (distanceAlong / length) * endHalfWidth;
+
+  return perpendicularDistance <= allowedHalfWidth;
+}
+
+function shouldRetainTooltipAtPoint(
+  pointX: number,
+  pointY: number,
+  shellRect: DOMRect,
+  tooltipRect: DOMRect,
+  tooltip: HoveredTooltipState,
+) {
+  const localLeft = tooltipRect.left - shellRect.left;
+  const localRight = tooltipRect.right - shellRect.left;
+  const localTop = tooltipRect.top - shellRect.top;
+  const localBottom = tooltipRect.bottom - shellRect.top;
+
+  if (
+    pointX >= localLeft &&
+    pointX <= localRight &&
+    pointY >= localTop &&
+    pointY <= localBottom
+  ) {
+    return true;
+  }
+
+  const edgeX = clamp(tooltip.anchorX, localLeft + 8, localRight - 8);
+  const edgeY = tooltip.placement === "below" ? localTop : localBottom;
+
+  return isPointInTooltipBridgeTriangle(
+    pointX,
+    pointY,
+    tooltip.anchorX,
+    tooltip.anchorY,
+    edgeX,
+    edgeY,
+    TOOLTIP_BRIDGE_BASE_HALF_WIDTH,
+  );
+}
+
+function shouldPrioritizeCurrentTooltipRetention(
+  tooltip: HoveredTooltipState | null,
+) {
+  return tooltip?.tooltip.kind === "overlay";
 }
 
 function parseHexColor(color: string): RgbaColor | null {
@@ -333,10 +450,7 @@ function parseHexColor(color: string): RgbaColor | null {
       r: Number.parseInt(hex.slice(0, 2), 16),
       g: Number.parseInt(hex.slice(2, 4), 16),
       b: Number.parseInt(hex.slice(4, 6), 16),
-      a:
-        hex.length === 8
-          ? Number.parseInt(hex.slice(6, 8), 16) / 255
-          : 1,
+      a: hex.length === 8 ? Number.parseInt(hex.slice(6, 8), 16) / 255 : 1,
     };
   }
 
@@ -473,7 +587,10 @@ function getOverlayLabelPaint(
     parsedBackgroundColor,
   );
   const darkCandidate = withAlpha(parsedLabelColor, 1);
-  const lightContrast = getContrastRatio(LIGHT_OVERLAY_LABEL, effectiveBandColor);
+  const lightContrast = getContrastRatio(
+    LIGHT_OVERLAY_LABEL,
+    effectiveBandColor,
+  );
   const darkContrast = getContrastRatio(darkCandidate, effectiveBandColor);
   const useLightLabel = lightContrast >= darkContrast;
   const fillColor = useLightLabel ? LIGHT_OVERLAY_LABEL : darkCandidate;
@@ -481,7 +598,6 @@ function getOverlayLabelPaint(
     fillStyle: toCssColor(fillColor),
   };
 }
-
 
 export function TimelineCanvas({
   width,
@@ -503,18 +619,157 @@ export function TimelineCanvas({
   onReleaseMomentum,
 }: TimelineCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
   const dragStateRef = useRef<DragState | null>(null);
-  const axisTickAnimationRef = useRef<Map<string, AnimatedAxisTickState>>(new Map());
+  const hoverRegionsRef = useRef<HoverRegion[]>([]);
+  const hoveredTooltipRef = useRef<HoveredTooltipState | null>(null);
+  const lastPointerRef = useRef<{
+    x: number;
+    y: number;
+    pointerType: string;
+  } | null>(null);
+  const axisTickAnimationRef = useRef<Map<string, AnimatedAxisTickState>>(
+    new Map(),
+  );
   const axisTickAnimationLastTimeRef = useRef(0);
   const axisTickAnimationFrameRef = useRef(0);
   const axisTickAnimationInitializedRef = useRef(false);
-  const eraChildAnimationRef = useRef<Map<string, AnimatedEraChildState>>(new Map());
+  const eraChildAnimationRef = useRef<Map<string, AnimatedEraChildState>>(
+    new Map(),
+  );
   const eraChildAnimationFrameRef = useRef(0);
   const eraChildAnimationInitializedRef = useRef(false);
+  const markerPriorityBoostRef = useRef<Map<string, MarkerPriorityBoostState>>(
+    new Map(),
+  );
+  const markerPriorityBoostFrameRef = useRef(0);
+  const markerPriorityBoostLastTimeRef = useRef(0);
   const [axisTickAnimationVersion, setAxisTickAnimationVersion] = useState(0);
-  const [animatedEraChildOpacityById, setAnimatedEraChildOpacityById] = useState<
-    ReadonlyMap<string, number>
-  >(new Map());
+  const [markerPriorityBoostVersion, setMarkerPriorityBoostVersion] =
+    useState(0);
+  const [animatedEraChildOpacityById, setAnimatedEraChildOpacityById] =
+    useState<ReadonlyMap<string, number>>(new Map());
+  const [hoveredTooltip, setHoveredTooltip] =
+    useState<HoveredTooltipState | null>(null);
+  useEffect(() => {
+    hoveredTooltipRef.current = hoveredTooltip;
+  }, [hoveredTooltip]);
+  const highlightedMarkerId =
+    hoveredTooltip?.tooltip.kind === "marker" ? hoveredTooltip.id : null;
+
+  useEffect(() => {
+    const boostStates = markerPriorityBoostRef.current;
+
+    for (const [markerId, state] of boostStates) {
+      state.target = markerId === highlightedMarkerId ? 1 : 0;
+    }
+
+    if (highlightedMarkerId && !boostStates.has(highlightedMarkerId)) {
+      boostStates.set(highlightedMarkerId, {
+        current: 0,
+        target: 1,
+      });
+    }
+
+    const stepAnimation = (now: number) => {
+      const lastTime = markerPriorityBoostLastTimeRef.current || now;
+      const dt = Math.max(now - lastTime, 0);
+      markerPriorityBoostLastTimeRef.current = now;
+      const factor = 1 - Math.exp(-dt / MARKER_PRIORITY_BOOST_SMOOTHING_MS);
+      let hasActiveAnimation = false;
+
+      for (const [markerId, state] of boostStates) {
+        state.current += (state.target - state.current) * factor;
+
+        if (Math.abs(state.target - state.current) > 0.002) {
+          hasActiveAnimation = true;
+        } else {
+          state.current = state.target;
+        }
+
+        if (state.target <= 0.001 && state.current <= 0.003) {
+          boostStates.delete(markerId);
+        }
+      }
+
+      setMarkerPriorityBoostVersion((version) => version + 1);
+
+      if (hasActiveAnimation) {
+        markerPriorityBoostFrameRef.current = requestAnimationFrame(stepAnimation);
+      } else {
+        markerPriorityBoostFrameRef.current = 0;
+      }
+    };
+
+    if (markerPriorityBoostFrameRef.current) {
+      cancelAnimationFrame(markerPriorityBoostFrameRef.current);
+    }
+
+    markerPriorityBoostLastTimeRef.current = performance.now();
+    markerPriorityBoostFrameRef.current = requestAnimationFrame(stepAnimation);
+
+    return () => {
+      if (markerPriorityBoostFrameRef.current) {
+        cancelAnimationFrame(markerPriorityBoostFrameRef.current);
+        markerPriorityBoostFrameRef.current = 0;
+      }
+    };
+  }, [highlightedMarkerId]);
+  const resolveHoveredTooltip = (
+    x: number,
+    y: number,
+    pointerType: string,
+  ) => {
+    if (pointerType !== "mouse" && pointerType !== "pen") {
+      return null;
+    }
+
+    const matchingRegions = hoverRegionsRef.current.filter(
+      (region) =>
+        x >= region.left &&
+        x <= region.right &&
+        y >= region.top &&
+        y <= region.bottom,
+    );
+
+    if (matchingRegions.length === 0) {
+      return null;
+    }
+
+    const previousTooltip = hoveredTooltipRef.current;
+    const selectedRegion = [...matchingRegions].sort((left, right) => {
+      const leftKindPriority = left.tooltip.kind === "marker" ? 0 : 1;
+      const rightKindPriority = right.tooltip.kind === "marker" ? 0 : 1;
+
+      if (leftKindPriority !== rightKindPriority) {
+        return leftKindPriority - rightKindPriority;
+      }
+
+      const leftDistance = Math.hypot(x - left.anchorX, y - left.anchorY);
+      const rightDistance = Math.hypot(x - right.anchorX, y - right.anchorY);
+
+      if (Math.abs(leftDistance - rightDistance) > 0.001) {
+        return leftDistance - rightDistance;
+      }
+
+      const leftCurrentBias = previousTooltip?.id === left.id ? -0.25 : 0;
+      const rightCurrentBias = previousTooltip?.id === right.id ? -0.25 : 0;
+
+      return leftCurrentBias - rightCurrentBias;
+    })[0];
+
+    return {
+      id: selectedRegion.id,
+      anchorX:
+        selectedRegion.anchorMode === "follow-x"
+          ? x
+          : selectedRegion.anchorX,
+      anchorY: selectedRegion.anchorY,
+      placement: selectedRegion.placement,
+      tooltip: selectedRegion.tooltip,
+    } satisfies HoveredTooltipState;
+  };
   const resolvedEraLayers = useMemo(
     () =>
       resolveTimelineEraLayersFromOpacityMap(
@@ -531,7 +786,12 @@ export function TimelineCanvas({
     (layer) => layer.opacity > 0.01,
   );
   const interactiveChildEras = getInteractiveDescendantEras(resolvedEraLayers);
-  const visibleMarkers = getVisibleTimelineMarkers(markers, viewport, width, PAD);
+  const visibleMarkers = getVisibleTimelineMarkers(
+    markers,
+    viewport,
+    width,
+    PAD,
+  );
   const resolvedOverlayBands = resolveTimelineOverlayTracks(
     overlayBands,
     viewport,
@@ -693,7 +953,8 @@ export function TimelineCanvas({
       setAnimatedEraChildOpacityById(createSnapshot());
 
       if (hasActiveAnimation) {
-        eraChildAnimationFrameRef.current = requestAnimationFrame(stepAnimation);
+        eraChildAnimationFrameRef.current =
+          requestAnimationFrame(stepAnimation);
       } else {
         eraChildAnimationFrameRef.current = 0;
       }
@@ -799,7 +1060,8 @@ export function TimelineCanvas({
       setAxisTickAnimationVersion((version) => version + 1);
 
       if (hasActiveAnimation) {
-        axisTickAnimationFrameRef.current = requestAnimationFrame(stepAnimation);
+        axisTickAnimationFrameRef.current =
+          requestAnimationFrame(stepAnimation);
       } else {
         axisTickAnimationFrameRef.current = 0;
       }
@@ -827,6 +1089,9 @@ export function TimelineCanvas({
       }
       if (axisTickAnimationFrameRef.current) {
         cancelAnimationFrame(axisTickAnimationFrameRef.current);
+      }
+      if (markerPriorityBoostFrameRef.current) {
+        cancelAnimationFrame(markerPriorityBoostFrameRef.current);
       }
     };
   }, []);
@@ -865,10 +1130,9 @@ export function TimelineCanvas({
     const breadcrumbChainIds = new Set(
       breadcrumbChain.slice(1).map((era) => era.id),
     );
+    const hoverRegions: HoverRegion[] = [];
     const resolvedAxisTickStates = [...axisTickAnimationRef.current.values()]
-      .filter(
-        (tick) => tick.visibleProgress > 0.01 || tick.labelOpacity > 0.01,
-      )
+      .filter((tick) => tick.visibleProgress > 0.01 || tick.labelOpacity > 0.01)
       .sort((left, right) => left.step - right.step || left.year - right.year);
 
     // Helper: map world year to canvas x (offset into padded region)
@@ -897,6 +1161,8 @@ export function TimelineCanvas({
       const x0 = toX(era.startYear);
       const x1 = toX(era.endYear);
       const eraWidth = x1 - x0;
+      const clippedLeft = Math.max(x0, pad);
+      const clippedRight = Math.min(x1, width - pad);
 
       if (x1 < pad || x0 > width - pad || eraWidth < 2) return;
 
@@ -904,20 +1170,20 @@ export function TimelineCanvas({
       context.globalAlpha = opacity;
       context.fillStyle = era.color;
       context.fillRect(
-        Math.max(x0, pad),
+        clippedLeft,
         0,
-        Math.min(x1, width - pad) - Math.max(x0, pad),
+        clippedRight - clippedLeft,
         height,
       );
       context.restore();
 
-      const shouldHideInlineLabel =
-        breadcrumbChainIds.has(era.id);
+      const shouldHideInlineLabel = breadcrumbChainIds.has(era.id);
 
       if (eraWidth > 60 && !shouldHideInlineLabel) {
         const labelX = Math.max(x0, pad) / 2 + Math.min(x1, width - pad) / 2;
         const labelAlpha =
-          Math.min((eraWidth - 60) / 120, 1) * (0.28 + Math.min(opacity, 1) * 0.22);
+          Math.min((eraWidth - 60) / 120, 1) *
+          (0.28 + Math.min(opacity, 1) * 0.22);
 
         context.save();
         context.globalAlpha = labelAlpha;
@@ -945,6 +1211,19 @@ export function TimelineCanvas({
 
         const bandWidth = overlay.renderWidth;
         const y = getOverlayLaneY(layout, overlay.laneIndex);
+
+        hoverRegions.push({
+          id: overlay.band.id,
+          left: overlay.renderX,
+          right: overlay.renderX + bandWidth,
+          top: y - 4,
+          bottom: y + OVERLAY_LANE_HEIGHT + 4,
+          anchorX: overlay.renderX + bandWidth / 2,
+          anchorY: y + 2,
+          anchorMode: "follow-x",
+          placement: "above",
+          tooltip: getOverlayTooltipContent(overlay.band),
+        });
 
         context.save();
         context.globalAlpha = 0.92 * progress;
@@ -1152,15 +1431,13 @@ export function TimelineCanvas({
           (1 - tick.majorProgress + tick.majorProgress * boundaryFade);
         const overlayFade = edgeFade * boundaryFade;
         const minorExtent = 10 * tick.visibleProgress;
-        const top =
-          axisY - minorExtent - majorExtraAbove * tick.majorProgress;
+        const top = axisY - minorExtent - majorExtraAbove * tick.majorProgress;
         const bottom =
           axisY + minorExtent + majorExtraBelow * tick.majorProgress;
 
         if (baseFade > 0.01) {
           context.strokeStyle = lineSoft;
-          context.globalAlpha =
-            (0.18 + tick.visibleProgress * 0.36) * baseFade;
+          context.globalAlpha = (0.18 + tick.visibleProgress * 0.36) * baseFade;
           context.beginPath();
           context.moveTo(x, top);
           context.lineTo(x, bottom);
@@ -1203,7 +1480,11 @@ export function TimelineCanvas({
       if (useCalendarSubYearAxis) {
         context.globalAlpha = 0.9;
         context.font = "12px var(--font-sans)";
-        context.fillText(formatAxisDate(year, edgeLabelStep), x, layout.dateLabelY);
+        context.fillText(
+          formatAxisDate(year, edgeLabelStep),
+          x,
+          layout.dateLabelY,
+        );
 
         context.globalAlpha = 0.72;
         context.font = "11px var(--font-sans)";
@@ -1246,11 +1527,11 @@ export function TimelineCanvas({
       pad,
       toX,
     );
-    const resolvedMarkerStates = resolveMarkerRenderStates(
+    const baseResolvedMarkerStates = resolveMarkerRenderStates(
       visibleMarkerPositions,
       width,
       pad,
-      (_marker, { fullLabel, shortLabel, dateLabel }) => {
+      (_marker: TimelineMarker, { fullLabel, shortLabel, dateLabel }: MarkerTextMeasureInput) => {
         context.font = "12px var(--font-sans)";
         const fullLabelWidth = context.measureText(fullLabel).width;
         const shortLabelWidth =
@@ -1266,13 +1547,86 @@ export function TimelineCanvas({
         };
       },
     );
+    const activeMarkerBoosts = [...markerPriorityBoostRef.current.entries()]
+      .filter(([, state]) => state.current > 0.001)
+      .sort((left, right) => right[1].current - left[1].current);
+    const resolvedMarkerStates = (() => {
+      if (activeMarkerBoosts.length === 0) {
+        return baseResolvedMarkerStates;
+      }
 
-    for (const { marker, x, dotProgress, stemProgress } of resolvedMarkerStates) {
+      const finalStatesById = new Map(
+        baseResolvedMarkerStates.map((state) => [state.marker.id, { ...state }]),
+      );
+
+      for (const [boostedMarkerId, boostState] of activeMarkerBoosts) {
+        const boostedStates = resolveMarkerRenderStates(
+          visibleMarkerPositions,
+          width,
+          pad,
+          (_marker: TimelineMarker, { fullLabel, shortLabel, dateLabel }: MarkerTextMeasureInput) => {
+            context.font = "12px var(--font-sans)";
+            const fullLabelWidth = context.measureText(fullLabel).width;
+            const shortLabelWidth =
+              shortLabel === fullLabel
+                ? fullLabelWidth
+                : context.measureText(shortLabel).width;
+            context.font = "10px var(--font-sans)";
+
+            return {
+              fullLabelWidth,
+              shortLabelWidth,
+              dateLabelWidth: context.measureText(dateLabel).width,
+            };
+          },
+          {
+            highlightedMarkerId: boostedMarkerId,
+          },
+        );
+
+        for (const boostedState of boostedStates) {
+          const currentState = finalStatesById.get(boostedState.marker.id);
+
+          if (!currentState) {
+            continue;
+          }
+
+          currentState.labelOpacity +=
+            (boostedState.labelOpacity - currentState.labelOpacity) *
+            boostState.current;
+          currentState.stemProgress +=
+            (boostedState.stemProgress - currentState.stemProgress) *
+            boostState.current;
+          currentState.intrinsicLabelOpacity +=
+            (boostedState.intrinsicLabelOpacity - currentState.intrinsicLabelOpacity) *
+            boostState.current;
+          currentState.revealProgress +=
+            (boostedState.revealProgress - currentState.revealProgress) *
+            boostState.current;
+          currentState.timingProgress +=
+            (boostedState.timingProgress - currentState.timingProgress) *
+            boostState.current;
+          currentState.dotProgress +=
+            (boostedState.dotProgress - currentState.dotProgress) *
+            boostState.current;
+        }
+      }
+
+      return baseResolvedMarkerStates.map(
+        (state) => finalStatesById.get(state.marker.id) ?? state,
+      );
+    })();
+
+    for (const {
+      marker,
+      x,
+      dotProgress,
+      stemProgress,
+    } of resolvedMarkerStates) {
       const markerColor = marker.color ?? line;
       const stemStartY = axisY + 2;
       const stemY =
-        stemStartY +
-        (layout.markerStemBottom - stemStartY) * stemProgress;
+        stemStartY + (layout.markerStemBottom - stemStartY) * stemProgress;
 
       context.save();
       context.strokeStyle = markerColor;
@@ -1287,10 +1641,10 @@ export function TimelineCanvas({
         context.stroke();
       }
 
-      const dotRadius = 3.5 * dotProgress;
+      const dotRadius = dotProgress > 0.01 ? 0.9 + 1.7 * dotProgress : 0;
 
       if (dotRadius > 0.001) {
-        context.globalAlpha = 0.14 + dotProgress * 0.76;
+        context.globalAlpha = 0.18 + dotProgress * 0.5;
         context.beginPath();
         context.arc(x, axisY, dotRadius, 0, Math.PI * 2);
         context.fill();
@@ -1317,6 +1671,28 @@ export function TimelineCanvas({
       context.textBaseline = "top";
       context.fillText(dateLabel, x, layout.markerDateY);
       context.restore();
+    }
+
+    for (const state of resolvedMarkerStates) {
+      const markerHoverHalfWidth =
+        state.labelOpacity > 0.01
+          ? Math.max(14, Math.min(state.width * 0.22, 26))
+          : 12;
+      const markerHoverBottom =
+        state.labelOpacity > 0.01 ? layout.markerDateY + 20 : axisY + 18;
+
+      hoverRegions.push({
+        id: state.marker.id,
+        left: state.x - markerHoverHalfWidth,
+        right: state.x + markerHoverHalfWidth,
+        top: layout.majorTickTop - 10,
+        bottom: markerHoverBottom,
+        anchorX: state.x,
+        anchorY: axisY - 14,
+        anchorMode: "fixed",
+        placement: "above",
+        tooltip: getMarkerTooltipContent(state.marker),
+      });
     }
 
     // "Now" indicator
@@ -1463,7 +1839,7 @@ export function TimelineCanvas({
           ? formatAxisDate(edgeLeftYear, edgeLabelStep)
           : useElapsedSubYearAxis
             ? (formatElapsedAxisLabel(edgeLeftYear)?.primaryText ?? "")
-          : formatAxisLabel(edgeLeftYear, edgeLabelStep),
+            : formatAxisLabel(edgeLeftYear, edgeLabelStep),
         secondaryText: useElapsedSubYearAxis
           ? formatElapsedAxisLabel(edgeLeftYear)?.secondaryText
           : undefined,
@@ -1475,7 +1851,7 @@ export function TimelineCanvas({
           ? formatAxisDate(edgeRightYear, edgeLabelStep)
           : useElapsedSubYearAxis
             ? (formatElapsedAxisLabel(edgeRightYear)?.primaryText ?? "")
-          : formatAxisLabel(edgeRightYear, edgeLabelStep),
+            : formatAxisLabel(edgeRightYear, edgeLabelStep),
         secondaryText: useElapsedSubYearAxis
           ? formatElapsedAxisLabel(edgeRightYear)?.secondaryText
           : undefined,
@@ -1512,14 +1888,17 @@ export function TimelineCanvas({
     }
 
     const resolvedAxisLabels = resolveAxisLabelCandidates(
-      axisLabelCandidates.filter((candidate) =>
-        allowedLabelSteps.size === 0 || allowedLabelSteps.has(candidate.step),
+      axisLabelCandidates.filter(
+        (candidate) =>
+          allowedLabelSteps.size === 0 || allowedLabelSteps.has(candidate.step),
       ),
       primaryOccupiedBounds,
       { dedupeByTextOnly: useSubYearAxis },
     );
 
-    for (const label of resolvedAxisLabels.sort((left, right) => left.x - right.x)) {
+    for (const label of resolvedAxisLabels.sort(
+      (left, right) => left.x - right.x,
+    )) {
       context.save();
       context.globalAlpha = label.alpha;
 
@@ -1561,11 +1940,16 @@ export function TimelineCanvas({
         const labelText = formatTimelineYear(year, 1);
         const labelWidth = context.measureText(labelText).width;
         const boundaryFade =
-          Math.min(Math.max(0, (x - pad) / 60), Math.max(0, (width - pad - x) / 60), 1) *
+          Math.min(
+            Math.max(0, (x - pad) / 60),
+            Math.max(0, (width - pad - x) / 60),
+            1,
+          ) *
           (Math.min(Math.abs(x - edgeLeftX), Math.abs(x - edgeRightX)) < 100
             ? Math.max(
                 0,
-                (Math.min(Math.abs(x - edgeLeftX), Math.abs(x - edgeRightX)) - 20) /
+                (Math.min(Math.abs(x - edgeLeftX), Math.abs(x - edgeRightX)) -
+                  20) /
                   80,
               )
             : 1);
@@ -1618,13 +2002,65 @@ export function TimelineCanvas({
         { dedupeByTextOnly: true },
       );
 
-      for (const label of resolvedYearLabels.sort((left, right) => left.x - right.x)) {
+      for (const label of resolvedYearLabels.sort(
+        (left, right) => left.x - right.x,
+      )) {
         context.save();
         context.globalAlpha = label.alpha;
         context.font = "11px var(--font-sans)";
         context.fillText(label.text, label.x, layout.yearLabelY);
         context.restore();
       }
+    }
+
+    hoverRegionsRef.current = hoverRegions;
+
+    if (lastPointerRef.current && !dragStateRef.current) {
+      const currentTooltip = hoveredTooltipRef.current;
+
+      if (
+        currentTooltip &&
+        tooltipRef.current &&
+        shellRef.current &&
+        shouldPrioritizeCurrentTooltipRetention(currentTooltip) &&
+        shouldRetainTooltipAtPoint(
+          lastPointerRef.current.x,
+          lastPointerRef.current.y,
+          shellRef.current.getBoundingClientRect(),
+          tooltipRef.current.getBoundingClientRect(),
+          currentTooltip,
+        )
+      ) {
+        setHoveredTooltip(currentTooltip);
+        return;
+      }
+
+      const resolvedTooltip = resolveHoveredTooltip(
+        lastPointerRef.current.x,
+        lastPointerRef.current.y,
+        lastPointerRef.current.pointerType,
+      );
+
+      if (resolvedTooltip) {
+        setHoveredTooltip(resolvedTooltip);
+      } else if (
+        hoveredTooltipRef.current &&
+        tooltipRef.current &&
+        shellRef.current &&
+        shouldRetainTooltipAtPoint(
+          lastPointerRef.current.x,
+          lastPointerRef.current.y,
+          shellRef.current.getBoundingClientRect(),
+          tooltipRef.current.getBoundingClientRect(),
+          hoveredTooltipRef.current,
+        )
+      ) {
+        setHoveredTooltip(hoveredTooltipRef.current);
+      } else {
+        setHoveredTooltip(null);
+      }
+    } else if (!lastPointerRef.current) {
+      setHoveredTooltip(null);
     }
   }, [
     activeEra,
@@ -1640,6 +2076,8 @@ export function TimelineCanvas({
     viewport,
     width,
     axisTickAnimationVersion,
+    highlightedMarkerId,
+    markerPriorityBoostVersion,
   ]);
 
   // Pinch-to-zoom via native gesture events (Safari) and touch events
@@ -1745,6 +2183,8 @@ export function TimelineCanvas({
 
   const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     event.preventDefault();
+    lastPointerRef.current = null;
+    setHoveredTooltip(null);
     dragStateRef.current = {
       pointerId: event.pointerId,
       lastX: event.clientX,
@@ -1775,6 +2215,70 @@ export function TimelineCanvas({
     event.currentTarget.releasePointerCapture(event.pointerId);
   };
 
+  const handleShellPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const currentTooltip = hoveredTooltipRef.current;
+
+    lastPointerRef.current = {
+      x,
+      y,
+      pointerType: event.pointerType,
+    };
+
+    if (dragStateRef.current?.pointerId === event.pointerId) {
+      setHoveredTooltip(null);
+      return;
+    }
+
+    if (
+      currentTooltip &&
+      tooltipRef.current &&
+      shouldPrioritizeCurrentTooltipRetention(currentTooltip) &&
+      shouldRetainTooltipAtPoint(
+        x,
+        y,
+        rect,
+        tooltipRef.current.getBoundingClientRect(),
+        currentTooltip,
+      )
+    ) {
+      setHoveredTooltip(currentTooltip);
+      return;
+    }
+
+    const resolvedTooltip = resolveHoveredTooltip(x, y, event.pointerType);
+
+    if (resolvedTooltip) {
+      setHoveredTooltip(resolvedTooltip);
+      return;
+    }
+
+    if (currentTooltip && tooltipRef.current) {
+
+      if (
+        shouldRetainTooltipAtPoint(
+          x,
+          y,
+          rect,
+          tooltipRef.current.getBoundingClientRect(),
+          currentTooltip,
+        )
+      ) {
+        setHoveredTooltip(currentTooltip);
+        return;
+      }
+    }
+
+    setHoveredTooltip(null);
+  };
+
+  const handleShellPointerLeave = () => {
+    lastPointerRef.current = null;
+    setHoveredTooltip(null);
+  };
+
   const handleDoubleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!width) return;
 
@@ -1796,57 +2300,134 @@ export function TimelineCanvas({
     }
   };
 
+  const tooltipStyle: (CSSProperties & Record<string, string | number>) | undefined = hoveredTooltip
+    ? {
+        left:
+          hoveredTooltip.anchorX > width - TOOLTIP_MAX_WIDTH * 0.4
+            ? hoveredTooltip.anchorX - TOOLTIP_OFFSET
+            : hoveredTooltip.anchorX < TOOLTIP_MAX_WIDTH * 0.4
+              ? hoveredTooltip.anchorX + TOOLTIP_OFFSET
+              : hoveredTooltip.anchorX,
+        top: hoveredTooltip.anchorY,
+        maxWidth: `${Math.min(TOOLTIP_MAX_WIDTH, Math.max(width - 32, 220))}px`,
+        "--tooltip-translate-x":
+          hoveredTooltip.anchorX > width - TOOLTIP_MAX_WIDTH * 0.4
+            ? "-100%"
+            : hoveredTooltip.anchorX < TOOLTIP_MAX_WIDTH * 0.4
+              ? "0%"
+              : "-50%",
+        "--tooltip-translate-y":
+          hoveredTooltip.anchorY < 96 || hoveredTooltip.placement === "below"
+            ? `${TOOLTIP_OFFSET}px`
+            : `calc(-100% - ${TOOLTIP_OFFSET}px)`,
+        "--tooltip-origin":
+          hoveredTooltip.anchorY < 96 || hoveredTooltip.placement === "below"
+            ? "top center"
+            : "bottom center",
+      }
+    : undefined;
+
   return (
-    <canvas
-      aria-label="Interactive timeline canvas"
-      className="timeline-canvas"
-      onKeyDown={(event) => {
-        if (!width) return;
+    <div
+      className="timeline-canvas-shell"
+      ref={shellRef}
+      onPointerLeave={handleShellPointerLeave}
+      onPointerMove={handleShellPointerMove}
+    >
+      <canvas
+        aria-label="Interactive timeline canvas"
+        className="timeline-canvas"
+        onKeyDown={(event) => {
+          if (!width) return;
 
-        if (event.key === "h" || event.key === "H") {
-          event.preventDefault();
-          onNavigateUp();
-          return;
-        }
+          if (event.key === "h" || event.key === "H") {
+            event.preventDefault();
+            onNavigateUp();
+            return;
+          }
 
-        if (event.key === "Escape" || event.key === "Backspace") {
-          event.preventDefault();
-          onNavigateUp();
-          return;
-        }
+          if (event.key === "Escape" || event.key === "Backspace") {
+            event.preventDefault();
+            onNavigateUp();
+            return;
+          }
 
-        if (event.key === "+" || event.key === "=") {
-          event.preventDefault();
-          const innerW = width - PAD * 2;
-          onAnimateZoom(1, innerW / 2);
-        }
+          if (event.key === "+" || event.key === "=") {
+            event.preventDefault();
+            const innerW = width - PAD * 2;
+            onAnimateZoom(1, innerW / 2);
+          }
 
-        if (event.key === "-" || event.key === "_") {
-          event.preventDefault();
-          const innerW = width - PAD * 2;
-          onAnimateZoom(-1, innerW / 2);
-        }
+          if (event.key === "-" || event.key === "_") {
+            event.preventDefault();
+            const innerW = width - PAD * 2;
+            onAnimateZoom(-1, innerW / 2);
+          }
 
-        if (event.key === "ArrowLeft") {
-          event.preventDefault();
-          const innerW = width - PAD * 2;
-          onViewportChange((current) => panByPixels(current, 120, innerW));
-        }
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            const innerW = width - PAD * 2;
+            onViewportChange((current) => panByPixels(current, 120, innerW));
+          }
 
-        if (event.key === "ArrowRight") {
-          event.preventDefault();
-          const innerW = width - PAD * 2;
-          onViewportChange((current) => panByPixels(current, -120, innerW));
-        }
-      }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-      onWheel={handleWheel}
-      onDoubleClick={handleDoubleClick}
-      ref={canvasRef}
-      tabIndex={0}
-    />
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            const innerW = width - PAD * 2;
+            onViewportChange((current) => panByPixels(current, -120, innerW));
+          }
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onWheel={handleWheel}
+        onDoubleClick={handleDoubleClick}
+        ref={canvasRef}
+        tabIndex={0}
+      />
+      {hoveredTooltip ? (
+        <div className="timeline-tooltip" ref={tooltipRef} style={tooltipStyle}>
+          <div className="timeline-tooltip__title">
+            {hoveredTooltip.tooltip.title}
+          </div>
+          <div className="timeline-tooltip__time">
+            {hoveredTooltip.tooltip.timeLabel}
+          </div>
+          {hoveredTooltip.tooltip.description ? (
+            <div className="timeline-tooltip__description">
+              {hoveredTooltip.tooltip.description}
+            </div>
+          ) : null}
+          {hoveredTooltip.tooltip.sources.length > 0 ? (
+            <div className="timeline-tooltip__sources">
+              <div className="timeline-tooltip__sources-label">Sources</div>
+              <ul className="timeline-tooltip__source-list">
+                {hoveredTooltip.tooltip.sources.map((source) => (
+                  <li className="timeline-tooltip__source-item" key={source.id}>
+                    {source.url ? (
+                      <a
+                        className="timeline-tooltip__source-link"
+                        href={source.url}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        {source.shortTitle}
+                      </a>
+                    ) : (
+                      <span className="timeline-tooltip__source-title">
+                        {source.shortTitle}
+                      </span>
+                    )}
+                    <span className="timeline-tooltip__source-org">
+                      {source.organization}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 }

@@ -35,6 +35,10 @@ export type ResolvedMarkerRenderState = VisibleMarkerPosition & {
   width: number;
 };
 
+export type ResolveMarkerRenderOptions = {
+  highlightedMarkerId?: string | null;
+};
+
 const MAX_MARKER_LABEL_WIDTH = 140;
 const MARKER_LABEL_EDGE_INSET = 12;
 const MARKER_LABEL_BOUNDARY_INSET = 8;
@@ -42,6 +46,8 @@ const MARKER_LABEL_OCCUPIED_PADDING = 14;
 
 export const MARKER_STEM_REVEAL_START = 4;
 export const MARKER_STEM_REVEAL_END = 20;
+export const MARKER_DOT_REVEAL_START = 0;
+export const MARKER_DOT_REVEAL_END = 42;
 export const MARKER_MIN_TIMING_PROGRESS = 0.28;
 export const MARKER_LABEL_FADE_START = 0.42;
 export const MARKER_LABEL_FADE_END = 0.9;
@@ -98,10 +104,22 @@ export function getVisibleMarkerPositions(
     .filter((marker) => marker.x >= pad + 4 && marker.x <= width - pad - 4);
 }
 
-function resolveMarkerTimingStates(markers: VisibleMarkerPosition[]) {
+function getEffectivePriority(
+  marker: TimelineMarker,
+  highlightedMarkerId?: string | null,
+) {
+  return (marker.priority ?? 0) +
+    (marker.id === highlightedMarkerId ? 1_000_000 : 0);
+}
+
+function resolveMarkerTimingStates(
+  markers: VisibleMarkerPosition[],
+  options: ResolveMarkerRenderOptions = {},
+) {
   const sortedByPriority = [...markers].sort(
     (left, right) =>
-      (right.marker.priority ?? 0) - (left.marker.priority ?? 0) ||
+      getEffectivePriority(right.marker, options.highlightedMarkerId) -
+        getEffectivePriority(left.marker, options.highlightedMarkerId) ||
       left.x - right.x,
   );
   const resolvedById = new Map<string, MarkerTimingState>();
@@ -120,6 +138,15 @@ function resolveMarkerTimingStates(markers: VisibleMarkerPosition[]) {
             (nearestHigherPriorityDistance - MARKER_STEM_REVEAL_START) /
               (MARKER_STEM_REVEAL_END - MARKER_STEM_REVEAL_START),
           );
+    const dotProgress =
+      nearestHigherPriorityDistance === Number.POSITIVE_INFINITY
+        ? 1
+        : smoothstep01(
+            clamp01(
+              (nearestHigherPriorityDistance - MARKER_DOT_REVEAL_START) /
+                (MARKER_DOT_REVEAL_END - MARKER_DOT_REVEAL_START),
+            ),
+          );
 
     resolvedById.set(marker.marker.id, {
       ...marker,
@@ -129,7 +156,7 @@ function resolveMarkerTimingStates(markers: VisibleMarkerPosition[]) {
           ? 1
           : MARKER_MIN_TIMING_PROGRESS +
             revealProgress * (1 - MARKER_MIN_TIMING_PROGRESS),
-      dotProgress: smoothstep01(revealProgress),
+      dotProgress,
     });
     higherPriorityMarkers.push(marker);
   }
@@ -152,8 +179,9 @@ export function resolveMarkerRenderStates(
   width: number,
   pad: number,
   measureText: MarkerTextMeasurer,
+  options: ResolveMarkerRenderOptions = {},
 ): ResolvedMarkerRenderState[] {
-  const timingStates = resolveMarkerTimingStates(markers);
+  const timingStates = resolveMarkerTimingStates(markers, options);
   const preparedStates: PreparedMarkerRenderState[] = timingStates.map(
     (state) => {
       const fullLabel = state.marker.label;
@@ -192,7 +220,8 @@ export function resolveMarkerRenderStates(
     )
     .sort(
       (left, right) =>
-        (right.marker.priority ?? 0) - (left.marker.priority ?? 0) ||
+        getEffectivePriority(right.marker, options.highlightedMarkerId) -
+          getEffectivePriority(left.marker, options.highlightedMarkerId) ||
         left.x - right.x,
     );
 

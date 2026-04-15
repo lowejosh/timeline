@@ -34,9 +34,9 @@ describe("timeline tick generation", () => {
   });
 
   it("switches axis labels from billions to millions before decimals get noisy", () => {
-    expect(
-      formatTimelineYear(-13_812_345_678, 100_000, { mode: "axis" }),
-    ).toBe("13,812.3M years ago");
+    expect(formatTimelineYear(-13_812_345_678, 100_000, { mode: "axis" })).toBe(
+      "13,812.3M years ago",
+    );
   });
 
   it("uses thousands for mid-range prehistoric axis labels while they stay readable", () => {
@@ -61,6 +61,11 @@ describe("timeline tick generation", () => {
 
   it("formats day-level sub-year labels with month and day", () => {
     expect(formatTimelineDateLabel(2024, 0.02)).toBe("Jan 1");
+  });
+
+  it("formats historical BCE years without adding an extra year", () => {
+    expect(formatTimelineYear(-27)).toBe("27 BCE");
+    expect(formatTimelineYear(-3000)).toBe("3,000 BCE");
   });
 
   it("formats sub-year long-ago labels as years and days ago", () => {

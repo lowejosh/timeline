@@ -98,7 +98,9 @@ function groupNumberString(value: string) {
   const [wholePart, fractionPart] = value.split(".");
   const groupedWholePart = wholePart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-  return fractionPart ? `${groupedWholePart}.${fractionPart}` : groupedWholePart;
+  return fractionPart
+    ? `${groupedWholePart}.${fractionPart}`
+    : groupedWholePart;
 }
 
 function formatScaled(
@@ -120,7 +122,11 @@ function formatScaled(
   return `${groupNumberString(trimmed)}${suffix}`;
 }
 
-function formatUnitCount(value: number, singular: string, plural = `${singular}s`) {
+function formatUnitCount(
+  value: number,
+  singular: string,
+  plural = `${singular}s`,
+) {
   return `${numberFormatter.format(value)} ${value === 1 ? singular : plural}`;
 }
 
@@ -148,7 +154,9 @@ function createTimelineUtcDate(
   seconds = 0,
   milliseconds = 0,
 ) {
-  const date = new Date(Date.UTC(2000, month, day, hours, minutes, seconds, milliseconds));
+  const date = new Date(
+    Date.UTC(2000, month, day, hours, minutes, seconds, milliseconds),
+  );
 
   date.setUTCFullYear(year, month, day);
   date.setUTCHours(hours, minutes, seconds, milliseconds);
@@ -199,8 +207,7 @@ function formatAxisElapsedYears(
     return "Big Bang";
   }
 
-  const suffix =
-    reference === "after-big-bang" ? "after the Big Bang" : "ago";
+  const suffix = reference === "after-big-bang" ? "after the Big Bang" : "ago";
 
   for (const unit of AXIS_DEEP_TIME_UNITS) {
     if (absolute < unit.minAbsolute) {
@@ -343,6 +350,7 @@ export function formatTimelineYear(
 ) {
   const absolute = Math.abs(year);
   const safeStep = Math.max(Math.abs(step), 1e-9);
+  const roundedYear = Math.round(year);
 
   if (year <= -YEARS_AGO_CUTOFF) {
     return options.mode === "axis"
@@ -351,10 +359,12 @@ export function formatTimelineYear(
   }
 
   if (year < 1) {
-    return `${numberFormatter.format(Math.abs(Math.round(year)) + 1)} BCE`;
+    return `${numberFormatter.format(
+      roundedYear === 0 ? 1 : Math.abs(roundedYear),
+    )} BCE`;
   }
 
-  return `${numberFormatter.format(Math.round(year))} CE`;
+  return `${numberFormatter.format(roundedYear)} CE`;
 }
 
 export function formatTimelineRange(startYear: number, endYear: number) {

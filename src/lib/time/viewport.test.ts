@@ -72,7 +72,12 @@ describe("timeline viewport math", () => {
 
   it("does not allow panning past the start edge", () => {
     const width = 1200;
-    const viewport = getViewportForRange(-13_800_000_000, -4_000_000_000, width, 0);
+    const viewport = getViewportForRange(
+      -13_800_000_000,
+      -4_000_000_000,
+      width,
+      0,
+    );
     const panned = panByPixels(viewport, 100000, width);
     const [visibleStart] = getVisibleRange(panned, width);
 
@@ -101,7 +106,12 @@ describe("timeline viewport math", () => {
 
     const leftBefore = screenToWorld(0, viewport, innerWidth);
     const anchorX = getZoomAnchorForCanvasX(40, canvasWidth, pad);
-    const zoomed = zoomAtPosition(viewport, viewport.zoom + 1, anchorX, innerWidth);
+    const zoomed = zoomAtPosition(
+      viewport,
+      viewport.zoom + 1,
+      anchorX,
+      innerWidth,
+    );
     const leftAfter = screenToWorld(0, zoomed, innerWidth);
 
     expect(leftAfter).toBeCloseTo(leftBefore, 3);
@@ -121,7 +131,12 @@ describe("timeline viewport math", () => {
 
     const rightBefore = screenToWorld(innerWidth, viewport, innerWidth);
     const anchorX = getZoomAnchorForCanvasX(1180, canvasWidth, pad);
-    const zoomed = zoomAtPosition(viewport, viewport.zoom + 1, anchorX, innerWidth);
+    const zoomed = zoomAtPosition(
+      viewport,
+      viewport.zoom + 1,
+      anchorX,
+      innerWidth,
+    );
     const rightAfter = screenToWorld(innerWidth, zoomed, innerWidth);
 
     expect(rightAfter).toBeCloseTo(rightBefore, 3);
@@ -139,7 +154,9 @@ describe("timeline viewport math", () => {
     const [visibleStart, visibleEnd] = getVisibleRange(viewport, width);
 
     expect(viewport.zoom).toBeCloseTo(getMaxZoomForWidth(width), 6);
-    expect(visibleEnd - visibleStart).toBeGreaterThanOrEqual(14 / 365.2425 - 1e-6);
+    expect(visibleEnd - visibleStart).toBeGreaterThanOrEqual(
+      14 / 365.2425 - 1e-6,
+    );
   });
 
   it("tracks the present boundary past January first", () => {
