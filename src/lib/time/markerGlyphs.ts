@@ -108,8 +108,9 @@ function getEffectivePriority(
   marker: TimelineMarker,
   highlightedMarkerId?: string | null,
 ) {
-  return (marker.priority ?? 0) +
-    (marker.id === highlightedMarkerId ? 1_000_000 : 0);
+  return (
+    (marker.priority ?? 0) + (marker.id === highlightedMarkerId ? 1_000_000 : 0)
+  );
 }
 
 function resolveMarkerTimingStates(

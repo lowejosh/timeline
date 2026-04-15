@@ -382,9 +382,7 @@ function isPointInTooltipBridgeTriangle(
     return false;
   }
 
-  const perpendicularDistance = Math.abs(
-    offsetX * -unitY + offsetY * unitX,
-  );
+  const perpendicularDistance = Math.abs(offsetX * -unitY + offsetY * unitX);
   const allowedHalfWidth = (distanceAlong / length) * endHalfWidth;
 
   return perpendicularDistance <= allowedHalfWidth;
@@ -696,7 +694,8 @@ export function TimelineCanvas({
       setMarkerPriorityBoostVersion((version) => version + 1);
 
       if (hasActiveAnimation) {
-        markerPriorityBoostFrameRef.current = requestAnimationFrame(stepAnimation);
+        markerPriorityBoostFrameRef.current =
+          requestAnimationFrame(stepAnimation);
       } else {
         markerPriorityBoostFrameRef.current = 0;
       }
@@ -716,11 +715,7 @@ export function TimelineCanvas({
       }
     };
   }, [highlightedMarkerId]);
-  const resolveHoveredTooltip = (
-    x: number,
-    y: number,
-    pointerType: string,
-  ) => {
+  const resolveHoveredTooltip = (x: number, y: number, pointerType: string) => {
     if (pointerType !== "mouse" && pointerType !== "pen") {
       return null;
     }
@@ -762,9 +757,7 @@ export function TimelineCanvas({
     return {
       id: selectedRegion.id,
       anchorX:
-        selectedRegion.anchorMode === "follow-x"
-          ? x
-          : selectedRegion.anchorX,
+        selectedRegion.anchorMode === "follow-x" ? x : selectedRegion.anchorX,
       anchorY: selectedRegion.anchorY,
       placement: selectedRegion.placement,
       tooltip: selectedRegion.tooltip,
@@ -1169,12 +1162,7 @@ export function TimelineCanvas({
       context.save();
       context.globalAlpha = opacity;
       context.fillStyle = era.color;
-      context.fillRect(
-        clippedLeft,
-        0,
-        clippedRight - clippedLeft,
-        height,
-      );
+      context.fillRect(clippedLeft, 0, clippedRight - clippedLeft, height);
       context.restore();
 
       const shouldHideInlineLabel = breadcrumbChainIds.has(era.id);
@@ -1531,7 +1519,10 @@ export function TimelineCanvas({
       visibleMarkerPositions,
       width,
       pad,
-      (_marker: TimelineMarker, { fullLabel, shortLabel, dateLabel }: MarkerTextMeasureInput) => {
+      (
+        _marker: TimelineMarker,
+        { fullLabel, shortLabel, dateLabel }: MarkerTextMeasureInput,
+      ) => {
         context.font = "12px var(--font-sans)";
         const fullLabelWidth = context.measureText(fullLabel).width;
         const shortLabelWidth =
@@ -1556,7 +1547,10 @@ export function TimelineCanvas({
       }
 
       const finalStatesById = new Map(
-        baseResolvedMarkerStates.map((state) => [state.marker.id, { ...state }]),
+        baseResolvedMarkerStates.map((state) => [
+          state.marker.id,
+          { ...state },
+        ]),
       );
 
       for (const [boostedMarkerId, boostState] of activeMarkerBoosts) {
@@ -1564,7 +1558,10 @@ export function TimelineCanvas({
           visibleMarkerPositions,
           width,
           pad,
-          (_marker: TimelineMarker, { fullLabel, shortLabel, dateLabel }: MarkerTextMeasureInput) => {
+          (
+            _marker: TimelineMarker,
+            { fullLabel, shortLabel, dateLabel }: MarkerTextMeasureInput,
+          ) => {
             context.font = "12px var(--font-sans)";
             const fullLabelWidth = context.measureText(fullLabel).width;
             const shortLabelWidth =
@@ -1598,7 +1595,8 @@ export function TimelineCanvas({
             (boostedState.stemProgress - currentState.stemProgress) *
             boostState.current;
           currentState.intrinsicLabelOpacity +=
-            (boostedState.intrinsicLabelOpacity - currentState.intrinsicLabelOpacity) *
+            (boostedState.intrinsicLabelOpacity -
+              currentState.intrinsicLabelOpacity) *
             boostState.current;
           currentState.revealProgress +=
             (boostedState.revealProgress - currentState.revealProgress) *
@@ -2256,7 +2254,6 @@ export function TimelineCanvas({
     }
 
     if (currentTooltip && tooltipRef.current) {
-
       if (
         shouldRetainTooltipAtPoint(
           x,
@@ -2300,7 +2297,9 @@ export function TimelineCanvas({
     }
   };
 
-  const tooltipStyle: (CSSProperties & Record<string, string | number>) | undefined = hoveredTooltip
+  const tooltipStyle:
+    | (CSSProperties & Record<string, string | number>)
+    | undefined = hoveredTooltip
     ? {
         left:
           hoveredTooltip.anchorX > width - TOOLTIP_MAX_WIDTH * 0.4

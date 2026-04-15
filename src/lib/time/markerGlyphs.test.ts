@@ -29,10 +29,12 @@ function resolveStates(
   }),
   options: ResolveMarkerRenderOptions = {},
 ) {
-  const positions: VisibleMarkerPosition[] = markers.map(({ id, priority, x }) => ({
-    marker: makeMarker(id, priority),
-    x,
-  }));
+  const positions: VisibleMarkerPosition[] = markers.map(
+    ({ id, priority, x }) => ({
+      marker: makeMarker(id, priority),
+      x,
+    }),
+  );
 
   return resolveMarkerRenderStates(positions, WIDTH, PAD, measureText, options);
 }
@@ -66,8 +68,8 @@ describe("marker glyph timing", () => {
 
     expect(halfVisible).toBeDefined();
     expect(halfVisible?.revealProgress).toBe(1);
-  expect(halfVisible?.dotProgress).toBeGreaterThan(0.85);
-  expect(halfVisible?.dotProgress ?? 1).toBeLessThan(1);
+    expect(halfVisible?.dotProgress).toBeGreaterThan(0.85);
+    expect(halfVisible?.dotProgress ?? 1).toBeLessThan(1);
     expect(halfVisible?.intrinsicLabelOpacity).toBe(1);
     expect(halfVisible?.labelOpacity).toBeCloseTo(0.5, 6);
     expect(halfVisible?.stemProgress).toBeCloseTo(0.5, 6);
@@ -110,7 +112,12 @@ describe("marker glyph timing", () => {
       },
     ];
 
-    const [state] = resolveMarkerRenderStates(positions, WIDTH, PAD, measureText);
+    const [state] = resolveMarkerRenderStates(
+      positions,
+      WIDTH,
+      PAD,
+      measureText,
+    );
 
     expect(state.label).toBe("wide-short");
   });
