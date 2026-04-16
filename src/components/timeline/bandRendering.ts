@@ -34,15 +34,52 @@ export type ResolvedContextBandRenderState = {
   alphaMultiplier: number;
 };
 
+export type ContextBandLabelVariant = "hidden" | "short" | "full";
+
+export type AnimatedContextBandLabelState = {
+  fromVariant: ContextBandLabelVariant;
+  toVariant: ContextBandLabelVariant;
+  queuedVariant: ContextBandLabelVariant | null;
+  startTime: number;
+  duration: number;
+};
+
+export type ResolvedContextBandLabelLayer = {
+  variant: Exclude<ContextBandLabelVariant, "hidden">;
+  opacity: number;
+};
+
 const DEFAULT_DARK_LABEL: RgbaColor = { r: 34, g: 26, b: 19, a: 1 };
 const DEFAULT_LIGHT_LABEL: RgbaColor = { r: 252, g: 248, b: 241, a: 1 };
 const DEFAULT_PAPER: RgbaColor = { r: 247, g: 240, b: 226, a: 1 };
-const LIGHT_LABEL_PREFERRED_MAX_LUMINANCE = 0.285;
-const LIGHT_LABEL_PREFERRED_MIN_CONTRAST = 2.95;
-const LIGHT_LABEL_CONTRAST_BIAS = 0.85;
+const LIGHT_LABEL_PREFERRED_MAX_LUMINANCE = 0.315;
+const LIGHT_LABEL_PREFERRED_MIN_CONTRAST = 2.7;
+const LIGHT_LABEL_CONTRAST_BIAS = 1.05;
+const CONTEXT_BAND_LABEL_PADDING = 10;
+const CONTEXT_BAND_LABEL_SHOW_ENTER_SLACK = 6;
+const CONTEXT_BAND_LABEL_SHOW_EXIT_SLACK = -2;
+const CONTEXT_BAND_LABEL_FULL_ENTER_SLACK = 10;
+const CONTEXT_BAND_LABEL_FULL_EXIT_SLACK = 2;
+const CONTEXT_BAND_LABEL_SWAP_POINT = 0.48;
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));
+}
+
+function smoothstep01(value: number) {
+  const t = clamp01(value);
+  return t * t * (3 - 2 * t);
+}
+
+function getContextBandLabelTransitionProgress(
+  state: AnimatedContextBandLabelState,
+  now: number,
+) {
+  if (state.duration <= 0) {
+    return 1;
+  }
+
+  return clamp01((now - state.startTime) / state.duration);
 }
 
 function parseHexColor(color: string): RgbaColor | null {
@@ -214,6 +251,228 @@ export function resolveOverlayLabelPaint({
     fillStyle: toCssColor(usesLightLabel ? DEFAULT_LIGHT_LABEL : darkCandidate),
     usesLightLabel,
   };
+}
+
+export function resolveContextBandLabelVariant({
+  availableWidth,
+  fullLabelWidth,
+  shortLabelWidth,
+  currentVariant,
+  hasDistinctShortLabel = true,
+}: {
+  availableWidth: number;
+  fullLabelWidth: number;
+  shortLabelWidth: number;
+  currentVariant: ContextBandLabelVariant;
+  hasDistinctShortLabel?: boolean;
+}): ContextBandLabelVariant {
+  const effectiveWidth = Math.max(availableWidth, 0);
+  const normalizedCurrentVariant =
+    !hasDistinctShortLabel && currentVariant === "short"
+      ? "full"
+      : currentVariant;
+  const fullRoom =
+    effectiveWidth - (Math.max(fullLabelWidth, 0) + CONTEXT_BAND_LABEL_PADDING);
+  const shortRoom =
+    hasDistinctShortLabel
+      ? effectiveWidth -
+        (Math.max(Math.min(shortLabelWidth, fullLabelWidth), 0) +
+          CONTEXT_BAND_LABEL_PADDING)
+      : Number.NEGATIVE_INFINITY;
+
+  switch (normalizedCurrentVariant) {
+    case "full":
+      if (fullRoom >= CONTEXT_BAND_LABEL_FULL_EXIT_SLACK) {
+        return "full";
+      }
+
+      if (shortRoom >= CONTEXT_BAND_LABEL_SHOW_EXIT_SLACK) {
+        return "short";
+      }
+
+      return "hidden";
+    case "short":
+      if (fullRoom >= CONTEXT_BAND_LABEL_FULL_ENTER_SLACK) {
+        return "full";
+      }
+
+      if (shortRoom >= CONTEXT_BAND_LABEL_SHOW_EXIT_SLACK) {
+        return "short";
+      }
+
+      return "hidden";
+    case "hidden":
+    default:
+      if (fullRoom >= CONTEXT_BAND_LABEL_FULL_ENTER_SLACK) {
+        return "full";
+      }
+
+      if (shortRoom >= CONTEXT_BAND_LABEL_SHOW_ENTER_SLACK) {
+        return "short";
+      }
+
+      return "hidden";
+  }
+}
+
+export function stepAnimatedContextBandLabelState(
+  state: AnimatedContextBandLabelState,
+  now: number,
+): AnimatedContextBandLabelState {
+  const progress = getContextBandLabelTransitionProgress(state, now);
+
+  if (progress < 1) {
+    return state;
+  }
+
+  if (state.queuedVariant && state.queuedVariant !== state.toVariant) {
+    return {
+      fromVariant: state.toVariant,
+      toVariant: state.queuedVariant,
+      queuedVariant: null,
+      startTime: now,
+      duration: state.duration,
+    };
+  }
+
+  return {
+    ...state,
+    fromVariant: state.toVariant,
+    toVariant: state.toVariant,
+    queuedVariant: null,
+    startTime: now,
+  };
+}
+
+export function syncAnimatedContextBandLabelState({
+  existing,
+  nextVariant,
+  now,
+  duration,
+  hasInitialized,
+}: {
+  existing?: AnimatedContextBandLabelState;
+  nextVariant: ContextBandLabelVariant;
+  now: number;
+  duration: number;
+  hasInitialized: boolean;
+}): AnimatedContextBandLabelState {
+  if (!hasInitialized) {
+    return {
+      fromVariant: nextVariant,
+      toVariant: nextVariant,
+      queuedVariant: null,
+      startTime: now,
+      duration,
+    };
+  }
+
+  if (!existing) {
+    return {
+      fromVariant: "hidden",
+      toVariant: nextVariant,
+      queuedVariant: null,
+      startTime: now,
+      duration,
+    };
+  }
+
+  const steppedState = stepAnimatedContextBandLabelState(existing, now);
+  const isActiveTransition = steppedState.fromVariant !== steppedState.toVariant;
+
+  if (!isActiveTransition) {
+    if (steppedState.toVariant === nextVariant) {
+      return {
+        ...steppedState,
+        duration,
+      };
+    }
+
+    return {
+      fromVariant: steppedState.toVariant,
+      toVariant: nextVariant,
+      queuedVariant: null,
+      startTime: now,
+      duration,
+    };
+  }
+
+  if (nextVariant === steppedState.toVariant) {
+    return {
+      ...steppedState,
+      queuedVariant: null,
+      duration,
+    };
+  }
+
+  return {
+    ...steppedState,
+    queuedVariant: nextVariant,
+    duration,
+  };
+}
+
+export function isAnimatedContextBandLabelStateActive(
+  state: AnimatedContextBandLabelState,
+  now: number,
+) {
+  const steppedState = stepAnimatedContextBandLabelState(state, now);
+  return steppedState.fromVariant !== steppedState.toVariant;
+}
+
+export function resolveAnimatedContextBandLabelLayers(
+  state: AnimatedContextBandLabelState,
+  now: number,
+): ResolvedContextBandLabelLayer[] {
+  const steppedState = stepAnimatedContextBandLabelState(state, now);
+
+  if (steppedState.fromVariant === steppedState.toVariant) {
+    return steppedState.toVariant === "hidden"
+      ? []
+      : [{ variant: steppedState.toVariant, opacity: 1 }];
+  }
+
+  const progress = getContextBandLabelTransitionProgress(steppedState, now);
+
+  if (steppedState.fromVariant === "hidden") {
+    return steppedState.toVariant === "hidden"
+      ? []
+      : [
+          {
+            variant: steppedState.toVariant,
+            opacity: smoothstep01(progress),
+          },
+        ];
+  }
+
+  if (steppedState.toVariant === "hidden") {
+    return [
+      {
+        variant: steppedState.fromVariant,
+        opacity: 1 - smoothstep01(progress),
+      },
+    ];
+  }
+
+  if (progress < CONTEXT_BAND_LABEL_SWAP_POINT) {
+    return [
+      {
+        variant: steppedState.fromVariant,
+        opacity:
+          1 - smoothstep01(progress / CONTEXT_BAND_LABEL_SWAP_POINT),
+      },
+    ];
+  }
+
+  return [
+    {
+      variant: steppedState.toVariant,
+      opacity: smoothstep01(
+        (progress - CONTEXT_BAND_LABEL_SWAP_POINT) /
+          (1 - CONTEXT_BAND_LABEL_SWAP_POINT),
+      ),
+    },
+  ];
 }
 
 export function resolveContextBandRenderState({

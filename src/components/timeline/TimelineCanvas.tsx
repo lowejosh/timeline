@@ -75,8 +75,14 @@ import {
   type AnimatedEraChildState,
 } from "./eraChildAnimation";
 import {
+  isAnimatedContextBandLabelStateActive,
+  resolveAnimatedContextBandLabelLayers,
+  resolveContextBandLabelVariant,
   resolveContextBandRenderState,
   resolveOverlayLabelPaint,
+  stepAnimatedContextBandLabelState,
+  syncAnimatedContextBandLabelState,
+  type AnimatedContextBandLabelState,
 } from "./bandRendering";
 
 type TimelineCanvasProps = {
@@ -318,6 +324,15 @@ type TimelineSceneDiagnosticsSnapshot = {
   axisTickCount: number;
 };
 
+type ExpandedOverlayConnectorGeometry = {
+  stemX: number;
+  stemTop: number;
+  stemBottom: number;
+  railLeft: number;
+  railRight: number;
+  railY: number;
+};
+
 const PAD = 120;
 const OVERLAY_LANE_HEIGHT = 16;
 const OVERLAY_LANE_GAP = 8;
@@ -334,11 +349,13 @@ const AXIS_TICK_ANIMATION_SMOOTHING_MS = 110;
 const ERA_CHILD_TRANSITION_DURATION_MS = 220;
 const MARKER_PRIORITY_BOOST_SMOOTHING_MS = 130;
 const EXPANDED_OVERLAY_ANIMATION_SMOOTHING_MS = 140;
+const CONTEXT_BAND_LABEL_TRANSITION_DURATION_MS = 160;
 const AXIS_LABEL_SECONDARY_STEP_RATIO = 0.82;
 const ERA_BAND_ALPHA = 0.3;
-const OVERLAY_BAND_ALPHA = 0.9;
-const EXPANDED_OVERLAY_BODY_ALPHA = 0.1;
-const EXPANDED_OVERLAY_BORDER_ALPHA = 0.34;
+const OVERLAY_BAND_ALPHA = 1;
+const EXPANDED_OVERLAY_CONNECTOR_ALPHA = 1;
+const EXPANDED_OVERLAY_CONNECTOR_LINE_WIDTH = 1;
+const EXPANDED_OVERLAY_CHILD_BORDER_ALPHA = 1;
 const PARENT_ERA_TINT_ALPHA = 0.05;
 const MIN_VISIBLE_OVERLAY_CHILD_WIDTH = 1;
 const TOOLTIP_OFFSET = 3;
@@ -994,12 +1011,54 @@ function resolveExpandedOverlayDetail(
   };
 }
 
+function resolveExpandedOverlayConnectorGeometry(
+  children: ExpandedOverlayChild[],
+  panelLeft: number,
+  panelRight: number,
+  parentCenterX: number,
+  parentBandBottom: number,
+  panelTop: number,
+): ExpandedOverlayConnectorGeometry {
+  let childConnectorLeft = Number.POSITIVE_INFINITY;
+  let childConnectorRight = Number.NEGATIVE_INFINITY;
+
+  for (const child of children) {
+    const clippedLeft = Math.max(child.x0, panelLeft);
+    const clippedRight = Math.min(child.x1, panelRight);
+
+    if (clippedRight - clippedLeft < MIN_VISIBLE_OVERLAY_CHILD_WIDTH) {
+      continue;
+    }
+
+    const childConnectorX = clippedLeft + (clippedRight - clippedLeft) / 2;
+    childConnectorLeft = Math.min(childConnectorLeft, childConnectorX);
+    childConnectorRight = Math.max(childConnectorRight, childConnectorX);
+  }
+
+  const railY = panelTop + Math.max(3, EXPANDED_OVERLAY_TOP_PADDING * 0.45);
+  const fallbackLeft = Math.max(panelLeft, parentCenterX - 12);
+  const fallbackRight = Math.min(panelRight, parentCenterX + 12);
+  const railLeft = Number.isFinite(childConnectorLeft)
+    ? Math.min(childConnectorLeft, parentCenterX)
+    : fallbackLeft;
+  const railRight = Number.isFinite(childConnectorRight)
+    ? Math.max(childConnectorRight, parentCenterX)
+    : fallbackRight;
+
+  return {
+    stemX: Math.min(Math.max(parentCenterX, railLeft), railRight),
+    stemTop: parentBandBottom,
+    stemBottom: railY,
+    railLeft,
+    railRight,
+    railY,
+  };
+}
+
 function shouldPrioritizeCurrentTooltipRetention(
   tooltip: HoveredTooltipState | null,
 ) {
-  return (
-    tooltip?.tooltip.kind === "overlay" || tooltip?.tooltip.kind === "era"
-  );
+  return tooltip?.tooltip.kind === "overlay" || tooltip?.tooltip.kind === "era";
 }
 
 function isEquivalentHoveredTooltip(
@@ -1145,6 +1204,9 @@ export function TimelineCanvas({
   const verbosePerfStatsRef = useRef<TimelineVerboseStats>(
     createTimelineVerboseStats(),
   );
+  const drawCanvasRef = useRef<((invalidateReasons?: string[]) => void) | null>(
+    null,
+  );
   const sceneRef = useRef<TimelineCanvasScene | null>(null);
   const lastSceneDiagnosticsRef =
     useRef<TimelineSceneDiagnosticsSnapshot | null>(null);
@@ -1175,6 +1237,10 @@ export function TimelineCanvas({
   const markerPriorityBoostRef = useRef<Map<string, MarkerPriorityBoostState>>(
     new Map(),
   );
+  const overlayLabelAnimationRef = useRef<
+    Map<string, AnimatedContextBandLabelState>
+  >(new Map());
+  const overlayLabelAnimationInitializedRef = useRef(false);
   const markerPriorityBoostFrameRef = useRef(0);
   const markerPriorityBoostLastTimeRef = useRef(0);
   const expandedOverlayAnimationFrameRef = useRef(0);
@@ -1372,9 +1438,11 @@ export function TimelineCanvas({
         sceneWidth,
         PAD,
       );
+      const expandedOverlayFullHeight = getExpandedOverlayPanelHeight(
+        expandedOverlayDetail,
+      );
       const expandedOverlayAnimatedHeight =
-        getExpandedOverlayPanelHeight(expandedOverlayDetail) *
-        expandedOverlayProgressRef.current;
+        expandedOverlayFullHeight * expandedOverlayProgressRef.current;
       const paper = themeRef.current.paper;
       const paperDeep = themeRef.current.paperDeep;
       const line = themeRef.current.line;
@@ -1384,6 +1452,7 @@ export function TimelineCanvas({
       const perfEnabled = perfMode !== "off";
       const verbosePerfEnabled = perfMode === "verbose";
       const drawStart = perfEnabled ? performance.now() : 0;
+      const drawNow = performance.now();
       const perfSample = perfEnabled
         ? {
             ...createTimelinePerfBreakdown(),
@@ -1411,6 +1480,7 @@ export function TimelineCanvas({
         typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
       const layout = getTimelineLayout(sceneHeight, sceneOverlayLaneCount);
       const axisY = layout.axisY;
+      const overlayBottomY = getOverlayLaneY(layout, 0);
       const resolvedOverlayLayout = resolveExpandedOverlayLayout(
         sceneResolvedOverlayBands.map((overlay) => ({
           id: overlay.band.id,
@@ -1420,13 +1490,18 @@ export function TimelineCanvas({
           baseY: getOverlayLaneY(layout, overlay.laneIndex),
         })),
         visibleExpandedOverlayId,
-        expandedOverlayAnimatedHeight,
+        expandedOverlayFullHeight,
+        expandedOverlayProgressRef.current,
+        overlayBottomY,
         OVERLAY_LANE_HEIGHT,
         OVERLAY_LANE_GAP,
       );
       const breadcrumbChainIds = new Set(
         breadcrumbChain.slice(1).map((era) => era.id),
       );
+      const overlayLabelAnimationStates = overlayLabelAnimationRef.current;
+      const activeOverlayLabelKeys = new Set<string>();
+      let hasActiveOverlayLabelAnimation = false;
       const hoverRegions: HoverRegion[] = [];
       const overlayInteractionRegions: OverlayInteractionRegion[] = [];
       const resolvedAxisTickStates = [...axisTickAnimationRef.current.values()]
@@ -1539,6 +1614,123 @@ export function TimelineCanvas({
         }
       };
 
+      const drawAnimatedOverlayLabel = ({
+        key,
+        fullLabel,
+        shortLabel,
+        renderX,
+        renderWidth,
+        y,
+        fillStyle,
+        alpha,
+        hoverId,
+        tooltip,
+      }: {
+        key: string;
+        fullLabel: string;
+        shortLabel: string;
+        renderX: number;
+        renderWidth: number;
+        y: number;
+        fillStyle: string;
+        alpha: number;
+        hoverId: string;
+        tooltip: TimelineTooltipContent;
+      }) => {
+        context.font = "11px var(--font-sans)";
+        const fullLabelWidth = context.measureText(fullLabel).width;
+        const hasDistinctShortLabel = shortLabel !== fullLabel;
+        const shortLabelWidth =
+          !hasDistinctShortLabel
+            ? fullLabelWidth
+            : context.measureText(shortLabel).width;
+        const existingState = overlayLabelAnimationStates.get(key);
+        const steppedExistingState = existingState
+          ? stepAnimatedContextBandLabelState(existingState, drawNow)
+          : undefined;
+        const currentVariant = steppedExistingState?.toVariant ?? "hidden";
+        const nextVariant = resolveContextBandLabelVariant({
+          availableWidth: renderWidth,
+          fullLabelWidth,
+          shortLabelWidth,
+          currentVariant,
+          hasDistinctShortLabel,
+        });
+        const nextState = syncAnimatedContextBandLabelState({
+          existing: steppedExistingState,
+          nextVariant,
+          now: drawNow,
+          duration: CONTEXT_BAND_LABEL_TRANSITION_DURATION_MS,
+          hasInitialized: overlayLabelAnimationInitializedRef.current,
+        });
+        const layers = resolveAnimatedContextBandLabelLayers(nextState, drawNow)
+          .map((layer) => ({
+            ...layer,
+            text: layer.variant === "full" ? fullLabel : shortLabel,
+            width: layer.variant === "full" ? fullLabelWidth : shortLabelWidth,
+          }))
+          .filter((layer) => layer.opacity > 0.01);
+
+        overlayLabelAnimationStates.set(key, nextState);
+        activeOverlayLabelKeys.add(key);
+
+        if (isAnimatedContextBandLabelStateActive(nextState, drawNow)) {
+          hasActiveOverlayLabelAnimation = true;
+        }
+
+        const dominantLayer = layers.reduce<
+          | {
+              variant: "short" | "full";
+              opacity: number;
+              text: string;
+              width: number;
+            }
+          | null
+        >(
+          (best, layer) =>
+            !best || layer.opacity > best.opacity ? layer : best,
+          null,
+        );
+
+        if (dominantLayer) {
+          const hoverBounds = resolveOverlayLabelHoverBounds({
+            centerX: renderX + renderWidth / 2,
+            labelWidth: dominantLayer.width,
+            bandLeft: renderX,
+            bandRight: renderX + renderWidth,
+            bandTop: y,
+            bandBottom: y + OVERLAY_LANE_HEIGHT,
+          });
+
+          hoverRegions.push({
+            id: hoverId,
+            left: hoverBounds.left,
+            right: hoverBounds.right,
+            top: hoverBounds.top,
+            bottom: hoverBounds.bottom,
+            anchorX: renderX + renderWidth / 2,
+            anchorY: y + 2,
+            anchorMode: "follow-x",
+            placement: "above",
+            tooltip,
+          });
+        }
+
+        for (const layer of layers) {
+          context.save();
+          context.fillStyle = fillStyle;
+          context.globalAlpha = alpha * layer.opacity;
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillText(
+            layer.text,
+            renderX + renderWidth / 2,
+            y + OVERLAY_LANE_HEIGHT / 2,
+          );
+          context.restore();
+        }
+      };
+
       for (const layer of visibleEraLayers) {
         renderEra(layer.era, layer.opacity);
       }
@@ -1589,61 +1781,18 @@ export function TimelineCanvas({
 
           const fullLabel = overlay.band.label;
           const shortLabel = overlay.band.shortLabel ?? fullLabel;
-          context.font = "11px var(--font-sans)";
-          const fullLabelWidth = context.measureText(fullLabel).width;
-          const shortLabelWidth = context.measureText(shortLabel).width;
-          const chosenLabel =
-            fullLabelWidth <= Math.max(bandWidth - 10, 0)
-              ? fullLabel
-              : shortLabelWidth <= Math.max(bandWidth - 10, 0)
-                ? shortLabel
-                : "";
-          const chosenLabelWidth =
-            chosenLabel === fullLabel
-              ? fullLabelWidth
-              : chosenLabel === shortLabel
-                ? shortLabelWidth
-                : 0;
-          const labelOpacity =
-            chosenLabelWidth > 0
-              ? clamp01((bandWidth - (chosenLabelWidth + 8)) / 20)
-              : 0;
-
-          if (chosenLabel && labelOpacity > 0.01) {
-            const hoverBounds = resolveOverlayLabelHoverBounds({
-              centerX: overlay.renderX + bandWidth / 2,
-              labelWidth: chosenLabelWidth,
-              bandLeft: overlay.renderX,
-              bandRight: overlay.renderX + bandWidth,
-              bandTop: y,
-              bandBottom: y + OVERLAY_LANE_HEIGHT,
-            });
-
-            hoverRegions.push({
-              id: overlay.band.id,
-              left: hoverBounds.left,
-              right: hoverBounds.right,
-              top: hoverBounds.top,
-              bottom: hoverBounds.bottom,
-              anchorX: overlay.renderX + bandWidth / 2,
-              anchorY: y + 2,
-              anchorMode: "follow-x",
-              placement: "above",
-              tooltip: getOverlayTooltipContent(overlay.band),
-            });
-          }
-
-          if (chosenLabel && labelOpacity > 0.01) {
-            context.fillStyle = overlayLabelPaint.fillStyle;
-            context.globalAlpha = 0.82 * labelOpacity;
-            context.textAlign = "center";
-            context.textBaseline = "middle";
-            context.fillText(
-              chosenLabel,
-              overlay.renderX + bandWidth / 2,
-              y + OVERLAY_LANE_HEIGHT / 2,
-            );
-          }
+          drawAnimatedOverlayLabel({
+            key: `overlay:${overlay.band.id}`,
+            fullLabel,
+            shortLabel,
+            renderX: overlay.renderX,
+            renderWidth: bandWidth,
+            y,
+            fillStyle: overlayLabelPaint.fillStyle,
+            alpha: 0.82,
+            hoverId: overlay.band.id,
+            tooltip: getOverlayTooltipContent(overlay.band),
+          });
 
           if ((overlay.band.children?.length ?? 0) > 0) {
             const indicatorOpacity = clamp01((bandWidth - 26) / 18);
@@ -1678,18 +1827,19 @@ export function TimelineCanvas({
       if (expandedOverlayDetail && expandedOverlayAnimatedHeight > 0.5) {
         const panelHeight = expandedOverlayAnimatedHeight;
         const parentY =
-          resolvedOverlayLayout.yById.get(expandedOverlayDetail.parent.band.id) ??
-          getOverlayLaneY(layout, expandedOverlayDetail.parent.laneIndex);
-        const { panelTop, panelBottom, unionTop, unionHeight } =
-          getExpandedOverlayPanelBounds(
-            parentY,
-            panelHeight,
-            OVERLAY_LANE_HEIGHT,
-          );
+          resolvedOverlayLayout.yById.get(
+            expandedOverlayDetail.parent.band.id,
+          ) ?? getOverlayLaneY(layout, expandedOverlayDetail.parent.laneIndex);
+        const { panelTop } = getExpandedOverlayPanelBounds(
+          parentY,
+          panelHeight,
+          OVERLAY_LANE_HEIGHT,
+        );
         const panelLeft = expandedOverlayDetail.parent.renderX;
         const panelRight = panelLeft + expandedOverlayDetail.panelWidth;
         const panelInnerLeft = panelLeft;
         const panelInnerRight = panelRight;
+        const parentCenterX = panelLeft + expandedOverlayDetail.panelWidth / 2;
         const parentColor = parseColor(
           expandedOverlayDetail.parent.band.color,
         ) ?? {
@@ -1698,67 +1848,42 @@ export function TimelineCanvas({
           b: 70,
           a: 1,
         };
-        const panelFill = toCssColor(
-          withAlpha(parentColor, EXPANDED_OVERLAY_BODY_ALPHA),
+        const connectorStroke = toCssColor(
+          withAlpha(parentColor, EXPANDED_OVERLAY_CONNECTOR_ALPHA),
         );
-        const panelBorder = toCssColor(
-          withAlpha(parentColor, EXPANDED_OVERLAY_BORDER_ALPHA),
+        const childBorder = toCssColor(
+          withAlpha(parentColor, EXPANDED_OVERLAY_CHILD_BORDER_ALPHA),
+        );
+        const connectorGeometry = resolveExpandedOverlayConnectorGeometry(
+          expandedOverlayDetail.children,
+          panelLeft,
+          panelRight,
+          parentCenterX,
+          parentY + OVERLAY_LANE_HEIGHT,
+          panelTop,
         );
 
         overlayInteractionRegions.push({
           id: expandedOverlayDetail.parent.band.id,
-          left: panelLeft,
-          right: panelRight,
-          top: panelTop,
-          bottom: panelBottom,
+          left: connectorGeometry.railLeft - 6,
+          right: connectorGeometry.railRight + 6,
+          top: parentY + OVERLAY_LANE_HEIGHT - 4,
+          bottom: panelTop + EXPANDED_OVERLAY_TOP_PADDING + 6,
           role: "panel",
           parentId: expandedOverlayDetail.parent.band.id,
         });
 
         context.save();
-        context.fillStyle = panelFill;
-        context.fillRect(
-          panelLeft,
-          panelTop,
-          expandedOverlayDetail.panelWidth,
-          panelHeight,
-        );
-        context.restore();
-
-        context.save();
+        context.strokeStyle = connectorStroke;
+        context.lineWidth = EXPANDED_OVERLAY_CONNECTOR_LINE_WIDTH;
+        context.lineCap = "round";
         context.beginPath();
-        context.rect(
-          panelLeft,
-          unionTop,
-          expandedOverlayDetail.panelWidth,
-          unionHeight,
-        );
-        context.clip();
-        context.strokeStyle = panelBorder;
-        context.lineWidth = 1;
-        context.strokeRect(
-          panelLeft,
-          unionTop,
-          expandedOverlayDetail.panelWidth,
-          unionHeight,
-        );
-        context.restore();
-
-        context.save();
-        context.beginPath();
-        context.rect(
-          panelLeft,
-          panelTop,
-          expandedOverlayDetail.panelWidth,
-          panelHeight,
-        );
-        context.clip();
-        context.strokeStyle = panelBorder;
-        context.lineWidth = 1;
-        context.beginPath();
-        context.moveTo(panelLeft, panelTop);
-        context.lineTo(panelRight, panelTop);
+        context.moveTo(connectorGeometry.stemX, connectorGeometry.stemTop);
+        context.lineTo(connectorGeometry.stemX, connectorGeometry.stemBottom);
+        context.moveTo(connectorGeometry.railLeft, connectorGeometry.railY);
+        context.lineTo(connectorGeometry.railRight, connectorGeometry.railY);
         context.stroke();
+        context.restore();
 
         for (const child of expandedOverlayDetail.children) {
           const clippedX0 = Math.max(child.x0, panelInnerLeft);
@@ -1775,6 +1900,7 @@ export function TimelineCanvas({
             panelTop +
             EXPANDED_OVERLAY_TOP_PADDING +
             child.laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP);
+          const childConnectorX = renderX + renderWidth / 2;
           const childBandOpacity = OVERLAY_BAND_ALPHA;
           const childLabelPaint = getOverlayLabelPaint(
             child.band.color,
@@ -1794,78 +1920,40 @@ export function TimelineCanvas({
           });
 
           context.save();
+          context.strokeStyle = connectorStroke;
+          context.lineWidth = 1;
+          context.lineCap = "round";
+          context.beginPath();
+          context.moveTo(childConnectorX, connectorGeometry.railY);
+          context.lineTo(childConnectorX, childY);
+          context.stroke();
+          context.restore();
+
+          context.save();
           context.globalAlpha = childBandOpacity;
           context.fillStyle = child.band.color;
           context.fillRect(renderX, childY, renderWidth, OVERLAY_LANE_HEIGHT);
-          context.strokeStyle = panelBorder;
+          context.strokeStyle = childBorder;
           context.lineWidth = 1;
           context.strokeRect(renderX, childY, renderWidth, OVERLAY_LANE_HEIGHT);
 
           const fullLabel = child.band.label;
           const shortLabel = child.band.shortLabel ?? fullLabel;
-          context.font = "11px var(--font-sans)";
-          const fullLabelWidth = context.measureText(fullLabel).width;
-          const shortLabelWidth =
-            shortLabel === fullLabel
-              ? fullLabelWidth
-              : context.measureText(shortLabel).width;
-          const chosenLabel =
-            fullLabelWidth <= Math.max(renderWidth - 10, 0)
-              ? fullLabel
-              : shortLabelWidth <= Math.max(renderWidth - 10, 0)
-                ? shortLabel
-                : "";
-          const chosenLabelWidth =
-            chosenLabel === fullLabel
-              ? fullLabelWidth
-              : chosenLabel === shortLabel
-                ? shortLabelWidth
-                : 0;
-          const labelOpacity =
-            chosenLabelWidth > 0
-              ? clamp01((renderWidth - (chosenLabelWidth + 8)) / 20)
-              : 0;
-
-          if (chosenLabel && labelOpacity > 0.01) {
-            const hoverBounds = resolveOverlayLabelHoverBounds({
-              centerX: renderX + renderWidth / 2,
-              labelWidth: chosenLabelWidth,
-              bandLeft: renderX,
-              bandRight: renderX + renderWidth,
-              bandTop: childY,
-              bandBottom: childY + OVERLAY_LANE_HEIGHT,
-            });
-
-            hoverRegions.push({
-              id: child.band.id,
-              left: hoverBounds.left,
-              right: hoverBounds.right,
-              top: hoverBounds.top,
-              bottom: hoverBounds.bottom,
-              anchorX: renderX + renderWidth / 2,
-              anchorY: childY + 2,
-              anchorMode: "follow-x",
-              placement: "above",
-              tooltip: getOverlayTooltipContent(child.band),
-            });
-          }
-
-          if (chosenLabel && labelOpacity > 0.01) {
-            context.fillStyle = childLabelPaint.fillStyle;
-            context.globalAlpha = 0.8 * labelOpacity;
-            context.textAlign = "center";
-            context.textBaseline = "middle";
-            context.fillText(
-              chosenLabel,
-              renderX + renderWidth / 2,
-              childY + OVERLAY_LANE_HEIGHT / 2,
-            );
-          }
+          drawAnimatedOverlayLabel({
+            key: `overlay:${child.band.id}`,
+            fullLabel,
+            shortLabel,
+            renderX,
+            renderWidth,
+            y: childY,
+            fillStyle: childLabelPaint.fillStyle,
+            alpha: 0.8,
+            hoverId: child.band.id,
+            tooltip: getOverlayTooltipContent(child.band),
+          });
 
           context.restore();
         }
-
-        context.restore();
       }
 
       markPerf("overlayMs");
@@ -2595,6 +2683,14 @@ export function TimelineCanvas({
         context.restore();
       }
 
+      for (const key of [...overlayLabelAnimationStates.keys()]) {
+        if (!activeOverlayLabelKeys.has(key)) {
+          overlayLabelAnimationStates.delete(key);
+        }
+      }
+
+      overlayLabelAnimationInitializedRef.current = true;
+
       hoverRegionsRef.current = hoverRegions;
       overlayInteractionRegionsRef.current = overlayInteractionRegions;
 
@@ -2676,6 +2772,13 @@ export function TimelineCanvas({
           );
         }
       }
+
+      if (hasActiveOverlayLabelAnimation && !drawFrameRef.current) {
+        drawFrameRef.current = requestAnimationFrame(() => {
+          drawFrameRef.current = 0;
+          drawCanvasRef.current?.(["overlay-label-animation"]);
+        });
+      }
     },
     [
       commitHoveredTooltip,
@@ -2683,6 +2786,16 @@ export function TimelineCanvas({
       resolveHoveredTooltipForCanvasDraw,
     ],
   );
+
+  useEffect(() => {
+    drawCanvasRef.current = drawCanvas;
+
+    return () => {
+      if (drawCanvasRef.current === drawCanvas) {
+        drawCanvasRef.current = null;
+      }
+    };
+  }, [drawCanvas]);
 
   const invalidateCanvas = useCallback(
     (reason = "unspecified") => {
@@ -3625,7 +3738,6 @@ export function TimelineCanvas({
     }
 
     if (expandedOverlayDetail && expandedOverlayAnimatedHeight > 0.5) {
-      const panelHeight = expandedOverlayAnimatedHeight;
       const baseParentY = getOverlayLaneY(
         layout,
         expandedOverlayDetail.parent.laneIndex,
@@ -3638,11 +3750,11 @@ export function TimelineCanvas({
           expandedOverlayAnimatedHeight,
         );
       const panelTop = parentY + OVERLAY_LANE_HEIGHT;
-      const panelBottom = baseParentY + OVERLAY_LANE_HEIGHT;
       const panelLeft = expandedOverlayDetail.parent.renderX;
       const panelRight = panelLeft + expandedOverlayDetail.panelWidth;
       const panelInnerLeft = panelLeft;
       const panelInnerRight = panelRight;
+      const parentCenterX = panelLeft + expandedOverlayDetail.panelWidth / 2;
       const parentColor = parseColor(
         expandedOverlayDetail.parent.band.color,
       ) ?? {
@@ -3651,67 +3763,42 @@ export function TimelineCanvas({
         b: 70,
         a: 1,
       };
-      const panelFill = toCssColor(
-        withAlpha(parentColor, EXPANDED_OVERLAY_BODY_ALPHA),
+      const connectorStroke = toCssColor(
+        withAlpha(parentColor, EXPANDED_OVERLAY_CONNECTOR_ALPHA),
       );
-      const panelBorder = toCssColor(
-        withAlpha(parentColor, EXPANDED_OVERLAY_BORDER_ALPHA),
+      const childBorder = toCssColor(
+        withAlpha(parentColor, EXPANDED_OVERLAY_CHILD_BORDER_ALPHA),
+      );
+      const connectorGeometry = resolveExpandedOverlayConnectorGeometry(
+        expandedOverlayDetail.children,
+        panelLeft,
+        panelRight,
+        parentCenterX,
+        parentY + OVERLAY_LANE_HEIGHT,
+        panelTop,
       );
 
       overlayInteractionRegions.push({
         id: expandedOverlayDetail.parent.band.id,
-        left: panelLeft,
-        right: panelRight,
-        top: panelTop,
-        bottom: panelBottom,
+        left: connectorGeometry.railLeft - 6,
+        right: connectorGeometry.railRight + 6,
+        top: parentY + OVERLAY_LANE_HEIGHT - 4,
+        bottom: panelTop + EXPANDED_OVERLAY_TOP_PADDING + 6,
         role: "panel",
         parentId: expandedOverlayDetail.parent.band.id,
       });
 
       context.save();
-      context.fillStyle = panelFill;
-      context.fillRect(
-        panelLeft,
-        panelTop,
-        expandedOverlayDetail.panelWidth,
-        panelHeight,
-      );
-      context.restore();
-
-      context.save();
+      context.strokeStyle = connectorStroke;
+      context.lineWidth = EXPANDED_OVERLAY_CONNECTOR_LINE_WIDTH;
+      context.lineCap = "round";
       context.beginPath();
-      context.rect(
-        panelLeft,
-        parentY,
-        expandedOverlayDetail.panelWidth,
-        OVERLAY_LANE_HEIGHT + panelHeight,
-      );
-      context.clip();
-      context.strokeStyle = panelBorder;
-      context.lineWidth = 1;
-      context.strokeRect(
-        panelLeft,
-        parentY,
-        expandedOverlayDetail.panelWidth,
-        OVERLAY_LANE_HEIGHT + panelHeight,
-      );
-      context.restore();
-
-      context.save();
-      context.beginPath();
-      context.rect(
-        panelLeft,
-        panelTop,
-        expandedOverlayDetail.panelWidth,
-        panelHeight,
-      );
-      context.clip();
-      context.strokeStyle = panelBorder;
-      context.lineWidth = 1;
-      context.beginPath();
-      context.moveTo(panelLeft, panelTop);
-      context.lineTo(panelRight, panelTop);
+      context.moveTo(connectorGeometry.stemX, connectorGeometry.stemTop);
+      context.lineTo(connectorGeometry.stemX, connectorGeometry.stemBottom);
+      context.moveTo(connectorGeometry.railLeft, connectorGeometry.railY);
+      context.lineTo(connectorGeometry.railRight, connectorGeometry.railY);
       context.stroke();
+      context.restore();
 
       for (const child of expandedOverlayDetail.children) {
         const clippedX0 = Math.max(child.x0, panelInnerLeft);
@@ -3728,6 +3815,7 @@ export function TimelineCanvas({
           EXPANDED_OVERLAY_TOP_PADDING +
           child.laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP);
         const childRenderY = childY;
+        const childConnectorX = renderX + renderWidth / 2;
         const childBandOpacity = OVERLAY_BAND_ALPHA;
         const childLabelPaint = getOverlayLabelPaint(
           child.band.color,
@@ -3760,6 +3848,16 @@ export function TimelineCanvas({
         });
 
         context.save();
+        context.strokeStyle = connectorStroke;
+        context.lineWidth = 1;
+        context.lineCap = "round";
+        context.beginPath();
+        context.moveTo(childConnectorX, connectorGeometry.railY);
+        context.lineTo(childConnectorX, childRenderY);
+        context.stroke();
+        context.restore();
+
+        context.save();
         context.globalAlpha = childBandOpacity;
         context.fillStyle = child.band.color;
         context.fillRect(
@@ -3768,7 +3866,7 @@ export function TimelineCanvas({
           renderWidth,
           OVERLAY_LANE_HEIGHT,
         );
-        context.strokeStyle = panelBorder;
+        context.strokeStyle = childBorder;
         context.lineWidth = 1;
         context.strokeRect(
           renderX,
@@ -5037,7 +5135,8 @@ export function TimelineCanvas({
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     const currentTooltip = hoveredTooltipRef.current;
-    const stickyRect = tooltipSourcesRef.current?.getBoundingClientRect() ?? null;
+    const stickyRect =
+      tooltipSourcesRef.current?.getBoundingClientRect() ?? null;
 
     lastPointerRef.current = {
       x,
