@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { ERA_SOURCES } from "./eraSources";
 import { ROOT_ERA, ROOT_TIMELINE, TIMELINE_DISPLAY } from "./eras";
+import {
+  TIMELINE_DECORATION_CATEGORIES,
+  TIMELINE_DECORATION_GROUPS,
+} from "./timelineDecorations";
 import type { TimelineOverlayBand } from "./timelineTypes";
 
 function flattenOverlayBands(bands: TimelineOverlayBand[]): TimelineOverlayBand[] {
@@ -11,6 +15,33 @@ describe("root timeline display data", () => {
   it("keeps the stitched root era as the canonical root export", () => {
     expect(ROOT_TIMELINE.rootEra).toBe(ROOT_ERA);
     expect(ROOT_TIMELINE.display).toBe(TIMELINE_DISPLAY);
+  });
+
+  it("keeps decoration group metadata aligned with the assembled display data", () => {
+    const categoryIds = new Set(
+      TIMELINE_DECORATION_CATEGORIES.map((category) => category.id),
+    );
+    const groupIds = new Set(
+      TIMELINE_DECORATION_GROUPS.map((group) => group.id),
+    );
+
+    expect(
+      TIMELINE_DECORATION_GROUPS.every((group) =>
+        categoryIds.has(group.categoryId),
+      ),
+    ).toBe(true);
+
+    expect(
+      TIMELINE_DISPLAY.markers.every(
+        (marker) => marker.groupId && groupIds.has(marker.groupId),
+      ),
+    ).toBe(true);
+
+    expect(
+      flattenOverlayBands(TIMELINE_DISPLAY.overlays).every(
+        (band) => band.groupId && groupIds.has(band.groupId),
+      ),
+    ).toBe(true);
   });
 
   it("keeps core markers ordered chronologically with valid sources", () => {

@@ -1,5 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { TimelineCanvas } from "./components/timeline/TimelineCanvas";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  TimelineCanvas,
+  TIMELINE_CANVAS_PAD,
+} from "./components/timeline/TimelineCanvas";
+import { TimelineSidebar } from "./components/chrome/TimelineSidebar";
 import { useAnimatedViewport } from "./hooks/useAnimatedViewport";
 import { useElementSize } from "./hooks/useElementSize";
 import {
@@ -9,6 +13,8 @@ import {
   getAncestorChain,
   type Era,
 } from "./lib/data/eras";
+import { getDefaultEnabledTimelineGroupIds } from "./lib/data/timelineDecorations";
+import { resolveTimelineSidebarSections } from "./lib/data/timelineSidebar";
 import {
   getHomeViewport,
   getYearsPerPixel,
@@ -18,9 +24,13 @@ import "./App.css";
 
 function App() {
   const [stageRef, stageSize] = useElementSize<HTMLDivElement>();
-  const innerWidth = Math.max(stageSize.width - 240, 0);
+  const innerWidth = Math.max(stageSize.width, 1);
   const animated = useAnimatedViewport(getHomeViewport(1440), innerWidth);
   const [activeEraId, setActiveEraId] = useState(ROOT_ERA.id);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [enabledGroupIds, setEnabledGroupIds] = useState<Set<string>>(() =>
+    getDefaultEnabledTimelineGroupIds(),
+  );
   const autoTransitionFrameRef = useRef(0);
 
   // Use refs for values needed in RAF callbacks to avoid stale closures
@@ -120,29 +130,94 @@ function App() {
     }
   }, [activeEraId, animated]);
 
+  const sidebarSections = useMemo(
+    () =>
+      resolveTimelineSidebarSections(
+        TIMELINE_DISPLAY,
+        animated.viewport,
+        innerWidth,
+        TIMELINE_CANVAS_PAD,
+        enabledGroupIds,
+      ),
+    [animated.viewport, enabledGroupIds, innerWidth],
+  );
+
+  const handleToggleEntry = useCallback(
+    (entryId: string, groupIds: string[], nextEnabled: boolean) => {
+      void entryId;
+      setEnabledGroupIds((current) => {
+        const next = new Set(current);
+
+        for (const groupId of groupIds) {
+          if (nextEnabled) {
+            next.add(groupId);
+          } else {
+            next.delete(groupId);
+          }
+        }
+
+        return next;
+      });
+    },
+    [],
+  );
+
   return (
-    <main className="app-shell" ref={stageRef}>
-      {stageSize.width > 0 && stageSize.height > 0 ? (
-        <TimelineCanvas
-          height={stageSize.height}
-          viewport={animated.viewport}
-          width={stageSize.width}
-          activeEra={activeEra}
-          activeChain={chain}
-          siblingEras={siblingEras}
-          markers={TIMELINE_DISPLAY.markers}
-          overlayBands={TIMELINE_DISPLAY.overlays}
-          parentEra={parentEra}
-          isAnimating={animated.isAnimating}
-          onViewportChange={handleViewportChange}
-          onAnimateZoom={handleZoom}
-          onAnimateToRange={animated.animateToRange}
-          onDrillIntoEra={handleDrillIntoEra}
-          onNavigateUp={handleNavigateUp}
-          onRecordDragSample={animated.recordDragSample}
-          onReleaseMomentum={animated.releaseMomentum}
+    <main
+      className="app-shell"
+      data-sidebar-open={isSidebarOpen ? "true" : "false"}
+    >
+      <button
+        aria-controls="timeline-sidebar-panel"
+        aria-expanded={isSidebarOpen}
+        aria-label="Toggle layers sidebar"
+        className="timeline-sidebar-toggle"
+        onClick={() => {
+          setIsSidebarOpen((current) => !current);
+        }}
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          className="timeline-sidebar-toggle__glyph"
         />
-      ) : null}
+        <span className="timeline-sidebar-toggle__label">Layers</span>
+      </button>
+      <div
+        aria-hidden={!isSidebarOpen}
+        className="timeline-sidebar-shell"
+        data-open={isSidebarOpen ? "true" : "false"}
+        id="timeline-sidebar-panel"
+      >
+        <TimelineSidebar
+          sections={sidebarSections}
+          onToggleEntry={handleToggleEntry}
+        />
+      </div>
+      <section className="app-stage" ref={stageRef}>
+        {stageSize.width > 0 && stageSize.height > 0 ? (
+          <TimelineCanvas
+            height={stageSize.height}
+            viewport={animated.viewport}
+            width={stageSize.width}
+            activeEra={activeEra}
+            activeChain={chain}
+            siblingEras={siblingEras}
+            markers={TIMELINE_DISPLAY.markers}
+            overlayBands={TIMELINE_DISPLAY.overlays}
+            enabledGroupIds={enabledGroupIds}
+            parentEra={parentEra}
+            isAnimating={animated.isAnimating}
+            onViewportChange={handleViewportChange}
+            onAnimateZoom={handleZoom}
+            onAnimateToRange={animated.animateToRange}
+            onDrillIntoEra={handleDrillIntoEra}
+            onNavigateUp={handleNavigateUp}
+            onRecordDragSample={animated.recordDragSample}
+            onReleaseMomentum={animated.releaseMomentum}
+          />
+        ) : null}
+      </section>
     </main>
   );
 }

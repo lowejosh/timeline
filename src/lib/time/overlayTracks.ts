@@ -90,6 +90,17 @@ function isVisibleAtZoom(item: TimelineZoomVisibility, zoom: number) {
   return true;
 }
 
+function isDecorationGroupEnabled(
+  item: Pick<TimelineMarker | TimelineOverlayBand, "groupId">,
+  enabledGroupIds?: ReadonlySet<string> | null,
+) {
+  if (!enabledGroupIds || !item.groupId) {
+    return true;
+  }
+
+  return enabledGroupIds.has(item.groupId);
+}
+
 function compareDecorations(
   left:
     | Pick<TimelineMarker, "id" | "priority"> & { startYear: number; endYear: number }
@@ -228,6 +239,7 @@ export function getVisibleTimelineMarkers(
   viewport: TimelineViewport,
   width: number,
   pad: number,
+  enabledGroupIds?: ReadonlySet<string> | null,
 ) {
   const innerWidth = Math.max(width - pad * 2, 1);
   const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
@@ -244,7 +256,10 @@ export function getVisibleTimelineMarkers(
     for (let index = startIndex; index < endIndex; index += 1) {
       const marker = markers[index];
 
-      if (isVisibleAtZoom(marker, viewport.zoom)) {
+      if (
+        isVisibleAtZoom(marker, viewport.zoom) &&
+        isDecorationGroupEnabled(marker, enabledGroupIds)
+      ) {
         visibleMarkers.push(marker);
       }
     }
@@ -255,6 +270,7 @@ export function getVisibleTimelineMarkers(
   return [...markers]
     .filter(
       (marker) =>
+        isDecorationGroupEnabled(marker, enabledGroupIds) &&
         isVisibleAtZoom(marker, viewport.zoom) &&
         marker.year >= visibleStart &&
         marker.year <= visibleEnd,
@@ -283,10 +299,19 @@ export function resolveTimelineOverlayTracks(
   width: number,
   pad: number,
   devicePixelRatio = 1,
+  enabledGroupIds?: ReadonlySet<string> | null,
 ): ResolvedTimelineOverlayBand[] {
   const innerWidth = Math.max(width - pad * 2, 1);
   const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
-  const { assigned, laneCount } = getAssignedOverlayLanes(overlays);
+  const enabledOverlays = overlays.filter((overlay) =>
+    isDecorationGroupEnabled(overlay, enabledGroupIds),
+  );
+
+  if (enabledOverlays.length === 0) {
+    return [];
+  }
+
+  const { assigned, laneCount } = getAssignedOverlayLanes(enabledOverlays);
   const visibleOverlays: ResolvedTimelineOverlayBand[] = [];
 
   for (const { band, laneIndex } of assigned) {

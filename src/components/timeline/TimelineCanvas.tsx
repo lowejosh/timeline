@@ -96,6 +96,7 @@ type TimelineCanvasProps = {
   siblingEras: Era[];
   markers: TimelineMarker[];
   overlayBands: TimelineOverlayBand[];
+  enabledGroupIds: ReadonlySet<string>;
   parentEra: Era | null;
   isAnimating: boolean;
   onViewportChange: (
@@ -333,7 +334,8 @@ type ExpandedOverlayConnectorGeometry = {
   railY: number;
 };
 
-const PAD = 120;
+export const TIMELINE_CANVAS_PAD = 120;
+const PAD = TIMELINE_CANVAS_PAD;
 const OVERLAY_LANE_HEIGHT = 16;
 const OVERLAY_LANE_GAP = 8;
 const OVERLAY_PANEL_GAP = 56;
@@ -1246,6 +1248,7 @@ export function TimelineCanvas({
   siblingEras,
   markers,
   overlayBands,
+  enabledGroupIds,
   parentEra,
   isAnimating,
   onViewportChange,
@@ -3167,8 +3170,15 @@ export function TimelineCanvas({
     return selectedRegion;
   }
   const visibleMarkers = useMemo(
-    () => getVisibleTimelineMarkers(markers, viewport, width, PAD),
-    [markers, viewport, width],
+    () =>
+      getVisibleTimelineMarkers(
+        markers,
+        viewport,
+        width,
+        PAD,
+        enabledGroupIds,
+      ),
+    [enabledGroupIds, markers, viewport, width],
   );
   const resolvedOverlayBands = useMemo(
     () =>
@@ -3178,8 +3188,9 @@ export function TimelineCanvas({
         width,
         PAD,
         typeof window === "undefined" ? 1 : window.devicePixelRatio || 1,
+        enabledGroupIds,
       ),
-    [overlayBands, viewport, width],
+    [enabledGroupIds, overlayBands, viewport, width],
   );
   const overlayLaneCount = resolvedOverlayBands[0]?.laneCount ?? 0;
   const axisTickTargets = useMemo(() => {

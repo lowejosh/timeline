@@ -48,12 +48,35 @@ export type TimelineZoomVisibility = {
   maxZoom?: number;
 };
 
+export type TimelineDecorationContentType =
+  | "markers"
+  | "overlays"
+  | "mixed";
+
+export type TimelineDecorationCategory = {
+  id: string;
+  label: string;
+  description?: string;
+  order: number;
+};
+
+export type TimelineDecorationGroup = {
+  id: string;
+  categoryId: string;
+  label: string;
+  description?: string;
+  contentType: TimelineDecorationContentType;
+  order: number;
+  defaultEnabled?: boolean;
+};
+
 type TimelineDecorationBase = TimelineZoomVisibility & TimelineRegionalScope & {
   id: string;
   label: string;
   shortLabel?: string;
   description?: string;
   priority?: number;
+  groupId?: string;
   sourceRefs?: TimelineSourceRef[];
 };
 
@@ -69,7 +92,6 @@ export type TimelineOverlayBand =
   startYear: number;
   endYear: number;
   color: string;
-  groupId?: string;
   children?: TimelineOverlayBand[];
 };
 

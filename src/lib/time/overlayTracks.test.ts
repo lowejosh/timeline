@@ -42,6 +42,42 @@ describe("timeline overlay tracks", () => {
     ]);
   });
 
+  it("filters markers by enabled group ids before rendering", () => {
+    const width = 1000;
+    const pad = 100;
+    const markers: TimelineMarker[] = [
+      {
+        id: "enabled-marker",
+        label: "Enabled marker",
+        year: -4_560_000_000,
+        minZoom: 8,
+        groupId: "enabled-group",
+      },
+      {
+        id: "disabled-marker",
+        label: "Disabled marker",
+        year: -4_550_000_000,
+        minZoom: 8,
+        groupId: "disabled-group",
+      },
+    ];
+
+    const viewport = {
+      centerYear: -4_555_000_000,
+      zoom: 9,
+    };
+
+    expect(
+      getVisibleTimelineMarkers(
+        markers,
+        viewport,
+        width,
+        pad,
+        new Set(["enabled-group"]),
+      ).map((marker) => marker.id),
+    ).toEqual(["enabled-marker"]);
+  });
+
   it("packs overlapping overlays into separate lanes and reuses free lanes", () => {
     const width = 1000;
     const pad = 100;
@@ -79,6 +115,47 @@ describe("timeline overlay tracks", () => {
     expect(resolved.map((band) => band.band.id)).toEqual(["a", "b", "c"]);
     expect(resolved.map((band) => band.laneIndex)).toEqual([0, 1, 0]);
     expect(resolved.every((band) => band.laneCount === 2)).toBe(true);
+  });
+
+  it("filters overlays by enabled group ids before lane assignment", () => {
+    const width = 1000;
+    const pad = 100;
+    const overlays: TimelineOverlayBand[] = [
+      {
+        id: "enabled-overlay",
+        label: "Enabled overlay",
+        startYear: -3500,
+        endYear: -2500,
+        color: "rgba(0, 0, 0, 0.1)",
+        groupId: "enabled-group",
+      },
+      {
+        id: "disabled-overlay",
+        label: "Disabled overlay",
+        startYear: -3400,
+        endYear: -1500,
+        color: "rgba(0, 0, 0, 0.1)",
+        groupId: "disabled-group",
+      },
+    ];
+
+    const viewport = {
+      centerYear: -2600,
+      zoom: 21,
+    };
+
+    const resolved = resolveTimelineOverlayTracks(
+      overlays,
+      viewport,
+      width,
+      pad,
+      1,
+      new Set(["enabled-group"]),
+    );
+
+    expect(resolved.map((band) => band.band.id)).toEqual(["enabled-overlay"]);
+    expect(resolved[0].laneIndex).toBe(0);
+    expect(resolved[0].laneCount).toBe(1);
   });
 
   it("keeps lane count stable even when only a subset is visible", () => {

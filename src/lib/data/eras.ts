@@ -1,25 +1,12 @@
 import { COSMIC_ERA_DEFINITIONS } from "./eraTrees/cosmic";
 import { GEOLOGICAL_ERA_DEFINITIONS } from "./eraTrees/geological";
 import { HUMAN_HISTORY_ERA_DEFINITION } from "./eraTrees/humanHistory";
-import { CHALCOLITHIC_MARKERS } from "./markers/chalcolithic";
-import { CLASSICAL_ANTIQUITY_MARKERS } from "./markers/classicalAntiquity";
-import { BRONZE_AGE_MARKERS } from "./markers/bronzeAge";
-import { CORE_TIMELINE_MARKERS } from "./markers/core";
-import { DEEP_TIME_LIFE_MARKERS } from "./markers/deepTimeLife";
-import { EPIPALEOLITHIC_MARKERS } from "./markers/epipaleolithic";
-import { HISTORICAL_TURNING_POINT_MARKERS } from "./markers/historicalTurningPoints";
-import { NEOLITHIC_MARKERS } from "./markers/neolithic";
-import { PALEOLITHIC_MARKERS } from "./markers/paleolithic";
-import { POST_CLASSICAL_MARKERS } from "./markers/postClassical";
-import { ANCIENT_CIVILIZATION_OVERLAYS } from "./overlays/ancientCivilizations";
-import { DEEP_TIME_LIFE_OVERLAYS } from "./overlays/deepTimeLife";
-import { POST_CLASSICAL_EARLY_MODERN_OVERLAYS } from "./overlays/postClassicalEarlyModern";
+import { TIMELINE_DISPLAY } from "./timelineDecorations";
 import { getPresentTimelineYear } from "../time/present";
 import type {
   Era,
   EraDefinition,
   RootTimelineData,
-  TimelineDisplayConfig,
   TimelineSourceRef,
 } from "./timelineTypes";
 
@@ -32,6 +19,7 @@ export type {
   TimelineMarker,
   TimelineOverlayBand,
 } from "./timelineTypes";
+export { TIMELINE_DISPLAY } from "./timelineDecorations";
 
 export type EraSourceRef = TimelineSourceRef;
 
@@ -143,41 +131,6 @@ export const ROOT_ERA: Era = materializeEra({
     ...HUMAN_HISTORY_VISIBLE_CHILDREN,
   ],
 });
-
-const TIMELINE_MARKERS = [
-  ...CORE_TIMELINE_MARKERS,
-  ...DEEP_TIME_LIFE_MARKERS,
-  ...PALEOLITHIC_MARKERS,
-  ...EPIPALEOLITHIC_MARKERS,
-  ...NEOLITHIC_MARKERS,
-  ...CHALCOLITHIC_MARKERS,
-  ...BRONZE_AGE_MARKERS,
-  ...HISTORICAL_TURNING_POINT_MARKERS,
-  ...CLASSICAL_ANTIQUITY_MARKERS,
-  ...POST_CLASSICAL_MARKERS,
-].sort(
-  (left, right) =>
-    left.year - right.year ||
-    (right.priority ?? 0) - (left.priority ?? 0) ||
-    left.id.localeCompare(right.id),
-);
-
-const TIMELINE_OVERLAYS = [
-  ...DEEP_TIME_LIFE_OVERLAYS,
-  ...ANCIENT_CIVILIZATION_OVERLAYS,
-  ...POST_CLASSICAL_EARLY_MODERN_OVERLAYS,
-].sort(
-  (left, right) =>
-    left.startYear - right.startYear ||
-    left.endYear - right.endYear ||
-    (right.priority ?? 0) - (left.priority ?? 0) ||
-    left.id.localeCompare(right.id),
-);
-
-export const TIMELINE_DISPLAY: TimelineDisplayConfig = {
-  markers: TIMELINE_MARKERS,
-  overlays: TIMELINE_OVERLAYS,
-};
 
 export const ROOT_TIMELINE: RootTimelineData = {
   rootEra: ROOT_ERA,
