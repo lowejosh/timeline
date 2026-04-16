@@ -21,6 +21,7 @@ function App() {
   const innerWidth = Math.max(stageSize.width - 240, 0);
   const animated = useAnimatedViewport(getHomeViewport(1440), innerWidth);
   const [activeEraId, setActiveEraId] = useState(ROOT_ERA.id);
+  const autoTransitionFrameRef = useRef(0);
 
   // Use refs for values needed in RAF callbacks to avoid stale closures
   const zoomRef = useRef(animated.viewport.zoom);
@@ -58,12 +59,31 @@ function App() {
     });
   }, []);
 
+  const scheduleAutoTransitionCheck = useCallback(() => {
+    if (autoTransitionFrameRef.current) {
+      return;
+    }
+
+    autoTransitionFrameRef.current = requestAnimationFrame(() => {
+      autoTransitionFrameRef.current = 0;
+      checkAutoTransition();
+    });
+  }, [checkAutoTransition]);
+
+  useEffect(() => {
+    return () => {
+      if (autoTransitionFrameRef.current) {
+        cancelAnimationFrame(autoTransitionFrameRef.current);
+      }
+    };
+  }, []);
+
   const handleZoom = useCallback(
     (zoomDelta: number, anchorX: number) => {
       animated.animateZoom(zoomDelta, anchorX);
-      requestAnimationFrame(checkAutoTransition);
+      scheduleAutoTransitionCheck();
     },
-    [animated, checkAutoTransition],
+    [animated, scheduleAutoTransitionCheck],
   );
 
   const handleViewportChange = useCallback(
@@ -73,9 +93,9 @@ function App() {
       ) => import("./lib/time/viewport").TimelineViewport,
     ) => {
       animated.updateViewport(updater);
-      requestAnimationFrame(checkAutoTransition);
+      scheduleAutoTransitionCheck();
     },
-    [animated, checkAutoTransition],
+    [animated, scheduleAutoTransitionCheck],
   );
 
   const handleDrillIntoEra = useCallback(

@@ -24,7 +24,15 @@ type AssignedTimelineOverlayBand = {
   laneIndex: number;
 };
 
+type CachedOverlayLaneAssignment = {
+  assigned: AssignedTimelineOverlayBand[];
+  laneCount: number;
+};
+
 const OVERLAY_MIN_RENDER_WIDTH = 1;
+const overlayLaneAssignmentCache =
+  new WeakMap<TimelineOverlayBand[], CachedOverlayLaneAssignment>();
+const markerSortStateCache = new WeakMap<TimelineMarker[], boolean>();
 
 function isVisibleAtZoom(item: TimelineZoomVisibility, zoom: number) {
   if (item.minZoom !== undefined && zoom < item.minZoom) {
@@ -82,6 +90,95 @@ function assignOverlayLanes(overlays: TimelineOverlayBand[]) {
   };
 }
 
+function getAssignedOverlayLanes(overlays: TimelineOverlayBand[]) {
+  const cached = overlayLaneAssignmentCache.get(overlays);
+
+  if (cached) {
+    return cached;
+  }
+
+  const computed = assignOverlayLanes(overlays);
+  overlayLaneAssignmentCache.set(overlays, computed);
+  return computed;
+}
+
+function isMarkerArrayChronologicallySorted(markers: TimelineMarker[]) {
+  const cached = markerSortStateCache.get(markers);
+
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  for (let index = 1; index < markers.length; index += 1) {
+    const previous = markers[index - 1];
+    const current = markers[index];
+
+    if (
+      previous.year > current.year ||
+      (previous.year === current.year && compareDecorations(
+        {
+          id: previous.id,
+          startYear: previous.year,
+          endYear: previous.year,
+          priority: previous.priority,
+        },
+        {
+          id: current.id,
+          startYear: current.year,
+          endYear: current.year,
+          priority: current.priority,
+        },
+      ) > 0)
+    ) {
+      markerSortStateCache.set(markers, false);
+      return false;
+    }
+  }
+
+  markerSortStateCache.set(markers, true);
+  return true;
+}
+
+function findFirstMarkerIndexAtOrAfter(
+  markers: TimelineMarker[],
+  year: number,
+) {
+  let low = 0;
+  let high = markers.length;
+
+  while (low < high) {
+    const mid = Math.floor((low + high) / 2);
+
+    if (markers[mid].year < year) {
+      low = mid + 1;
+    } else {
+      high = mid;
+    }
+  }
+
+  return low;
+}
+
+function findFirstMarkerIndexAfter(
+  markers: TimelineMarker[],
+  year: number,
+) {
+  let low = 0;
+  let high = markers.length;
+
+  while (low < high) {
+    const mid = Math.floor((low + high) / 2);
+
+    if (markers[mid].year <= year) {
+      low = mid + 1;
+    } else {
+      high = mid;
+    }
+  }
+
+  return low;
+}
+
 export function getVisibleTimelineMarkers(
   markers: TimelineMarker[],
   viewport: TimelineViewport,
@@ -90,6 +187,26 @@ export function getVisibleTimelineMarkers(
 ) {
   const innerWidth = Math.max(width - pad * 2, 1);
   const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
+
+  if (markers.length === 0) {
+    return [];
+  }
+
+  if (isMarkerArrayChronologicallySorted(markers)) {
+    const startIndex = findFirstMarkerIndexAtOrAfter(markers, visibleStart);
+    const endIndex = findFirstMarkerIndexAfter(markers, visibleEnd);
+    const visibleMarkers: TimelineMarker[] = [];
+
+    for (let index = startIndex; index < endIndex; index += 1) {
+      const marker = markers[index];
+
+      if (isVisibleAtZoom(marker, viewport.zoom)) {
+        visibleMarkers.push(marker);
+      }
+    }
+
+    return visibleMarkers;
+  }
 
   return [...markers]
     .filter(
@@ -124,17 +241,18 @@ export function resolveTimelineOverlayTracks(
 ): ResolvedTimelineOverlayBand[] {
   const innerWidth = Math.max(width - pad * 2, 1);
   const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
-  const { assigned, laneCount } = assignOverlayLanes(overlays);
-  const visibleOverlays = assigned
-    .filter(
-      ({ band }) =>
-        isVisibleAtZoom(band, viewport.zoom) &&
-        band.endYear >= visibleStart &&
-        band.startYear <= visibleEnd,
-    )
-    .sort((left, right) => compareDecorations(left.band, right.band));
+  const { assigned, laneCount } = getAssignedOverlayLanes(overlays);
+  const visibleOverlays: ResolvedTimelineOverlayBand[] = [];
 
-  return visibleOverlays.flatMap(({ band, laneIndex }) => {
+  for (const { band, laneIndex } of assigned) {
+    if (band.startYear > visibleEnd) {
+      break;
+    }
+
+    if (!isVisibleAtZoom(band, viewport.zoom) || band.endYear < visibleStart) {
+      continue;
+    }
+
     const x0 = pad + worldToScreen(band.startYear, viewport, innerWidth);
     const x1 = pad + worldToScreen(band.endYear, viewport, innerWidth);
     const clippedX0 = Math.max(x0, pad);
@@ -142,17 +260,14 @@ export function resolveTimelineOverlayTracks(
     const clippedWidth = Math.max(clippedX1 - clippedX0, 0);
 
     if (clippedWidth < OVERLAY_MIN_RENDER_WIDTH) {
-      return [];
+      continue;
     }
 
     const centerX =
       clippedWidth > 0
         ? clippedX0 + clippedWidth / 2
         : Math.min(Math.max((x0 + x1) / 2, pad), width - pad);
-    const renderWidth = clippedWidth;
-    const renderX = clippedX0;
-
-    return [{
+      visibleOverlays.push({
       band,
       laneIndex,
       laneCount,
@@ -162,8 +277,10 @@ export function resolveTimelineOverlayTracks(
       clippedX1,
       centerX,
       visibleWidth: clippedWidth,
-      renderX,
-      renderWidth,
-    }];
-  });
+      renderX: clippedX0,
+      renderWidth: clippedWidth,
+    });
+  }
+
+  return visibleOverlays;
 }
