@@ -58,6 +58,7 @@ describe("root timeline display data", () => {
       "protestant-reformation",
       "american-independence-declared",
       "french-revolution",
+      "titanic-sinks",
       "world-war-i",
       "russian-revolution",
       "world-war-ii",
@@ -122,10 +123,24 @@ describe("root timeline display data", () => {
     ).toEqual([
       "sumerian-city-states",
       "akkadian-empire",
+      "ur-iii-empire",
       "old-babylonian-empire",
+      "kassite-babylonia",
+      "middle-assyrian-empire",
       "neo-assyrian-empire",
       "neo-babylonian-empire",
     ]);
+
+    const mesopotamiaChildren = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "mesopotamia",
+    )?.children;
+
+    expect(
+      mesopotamiaChildren?.every(
+        (band, index, bands) =>
+          index === 0 || bands[index - 1].startYear <= band.startYear,
+      ),
+    ).toBe(true);
   });
 
   it("keeps the flattened root era child chronology stitched in the expected order", () => {

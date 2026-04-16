@@ -177,6 +177,36 @@ function getTimelineDateFromYear(year: number) {
   return new Date(start + fraction * (end - start));
 }
 
+export function getTimelineYearFromUtcDate(date: Date) {
+  const wholeYear = date.getUTCFullYear();
+  const start = getTimelineYearStart(wholeYear);
+  const end = getTimelineYearStart(wholeYear + 1);
+
+  return wholeYear + (date.getTime() - start) / (end - start);
+}
+
+export function getTimelineYearFromUtcParts(
+  year: number,
+  monthIndex: number,
+  day = 1,
+  hours = 0,
+  minutes = 0,
+  seconds = 0,
+  milliseconds = 0,
+) {
+  return getTimelineYearFromUtcDate(
+    createTimelineUtcDate(
+      year,
+      monthIndex,
+      day,
+      hours,
+      minutes,
+      seconds,
+      milliseconds,
+    ),
+  );
+}
+
 function formatDefaultYearsAgo(absolute: number, step: number) {
   if (absolute >= 1_000_000_000) {
     // Only downscale to millions when step is meaningfully between 1M and 10M

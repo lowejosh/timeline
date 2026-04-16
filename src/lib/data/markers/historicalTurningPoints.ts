@@ -1,4 +1,5 @@
 import type { TimelineMarker } from "../timelineTypes";
+import { getTimelineYearFromUtcParts } from "../../time/bands";
 
 export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
   {
@@ -284,6 +285,23 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
       {
         sourceId: "historyFrenchRevolution",
         note: "HISTORY identifies 1789 as the beginning of the French Revolution and treats the storming of the Bastille that year as its symbolic start.",
+      },
+    ],
+  },
+  {
+    id: "titanic-sinks",
+    label: "Titanic sinks in North Atlantic",
+    shortLabel: "Titanic Sinks",
+    year: getTimelineYearFromUtcParts(1912, 3, 15, 2, 20),
+    dateLabel: "Apr 15, 1912",
+    timeLabel: "Apr 15, 1912, 2:20 AM UTC",
+    color: "rgba(79, 109, 148, 0.94)",
+    minZoom: 20,
+    priority: 77,
+    sourceRefs: [
+      {
+        sourceId: "britannicaTitanic",
+        note: "Britannica dates Titanic's sinking to April 15, 1912 in the North Atlantic and standard ship histories place the final sinking at about 2:20 a.m.; the app uses that UTC instant as the marker anchor.",
       },
     ],
   },

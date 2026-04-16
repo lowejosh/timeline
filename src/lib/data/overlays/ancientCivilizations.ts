@@ -6,7 +6,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     label: "Sumerian city-states",
     shortLabel: "Sumer",
     description:
-      "Broad early-urban Sumerian phase spanning the first city-states of southern Mesopotamia before Akkadian imperial unification.",
+      "Early civilization of southern Mesopotamia organized around independent city-states such as Uruk, Ur, and Lagash.",
     startYear: -3_500,
     endYear: -2_334,
     color: "rgb(202, 156, 105)",
@@ -38,6 +38,22 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     ],
   },
   {
+    id: "ur-iii-empire",
+    label: "Ur III Empire",
+    shortLabel: "Ur III",
+    description:
+      "Neo-Sumerian kingdom centered on Ur, known for restoring centralized rule in southern Mesopotamia after the Akkadian collapse.",
+    startYear: -2_112,
+    endYear: -2_004,
+    color: "rgb(182, 144, 101)",
+    sourceRefs: [
+      {
+        sourceId: "britannicaMesopotamia",
+        note: "Britannica highlights the 3rd dynasty of Ur as a major Mesopotamian phase whose administrative system and influence carried into the first quarter of the 2nd millennium BCE.",
+      },
+    ],
+  },
+  {
     id: "old-babylonian-empire",
     label: "Old Babylonian Empire",
     shortLabel: "Babylon",
@@ -54,6 +70,46 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
       {
         sourceId: "britannicaHammurabi",
         note: "Supports the public-facing association of this Babylonian phase with Hammurabi's reign and legal legacy.",
+      },
+    ],
+  },
+  {
+    id: "kassite-babylonia",
+    label: "Kassite Babylonia",
+    shortLabel: "Kassites",
+    description:
+      "The long-lasting Kassite dynasty that ruled Babylonia after the Old Babylonian collapse and anchored much of southern Mesopotamia in the later Bronze Age.",
+    startYear: -1_595,
+    endYear: -1_155,
+    color: "rgb(154, 126, 96)",
+    sourceRefs: [
+      {
+        sourceId: "metBabylon",
+        note: "The Met says the Old Babylonian period ended in 1595 BCE and that a new Kassite dynasty then emerged in Babylonia; the app uses the conventional Kassite span through 1155 BCE.",
+      },
+      {
+        sourceId: "britannicaBabylonia",
+        note: "Britannica's broad Babylonia overview supports treating the Kassite centuries as a major intermediate Babylonian phase between Old and late Babylonian prominence.",
+      },
+    ],
+  },
+  {
+    id: "middle-assyrian-empire",
+    label: "Middle Assyrian Empire",
+    shortLabel: "Mid Assyria",
+    description:
+      "Assyrian kingdom and expanding empire of the late second millennium BCE, centered in northern Mesopotamia.",
+    startYear: -1_365,
+    endYear: -1_050,
+    color: "rgb(141, 118, 138)",
+    sourceRefs: [
+      {
+        sourceId: "metAssyria",
+        note: "The Met frames Assyria's revival from Ashur-uballit I in 1365 BCE, its expansion under Adad-nirari I and Tukulti-Ninurta I, and its territorial contraction by the end of the 2nd millennium BCE; the app uses a conventional c. 1365–1050 BCE span for this middle imperial phase.",
+      },
+      {
+        sourceId: "worldHistoryAssyria",
+        note: "World History Encyclopedia divides Assyria into older, middle, and neo-imperial phases and helps support a broad public-facing Middle Assyrian band before the Neo-Assyrian revival.",
       },
     ],
   },
@@ -96,7 +152,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     id: "mesopotamia",
     label: "Mesopotamia",
     description:
-      "Umbrella band for the long arc of Mesopotamian civilization, from early Sumerian cities to the Persian conquest of Babylon.",
+      "Ancient civilization of the Tigris-Euphrates river valley, home to some of the world's earliest cities, states, and writing systems.",
     startYear: -3_500,
     endYear: -539,
     color: "rgb(180, 120, 70)",
@@ -115,6 +171,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     id: "indus-valley-civilization",
     label: "Indus Valley Civilization",
     shortLabel: "Indus Valley",
+    description:
+      "Bronze Age civilization of South Asia with carefully planned cities, sophisticated drainage, and far-reaching trade.",
     startYear: -3_300,
     endYear: -1_300,
     color: "rgb(107, 136, 166)",
@@ -131,6 +189,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
   {
     id: "ancient-egypt",
     label: "Ancient Egypt",
+    description:
+      "Civilization of the Nile valley shaped by pharaohs, monumental building, and religious traditions that endured for millennia.",
     startYear: -3_100,
     endYear: -30,
     color: "rgb(166, 149, 94)",
@@ -168,7 +228,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Mycenaean Greece",
     shortLabel: "Mycenae",
     description:
-      "Late Bronze Age palatial Greece before the post-Mycenaean transition usually used to open ancient Greece surveys.",
+      "Late Bronze Age civilization of mainland Greece centered on fortified palace kingdoms such as Mycenae and Tiryns.",
     startYear: -1_600,
     endYear: -1_100,
     color: "rgb(118, 132, 186)",
@@ -185,6 +245,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
   {
     id: "ancient-greece",
     label: "Ancient Greece",
+    description:
+      "Greek civilization of city-states, philosophy, drama, and new ways of thinking about politics and citizenship.",
     startYear: -1_200,
     endYear: -323,
     color: "rgb(93, 119, 183)",
@@ -202,6 +264,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     id: "achaemenid-persia",
     label: "Achaemenid Persia",
     shortLabel: "Achaemenids",
+    description:
+      "Vast empire founded by Cyrus the Great, bringing many peoples of the ancient Near East under Persian rule.",
     startYear: -550,
     endYear: -330,
     color: "rgb(135, 92, 142)",
@@ -218,6 +282,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
   {
     id: "roman-republic",
     label: "Roman Republic",
+    description:
+      "Roman state before the emperors, marked by the Senate, elected magistrates, and steady expansion across the Mediterranean.",
     startYear: -509,
     endYear: -27,
     color: "rgb(159, 91, 70)",
@@ -239,6 +305,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     id: "hellenistic-world",
     label: "Hellenistic World",
     shortLabel: "Hellenistic",
+    description:
+      "Age after Alexander when Greek culture mingled with Egyptian, Persian, and Asian traditions across a network of kingdoms.",
     startYear: -323,
     endYear: -30,
     color: "rgb(87, 142, 166)",
@@ -256,6 +324,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     id: "han-china",
     label: "Han China",
     shortLabel: "Han",
+    description:
+      "Chinese dynasty of strong imperial rule, expanding trade routes, and a flourishing Silk Road.",
     startYear: -206,
     endYear: 220,
     color: "rgb(72, 132, 108)",
@@ -272,6 +342,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
   {
     id: "roman-empire",
     label: "Roman Empire",
+    description:
+      "Mediterranean superpower built on law, roads, cities, and imperial rule, shaping surrounding regions for centuries.",
     startYear: -27,
     endYear: 476,
     color: "rgb(136, 78, 64)",

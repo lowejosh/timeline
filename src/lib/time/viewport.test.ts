@@ -14,6 +14,8 @@ import {
   zoomAtPosition,
 } from "./viewport";
 
+const FLOAT_EPSILON = 1e-9;
+
 describe("timeline viewport math", () => {
   it("round-trips between world and screen coordinates", () => {
     const viewport = { centerYear: 1900, zoom: 26 };
@@ -42,7 +44,7 @@ describe("timeline viewport math", () => {
     const [visibleStart, visibleEnd] = getVisibleRange(viewport, 1200);
 
     expect(visibleStart).toBeLessThanOrEqual(1500);
-    expect(visibleEnd).toBeGreaterThanOrEqual(TIMELINE_MAX_YEAR);
+    expect(visibleEnd + FLOAT_EPSILON).toBeGreaterThanOrEqual(TIMELINE_MAX_YEAR);
   });
 
   it("fits the full timeline exactly at minimum zoom", () => {

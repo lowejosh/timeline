@@ -140,8 +140,9 @@ describe("timeline overlay tracks", () => {
     const resolved = resolveTimelineOverlayTracks(overlays, viewport, width, pad);
 
     expect(resolved).toHaveLength(1);
-    expect(resolved[0].renderWidth).toBeGreaterThanOrEqual(1);
+    expect(resolved[0].renderWidth).toBeGreaterThanOrEqual(0.5);
     expect(resolved[0].renderWidth).toBe(resolved[0].visibleWidth);
+    expect(resolved[0].renderAlphaMultiplier).toBe(1);
   });
 
   it("hides overlays once they fall below the tiny-width threshold", () => {
@@ -165,6 +166,39 @@ describe("timeline overlay tracks", () => {
     const resolved = resolveTimelineOverlayTracks(overlays, viewport, width, pad);
 
     expect(resolved).toHaveLength(0);
+  });
+
+  it("renders narrow overlays as single-device-pixel hairlines on Retina displays", () => {
+    const width = 1000;
+    const pad = 100;
+    const overlays: TimelineOverlayBand[] = [
+      {
+        id: "hairline",
+        label: "Hairline",
+        startYear: -10_000_000,
+        endYear: -4_000_000,
+        color: "rgba(0, 0, 0, 0.1)",
+      },
+    ];
+
+    const viewport = {
+      centerYear: 0,
+      zoom: 0,
+    };
+
+    const resolved = resolveTimelineOverlayTracks(
+      overlays,
+      viewport,
+      width,
+      pad,
+      2,
+    );
+
+    expect(resolved).toHaveLength(1);
+    expect(resolved[0].renderWidth).toBeCloseTo(0.5, 6);
+    expect(resolved[0].isHairline).toBe(true);
+    expect(resolved[0].renderAlphaMultiplier).toBeGreaterThan(0);
+    expect(resolved[0].renderAlphaMultiplier).toBeLessThan(1);
   });
 
   it("switches overlay visibility on cleanly at the zoom threshold", () => {
@@ -264,6 +298,31 @@ describe("timeline overlay tracks", () => {
     ]);
     expect(resolved.map((band) => band.laneIndex)).toEqual([0, 1, 2, 3, 1, 2]);
     expect(resolved.every((band) => band.laneCount === 5)).toBe(true);
+  });
+
+  it("keeps post-classical overlays visible below the old zoom-18 cutoff", () => {
+    const width = 1000;
+    const pad = 100;
+    const viewport = {
+      centerYear: 1100,
+      zoom: 16,
+    };
+
+    const resolved = resolveTimelineOverlayTracks(
+      POST_CLASSICAL_EARLY_MODERN_OVERLAYS,
+      viewport,
+      width,
+      pad,
+      2,
+    );
+
+    expect(resolved.map((band) => band.band.id)).toEqual([
+      "byzantine-empire",
+      "abbasid-caliphate",
+      "song-china",
+      "ottoman-empire",
+      "ming-dynasty",
+    ]);
   });
 
   it("shows the Mongol Empire band in the post-classical stack once it starts", () => {

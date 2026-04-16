@@ -70,4 +70,28 @@ describe("timeline tooltip content", () => {
       description: "Optional descriptions should show up when present.",
     });
   });
+
+  it("prefers explicit marker date/time labels when provided", () => {
+    const marker: TimelineMarker = {
+      id: "titanic-sinks",
+      label: "Titanic sinks in North Atlantic",
+      year: 1912.286,
+      dateLabel: "Apr 15, 1912",
+      timeLabel: "Apr 15, 1912, 2:20 AM UTC",
+      sourceRefs: [{ sourceId: "britannicaTitanic" }],
+    };
+
+    expect(getMarkerTooltipContent(marker)).toMatchObject({
+      timeLabel: "Apr 15, 1912, 2:20 AM UTC",
+      sources: [
+        {
+          id: "britannicaTitanic",
+          organization: "Encyclopaedia Britannica",
+          shortTitle: "Britannica: Titanic",
+          title: "Titanic",
+          url: "https://www.britannica.com/topic/Titanic",
+        },
+      ],
+    });
+  });
 });

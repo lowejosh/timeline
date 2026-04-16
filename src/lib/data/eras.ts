@@ -64,11 +64,7 @@ function hashString(value: string): number {
   return hash >>> 0;
 }
 
-function hslToRgb(
-  hue: number,
-  saturation: number,
-  lightness: number,
-): string {
+function hslToRgb(hue: number, saturation: number, lightness: number): string {
   const s = saturation / 100;
   const l = lightness / 100;
   const c = (1 - Math.abs(2 * l - 1)) * s;

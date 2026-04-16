@@ -61,7 +61,8 @@ export function getMarkerTooltipContent(
     kind: "marker",
     kindLabel: "Marker",
     title: marker.label,
-    timeLabel: formatTimelineYear(marker.year, 1),
+    timeLabel:
+      marker.timeLabel ?? marker.dateLabel ?? formatTimelineYear(marker.year, 1),
     description: marker.description,
     sources: resolveTooltipSources(marker.sourceRefs),
   };

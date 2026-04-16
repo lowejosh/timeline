@@ -46,6 +46,8 @@ type TimelineDecorationBase = TimelineZoomVisibility & {
 export type TimelineMarker = TimelineDecorationBase & {
   year: number;
   color?: string;
+  dateLabel?: string;
+  timeLabel?: string;
 };
 
 export type TimelineOverlayBand = TimelineDecorationBase & {

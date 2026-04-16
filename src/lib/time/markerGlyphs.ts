@@ -187,7 +187,7 @@ export function resolveMarkerRenderStates(
     (state) => {
       const fullLabel = state.marker.label;
       const shortLabel = state.marker.shortLabel ?? fullLabel;
-      const dateLabel = formatTimelineYear(state.marker.year, 1);
+      const dateLabel = state.marker.dateLabel ?? formatTimelineYear(state.marker.year, 1);
       const { fullLabelWidth, shortLabelWidth, dateLabelWidth } = measureText(
         state.marker,
         {

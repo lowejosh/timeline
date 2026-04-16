@@ -1,7 +1,7 @@
 import type { TimelineOverlayBand } from "../timelineTypes";
 
 const POST_CLASSICAL_GROUP_ID = "post-classical-early-modern";
-const POST_CLASSICAL_MIN_ZOOM = 18;
+const POST_CLASSICAL_MIN_ZOOM = 15;
 
 export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
   {

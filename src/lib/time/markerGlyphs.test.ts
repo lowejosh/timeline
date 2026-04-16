@@ -122,6 +122,30 @@ describe("marker glyph timing", () => {
     expect(state.label).toBe("wide-short");
   });
 
+  it("uses an explicit marker date label when present", () => {
+    const positions: VisibleMarkerPosition[] = [
+      {
+        marker: {
+          id: "titanic-sinks",
+          label: "Titanic sinks in North Atlantic",
+          shortLabel: "Titanic Sinks",
+          year: 1912.286,
+          dateLabel: "Apr 15, 1912",
+          priority: 100,
+        },
+        x: 160,
+      },
+    ];
+
+    const [state] = resolveMarkerRenderStates(positions, WIDTH, PAD, () => ({
+      fullLabelWidth: 80,
+      shortLabelWidth: 72,
+      dateLabelWidth: 68,
+    }));
+
+    expect(state.dateLabel).toBe("Apr 15, 1912");
+  });
+
   it("temporarily lets a hovered marker outrank a nearby higher-priority marker", () => {
     const crowdedStates = resolveStates([
       { id: "anchor", priority: 100, x: 160 },

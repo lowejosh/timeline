@@ -4,6 +4,7 @@ import {
   formatTimelineElapsedAxisLabel,
   formatTimelineElapsedLabel,
   formatTimelineYear,
+  getTimelineYearFromUtcParts,
   getTimelineTicks,
 } from "./bands";
 import { TIMELINE_MIN_YEAR } from "./viewport";
@@ -61,6 +62,14 @@ describe("timeline tick generation", () => {
 
   it("formats day-level sub-year labels with month and day", () => {
     expect(formatTimelineDateLabel(2024, 0.02)).toBe("Jan 1");
+  });
+
+  it("converts UTC date parts into fractional timeline years", () => {
+    const titanicSinksAt = getTimelineYearFromUtcParts(1912, 3, 15, 2, 20);
+
+    expect(titanicSinksAt).toBeGreaterThan(1912);
+    expect(titanicSinksAt).toBeLessThan(1913);
+    expect(titanicSinksAt).toBeCloseTo(1912.287, 3);
   });
 
   it("formats historical BCE years without adding an extra year", () => {

@@ -282,6 +282,16 @@ export const ERA_SOURCES = {
     notes:
       "Used for the Sumer/Akkad-to-Babylonia transition, Hammurabi's Babylonian rise, and the broad late-Babylonian endpoint in 539 BCE.",
   },
+    metBabylon: {
+      shortTitle: "Met: Babylon",
+      title: "Babylon",
+      organization: "The Metropolitan Museum of Art",
+      citation:
+        'Seymour, Michael. "Babylon." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+      url: "https://www.metmuseum.org/toah/hd/babl/hd_babl.htm",
+      notes:
+        "Used for public-facing Babylonian periodization, including the Old Babylonian end in 1595 BCE, Kassite rule afterward, and the broader Babylonian sequence into the first millennium BCE.",
+    },
   britannicaHammurabi: {
     shortTitle: "Britannica: Hammurabi",
     title: "Hammurabi",
@@ -346,6 +356,16 @@ export const ERA_SOURCES = {
     notes:
       "Used for the Neo-Assyrian Empire's conventional 912–612 BCE span and public-facing chronology.",
   },
+    metAssyria: {
+      shortTitle: "Met: Assyria",
+      title: "Assyria, 1365–609 B.C.",
+      organization: "The Metropolitan Museum of Art",
+      citation:
+        'Department of Ancient Near Eastern Art. "Assyria, 1365–609 B.C." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+      url: "https://www.metmuseum.org/toah/hd/assy/hd_assy.htm",
+      notes:
+        "Used for broad Assyrian periodization from Ashur-uballit I's revival in the 14th century BCE through the Middle Assyrian high point and the Neo-Assyrian collapse in 612 BCE.",
+    },
   unescoMycenaeTiryns: {
     shortTitle: "UNESCO: Mycenae",
     title: "Archaeological Sites of Mycenae and Tiryns",
@@ -590,6 +610,15 @@ export const ERA_SOURCES = {
     url: "https://www.history.com/articles/world-war-i-history",
     notes:
       "Used for the canonical 1914 start year of World War I.",
+  },
+  britannicaTitanic: {
+    shortTitle: "Britannica: Titanic",
+    title: "Titanic",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Titanic."',
+    url: "https://www.britannica.com/topic/Titanic",
+    notes:
+      "Used for Titanic's sinking in the North Atlantic on April 15, 1912, including the widely cited 2:20 a.m. sinking time in ship histories.",
   },
   historyRussianRevolution: {
     shortTitle: "History: Russian Revolution",
