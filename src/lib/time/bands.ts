@@ -1,5 +1,12 @@
 import { ticks, tickStep } from "d3-array";
-import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "./viewport";
+import {
+  subtractPreciseTimelineYears,
+  splitTimelineYear,
+  TIMELINE_MAX_YEAR,
+  TIMELINE_MIN_YEAR,
+  toApproximateTimelineYear,
+  type PreciseTimelineYear,
+} from "./viewport";
 
 export type TimelineYearFormatOptions = {
   mode?: "default" | "axis";
@@ -34,7 +41,18 @@ export type TimelineTicks = {
 const numberFormatter = new Intl.NumberFormat("en-US");
 const AVERAGE_DAYS_PER_YEAR = 365.2425;
 export const YEARS_AGO_CUTOFF = 10_000;
-const ELAPSED_ZERO_EPSILON = 1e-9;
+const ELAPSED_ZERO_EPSILON = 1e-18;
+const HOURS_PER_DAY = 24;
+const MINUTES_PER_HOUR = 60;
+const SECONDS_PER_MINUTE = 60;
+const MILLISECONDS_PER_SECOND = 1_000;
+const MICROSECONDS_PER_MILLISECOND = 1_000;
+const YEARS_PER_DAY = 1 / AVERAGE_DAYS_PER_YEAR;
+const YEARS_PER_HOUR = YEARS_PER_DAY / HOURS_PER_DAY;
+const YEARS_PER_MINUTE = YEARS_PER_HOUR / MINUTES_PER_HOUR;
+const YEARS_PER_SECOND = YEARS_PER_MINUTE / SECONDS_PER_MINUTE;
+const YEARS_PER_MILLISECOND = YEARS_PER_SECOND / MILLISECONDS_PER_SECOND;
+const YEARS_PER_MICROSECOND = YEARS_PER_MILLISECOND / MICROSECONDS_PER_MILLISECOND;
 const MONTH_LABELS = [
   "Jan",
   "Feb",
@@ -143,19 +161,318 @@ function formatUnitCount(
   return `${numberFormatter.format(value)} ${value === 1 ? singular : plural}`;
 }
 
-function splitElapsedYearsAndDays(totalYears: number) {
-  let years = Math.max(0, Math.floor(totalYears + 1e-9));
-  let days = Math.max(
+function pad2(value: number) {
+  return value.toString().padStart(2, "0");
+}
+
+function pad3(value: number) {
+  return value.toString().padStart(3, "0");
+}
+
+function getAstronomicalYearFromTimelineYear(year: number) {
+  return year < 1 ? year + 1 : year;
+}
+
+function getTimelineYearFromAstronomicalYear(year: number) {
+  return year <= 0 ? year - 1 : year;
+}
+
+function joinNaturalLanguage(parts: string[]) {
+  if (parts.length <= 1) {
+    return parts[0] ?? "";
+  }
+
+  if (parts.length === 2) {
+    return `${parts[0]} and ${parts[1]}`;
+  }
+
+  return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
+}
+
+type TimelineElapsedAxisLabel = {
+  primaryText: string;
+  secondaryText?: string;
+};
+
+type TimelineElapsedDuration = {
+  years: number;
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  milliseconds: number;
+  microseconds: number;
+};
+
+type TimelineDateParts = {
+  monthLabel: string;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+  millisecond: number;
+  microsecond: number;
+};
+
+function resolvePreciseTimelineYear(
+  year: number | PreciseTimelineYear,
+): PreciseTimelineYear {
+  return typeof year === "number" ? splitTimelineYear(year) : year;
+}
+
+function splitElapsedDuration(totalYears: number): TimelineElapsedDuration {
+  let years = Math.max(0, Math.floor(totalYears + ELAPSED_ZERO_EPSILON));
+  let remainingYears = Math.max(totalYears - years, 0);
+  let daysFloat = remainingYears * AVERAGE_DAYS_PER_YEAR;
+  let days = Math.max(0, Math.floor(daysFloat + ELAPSED_ZERO_EPSILON));
+  let remainingDays = Math.max(daysFloat - days, 0);
+  let hoursFloat = remainingDays * HOURS_PER_DAY;
+  let hours = Math.max(0, Math.floor(hoursFloat + ELAPSED_ZERO_EPSILON));
+  let remainingHours = Math.max(hoursFloat - hours, 0);
+  let minutesFloat = remainingHours * MINUTES_PER_HOUR;
+  let minutes = Math.max(0, Math.floor(minutesFloat + ELAPSED_ZERO_EPSILON));
+  let remainingMinutes = Math.max(minutesFloat - minutes, 0);
+  let secondsFloat = remainingMinutes * SECONDS_PER_MINUTE;
+  let seconds = Math.max(0, Math.floor(secondsFloat + ELAPSED_ZERO_EPSILON));
+  let remainingSeconds = Math.max(secondsFloat - seconds, 0);
+  let millisecondsFloat = remainingSeconds * MILLISECONDS_PER_SECOND;
+  let milliseconds = Math.max(
     0,
-    Math.round((Math.max(totalYears, 0) - years) * AVERAGE_DAYS_PER_YEAR),
+    Math.floor(millisecondsFloat + ELAPSED_ZERO_EPSILON),
   );
+  let remainingMilliseconds = Math.max(millisecondsFloat - milliseconds, 0);
+  let microseconds = Math.max(
+    0,
+    Math.round(remainingMilliseconds * MICROSECONDS_PER_MILLISECOND),
+  );
+
+  if (microseconds >= MICROSECONDS_PER_MILLISECOND) {
+    milliseconds += 1;
+    microseconds = 0;
+  }
+
+  if (milliseconds >= MILLISECONDS_PER_SECOND) {
+    seconds += 1;
+    milliseconds = 0;
+  }
+
+  if (seconds >= SECONDS_PER_MINUTE) {
+    minutes += 1;
+    seconds = 0;
+  }
+
+  if (minutes >= MINUTES_PER_HOUR) {
+    hours += 1;
+    minutes = 0;
+  }
+
+  if (hours >= HOURS_PER_DAY) {
+    days += 1;
+    hours = 0;
+  }
 
   if (days >= Math.round(AVERAGE_DAYS_PER_YEAR)) {
     years += 1;
     days = 0;
   }
 
-  return { years, days };
+  return {
+    years,
+    days,
+    hours,
+    minutes,
+    seconds,
+    milliseconds,
+    microseconds,
+  };
+}
+
+function splitElapsedFractionalYear(fractionalYears: number) {
+  let remainingYears = Math.max(fractionalYears, 0);
+  let daysFloat = remainingYears * AVERAGE_DAYS_PER_YEAR;
+  let days = Math.max(0, Math.floor(daysFloat + ELAPSED_ZERO_EPSILON));
+  let remainingDays = Math.max(daysFloat - days, 0);
+  let hoursFloat = remainingDays * HOURS_PER_DAY;
+  let hours = Math.max(0, Math.floor(hoursFloat + ELAPSED_ZERO_EPSILON));
+  let remainingHours = Math.max(hoursFloat - hours, 0);
+  let minutesFloat = remainingHours * MINUTES_PER_HOUR;
+  let minutes = Math.max(0, Math.floor(minutesFloat + ELAPSED_ZERO_EPSILON));
+  let remainingMinutes = Math.max(minutesFloat - minutes, 0);
+  let secondsFloat = remainingMinutes * SECONDS_PER_MINUTE;
+  let seconds = Math.max(0, Math.floor(secondsFloat + ELAPSED_ZERO_EPSILON));
+  let remainingSeconds = Math.max(secondsFloat - seconds, 0);
+  let millisecondsFloat = remainingSeconds * MILLISECONDS_PER_SECOND;
+  let milliseconds = Math.max(
+    0,
+    Math.floor(millisecondsFloat + ELAPSED_ZERO_EPSILON),
+  );
+  let remainingMilliseconds = Math.max(millisecondsFloat - milliseconds, 0);
+  let microseconds = Math.max(
+    0,
+    Math.round(remainingMilliseconds * MICROSECONDS_PER_MILLISECOND),
+  );
+
+  if (microseconds >= MICROSECONDS_PER_MILLISECOND) {
+    milliseconds += 1;
+    microseconds = 0;
+  }
+
+  if (milliseconds >= MILLISECONDS_PER_SECOND) {
+    seconds += 1;
+    milliseconds = 0;
+  }
+
+  if (seconds >= SECONDS_PER_MINUTE) {
+    minutes += 1;
+    seconds = 0;
+  }
+
+  if (minutes >= MINUTES_PER_HOUR) {
+    hours += 1;
+    minutes = 0;
+  }
+
+  if (hours >= HOURS_PER_DAY) {
+    days += 1;
+    hours = 0;
+  }
+
+  return {
+    days,
+    hours,
+    minutes,
+    seconds,
+    milliseconds,
+    microseconds,
+  };
+}
+
+function getPreciseElapsedDuration(
+  year: number | PreciseTimelineYear,
+  reference: TimelineElapsedReference,
+): TimelineElapsedDuration {
+  const preciseYear = resolvePreciseTimelineYear(year);
+  const referenceYear =
+    reference === "after-big-bang"
+      ? splitTimelineYear(TIMELINE_MIN_YEAR)
+      : splitTimelineYear(TIMELINE_MAX_YEAR);
+  const rawWholeYears =
+    reference === "after-big-bang"
+      ? preciseYear.wholeYear - referenceYear.wholeYear
+      : referenceYear.wholeYear - preciseYear.wholeYear;
+  let wholeYears = rawWholeYears;
+  let fractionalYears =
+    reference === "after-big-bang"
+      ? preciseYear.fraction - referenceYear.fraction
+      : referenceYear.fraction - preciseYear.fraction;
+
+  if (fractionalYears < 0) {
+    wholeYears -= 1;
+    fractionalYears += 1;
+  }
+
+  if (fractionalYears >= 1) {
+    wholeYears += 1;
+    fractionalYears -= 1;
+  }
+
+  if (wholeYears < 0) {
+    return {
+      years: 0,
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      milliseconds: 0,
+      microseconds: 0,
+    };
+  }
+
+  const subYear = splitElapsedFractionalYear(fractionalYears);
+
+  return {
+    years: wholeYears,
+    days: subYear.days,
+    hours: subYear.hours,
+    minutes: subYear.minutes,
+    seconds: subYear.seconds,
+    milliseconds: subYear.milliseconds,
+    microseconds: subYear.microseconds,
+  };
+}
+
+function getElapsedAxisFinestUnitIndex(step: number) {
+  if (step >= 1) return 0;
+  if (step >= YEARS_PER_DAY) return 1;
+  if (step >= YEARS_PER_HOUR) return 2;
+  if (step >= YEARS_PER_MINUTE) return 3;
+  if (step >= YEARS_PER_SECOND) return 4;
+  if (step >= YEARS_PER_MILLISECOND) return 5;
+  return 6;
+}
+
+function formatElapsedAxisDurationParts(duration: TimelineElapsedDuration) {
+  return [
+    duration.years > 0 ? `${numberFormatter.format(duration.years)}y` : null,
+    duration.days > 0 ? `${numberFormatter.format(duration.days)}d` : null,
+    duration.hours > 0 ? `${duration.hours}h` : null,
+    duration.minutes > 0 ? `${duration.minutes}m` : null,
+    duration.seconds > 0 ? `${duration.seconds}s` : null,
+    duration.milliseconds > 0 ? `${duration.milliseconds}ms` : null,
+    duration.microseconds > 0 ? `${duration.microseconds}µs` : null,
+  ];
+}
+
+function formatPreciseElapsedAxisLabel(
+  year: number | PreciseTimelineYear,
+  step: number,
+  reference: TimelineElapsedReference,
+): TimelineElapsedAxisLabel {
+  if (reference === "after-big-bang") {
+    const preciseYear = resolvePreciseTimelineYear(year);
+
+    if (
+      preciseYear.wholeYear === TIMELINE_MIN_YEAR &&
+      Math.abs(preciseYear.fraction) <= ELAPSED_ZERO_EPSILON
+    ) {
+      return { primaryText: "Big Bang" };
+    }
+  }
+
+  const suffix = reference === "after-big-bang" ? "after the Big Bang" : "ago";
+  const duration = getPreciseElapsedDuration(year, reference);
+  const parts = formatElapsedAxisDurationParts(duration);
+  const finestRelevantIndex = getElapsedAxisFinestUnitIndex(step);
+  const leadingPrecisionIndex =
+    step < YEARS_PER_DAY && (duration.years > 0 || duration.days > 0) ? 2 : 0;
+  const includedParts = parts
+    .slice(leadingPrecisionIndex, finestRelevantIndex + 1)
+    .filter((part): part is string => part !== null);
+
+  if (includedParts.length === 0) {
+    return {
+      primaryText: `${step >= YEARS_PER_MILLISECOND ? "0ms" : "0µs"} ${suffix}`,
+    };
+  }
+
+  if (reference === "after-big-bang") {
+    return {
+      primaryText: includedParts.join(" "),
+      secondaryText: suffix,
+    };
+  }
+
+  if (includedParts.length <= 2) {
+    return {
+      primaryText: includedParts.join(" "),
+      secondaryText: suffix,
+    };
+  }
+
+  return {
+    primaryText: includedParts.slice(0, 2).join(" "),
+    secondaryText: `${includedParts.slice(2).join(" ")} ${suffix}`,
+  };
 }
 
 function createTimelineUtcDate(
@@ -184,8 +501,9 @@ function getTimelineYearStart(year: number) {
 function getTimelineDateFromYear(year: number) {
   const wholeYear = Math.floor(year);
   const fraction = year - wholeYear;
-  const start = getTimelineYearStart(wholeYear);
-  const end = getTimelineYearStart(wholeYear + 1);
+  const astronomicalYear = getAstronomicalYearFromTimelineYear(wholeYear);
+  const start = getTimelineYearStart(astronomicalYear);
+  const end = getTimelineYearStart(astronomicalYear + 1);
 
   return new Date(start + fraction * (end - start));
 }
@@ -194,8 +512,9 @@ export function getTimelineYearFromUtcDate(date: Date) {
   const wholeYear = date.getUTCFullYear();
   const start = getTimelineYearStart(wholeYear);
   const end = getTimelineYearStart(wholeYear + 1);
+  const timelineYear = getTimelineYearFromAstronomicalYear(wholeYear);
 
-  return wholeYear + (date.getTime() - start) / (end - start);
+  return timelineYear + (date.getTime() - start) / (end - start);
 }
 
 export function getTimelineYearFromUtcParts(
@@ -252,6 +571,33 @@ function formatAxisElapsedYears(
 
   const suffix = reference === "after-big-bang" ? "after the Big Bang" : "ago";
 
+  if (step < YEARS_PER_DAY) {
+    const duration = splitElapsedDuration(absolute);
+    const parts = [
+      duration.years > 0 ? `${numberFormatter.format(duration.years)}y` : null,
+      duration.days > 0 ? `${numberFormatter.format(duration.days)}d` : null,
+      duration.hours > 0 ? `${duration.hours}h` : null,
+      duration.minutes > 0 ? `${duration.minutes}m` : null,
+      duration.seconds > 0 ? `${duration.seconds}s` : null,
+      duration.milliseconds > 0 ? `${duration.milliseconds}ms` : null,
+      duration.microseconds > 0 ? `${duration.microseconds}µs` : null,
+    ].filter((part): part is string => part !== null);
+
+    const finestRelevantIndex =
+      step >= YEARS_PER_HOUR
+        ? 2
+        : step >= YEARS_PER_MINUTE
+          ? 3
+          : step >= YEARS_PER_SECOND
+            ? 4
+            : step >= YEARS_PER_MILLISECOND
+              ? 5
+              : 6;
+    const trimmedParts = parts.filter((_, index) => index <= finestRelevantIndex);
+
+    return `${trimmedParts.length > 0 ? trimmedParts.join(" ") : step >= YEARS_PER_MILLISECOND ? "0ms" : "0µs"} ${suffix}`;
+  }
+
   for (const unit of AXIS_DEEP_TIME_UNITS) {
     if (absolute < unit.minAbsolute) {
       continue;
@@ -277,6 +623,22 @@ function formatAxisElapsedYears(
     )} years ${suffix}`;
   }
 
+  // When the elapsed time is very small (sub-year), format using detailed
+  // time units instead of rounding to "0 years".
+  if (absolute < 1) {
+    const duration = splitElapsedDuration(absolute);
+    const parts = formatElapsedAxisDurationParts(duration);
+    const nonNullParts = parts.filter(
+      (part): part is string => part !== null,
+    );
+
+    if (nonNullParts.length > 0) {
+      return `${nonNullParts.slice(0, 2).join(" ")} ${suffix}`;
+    }
+
+    return `0µs ${suffix}`;
+  }
+
   return `${numberFormatter.format(Math.round(absolute))} years ${suffix}`;
 }
 
@@ -285,16 +647,45 @@ function formatAxisYearsAgo(absolute: number, step: number) {
 }
 
 export function formatTimelineElapsedAxisLabel(
-  year: number,
+  year: number | PreciseTimelineYear,
   step: number,
   reference: TimelineElapsedReference,
 ) {
-  const elapsedYears =
-    reference === "after-big-bang"
-      ? year - TIMELINE_MIN_YEAR
-      : TIMELINE_MAX_YEAR - year;
+  if (step >= YEARS_PER_DAY) {
+    const preciseYear = resolvePreciseTimelineYear(year);
+    const elapsedYears =
+      reference === "after-big-bang"
+        ? subtractPreciseTimelineYears(
+            preciseYear,
+            splitTimelineYear(TIMELINE_MIN_YEAR),
+          )
+        : subtractPreciseTimelineYears(
+            splitTimelineYear(TIMELINE_MAX_YEAR),
+            preciseYear,
+          );
 
-  return formatAxisElapsedYears(Math.max(0, elapsedYears), step, reference);
+    return formatAxisElapsedYears(Math.max(0, elapsedYears), step, reference);
+  }
+
+  const label = formatPreciseElapsedAxisLabel(year, step, reference);
+
+  return label.secondaryText
+    ? `${label.primaryText} ${label.secondaryText}`
+    : label.primaryText;
+}
+
+export function formatTimelineElapsedAxisLabelLines(
+  year: number | PreciseTimelineYear,
+  step: number,
+  reference: TimelineElapsedReference,
+) {
+  if (step >= YEARS_PER_DAY) {
+    return {
+      primaryText: formatTimelineElapsedAxisLabel(year, step, reference),
+    };
+  }
+
+  return formatPreciseElapsedAxisLabel(year, step, reference);
 }
 
 export function formatTimelineElapsedLabel(
@@ -309,51 +700,118 @@ export function formatTimelineElapsedLabel(
   const totalYears = isAfterBigBang
     ? year - TIMELINE_MIN_YEAR
     : TIMELINE_MAX_YEAR - year;
-  const { years, days } = splitElapsedYearsAndDays(totalYears);
+  const duration = splitElapsedDuration(totalYears);
+  const parts = [
+    duration.years > 0 ? formatUnitCount(duration.years, "year") : null,
+    duration.days > 0 ? formatUnitCount(duration.days, "day") : null,
+    duration.hours > 0 ? formatUnitCount(duration.hours, "hour") : null,
+    duration.minutes > 0 ? formatUnitCount(duration.minutes, "minute") : null,
+    duration.seconds > 0 ? formatUnitCount(duration.seconds, "second") : null,
+    duration.milliseconds > 0
+      ? formatUnitCount(duration.milliseconds, "millisecond")
+      : null,
+    duration.microseconds > 0
+      ? formatUnitCount(duration.microseconds, "microsecond")
+      : null,
+  ].filter((part): part is string => part !== null);
 
-  if (isAfterBigBang && years <= 0 && days <= 0) {
+  if (isAfterBigBang && parts.length === 0) {
     return { primaryText: "Big Bang" };
   }
 
-  if (years <= 0) {
+  if (parts.length <= 2) {
+    const label = joinNaturalLanguage(parts.length > 0 ? parts : ["0 microseconds"]);
+
     return {
       primaryText: isAfterBigBang
-        ? `${formatUnitCount(days, "day")} after the Big Bang`
-        : `${formatUnitCount(days, "day")} ago`,
+        ? `${label} after the Big Bang`
+        : `${label} ago`,
     };
   }
 
-  if (days <= 0) {
-    return {
-      primaryText: isAfterBigBang
-        ? `${formatUnitCount(years, "year")} after the Big Bang`
-        : `${formatUnitCount(years, "year")} ago`,
-    };
-  }
+  const primaryParts = parts.slice(0, 2);
+  const secondaryParts = parts.slice(2);
 
   return {
-    primaryText: formatUnitCount(years, "year"),
+    primaryText: joinNaturalLanguage(primaryParts),
     secondaryText: isAfterBigBang
-      ? `and ${formatUnitCount(days, "day")} after the Big Bang`
-      : `and ${formatUnitCount(days, "day")} ago`,
+      ? `${joinNaturalLanguage(secondaryParts)} after the Big Bang`
+      : `${joinNaturalLanguage(secondaryParts)} ago`,
   };
 }
 
-export function formatTimelineDateLabel(year: number, step = 1) {
-  const safeStep = Math.max(Math.abs(step), 1e-9);
+function getTimelineDatePartsFromYear(
+  year: number | PreciseTimelineYear,
+): TimelineDateParts {
+  const preciseYear = resolvePreciseTimelineYear(year);
+  const astronomicalYear = getAstronomicalYearFromTimelineYear(
+    preciseYear.wholeYear,
+  );
+  const start = getTimelineYearStart(astronomicalYear);
+  const end = getTimelineYearStart(astronomicalYear + 1);
+  const absoluteMilliseconds = start + preciseYear.fraction * (end - start);
+  let wholeMilliseconds = Math.floor(absoluteMilliseconds);
+  let microsecond = Math.round(
+    (absoluteMilliseconds - wholeMilliseconds) * MICROSECONDS_PER_MILLISECOND,
+  );
 
-  if (year < 1 || safeStep >= 1) {
+  if (microsecond >= MICROSECONDS_PER_MILLISECOND) {
+    wholeMilliseconds += 1;
+    microsecond = 0;
+  }
+
+  const date = new Date(wholeMilliseconds);
+
+  return {
+    monthLabel: MONTH_LABELS[date.getUTCMonth()],
+    day: date.getUTCDate(),
+    hour: date.getUTCHours(),
+    minute: date.getUTCMinutes(),
+    second: date.getUTCSeconds(),
+    millisecond: date.getUTCMilliseconds(),
+    microsecond,
+  };
+}
+
+export function formatTimelineDateLabel(
+  year: number | PreciseTimelineYear,
+  step = 1,
+) {
+  const safeStep = Math.max(Math.abs(step), 1e-18);
+
+  if (safeStep >= 1) {
     return formatTimelineYear(year, step);
   }
 
-  const date = getTimelineDateFromYear(year);
-  const month = MONTH_LABELS[date.getUTCMonth()];
+  const dateParts = getTimelineDatePartsFromYear(year);
 
   if (safeStep >= 1 / 12) {
-    return month;
+    return dateParts.monthLabel;
   }
 
-  return `${month} ${date.getUTCDate()}`;
+  if (safeStep >= YEARS_PER_DAY) {
+    return `${dateParts.monthLabel} ${dateParts.day}`;
+  }
+
+  const baseTime = `${pad2(dateParts.hour)}:${pad2(dateParts.minute)}`;
+
+  if (safeStep >= YEARS_PER_MINUTE) {
+    return baseTime;
+  }
+
+  const secondsLabel = `${baseTime}:${pad2(dateParts.second)}`;
+
+  if (safeStep >= YEARS_PER_SECOND) {
+    return secondsLabel;
+  }
+
+  const millisecondsLabel = `${secondsLabel}.${pad3(dateParts.millisecond)}`;
+
+  if (safeStep >= YEARS_PER_MILLISECOND) {
+    return millisecondsLabel;
+  }
+
+  return `${millisecondsLabel}${pad3(dateParts.microsecond)}`;
 }
 
 function isMajorTick(value: number, majorStep: number) {
@@ -387,27 +845,29 @@ export function getTimelineTicks(
 }
 
 export function formatTimelineYear(
-  year: number,
+  year: number | PreciseTimelineYear,
   step = 1,
   options: TimelineYearFormatOptions = {},
 ) {
-  const absolute = Math.abs(year);
-  const safeStep = Math.max(Math.abs(step), 1e-9);
-  const roundedYear = Math.round(year);
+  const preciseYear = resolvePreciseTimelineYear(year);
+  const approximateYear = toApproximateTimelineYear(preciseYear);
+  const absolute = Math.abs(approximateYear);
+  const safeStep = Math.max(Math.abs(step), 1e-18);
+  const containingYear = preciseYear.wholeYear;
 
-  if (year <= -YEARS_AGO_CUTOFF) {
+  if (approximateYear <= -YEARS_AGO_CUTOFF) {
     return options.mode === "axis"
       ? formatAxisYearsAgo(absolute, safeStep)
       : formatDefaultYearsAgo(absolute, safeStep);
   }
 
-  if (year < 1) {
+  if (approximateYear < 1) {
     return `${numberFormatter.format(
-      roundedYear === 0 ? 1 : Math.abs(roundedYear),
+      Math.abs(containingYear === 0 ? -1 : containingYear),
     )} BCE`;
   }
 
-  return `${numberFormatter.format(roundedYear)} CE`;
+  return `${numberFormatter.format(Math.max(1, containingYear))} CE`;
 }
 
 export function formatApproximateLabel(label: string, approximate = false) {

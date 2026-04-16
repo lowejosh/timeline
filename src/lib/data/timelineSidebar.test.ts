@@ -42,9 +42,7 @@ describe("timeline sidebar selectors", () => {
       new Set(["post-classical-history"]),
     );
 
-    expect(sections.map((section) => section.label)).toEqual([
-      "Markers",
-    ]);
+    expect(sections.map((section) => section.label)).toEqual(["Markers"]);
     expect(sections[0].entries.map((entry) => entry.id)).toEqual([
       "human-history",
     ]);
@@ -84,9 +82,7 @@ describe("timeline sidebar selectors", () => {
       new Set(),
     );
 
-    expect(sections.map((section) => section.label)).toEqual([
-      "Overlays",
-    ]);
+    expect(sections.map((section) => section.label)).toEqual(["Overlays"]);
     expect(sections[0].entries[0]).toMatchObject({
       id: "civilizations",
       enabled: false,

@@ -3,6 +3,10 @@ import {
   formatTimelinePointLabel,
   formatTimelineRange,
 } from "../time/bands";
+import {
+  formatTimelineExactRange,
+  formatTimelineExactTimestamp,
+} from "../time/exactTimestamp";
 import { ERA_SOURCES } from "./eraSources";
 import type {
   Era,
@@ -60,9 +64,12 @@ export function getMarkerTooltipContent(
     kindLabel: "Marker",
     title: marker.label,
     timeLabel: formatApproximateLabel(
-      marker.timeLabel ?? formatTimelinePointLabel(marker.year, {
-        label: marker.dateLabel,
-      }),
+      marker.timeLabel ??
+        (marker.exactTime
+          ? formatTimelineExactTimestamp(marker.exactTime)
+          : formatTimelinePointLabel(marker.year, {
+              label: marker.dateLabel,
+            })),
       marker.approximate,
     ),
     regionalScopeLabel: marker.regionalScopeLabel,
@@ -78,10 +85,13 @@ export function getOverlayTooltipContent(
     kind: "overlay",
     kindLabel: "Band",
     title: overlay.label,
-    timeLabel: formatTimelineRange(overlay.startYear, overlay.endYear, {
-      approximateStart: overlay.approximateStart,
-      approximateEnd: overlay.approximateEnd,
-    }),
+    timeLabel:
+      overlay.exactStartTime && overlay.exactEndTime
+        ? formatTimelineExactRange(overlay.exactStartTime, overlay.exactEndTime)
+        : formatTimelineRange(overlay.startYear, overlay.endYear, {
+            approximateStart: overlay.approximateStart,
+            approximateEnd: overlay.approximateEnd,
+          }),
     regionalScopeLabel: overlay.regionalScopeLabel,
     description: overlay.description,
     sources: resolveTooltipSources(overlay.sourceRefs),
@@ -95,10 +105,12 @@ export function getEraTooltipContent(era: Era): TimelineTooltipContent {
     title: era.name,
     timeLabel:
       era.timeLabel ??
-      formatTimelineRange(era.startYear, era.endYear, {
-        approximateStart: era.approximateStart,
-        approximateEnd: era.approximateEnd,
-      }),
+      (era.exactStartTime && era.exactEndTime
+        ? formatTimelineExactRange(era.exactStartTime, era.exactEndTime)
+        : formatTimelineRange(era.startYear, era.endYear, {
+            approximateStart: era.approximateStart,
+            approximateEnd: era.approximateEnd,
+          })),
     regionalScopeLabel: era.regionalScopeLabel,
     description: era.description,
     sources: resolveTooltipSources(era.sourceRefs),

@@ -80,7 +80,8 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     id: DEEP_TIME_LIFE_GROUP_ID,
     categoryId: PLANET_AND_LIFE_CATEGORY_ID,
     label: "Deep Time Life",
-    description: "Life milestones, extinction shocks, and broad biosphere overlays.",
+    description:
+      "Life milestones, extinction shocks, and broad biosphere overlays.",
     contentType: "mixed",
     order: 1,
   },
@@ -88,7 +89,8 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     id: PALEOLITHIC_GROUP_ID,
     categoryId: HUMAN_HISTORY_CATEGORY_ID,
     label: "Paleolithic",
-    description: "Early Homo sapiens, symbolic expression, and Upper Paleolithic culture.",
+    description:
+      "Early Homo sapiens, symbolic expression, and Upper Paleolithic culture.",
     contentType: "markers",
     order: 0,
   },
@@ -152,7 +154,8 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     id: ANCIENT_CIVILIZATIONS_GROUP_ID,
     categoryId: CIVILIZATIONS_CATEGORY_ID,
     label: "Ancient Civilizations",
-    description: "Ancient Nile, Near Eastern, Mediterranean, and Asian overlays.",
+    description:
+      "Ancient Nile, Near Eastern, Mediterranean, and Asian overlays.",
     contentType: "overlays",
     order: 0,
   },

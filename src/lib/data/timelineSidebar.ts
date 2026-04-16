@@ -126,53 +126,51 @@ export function resolveTimelineSidebarSections(
     countsByGroupId.set(overlay.groupId, existing);
   }
 
-  const entries = SIDEBAR_ENTRY_DEFINITIONS.reduce<TimelineSidebarResolvedEntry[]>(
-    (accumulator, definition) => {
-      const counts = definition.groupIds.reduce(
-        (totals, groupId) => {
-          const groupCounts = countsByGroupId.get(groupId);
+  const entries = SIDEBAR_ENTRY_DEFINITIONS.reduce<
+    TimelineSidebarResolvedEntry[]
+  >((accumulator, definition) => {
+    const counts = definition.groupIds.reduce(
+      (totals, groupId) => {
+        const groupCounts = countsByGroupId.get(groupId);
 
-          if (!groupCounts) {
-            return totals;
-          }
-
-          totals.markerCount += groupCounts.markerCount;
-          totals.overlayCount += groupCounts.overlayCount;
+        if (!groupCounts) {
           return totals;
-        },
-        {
-          markerCount: 0,
-          overlayCount: 0,
-        },
-      );
+        }
 
-      const relevantItemCount = counts.markerCount + counts.overlayCount;
+        totals.markerCount += groupCounts.markerCount;
+        totals.overlayCount += groupCounts.overlayCount;
+        return totals;
+      },
+      {
+        markerCount: 0,
+        overlayCount: 0,
+      },
+    );
 
-      if (relevantItemCount === 0) {
-        return accumulator;
-      }
+    const relevantItemCount = counts.markerCount + counts.overlayCount;
 
-      const enabledCount = definition.groupIds.filter((groupId) =>
-        enabledGroupIds.has(groupId),
-      ).length;
-
-      accumulator.push({
-        id: definition.id,
-        label: definition.label,
-        groupIds: [...definition.groupIds],
-        enabled: enabledCount === definition.groupIds.length,
-        mixed:
-          enabledCount > 0 && enabledCount < definition.groupIds.length,
-        markerCount: counts.markerCount,
-        overlayCount: counts.overlayCount,
-        relevantItemCount,
-        sectionId: definition.sectionId,
-      });
-
+    if (relevantItemCount === 0) {
       return accumulator;
-    },
-    [],
-  );
+    }
+
+    const enabledCount = definition.groupIds.filter((groupId) =>
+      enabledGroupIds.has(groupId),
+    ).length;
+
+    accumulator.push({
+      id: definition.id,
+      label: definition.label,
+      groupIds: [...definition.groupIds],
+      enabled: enabledCount === definition.groupIds.length,
+      mixed: enabledCount > 0 && enabledCount < definition.groupIds.length,
+      markerCount: counts.markerCount,
+      overlayCount: counts.overlayCount,
+      relevantItemCount,
+      sectionId: definition.sectionId,
+    });
+
+    return accumulator;
+  }, []);
 
   return SIDEBAR_SECTIONS.map((section) => ({
     id: section.id,

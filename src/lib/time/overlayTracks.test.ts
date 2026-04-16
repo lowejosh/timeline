@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { ANCIENT_CIVILIZATION_OVERLAYS } from "../data/overlays/ancientCivilizations";
 import { POST_CLASSICAL_EARLY_MODERN_OVERLAYS } from "../data/overlays/postClassicalEarlyModern";
-import type { TimelineMarker, TimelineOverlayBand } from "../data/timelineTypes";
+import type {
+  TimelineMarker,
+  TimelineOverlayBand,
+} from "../data/timelineTypes";
 import {
   getVisibleTimelineMarkers,
   resolveTimelineOverlayTracks,
@@ -37,9 +40,11 @@ describe("timeline overlay tracks", () => {
       zoom: 9,
     };
 
-    expect(getVisibleTimelineMarkers(markers, viewport, width, pad).map((marker) => marker.id)).toEqual([
-      "visible",
-    ]);
+    expect(
+      getVisibleTimelineMarkers(markers, viewport, width, pad).map(
+        (marker) => marker.id,
+      ),
+    ).toEqual(["visible"]);
   });
 
   it("filters markers by enabled group ids before rendering", () => {
@@ -110,7 +115,12 @@ describe("timeline overlay tracks", () => {
       zoom: 21,
     };
 
-    const resolved = resolveTimelineOverlayTracks(overlays, viewport, width, pad);
+    const resolved = resolveTimelineOverlayTracks(
+      overlays,
+      viewport,
+      width,
+      pad,
+    );
 
     expect(resolved.map((band) => band.band.id)).toEqual(["a", "b", "c"]);
     expect(resolved.map((band) => band.laneIndex)).toEqual([0, 1, 0]);
@@ -190,7 +200,12 @@ describe("timeline overlay tracks", () => {
       zoom: 27,
     };
 
-    const resolved = resolveTimelineOverlayTracks(overlays, viewport, width, pad);
+    const resolved = resolveTimelineOverlayTracks(
+      overlays,
+      viewport,
+      width,
+      pad,
+    );
 
     expect(resolved.map((band) => band.band.id)).toEqual(["c"]);
     expect(resolved[0].laneCount).toBe(2);
@@ -214,7 +229,12 @@ describe("timeline overlay tracks", () => {
       zoom: 0,
     };
 
-    const resolved = resolveTimelineOverlayTracks(overlays, viewport, width, pad);
+    const resolved = resolveTimelineOverlayTracks(
+      overlays,
+      viewport,
+      width,
+      pad,
+    );
 
     expect(resolved).toHaveLength(1);
     expect(resolved[0].renderWidth).toBeGreaterThanOrEqual(0.5);
@@ -240,7 +260,12 @@ describe("timeline overlay tracks", () => {
       zoom: 0,
     };
 
-    const resolved = resolveTimelineOverlayTracks(overlays, viewport, width, pad);
+    const resolved = resolveTimelineOverlayTracks(
+      overlays,
+      viewport,
+      width,
+      pad,
+    );
 
     expect(resolved).toHaveLength(0);
   });

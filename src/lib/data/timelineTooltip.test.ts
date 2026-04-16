@@ -4,6 +4,7 @@ import {
   getMarkerTooltipContent,
   getOverlayTooltipContent,
 } from "./timelineTooltip";
+import { createExactCalendarTimestamp } from "../time/exactTimestamp";
 import type { Era, TimelineMarker, TimelineOverlayBand } from "./timelineTypes";
 
 describe("timeline tooltip content", () => {
@@ -36,6 +37,56 @@ describe("timeline tooltip content", () => {
         },
       ],
     });
+  });
+
+  it("formats marker tooltips from exact calendar timestamps when no explicit time label exists", () => {
+    const marker: TimelineMarker = {
+      id: "ides-of-march",
+      label: "Julius Caesar assassinated",
+      year: -43,
+      exactTime: createExactCalendarTimestamp({
+        era: "bce",
+        year: 44,
+        month: 3,
+        day: 15,
+        hour: 12,
+        precision: "hour",
+      }),
+      sourceRefs: [{ sourceId: "periodo" }],
+    };
+
+    expect(getMarkerTooltipContent(marker).timeLabel).toBe(
+      "Mar 15, 44 BCE, 12:00 UTC",
+    );
+  });
+
+  it("formats overlay tooltips from exact ranges when available", () => {
+    const overlay: TimelineOverlayBand = {
+      id: "first-world-war",
+      label: "World War I",
+      startYear: 1914,
+      endYear: 1918,
+      exactStartTime: createExactCalendarTimestamp({
+        era: "ce",
+        year: 1914,
+        month: 7,
+        day: 28,
+        precision: "day",
+      }),
+      exactEndTime: createExactCalendarTimestamp({
+        era: "ce",
+        year: 1918,
+        month: 11,
+        day: 11,
+        precision: "day",
+      }),
+      color: "rgba(0, 0, 0, 0.1)",
+      sourceRefs: [{ sourceId: "historyWorldWarOne" }],
+    };
+
+    expect(getOverlayTooltipContent(overlay).timeLabel).toBe(
+      "Jul 28, 1914 — Nov 11, 1918",
+    );
   });
 
   it("formats overlay tooltips as ranges", () => {

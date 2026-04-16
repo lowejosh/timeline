@@ -7,8 +7,13 @@ import {
 } from "./timelineDecorations";
 import type { TimelineOverlayBand } from "./timelineTypes";
 
-function flattenOverlayBands(bands: TimelineOverlayBand[]): TimelineOverlayBand[] {
-  return bands.flatMap((band) => [band, ...flattenOverlayBands(band.children ?? [])]);
+function flattenOverlayBands(
+  bands: TimelineOverlayBand[],
+): TimelineOverlayBand[] {
+  return bands.flatMap((band) => [
+    band,
+    ...flattenOverlayBands(band.children ?? []),
+  ]);
 }
 
 describe("root timeline display data", () => {
@@ -224,13 +229,16 @@ describe("root timeline display data", () => {
       )?.description,
     ).toContain("more than a third");
     expect(
-      TIMELINE_DISPLAY.markers.find((marker) => marker.id === "k-pg-asteroid-impact")
-        ?.description,
+      TIMELINE_DISPLAY.markers.find(
+        (marker) => marker.id === "k-pg-asteroid-impact",
+      )?.description,
     ).toContain("75%");
     expect(
-      TIMELINE_DISPLAY.markers.find((marker) => marker.id === "great-oxidation-event")
-        ?.sourceRefs
-        ?.some((reference) => reference.sourceId === "asmGreatOxidationEvent"),
+      TIMELINE_DISPLAY.markers
+        .find((marker) => marker.id === "great-oxidation-event")
+        ?.sourceRefs?.some(
+          (reference) => reference.sourceId === "asmGreatOxidationEvent",
+        ),
     ).toBe(true);
   });
 
@@ -273,7 +281,8 @@ describe("root timeline display data", () => {
     ).toBe(true);
 
     expect(
-      TIMELINE_DISPLAY.overlays.find((band) => band.id === "mesopotamia")
+      TIMELINE_DISPLAY.overlays
+        .find((band) => band.id === "mesopotamia")
         ?.children?.map((band) => band.id),
     ).toEqual([
       "sumerian-city-states",

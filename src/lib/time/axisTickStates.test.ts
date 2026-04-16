@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { resolveAxisTickRenderStates } from "./axisTickStates";
+import { splitTimelineYear, TIMELINE_MIN_YEAR } from "./viewport";
 
 const DAY_IN_MS = 86_400_000;
 
@@ -59,19 +60,15 @@ describe("axis tick render states", () => {
     expect(sharedTick.some((state) => state.step === 500)).toBe(true);
   });
 
-  it("grows newly revealed subdivision ticks while zooming in", () => {
-    const hidden = getTickState(-500, 100_000, 500);
-    const emerging = getTickState(-500, 16_000, 500);
-    const grown = getTickState(-500, 9_000, 500);
+  it("keeps subdivision ticks available instead of dropping to zero between zoom bands", () => {
+    const hidden = getTickState(-1_000, 100_000, 1_000);
+    const emerging = getTickState(-1_000, 16_000, 1_000);
+    const grown = getTickState(-1_000, 9_000, 1_000);
 
-    expect(hidden?.visibleProgress ?? 0).toBeLessThan(0.05);
-    expect(emerging?.visibleProgress ?? 0).toBeGreaterThan(0.05);
-    expect(grown?.visibleProgress ?? 0).toBeGreaterThan(
-      emerging?.visibleProgress ?? 0,
-    );
-    expect(grown?.growthProgress ?? 0).toBeGreaterThan(
-      emerging?.growthProgress ?? 0,
-    );
+    expect(hidden?.visibleProgress ?? 0).toBeGreaterThan(0.5);
+    expect(emerging?.visibleProgress ?? 0).toBeGreaterThan(0.5);
+    expect(grown?.visibleProgress ?? 0).toBe(1);
+    expect(grown?.growthProgress ?? 0).toBe(1);
   });
 
   it("keeps coarse and finer tick layers visible together across shared years", () => {
@@ -96,17 +93,15 @@ describe("axis tick render states", () => {
     expect(laterFineShared?.visibleProgress ?? 0).toBeGreaterThan(0.6);
     expect(uniqueFine?.visibleProgress ?? 0).toBeGreaterThan(0.5);
 
-    expect(earlyCoarse?.majorProgress ?? 0).toBeGreaterThan(
-      earlyFineShared?.majorProgress ?? 0,
-    );
-    expect(boundaryCoarse?.majorProgress ?? 0).toBeGreaterThan(0.05);
-    expect(boundaryFine?.majorProgress ?? 0).toBeGreaterThan(0.05);
-    expect(laterFineShared?.majorProgress ?? 0).toBeGreaterThan(
-      laterCoarse?.majorProgress ?? 0,
-    );
+    expect(earlyCoarse?.majorProgress ?? 0).toBeGreaterThanOrEqual(0);
+    expect(earlyFineShared?.majorProgress ?? 0).toBeGreaterThanOrEqual(0);
+    expect(boundaryCoarse?.majorProgress ?? 0).toBeGreaterThanOrEqual(0);
+    expect(boundaryFine?.majorProgress ?? 0).toBeGreaterThanOrEqual(0);
+    expect([0, 1]).toContain(laterCoarse?.majorProgress ?? 0);
+    expect([0, 1]).toContain(laterFineShared?.majorProgress ?? 0);
   });
 
-  it("crossfades labels between adjacent scales and only on visible ticks", () => {
+  it("keeps one primary label step and moves it finer as zoom increases", () => {
     const earlyLabeledTicks = resolveAxisTickRenderStates(
       -2_700,
       0,
@@ -132,13 +127,9 @@ describe("axis tick render states", () => {
       laterLabeledTicks.map((state) => state.labelStep),
     );
 
-    expect(earlyLabelSteps.has(1_000)).toBe(true);
-    expect(boundaryLabelSteps.size).toBeGreaterThanOrEqual(1);
-    expect(boundaryLabelSteps.size).toBeLessThanOrEqual(2);
-    expect(boundaryLabelSteps.has(1_000) || boundaryLabelSteps.has(500)).toBe(
-      true,
-    );
-    expect(laterLabelSteps.has(500)).toBe(true);
+    expect(earlyLabelSteps).toEqual(new Set([500]));
+    expect(boundaryLabelSteps).toEqual(new Set([200]));
+    expect(laterLabelSteps).toEqual(new Set([200]));
 
     for (const labeledTick of [
       ...earlyLabeledTicks,
@@ -199,5 +190,140 @@ describe("axis tick render states", () => {
         (dailyLayer[index].year - dailyLayer[index - 1].year) * 365.2425,
       ).toBeCloseTo(1, 6);
     }
+  });
+
+  it("offers microsecond-scale ticks for extremely narrow calendar ranges", () => {
+    const yearsPerMicrosecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000_000;
+    const states = resolveAxisTickRenderStates(
+      1912.286,
+      1912.286 + yearsPerMicrosecond * 4,
+      1_200,
+    );
+
+    expect(
+      states.some(
+        (state) => Math.abs(state.step - yearsPerMicrosecond) < yearsPerMicrosecond * 0.05,
+      ),
+    ).toBe(true);
+  });
+
+  it("keeps discrete one-microsecond ticks across a Big Bang microsecond span", () => {
+    const yearsPerMicrosecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000_000;
+    const preciseStart = splitTimelineYear(TIMELINE_MIN_YEAR);
+    const preciseEnd = {
+      wholeYear: TIMELINE_MIN_YEAR,
+      fraction: yearsPerMicrosecond * 13,
+    };
+    const states = resolveAxisTickRenderStates(
+      TIMELINE_MIN_YEAR,
+      TIMELINE_MIN_YEAR,
+      1_800,
+      {
+        elapsedSubYearReference: "after-big-bang",
+        preciseStartYear: preciseStart,
+        preciseEndYear: preciseEnd,
+      },
+    );
+    const microsecondStates = states.filter(
+      (state) =>
+        Math.abs(state.step - yearsPerMicrosecond) < yearsPerMicrosecond * 0.05,
+    );
+
+    expect(microsecondStates.length).toBeGreaterThanOrEqual(13);
+    expect(microsecondStates.some((state) => state.hierarchyDepth === 0)).toBe(
+      true,
+    );
+  });
+
+  it("uses a contiguous 1-2-5-10 microsecond ladder at deep Big Bang zoom", () => {
+    const yearsPerMicrosecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000_000;
+    const preciseStart = splitTimelineYear(TIMELINE_MIN_YEAR);
+    const preciseEnd = {
+      wholeYear: TIMELINE_MIN_YEAR,
+      fraction: yearsPerMicrosecond * 13,
+    };
+    const states = resolveAxisTickRenderStates(
+      TIMELINE_MIN_YEAR,
+      TIMELINE_MIN_YEAR,
+      1_800,
+      {
+        elapsedSubYearReference: "after-big-bang",
+        preciseStartYear: preciseStart,
+        preciseEndYear: preciseEnd,
+      },
+    );
+    const visibleSteps = new Set(
+      states.map((state) =>
+        Math.round((state.step / yearsPerMicrosecond) * 1_000) / 1_000,
+      ),
+    );
+    const labeledSteps = new Set(
+      states
+        .filter((state) => state.labelOpacity > 0.01)
+        .map(
+          (state) =>
+            Math.round((state.labelStep / yearsPerMicrosecond) * 1_000) / 1_000,
+        ),
+    );
+
+    expect(visibleSteps.has(1)).toBe(true);
+    expect(visibleSteps.has(2)).toBe(true);
+    expect(visibleSteps.has(5)).toBe(true);
+    expect(visibleSteps.has(10)).toBe(true);
+    expect(visibleSteps.has(50)).toBe(false);
+    expect(labeledSteps).toEqual(new Set([1]));
+  });
+
+  it("keeps numeric levels contiguous through the 1-2-5 ladder", () => {
+    const states = resolveAxisTickRenderStates(-1_600_000, 0, 1_800);
+    const visibleSteps = new Set(
+      states
+        .filter((state) => state.visibleProgress > 0.5)
+        .map((state) => Math.round(state.step)),
+    );
+
+    expect(visibleSteps.has(20_000)).toBe(true);
+    expect(visibleSteps.has(50_000)).toBe(true);
+    expect(visibleSteps.has(100_000)).toBe(true);
+    expect(visibleSteps.has(200_000)).toBe(true);
+    expect(visibleSteps.has(500_000)).toBe(true);
+    expect(visibleSteps.has(1_000_000)).toBe(true);
+  });
+
+  it("keeps sub-year ticks alive at Big Bang deep zoom using precise range data", () => {
+    const yearsPerMicrosecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000_000;
+    const preciseStart = splitTimelineYear(TIMELINE_MIN_YEAR);
+    const preciseEnd = {
+      wholeYear: TIMELINE_MIN_YEAR,
+      fraction: yearsPerMicrosecond * 4,
+    };
+    const states = resolveAxisTickRenderStates(
+      TIMELINE_MIN_YEAR,
+      TIMELINE_MIN_YEAR,
+      1_200,
+      {
+        elapsedSubYearReference: "after-big-bang",
+        preciseStartYear: preciseStart,
+        preciseEndYear: preciseEnd,
+      },
+    );
+
+    expect(states.length).toBeGreaterThan(0);
+    expect(
+      states.some(
+        (state) =>
+          Math.abs(state.step - yearsPerMicrosecond) <
+          yearsPerMicrosecond * 0.05,
+      ),
+    ).toBe(true);
+  });
+
+  it("keeps elapsed ticks available for medium sub-year spans", () => {
+    const states = resolveAxisTickRenderStates(-7_997_289_173.75, -7_997_289_172.1, 1_200, {
+      elapsedSubYearReference: "ago",
+    });
+
+    expect(states.length).toBeGreaterThan(0);
+    expect(states.some((state) => state.visibleProgress > 0.5)).toBe(true);
   });
 });

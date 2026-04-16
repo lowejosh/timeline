@@ -3,7 +3,11 @@ import type {
   TimelineOverlayBand,
   TimelineZoomVisibility,
 } from "../data/timelineTypes";
-import { getVisibleRange, worldToScreen, type TimelineViewport } from "./viewport";
+import {
+  getVisibleRange,
+  worldToScreen,
+  type TimelineViewport,
+} from "./viewport";
 
 export type ResolvedTimelineOverlayBand = {
   band: TimelineOverlayBand;
@@ -32,8 +36,10 @@ type CachedOverlayLaneAssignment = {
 };
 
 const OVERLAY_MIN_VISIBLE_WIDTH_DEVICE_PX = 0.5;
-const overlayLaneAssignmentCache =
-  new WeakMap<TimelineOverlayBand[], CachedOverlayLaneAssignment>();
+const overlayLaneAssignmentCache = new WeakMap<
+  TimelineOverlayBand[],
+  CachedOverlayLaneAssignment
+>();
 const markerSortStateCache = new WeakMap<TimelineMarker[], boolean>();
 
 function resolveOverlayRenderGeometry(
@@ -103,10 +109,16 @@ function isDecorationGroupEnabled(
 
 function compareDecorations(
   left:
-    | Pick<TimelineMarker, "id" | "priority"> & { startYear: number; endYear: number }
+    | (Pick<TimelineMarker, "id" | "priority"> & {
+        startYear: number;
+        endYear: number;
+      })
     | TimelineOverlayBand,
   right:
-    | Pick<TimelineMarker, "id" | "priority"> & { startYear: number; endYear: number }
+    | (Pick<TimelineMarker, "id" | "priority"> & {
+        startYear: number;
+        endYear: number;
+      })
     | TimelineOverlayBand,
 ) {
   return (
@@ -170,20 +182,21 @@ function isMarkerArrayChronologicallySorted(markers: TimelineMarker[]) {
 
     if (
       previous.year > current.year ||
-      (previous.year === current.year && compareDecorations(
-        {
-          id: previous.id,
-          startYear: previous.year,
-          endYear: previous.year,
-          priority: previous.priority,
-        },
-        {
-          id: current.id,
-          startYear: current.year,
-          endYear: current.year,
-          priority: current.priority,
-        },
-      ) > 0)
+      (previous.year === current.year &&
+        compareDecorations(
+          {
+            id: previous.id,
+            startYear: previous.year,
+            endYear: previous.year,
+            priority: previous.priority,
+          },
+          {
+            id: current.id,
+            startYear: current.year,
+            endYear: current.year,
+            priority: current.priority,
+          },
+        ) > 0)
     ) {
       markerSortStateCache.set(markers, false);
       return false;
@@ -214,10 +227,7 @@ function findFirstMarkerIndexAtOrAfter(
   return low;
 }
 
-function findFirstMarkerIndexAfter(
-  markers: TimelineMarker[],
-  year: number,
-) {
+function findFirstMarkerIndexAfter(markers: TimelineMarker[], year: number) {
   let low = 0;
   let high = markers.length;
 

@@ -3,18 +3,119 @@ import { getPresentTimelineYear } from "./present";
 export type TimelineViewport = {
   centerYear: number;
   zoom: number;
+  centerYearWhole?: number;
+  centerYearFraction?: number;
+};
+
+export type PreciseTimelineYear = {
+  wholeYear: number;
+  fraction: number;
 };
 
 export const TIMELINE_MIN_YEAR = -13_800_000_000;
 export const TIMELINE_MAX_YEAR = getPresentTimelineYear();
 export const MIN_ZOOM = 0;
-export const MAX_ZOOM = 44;
+export const MAX_ZOOM = 80;
 export const BASE_YEARS_PER_PIXEL = 50_000_000;
 export const HOME_RANGE: [number, number] = [1500, TIMELINE_MAX_YEAR];
-const MIN_VISIBLE_RANGE_YEARS = 14 / 365.2425;
+const MICROSECONDS_PER_YEAR = 365.2425 * 24 * 60 * 60 * 1_000_000;
+export const MIN_VISIBLE_RANGE_MICROSECONDS = 8;
+const MIN_VISIBLE_RANGE_YEARS =
+  MIN_VISIBLE_RANGE_MICROSECONDS / MICROSECONDS_PER_YEAR;
+const PRECISION_YEARS_PER_PIXEL_FACTOR = 2;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
+}
+
+export function normalizePreciseTimelineYear(
+  wholeYear: number,
+  fraction: number,
+): PreciseTimelineYear {
+  let nextWholeYear = Math.trunc(wholeYear);
+  let nextFraction = fraction;
+
+  if (!Number.isFinite(nextFraction)) {
+    nextFraction = 0;
+  }
+
+  if (nextFraction >= 1 || nextFraction < 0) {
+    const carry = Math.floor(nextFraction);
+    nextWholeYear += carry;
+    nextFraction -= carry;
+  }
+
+  if (nextFraction < 0) {
+    nextWholeYear -= 1;
+    nextFraction += 1;
+  }
+
+  return {
+    wholeYear: nextWholeYear,
+    fraction: nextFraction,
+  };
+}
+
+export function splitTimelineYear(year: number): PreciseTimelineYear {
+  const wholeYear = Math.floor(year);
+
+  return normalizePreciseTimelineYear(wholeYear, year - wholeYear);
+}
+
+export function toApproximateTimelineYear(year: PreciseTimelineYear) {
+  return year.wholeYear + year.fraction;
+}
+
+export function addPreciseTimelineYears(
+  year: PreciseTimelineYear,
+  deltaYears: number,
+) {
+  return normalizePreciseTimelineYear(year.wholeYear, year.fraction + deltaYears);
+}
+
+export function subtractPreciseTimelineYears(
+  left: PreciseTimelineYear,
+  right: PreciseTimelineYear,
+) {
+  return left.wholeYear - right.wholeYear + (left.fraction - right.fraction);
+}
+
+export function comparePreciseTimelineYears(
+  left: PreciseTimelineYear,
+  right: PreciseTimelineYear,
+) {
+  return (
+    left.wholeYear - right.wholeYear ||
+    left.fraction - right.fraction
+  );
+}
+
+export function getViewportCenterYear(
+  viewport: TimelineViewport,
+): PreciseTimelineYear {
+  if (
+    viewport.centerYearWhole !== undefined &&
+    viewport.centerYearFraction !== undefined
+  ) {
+    return normalizePreciseTimelineYear(
+      viewport.centerYearWhole,
+      viewport.centerYearFraction,
+    );
+  }
+
+  return splitTimelineYear(viewport.centerYear);
+}
+
+function createViewportFromCenterYear(
+  centerYear: PreciseTimelineYear,
+  zoom: number,
+): TimelineViewport {
+  return {
+    centerYear: toApproximateTimelineYear(centerYear),
+    centerYearWhole: centerYear.wholeYear,
+    centerYearFraction: centerYear.fraction,
+    zoom,
+  };
 }
 
 export function getMinZoomForWidth(width: number) {
@@ -35,6 +136,56 @@ export function getMaxZoomForWidth(width: number) {
   return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, maxZoomForVisibleRange));
 }
 
+export function getPrecisionLimitedYearsPerPixel(centerYear: number) {
+  const magnitude = Math.max(Math.abs(centerYear), 1);
+
+  return magnitude * Number.EPSILON * PRECISION_YEARS_PER_PIXEL_FACTOR;
+}
+
+export function getViewportPrecisionLimitedYearsPerPixel(
+  viewport: TimelineViewport,
+) {
+  const centerYear = getViewportCenterYear(viewport);
+  const localMagnitude = Math.max(Math.abs(centerYear.fraction), 1);
+
+  return localMagnitude * Number.EPSILON * PRECISION_YEARS_PER_PIXEL_FACTOR;
+}
+
+export function getMaxZoomForViewport(centerYear: number, width: number) {
+  const safeWidth = Math.max(width, 1);
+  const maxZoomForVisibleRange = getMaxZoomForWidth(safeWidth);
+  const precisionYearsPerPixel = getPrecisionLimitedYearsPerPixel(centerYear);
+  const maxZoomForPrecision = Math.log2(
+    BASE_YEARS_PER_PIXEL / precisionYearsPerPixel,
+  );
+
+  return Math.min(
+    maxZoomForVisibleRange,
+    MAX_ZOOM,
+    Math.max(MIN_ZOOM, maxZoomForPrecision),
+  );
+}
+
+export function getMaxZoomForTimelineViewport(
+  viewport: TimelineViewport,
+  width: number,
+) {
+  const safeWidth = Math.max(width, 1);
+  const maxZoomForVisibleRange = getMaxZoomForWidth(safeWidth);
+  const precisionYearsPerPixel = getViewportPrecisionLimitedYearsPerPixel(
+    viewport,
+  );
+  const maxZoomForPrecision = Math.log2(
+    BASE_YEARS_PER_PIXEL / precisionYearsPerPixel,
+  );
+
+  return Math.min(
+    maxZoomForVisibleRange,
+    MAX_ZOOM,
+    Math.max(MIN_ZOOM, maxZoomForPrecision),
+  );
+}
+
 export function clampZoom(zoom: number, width?: number) {
   return clamp(zoom, MIN_ZOOM, width ? getMaxZoomForWidth(width) : MAX_ZOOM);
 }
@@ -43,31 +194,75 @@ export function getYearsPerPixel(zoom: number) {
   return BASE_YEARS_PER_PIXEL / 2 ** clampZoom(zoom);
 }
 
-export function clampCenter(centerYear: number, zoom: number, width: number) {
+function clampCenterYear(
+  centerYear: PreciseTimelineYear,
+  zoom: number,
+  width: number,
+) {
   const safeWidth = Math.max(width, 1);
   const ypp = getYearsPerPixel(zoom);
   const halfVisibleRange = ypp * (safeWidth / 2);
   const totalRange = TIMELINE_MAX_YEAR - TIMELINE_MIN_YEAR;
 
   if (halfVisibleRange * 2 >= totalRange) {
-    return (TIMELINE_MIN_YEAR + TIMELINE_MAX_YEAR) / 2;
+    return splitTimelineYear((TIMELINE_MIN_YEAR + TIMELINE_MAX_YEAR) / 2);
   }
 
-  return clamp(
-    centerYear,
-    TIMELINE_MIN_YEAR + halfVisibleRange,
-    TIMELINE_MAX_YEAR - halfVisibleRange,
+  const minCenter = addPreciseTimelineYears(
+    splitTimelineYear(TIMELINE_MIN_YEAR),
+    halfVisibleRange,
+  );
+  const maxCenter = addPreciseTimelineYears(
+    splitTimelineYear(TIMELINE_MAX_YEAR),
+    -halfVisibleRange,
+  );
+
+  if (comparePreciseTimelineYears(centerYear, minCenter) < 0) {
+    return minCenter;
+  }
+
+  if (comparePreciseTimelineYears(centerYear, maxCenter) > 0) {
+    return maxCenter;
+  }
+
+  return centerYear;
+}
+
+export function clampCenter(centerYear: number, zoom: number, width: number) {
+  return toApproximateTimelineYear(
+    clampCenterYear(splitTimelineYear(centerYear), zoom, width),
   );
 }
 
 export function normalizeViewport(viewport: TimelineViewport, width: number) {
+  const centerYear = getViewportCenterYear(viewport);
   const minZoom = getMinZoomForWidth(width);
-  const zoom = clamp(viewport.zoom, minZoom, getMaxZoomForWidth(width));
+  const zoom = clamp(
+    viewport.zoom,
+    minZoom,
+    getMaxZoomForTimelineViewport(viewport, width),
+  );
 
-  return {
+  return createViewportFromCenterYear(
+    clampCenterYear(centerYear, zoom, width),
     zoom,
-    centerYear: clampCenter(viewport.centerYear, zoom, width),
-  };
+  );
+}
+
+export function worldPreciseToScreen(
+  year: PreciseTimelineYear,
+  viewport: TimelineViewport,
+  width: number,
+) {
+  const safeWidth = Math.max(width, 1);
+  const normalized = normalizeViewport(viewport, safeWidth);
+  const centerYear = getViewportCenterYear(normalized);
+
+  return (
+    safeWidth / 2 +
+    subtractPreciseTimelineYears(year, centerYear) /
+      getYearsPerPixel(normalized.zoom)
+  );
 }
 
 export function worldToScreen(
@@ -75,12 +270,21 @@ export function worldToScreen(
   viewport: TimelineViewport,
   width: number,
 ) {
+  return worldPreciseToScreen(splitTimelineYear(year), viewport, width);
+}
+
+export function screenToWorldPrecise(
+  x: number,
+  viewport: TimelineViewport,
+  width: number,
+) {
   const safeWidth = Math.max(width, 1);
   const normalized = normalizeViewport(viewport, safeWidth);
+  const centerYear = getViewportCenterYear(normalized);
 
-  return (
-    safeWidth / 2 +
-    (year - normalized.centerYear) / getYearsPerPixel(normalized.zoom)
+  return addPreciseTimelineYears(
+    centerYear,
+    (x - safeWidth / 2) * getYearsPerPixel(normalized.zoom),
   );
 }
 
@@ -89,13 +293,7 @@ export function screenToWorld(
   viewport: TimelineViewport,
   width: number,
 ) {
-  const safeWidth = Math.max(width, 1);
-  const normalized = normalizeViewport(viewport, safeWidth);
-
-  return (
-    normalized.centerYear +
-    (x - safeWidth / 2) * getYearsPerPixel(normalized.zoom)
-  );
+  return toApproximateTimelineYear(screenToWorldPrecise(x, viewport, width));
 }
 
 export function getZoomAnchorForCanvasX(
@@ -124,6 +322,16 @@ export function getVisibleRange(viewport: TimelineViewport, width: number) {
   ] as const;
 }
 
+export function getVisibleRangePrecise(
+  viewport: TimelineViewport,
+  width: number,
+) {
+  return [
+    screenToWorldPrecise(0, viewport, width),
+    screenToWorldPrecise(width, viewport, width),
+  ] as const;
+}
+
 export function zoomAtPosition(
   viewport: TimelineViewport,
   nextZoom: number,
@@ -131,13 +339,22 @@ export function zoomAtPosition(
   width: number,
 ) {
   const safeWidth = Math.max(width, 1);
-  const rawYear = screenToWorld(anchorX, viewport, safeWidth);
-  const anchoredYear = clamp(rawYear, TIMELINE_MIN_YEAR, TIMELINE_MAX_YEAR);
-  const zoom = clampZoom(nextZoom, safeWidth);
-  const centerYear =
-    anchoredYear - (anchorX - safeWidth / 2) * getYearsPerPixel(zoom);
+  const anchoredYear = screenToWorldPrecise(anchorX, viewport, safeWidth);
+  const minZoom = getMinZoomForWidth(safeWidth);
+  const zoom = clamp(
+    nextZoom,
+    minZoom,
+    getMaxZoomForTimelineViewport(
+      createViewportFromCenterYear(anchoredYear, nextZoom),
+      safeWidth,
+    ),
+  );
+  const centerYear = addPreciseTimelineYears(
+    anchoredYear,
+    -(anchorX - safeWidth / 2) * getYearsPerPixel(zoom),
+  );
 
-  return normalizeViewport({ centerYear, zoom }, safeWidth);
+  return normalizeViewport(createViewportFromCenterYear(centerYear, zoom), safeWidth);
 }
 
 export function panByPixels(
@@ -146,13 +363,16 @@ export function panByPixels(
   width: number,
 ) {
   const normalized = normalizeViewport(viewport, width);
+  const centerYear = getViewportCenterYear(normalized);
 
   return normalizeViewport(
-    {
-      ...normalized,
-      centerYear:
-        normalized.centerYear - deltaPixels * getYearsPerPixel(normalized.zoom),
-    },
+    createViewportFromCenterYear(
+      addPreciseTimelineYears(
+        centerYear,
+        -deltaPixels * getYearsPerPixel(normalized.zoom),
+      ),
+      normalized.zoom,
+    ),
     width,
   );
 }
@@ -167,9 +387,10 @@ export function getViewportForRange(
   const minYear = Math.min(startYear, endYear);
   const maxYear = Math.max(startYear, endYear);
   const contentWidth = Math.max(1 - paddingRatio * 2, 0.1);
+  const minYearsPerPixel = MIN_VISIBLE_RANGE_YEARS / safeWidth;
   const yearsPerPixel = Math.max(
     (maxYear - minYear) / (safeWidth * contentWidth),
-    1e-6,
+    minYearsPerPixel,
   );
   const zoom = clampZoom(
     Math.log2(BASE_YEARS_PER_PIXEL / yearsPerPixel),
@@ -177,10 +398,7 @@ export function getViewportForRange(
   );
 
   return normalizeViewport(
-    {
-      centerYear: (minYear + maxYear) / 2,
-      zoom,
-    },
+    createViewportFromCenterYear(splitTimelineYear((minYear + maxYear) / 2), zoom),
     safeWidth,
   );
 }

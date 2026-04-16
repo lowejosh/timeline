@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  getMaxZoomForViewport,
+  getMaxZoomForTimelineViewport,
   getZoomAnchorForCanvasX,
   getMaxZoomForWidth,
+  getPrecisionLimitedYearsPerPixel,
+  getViewportPrecisionLimitedYearsPerPixel,
   getVisibleRange,
   getMinZoomForWidth,
+  MIN_VISIBLE_RANGE_MICROSECONDS,
   getViewportForRange,
   normalizeViewport,
   panByPixels,
@@ -144,7 +149,7 @@ describe("timeline viewport math", () => {
     expect(rightAfter).toBeCloseTo(rightBefore, 3);
   });
 
-  it("caps max zoom so at least about fourteen days stay in view", () => {
+  it("uses split-year center precision to reach the microsecond-scale visible-range floor", () => {
     const width = 1200;
     const viewport = normalizeViewport(
       {
@@ -154,10 +159,59 @@ describe("timeline viewport math", () => {
       width,
     );
     const [visibleStart, visibleEnd] = getVisibleRange(viewport, width);
+    const visibleMicroseconds =
+      (visibleEnd - visibleStart) * 365.2425 * 24 * 60 * 60 * 1_000_000;
+    const precisionLimitedMicroseconds =
+      getViewportPrecisionLimitedYearsPerPixel(viewport) *
+      width *
+      365.2425 *
+      24 *
+      60 *
+      60 *
+      1_000_000;
+    const effectiveVisibleRangeFloor = Math.max(
+      MIN_VISIBLE_RANGE_MICROSECONDS,
+      precisionLimitedMicroseconds,
+    );
 
-    expect(viewport.zoom).toBeCloseTo(getMaxZoomForWidth(width), 6);
-    expect(visibleEnd - visibleStart).toBeGreaterThanOrEqual(
-      14 / 365.2425 - 1e-6,
+    expect(viewport.zoom).toBeCloseTo(
+      getMaxZoomForTimelineViewport(
+        {
+          centerYear: TIMELINE_MAX_YEAR,
+          zoom: 0,
+        },
+        width,
+      ),
+      6,
+    );
+    expect(visibleMicroseconds).toBeGreaterThanOrEqual(
+      effectiveVisibleRangeFloor * 0.85,
+    );
+    expect(visibleMicroseconds).toBeLessThanOrEqual(
+      effectiveVisibleRangeFloor * 1.05,
+    );
+    expect(getMaxZoomForTimelineViewport(
+      {
+        centerYear: TIMELINE_MAX_YEAR,
+        zoom: 0,
+      },
+      width,
+    )).toBeGreaterThan(
+      getMaxZoomForViewport(TIMELINE_MAX_YEAR, width),
+    );
+    expect(precisionLimitedMicroseconds).toBeGreaterThan(
+      MIN_VISIBLE_RANGE_MICROSECONDS,
+    );
+  });
+
+  it("reduces allowed zoom further for very large-magnitude center years", () => {
+    const width = 1200;
+
+    expect(getMaxZoomForViewport(-13_800_000_000, width)).toBeLessThan(
+      getMaxZoomForViewport(TIMELINE_MAX_YEAR, width),
+    );
+    expect(getPrecisionLimitedYearsPerPixel(-13_800_000_000)).toBeGreaterThan(
+      getPrecisionLimitedYearsPerPixel(TIMELINE_MAX_YEAR),
     );
   });
 

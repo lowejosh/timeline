@@ -1,5 +1,18 @@
 import type { TimelineMarker } from "../timelineTypes";
-import { getTimelineYearFromUtcParts } from "../../time/bands";
+import {
+  createExactCalendarTimestamp,
+  getTimelineYearFromExactTimestamp,
+} from "../../time/exactTimestamp";
+
+const TITANIC_SINKS_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1912,
+  month: 4,
+  day: 15,
+  hour: 2,
+  minute: 20,
+  precision: "minute",
+});
 
 export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
   {
@@ -286,9 +299,9 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "titanic-sinks",
     label: "Titanic sinks in North Atlantic",
     shortLabel: "Titanic Sinks",
-    year: getTimelineYearFromUtcParts(1912, 3, 15, 2, 20),
+    year: getTimelineYearFromExactTimestamp(TITANIC_SINKS_AT),
+    exactTime: TITANIC_SINKS_AT,
     dateLabel: "Apr 15, 1912",
-    timeLabel: "Apr 15, 1912, 2:20 AM UTC",
     minZoom: 20,
     priority: 77,
     sourceRefs: [

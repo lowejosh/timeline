@@ -177,10 +177,7 @@ function App() {
         }}
         type="button"
       >
-        <span
-          aria-hidden="true"
-          className="timeline-sidebar-toggle__glyph"
-        />
+        <span aria-hidden="true" className="timeline-sidebar-toggle__glyph" />
         <span className="timeline-sidebar-toggle__label">Layers</span>
       </button>
       <div

@@ -26,7 +26,9 @@ function mergeRenderedSections(
   previous: RenderedTimelineSidebarSection[],
   next: TimelineSidebarSectionState[],
 ) {
-  const previousById = new Map(previous.map((section) => [section.id, section]));
+  const previousById = new Map(
+    previous.map((section) => [section.id, section]),
+  );
   const nextIds = new Set(next.map((section) => section.id));
   const merged = next.map<RenderedTimelineSidebarSection>((section) => {
     const existing = previousById.get(section.id);
@@ -66,15 +68,16 @@ export function TimelineSidebar({
   sections,
   onToggleEntry,
 }: TimelineSidebarProps) {
-  const [renderedSections, setRenderedSections] =
-    useState<RenderedTimelineSidebarSection[]>(() =>
-      sections
-        .map((section) => ({
-          ...section,
-          phase: "present" as const,
-        }))
-        .sort(sortRenderedSections),
-    );
+  const [renderedSections, setRenderedSections] = useState<
+    RenderedTimelineSidebarSection[]
+  >(() =>
+    sections
+      .map((section) => ({
+        ...section,
+        phase: "present" as const,
+      }))
+      .sort(sortRenderedSections),
+  );
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -160,7 +163,9 @@ export function TimelineSidebar({
                 key={section.id}
               >
                 <section className="timeline-sidebar__section">
-                  <h2 className="timeline-sidebar__section-title">{section.label}</h2>
+                  <h2 className="timeline-sidebar__section-title">
+                    {section.label}
+                  </h2>
 
                   <ul className="timeline-sidebar__item-list">
                     {section.entries.map((entry) => (
@@ -183,7 +188,10 @@ export function TimelineSidebar({
                             }}
                             type="checkbox"
                           />
-                          <span className="timeline-sidebar__checkbox" aria-hidden="true" />
+                          <span
+                            className="timeline-sidebar__checkbox"
+                            aria-hidden="true"
+                          />
                           <span className="timeline-sidebar__toggle-copy">
                             <span className="timeline-sidebar__item-title">
                               {entry.label}
