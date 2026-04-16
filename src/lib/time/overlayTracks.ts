@@ -17,8 +17,6 @@ export type ResolvedTimelineOverlayBand = {
   visibleWidth: number;
   renderX: number;
   renderWidth: number;
-  renderOpacity: number;
-  visibilityProgress: number;
 };
 
 type AssignedTimelineOverlayBand = {
@@ -26,36 +24,18 @@ type AssignedTimelineOverlayBand = {
   laneIndex: number;
 };
 
-const OVERLAY_MIN_VISIBLE_WIDTH = 1;
-const OVERLAY_FULL_OPACITY_WIDTH = 12;
-
-function clamp01(value: number) {
-  return Math.min(1, Math.max(0, value));
-}
-
-function getZoomVisibilityProgress(item: TimelineZoomVisibility, zoom: number) {
-  const fadeSpan = 0.85;
-  let progress = 1;
-
-  if (item.minZoom !== undefined) {
-    progress = Math.min(
-      progress,
-      clamp01((zoom - (item.minZoom - fadeSpan)) / fadeSpan),
-    );
-  }
-
-  if (item.maxZoom !== undefined) {
-    progress = Math.min(
-      progress,
-      clamp01(((item.maxZoom + fadeSpan) - zoom) / fadeSpan),
-    );
-  }
-
-  return progress;
-}
+const OVERLAY_MIN_RENDER_WIDTH = 1;
 
 function isVisibleAtZoom(item: TimelineZoomVisibility, zoom: number) {
-  return getZoomVisibilityProgress(item, zoom) > 0.01;
+  if (item.minZoom !== undefined && zoom < item.minZoom) {
+    return false;
+  }
+
+  if (item.maxZoom !== undefined && zoom > item.maxZoom) {
+    return false;
+  }
+
+  return true;
 }
 
 function compareDecorations(
@@ -154,28 +134,25 @@ export function resolveTimelineOverlayTracks(
     )
     .sort((left, right) => compareDecorations(left.band, right.band));
 
-  return visibleOverlays.map(({ band, laneIndex }) => {
+  return visibleOverlays.flatMap(({ band, laneIndex }) => {
     const x0 = pad + worldToScreen(band.startYear, viewport, innerWidth);
     const x1 = pad + worldToScreen(band.endYear, viewport, innerWidth);
-    const visibilityProgress = getZoomVisibilityProgress(band, viewport.zoom);
     const clippedX0 = Math.max(x0, pad);
     const clippedX1 = Math.min(x1, width - pad);
     const clippedWidth = Math.max(clippedX1 - clippedX0, 0);
+
+    if (clippedWidth < OVERLAY_MIN_RENDER_WIDTH) {
+      return [];
+    }
+
     const centerX =
       clippedWidth > 0
         ? clippedX0 + clippedWidth / 2
         : Math.min(Math.max((x0 + x1) / 2, pad), width - pad);
-    const renderOpacity = clamp01(
-      (clippedWidth - OVERLAY_MIN_VISIBLE_WIDTH) /
-        (OVERLAY_FULL_OPACITY_WIDTH - OVERLAY_MIN_VISIBLE_WIDTH),
-    );
-    const renderWidth = Math.max(clippedWidth, 1);
-    const renderX = Math.min(
-      Math.max(centerX - renderWidth / 2, pad),
-      width - pad - renderWidth,
-    );
+    const renderWidth = clippedWidth;
+    const renderX = clippedX0;
 
-    return {
+    return [{
       band,
       laneIndex,
       laneCount,
@@ -187,8 +164,6 @@ export function resolveTimelineOverlayTracks(
       visibleWidth: clippedWidth,
       renderX,
       renderWidth,
-      renderOpacity,
-      visibilityProgress,
-    };
-  }).filter((band) => band.renderOpacity > 0.01);
+    }];
+  });
 }

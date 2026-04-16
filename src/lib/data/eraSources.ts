@@ -264,6 +264,33 @@ export const ERA_SOURCES = {
     notes:
       "Used for the late 4th-millennium BCE emergence of writing and early urban civilization in Mesopotamia.",
   },
+  britannicaAkkad: {
+    shortTitle: "Britannica: Akkad",
+    title: "Akkad",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Akkad."',
+    url: "https://www.britannica.com/place/Akkad",
+    notes:
+      "Used for Sargon of Akkad's rise around 2300 BCE and the broad Akkadian imperial phase that followed.",
+  },
+  britannicaBabylonia: {
+    shortTitle: "Britannica: Babylonia",
+    title: "Babylonia",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Babylonia."',
+    url: "https://www.britannica.com/place/Babylonia",
+    notes:
+      "Used for the Sumer/Akkad-to-Babylonia transition, Hammurabi's Babylonian rise, and the broad late-Babylonian endpoint in 539 BCE.",
+  },
+  britannicaHammurabi: {
+    shortTitle: "Britannica: Hammurabi",
+    title: "Hammurabi",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Hammurabi."',
+    url: "https://www.britannica.com/biography/Hammurabi",
+    notes:
+      "Used for Hammurabi's reign (c. 1792–1750 BCE) and his enduring association with one of the best-known Mesopotamian law collections.",
+  },
   britannicaAncientEgypt: {
     shortTitle: "Britannica: Ancient Egypt",
     title: "ancient Egypt",
@@ -272,6 +299,16 @@ export const ERA_SOURCES = {
     url: "https://www.britannica.com/place/ancient-Egypt",
     notes:
       "Used for the broad span of ancient Egyptian civilization from dynastic unification to Roman annexation.",
+  },
+  britannicaHittiteEmpire: {
+    shortTitle: "Britannica: Hittites",
+    title: "The Hittite empire, c. 1650–1180 BCE",
+    organization: "Encyclopaedia Britannica",
+    citation:
+      'Encyclopaedia Britannica, "Anatolia: The Hittite empire, c. 1650–1180 BCE."',
+    url: "https://www.britannica.com/place/Anatolia/The-Hittite-empire-c-1650-1180-bce",
+    notes:
+      "Used for the conventional public-facing span of the Hittite Empire in Anatolia and northern Syria.",
   },
   britannicaIndusCivilization: {
     shortTitle: "Britannica: Indus civilization",
@@ -290,6 +327,43 @@ export const ERA_SOURCES = {
     url: "https://www.history.com/topics/ancient-middle-east/persian-empire",
     notes:
       "Used for the broad Achaemenid Persian Empire span from Cyrus the Great's rise in 550 BCE to Alexander's conquest in 330 BCE.",
+  },
+  worldHistoryGreatPyramidGiza: {
+    shortTitle: "WHE: Great Pyramid",
+    title: "Great Pyramid of Giza",
+    organization: "World History Encyclopedia",
+    citation: 'Mark, Joshua J., "Great Pyramid of Giza." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Great_Pyramid_of_Giza/",
+    notes:
+      "Used for the familiar c. 2560 BCE completion date of Khufu's pyramid in public-facing ancient-history timelines.",
+  },
+  worldHistoryAssyria: {
+    shortTitle: "WHE: Assyria",
+    title: "Assyria",
+    organization: "World History Encyclopedia",
+    citation: 'Mark, Joshua J., "Assyria." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/assyria/",
+    notes:
+      "Used for the Neo-Assyrian Empire's conventional 912–612 BCE span and public-facing chronology.",
+  },
+  unescoMycenaeTiryns: {
+    shortTitle: "UNESCO: Mycenae",
+    title: "Archaeological Sites of Mycenae and Tiryns",
+    organization: "UNESCO World Heritage Centre",
+    citation:
+      'UNESCO World Heritage Centre, "Archaeological Sites of Mycenae and Tiryns."',
+    url: "https://whc.unesco.org/en/list/941/",
+    notes:
+      "Used for Mycenaean civilization's broad 1600–1100 BCE span and for its role in preserving the earliest written Greek in Linear B.",
+  },
+  unescoYinXu: {
+    shortTitle: "UNESCO: Yin Xu",
+    title: "Yin Xu",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Yin Xu."',
+    url: "https://whc.unesco.org/en/list/1114/",
+    notes:
+      "Used for the late Shang capital at Yin around 1300 BCE and for oracle bones as the earliest known mature Chinese writing.",
   },
   britannicaAncientGreece: {
     shortTitle: "Britannica: ancient Greece",

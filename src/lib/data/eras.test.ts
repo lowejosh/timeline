@@ -63,7 +63,7 @@ describe("era data", () => {
     const cambrian = ROOT_ERA.children?.find((era) => era.id === "cambrian");
 
     expect(humanHistory?.color).toBe(getSeededEraColor("human-history"));
-    expect(cambrian?.color).toBe("rgba(127, 160, 86, 0.42)");
+    expect(cambrian?.color).toBe("rgb(127, 160, 86)");
     expect(cambrian?.color).not.toBe(getSeededEraColor("cambrian"));
   });
 

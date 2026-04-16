@@ -53,6 +53,7 @@ export type TimelineOverlayBand = TimelineDecorationBase & {
   endYear: number;
   color: string;
   groupId?: string;
+  children?: TimelineOverlayBand[];
 };
 
 export type TimelineDisplayConfig = {

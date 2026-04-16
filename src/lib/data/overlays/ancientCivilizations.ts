@@ -1,15 +1,109 @@
 import type { TimelineOverlayBand } from "../timelineTypes";
 
+const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
+  {
+    id: "sumerian-city-states",
+    label: "Sumerian city-states",
+    shortLabel: "Sumer",
+    description:
+      "Broad early-urban Sumerian phase spanning the first city-states of southern Mesopotamia before Akkadian imperial unification.",
+    startYear: -3_500,
+    endYear: -2_334,
+    color: "rgb(202, 156, 105)",
+    sourceRefs: [
+      {
+        sourceId: "britannicaMesopotamia",
+        note: "Britannica treats the late 4th millennium BCE as Mesopotamia's early urban and writing threshold; the app uses that broader framing for a public-facing Sumerian city-state band.",
+      },
+      {
+        sourceId: "britannicaBabylonia",
+        note: "Britannica describes Sumer as the southeastern half of pre-Babylonian southern Mesopotamia before Babylon's rise to political prominence.",
+      },
+    ],
+  },
+  {
+    id: "akkadian-empire",
+    label: "Akkadian Empire",
+    shortLabel: "Akkad",
+    description:
+      "The first large Mesopotamian empire built by Sargon of Akkad and his successors.",
+    startYear: -2_334,
+    endYear: -2_154,
+    color: "rgb(190, 120, 92)",
+    sourceRefs: [
+      {
+        sourceId: "britannicaAkkad",
+        note: "Britannica says Sargon founded Agade about 2300 BCE, united the city-states, and that his dynasty fell about 2150 BCE; the app uses the standard conventional span of c. 2334–2154 BCE for the Akkadian Empire.",
+      },
+    ],
+  },
+  {
+    id: "old-babylonian-empire",
+    label: "Old Babylonian Empire",
+    shortLabel: "Babylon",
+    description:
+      "The Amorite-era Babylonian kingdom best known for Hammurabi's reign and laws.",
+    startYear: -1_894,
+    endYear: -1_595,
+    color: "rgb(168, 132, 88)",
+    sourceRefs: [
+      {
+        sourceId: "britannicaBabylonia",
+        note: "Britannica says Babylon rose to political prominence around 1850 BCE under Amorite rule and that this phase lasted until 1600 BCE; the app uses the conventional Old Babylonian span of 1894–1595 BCE.",
+      },
+      {
+        sourceId: "britannicaHammurabi",
+        note: "Supports the public-facing association of this Babylonian phase with Hammurabi's reign and legal legacy.",
+      },
+    ],
+  },
+  {
+    id: "neo-assyrian-empire",
+    label: "Neo-Assyrian Empire",
+    shortLabel: "Assyria",
+    description:
+      "The late expansionist Assyrian superpower centered on cities such as Nineveh and Ashur.",
+    startYear: -912,
+    endYear: -612,
+    color: "rgb(129, 106, 154)",
+    sourceRefs: [
+      {
+        sourceId: "worldHistoryAssyria",
+        note: "World History Encyclopedia identifies the Neo-Assyrian Empire as the late imperial phase from 912 to 612 BCE, the period most familiar in broad ancient-history surveys.",
+      },
+    ],
+  },
+  {
+    id: "neo-babylonian-empire",
+    label: "Neo-Babylonian Empire",
+    shortLabel: "Neo-Babylon",
+    description:
+      "The final great independent Babylonian phase before the Persian conquest.",
+    startYear: -626,
+    endYear: -539,
+    color: "rgb(153, 114, 172)",
+    sourceRefs: [
+      {
+        sourceId: "britannicaBabylonia",
+        note: "Britannica describes the last and greatest period of Babylonian supremacy under Nabopolassar and Nebuchadnezzar II, ending when Cyrus captured Babylonia in 539 BCE; the app uses the conventional Neo-Babylonian span of 626–539 BCE.",
+      },
+    ],
+  },
+];
+
 export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
   {
     id: "mesopotamia",
     label: "Mesopotamia",
+    description:
+      "Umbrella band for the long arc of Mesopotamian civilization, from early Sumerian cities to the Persian conquest of Babylon.",
     startYear: -3_500,
     endYear: -539,
-    color: "rgba(180, 120, 70, 0.6)",
+    color: "rgb(180, 120, 70)",
     minZoom: 0,
     priority: 95,
     groupId: "ancient-civilizations",
+    children: MESOPOTAMIA_SUB_BANDS,
     sourceRefs: [
       {
         sourceId: "britannicaMesopotamia",
@@ -23,7 +117,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Indus Valley",
     startYear: -3_300,
     endYear: -1_300,
-    color: "rgba(107, 136, 166, 0.6)",
+    color: "rgb(107, 136, 166)",
     minZoom: 0,
     priority: 90,
     groupId: "ancient-civilizations",
@@ -39,7 +133,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Ancient Egypt",
     startYear: -3_100,
     endYear: -30,
-    color: "rgba(166, 149, 94, 0.6)",
+    color: "rgb(166, 149, 94)",
     minZoom: 0,
     priority: 92,
     groupId: "ancient-civilizations",
@@ -51,11 +145,49 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     ],
   },
   {
+    id: "hittite-empire",
+    label: "Hittite Empire",
+    shortLabel: "Hittites",
+    description:
+      "An Anatolian Bronze Age great power centered on Hattusa and active across northern Syria.",
+    startYear: -1_650,
+    endYear: -1_180,
+    color: "rgb(157, 106, 126)",
+    minZoom: 0,
+    priority: 89,
+    groupId: "ancient-civilizations",
+    sourceRefs: [
+      {
+        sourceId: "britannicaHittiteEmpire",
+        note: "Britannica summarizes the Hittite Empire as c. 1650–1180 BCE, which the app uses directly for this Bronze Age overlay.",
+      },
+    ],
+  },
+  {
+    id: "mycenaean-greece",
+    label: "Mycenaean Greece",
+    shortLabel: "Mycenae",
+    description:
+      "Late Bronze Age palatial Greece before the post-Mycenaean transition usually used to open ancient Greece surveys.",
+    startYear: -1_600,
+    endYear: -1_100,
+    color: "rgb(118, 132, 186)",
+    minZoom: 0,
+    priority: 88,
+    groupId: "ancient-civilizations",
+    sourceRefs: [
+      {
+        sourceId: "unescoMycenaeTiryns",
+        note: "UNESCO says Mycenaean civilization spread around the Mediterranean between 1600 and 1100 BCE; the app uses that broad span for a clean Late Bronze Age Greek band.",
+      },
+    ],
+  },
+  {
     id: "ancient-greece",
     label: "Ancient Greece",
     startYear: -1_200,
     endYear: -323,
-    color: "rgba(93, 119, 183, 0.6)",
+    color: "rgb(93, 119, 183)",
     minZoom: 0,
     priority: 88,
     groupId: "ancient-civilizations",
@@ -72,7 +204,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Achaemenids",
     startYear: -550,
     endYear: -330,
-    color: "rgba(135, 92, 142, 0.6)",
+    color: "rgb(135, 92, 142)",
     minZoom: 0,
     priority: 86,
     groupId: "ancient-civilizations",
@@ -88,7 +220,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Roman Republic",
     startYear: -509,
     endYear: -27,
-    color: "rgba(159, 91, 70, 0.84)",
+    color: "rgb(159, 91, 70)",
     minZoom: 0,
     priority: 84,
     groupId: "ancient-civilizations",
@@ -109,7 +241,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Hellenistic",
     startYear: -323,
     endYear: -30,
-    color: "rgba(87, 142, 166, 0.6)",
+    color: "rgb(87, 142, 166)",
     minZoom: 0,
     priority: 82,
     groupId: "ancient-civilizations",
@@ -126,7 +258,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Han",
     startYear: -206,
     endYear: 220,
-    color: "rgba(72, 132, 108, 0.6)",
+    color: "rgb(72, 132, 108)",
     minZoom: 0,
     priority: 80,
     groupId: "ancient-civilizations",
@@ -142,7 +274,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Roman Empire",
     startYear: -27,
     endYear: 476,
-    color: "rgba(136, 78, 64, 0.84)",
+    color: "rgb(136, 78, 64)",
     minZoom: 0,
     priority: 78,
     groupId: "ancient-civilizations",

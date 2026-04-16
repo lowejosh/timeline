@@ -2,6 +2,7 @@ import { COSMIC_ERA_DEFINITIONS } from "./eraTrees/cosmic";
 import { GEOLOGICAL_ERA_DEFINITIONS } from "./eraTrees/geological";
 import { HUMAN_HISTORY_ERA_DEFINITION } from "./eraTrees/humanHistory";
 import { CLASSICAL_ANTIQUITY_MARKERS } from "./markers/classicalAntiquity";
+import { BRONZE_AGE_MARKERS } from "./markers/bronzeAge";
 import { CORE_TIMELINE_MARKERS } from "./markers/core";
 import { DEEP_TIME_LIFE_MARKERS } from "./markers/deepTimeLife";
 import { HISTORICAL_TURNING_POINT_MARKERS } from "./markers/historicalTurningPoints";
@@ -63,11 +64,10 @@ function hashString(value: string): number {
   return hash >>> 0;
 }
 
-function hslToRgba(
+function hslToRgb(
   hue: number,
   saturation: number,
   lightness: number,
-  alpha: number,
 ): string {
   const s = saturation / 100;
   const l = lightness / 100;
@@ -102,16 +102,16 @@ function hslToRgba(
   const m = l - c / 2;
   const toChannel = (channel: number) => Math.round((channel + m) * 255);
 
-  return `rgba(${toChannel(red)}, ${toChannel(green)}, ${toChannel(blue)}, ${alpha.toFixed(2)})`;
+  return `rgb(${toChannel(red)}, ${toChannel(green)}, ${toChannel(blue)})`;
 }
 
-export function getSeededEraColor(seed: string, alpha = 0.42): string {
+export function getSeededEraColor(seed: string): string {
   const hash = hashString(seed);
   const hue = hash % 360;
   const saturation = 68 + ((hash >>> 8) % 18);
   const lightness = 52 + ((hash >>> 16) % 10);
 
-  return hslToRgba(hue, saturation, lightness, alpha);
+  return hslToRgb(hue, saturation, lightness);
 }
 
 function materializeEra(definition: EraDefinition): Era {
@@ -145,6 +145,7 @@ export const ROOT_ERA: Era = materializeEra({
 const TIMELINE_MARKERS = [
   ...CORE_TIMELINE_MARKERS,
   ...DEEP_TIME_LIFE_MARKERS,
+  ...BRONZE_AGE_MARKERS,
   ...HISTORICAL_TURNING_POINT_MARKERS,
   ...CLASSICAL_ANTIQUITY_MARKERS,
   ...POST_CLASSICAL_MARKERS,

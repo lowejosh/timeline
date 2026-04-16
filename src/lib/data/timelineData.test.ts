@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { ERA_SOURCES } from "./eraSources";
 import { ROOT_ERA, ROOT_TIMELINE, TIMELINE_DISPLAY } from "./eras";
+import type { TimelineOverlayBand } from "./timelineTypes";
+
+function flattenOverlayBands(bands: TimelineOverlayBand[]): TimelineOverlayBand[] {
+  return bands.flatMap((band) => [band, ...flattenOverlayBands(band.children ?? [])]);
+}
 
 describe("root timeline display data", () => {
   it("keeps the stitched root era as the canonical root export", () => {
@@ -31,7 +36,12 @@ describe("root timeline display data", () => {
       "agriculture-emerges-in-southwest-asia",
       "catalhoyuk-settled-farming-community",
       "jericho-ritual-community",
+      "cuneiform-writing-emerges",
       "stonehenge-begins",
+      "great-pyramid-of-giza-completed",
+      "sargon-of-akkad-builds-an-empire",
+      "hammurabi-promulgates-his-laws",
+      "earliest-attested-chinese-writing",
       "bronze-age-collapse",
       "alexander-dies-hellenistic-age-begins",
       "caesar-crosses-the-rubicon",
@@ -75,6 +85,8 @@ describe("root timeline display data", () => {
       "mesopotamia",
       "indus-valley-civilization",
       "ancient-egypt",
+      "hittite-empire",
+      "mycenaean-greece",
       "ancient-greece",
       "achaemenid-persia",
       "roman-republic",
@@ -91,7 +103,7 @@ describe("root timeline display data", () => {
       "inca-empire",
     ]);
 
-    for (const band of TIMELINE_DISPLAY.overlays) {
+    for (const band of flattenOverlayBands(TIMELINE_DISPLAY.overlays)) {
       for (const reference of band.sourceRefs ?? []) {
         expect(ERA_SOURCES[reference.sourceId]).toBeDefined();
       }
@@ -103,6 +115,17 @@ describe("root timeline display data", () => {
           index === 0 || bands[index - 1].startYear <= band.startYear,
       ),
     ).toBe(true);
+
+    expect(
+      TIMELINE_DISPLAY.overlays.find((band) => band.id === "mesopotamia")
+        ?.children?.map((band) => band.id),
+    ).toEqual([
+      "sumerian-city-states",
+      "akkadian-empire",
+      "old-babylonian-empire",
+      "neo-assyrian-empire",
+      "neo-babylonian-empire",
+    ]);
   });
 
   it("keeps the flattened root era child chronology stitched in the expected order", () => {

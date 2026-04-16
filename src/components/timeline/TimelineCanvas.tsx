@@ -1,11 +1,11 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
   type CSSProperties,
   type PointerEvent,
-  type WheelEvent,
 } from "react";
 import {
   formatTimelineDateLabel,
@@ -49,6 +49,7 @@ import {
 import {
   getVisibleTimelineMarkers,
   resolveTimelineOverlayTracks,
+  type ResolvedTimelineOverlayBand,
 } from "../../lib/time/overlayTracks";
 import {
   getVisibleMarkerPositions,
@@ -87,6 +88,9 @@ type TimelineCanvasProps = {
 type DragState = {
   pointerId: number;
   lastX: number;
+  startX: number;
+  startY: number;
+  moved: boolean;
 };
 
 type TimelineCanvasLayout = {
@@ -142,6 +146,16 @@ type HoverRegion = {
   tooltip: TimelineTooltipContent;
 };
 
+type OverlayInteractionRegion = {
+  id: string;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+  role: "parent" | "child" | "panel";
+  parentId?: string;
+};
+
 type HoveredTooltipState = {
   id: string;
   anchorX: number;
@@ -155,6 +169,21 @@ type MarkerPriorityBoostState = {
   target: number;
 };
 
+type ExpandedOverlayChild = {
+  band: TimelineOverlayBand;
+  laneIndex: number;
+  x0: number;
+  x1: number;
+};
+
+type ExpandedOverlayDetail = {
+  parent: ResolvedTimelineOverlayBand;
+  children: ExpandedOverlayChild[];
+  laneCount: number;
+  panelWidth: number;
+  headerText: string;
+};
+
 type RgbaColor = {
   r: number;
   g: number;
@@ -166,6 +195,7 @@ const PAD = 120;
 const OVERLAY_LANE_HEIGHT = 16;
 const OVERLAY_LANE_GAP = 8;
 const OVERLAY_PANEL_GAP = 56;
+const EXPANDED_OVERLAY_VERTICAL_PADDING = 6;
 const AXIS_LABEL_OCCUPIED_PADDING = 28;
 const AXIS_LABEL_CLEARANCE_FADE_START = -14;
 const AXIS_LABEL_CLEARANCE_FADE_END = 40;
@@ -173,12 +203,20 @@ const AXIS_DUPLICATE_LABEL_MIN_GAP = 18;
 const AXIS_TICK_ANIMATION_SMOOTHING_MS = 110;
 const ERA_CHILD_TRANSITION_DURATION_MS = 220;
 const MARKER_PRIORITY_BOOST_SMOOTHING_MS = 130;
+const EXPANDED_OVERLAY_ANIMATION_SMOOTHING_MS = 140;
 const AXIS_LABEL_SECONDARY_STEP_RATIO = 0.82;
+const ERA_BAND_ALPHA = 0.3;
+const OVERLAY_BAND_ALPHA = 0.9;
+const EXPANDED_OVERLAY_BODY_ALPHA = 0.1;
+const EXPANDED_OVERLAY_BORDER_ALPHA = 0.34;
+const PARENT_ERA_TINT_ALPHA = 0.05;
+const MIN_VISIBLE_OVERLAY_CHILD_WIDTH = 1;
 const DARK_OVERLAY_LABEL: RgbaColor = { r: 34, g: 26, b: 19, a: 1 };
 const LIGHT_OVERLAY_LABEL: RgbaColor = { r: 252, g: 248, b: 241, a: 1 };
 const TOOLTIP_OFFSET = 3;
 const TOOLTIP_MAX_WIDTH = 280;
 const TOOLTIP_BRIDGE_BASE_HALF_WIDTH = 16;
+const CLICK_DRAG_THRESHOLD = 6;
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));
@@ -349,6 +387,124 @@ function getOverlayLaneY(layout: TimelineCanvasLayout, laneIndex: number) {
     OVERLAY_LANE_HEIGHT -
     laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP)
   );
+}
+
+function getOverlayExpansionShift(
+  laneIndex: number,
+  expandedOverlayDetail: ExpandedOverlayDetail | null,
+  expandedOverlayAnimatedHeight: number,
+) {
+  if (
+    !expandedOverlayDetail ||
+    expandedOverlayAnimatedHeight <= 0.01 ||
+    laneIndex < expandedOverlayDetail.parent.laneIndex
+  ) {
+    return 0;
+  }
+
+  return expandedOverlayAnimatedHeight;
+}
+
+function getExpandedOverlayPanelHeight(detail: ExpandedOverlayDetail | null) {
+  if (!detail) {
+    return 0;
+  }
+
+  return (
+    EXPANDED_OVERLAY_VERTICAL_PADDING * 2 +
+    detail.laneCount * OVERLAY_LANE_HEIGHT +
+    Math.max(detail.laneCount - 1, 0) * OVERLAY_LANE_GAP
+  );
+}
+
+function compareOverlayBands(
+  left: TimelineOverlayBand,
+  right: TimelineOverlayBand,
+) {
+  return (
+    left.startYear - right.startYear ||
+    left.endYear - right.endYear ||
+    (right.priority ?? 0) - (left.priority ?? 0) ||
+    left.id.localeCompare(right.id)
+  );
+}
+
+function assignNestedOverlayLanes(overlays: TimelineOverlayBand[]) {
+  const laneEndYears: number[] = [];
+  const assigned = [...overlays].sort(compareOverlayBands).map((band) => {
+    let laneIndex = laneEndYears.findIndex(
+      (laneEndYear) => band.startYear >= laneEndYear,
+    );
+
+    if (laneIndex === -1) {
+      laneIndex = laneEndYears.length;
+      laneEndYears.push(band.endYear);
+    } else {
+      laneEndYears[laneIndex] = band.endYear;
+    }
+
+    return {
+      band,
+      laneIndex,
+    };
+  });
+
+  return {
+    assigned,
+    laneCount: Math.max(laneEndYears.length, 1),
+  };
+}
+
+function resolveExpandedOverlayDetail(
+  expandedOverlayId: string | null,
+  resolvedOverlayBands: ResolvedTimelineOverlayBand[],
+  viewport: TimelineViewport,
+  width: number,
+  pad: number,
+): ExpandedOverlayDetail | null {
+  if (!expandedOverlayId || width <= pad * 2) {
+    return null;
+  }
+
+  const parent = resolvedOverlayBands.find(
+    ({ band }) =>
+      band.id === expandedOverlayId && (band.children?.length ?? 0) > 0,
+  );
+
+  if (!parent?.band.children?.length) {
+    return null;
+  }
+
+  const innerWidth = width - pad * 2;
+  const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
+  const { assigned, laneCount } = assignNestedOverlayLanes(
+    parent.band.children,
+  );
+  const children = assigned
+    .filter(
+      ({ band }) =>
+        band.endYear >= visibleStart && band.startYear <= visibleEnd,
+    )
+    .map(({ band, laneIndex }) => ({
+      band,
+      laneIndex,
+      x0: pad + worldToScreen(band.startYear, viewport, innerWidth),
+      x1: pad + worldToScreen(band.endYear, viewport, innerWidth),
+    }));
+
+  if (children.length === 0) {
+    return null;
+  }
+
+  const panelWidth = Math.min(Math.max(parent.renderWidth, 1), width - pad * 2);
+
+  return {
+    parent,
+    children,
+    laneCount,
+    panelWidth,
+    headerText: `${parent.band.label} · major polities`,
+  };
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -621,6 +777,7 @@ export function TimelineCanvas({
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const dragStateRef = useRef<DragState | null>(null);
   const hoverRegionsRef = useRef<HoverRegion[]>([]);
+  const overlayInteractionRegionsRef = useRef<OverlayInteractionRegion[]>([]);
   const hoveredTooltipRef = useRef<HoveredTooltipState | null>(null);
   const lastPointerRef = useRef<{
     x: number;
@@ -643,6 +800,10 @@ export function TimelineCanvas({
   );
   const markerPriorityBoostFrameRef = useRef(0);
   const markerPriorityBoostLastTimeRef = useRef(0);
+  const expandedOverlayAnimationFrameRef = useRef(0);
+  const expandedOverlayAnimationLastTimeRef = useRef(0);
+  const expandedOverlayProgressRef = useRef(0);
+  const renderedExpandedOverlayIdRef = useRef<string | null>(null);
   const [axisTickAnimationVersion, setAxisTickAnimationVersion] = useState(0);
   const [markerPriorityBoostVersion, setMarkerPriorityBoostVersion] =
     useState(0);
@@ -650,6 +811,13 @@ export function TimelineCanvas({
     useState<ReadonlyMap<string, number>>(new Map());
   const [hoveredTooltip, setHoveredTooltip] =
     useState<HoveredTooltipState | null>(null);
+  const [expandedOverlayId, setExpandedOverlayId] = useState<string | null>(
+    null,
+  );
+  const [renderedExpandedOverlayId, setRenderedExpandedOverlayId] = useState<
+    string | null
+  >(null);
+  const [expandedOverlayProgress, setExpandedOverlayProgress] = useState(0);
   useEffect(() => {
     hoveredTooltipRef.current = hoveredTooltip;
   }, [hoveredTooltip]);
@@ -763,6 +931,36 @@ export function TimelineCanvas({
       tooltip: selectedRegion.tooltip,
     } satisfies HoveredTooltipState;
   };
+  const resolveOverlayInteractionRegion = (x: number, y: number) => {
+    const rolePriority = {
+      child: 0,
+      parent: 1,
+      panel: 2,
+    } as const;
+
+    return overlayInteractionRegionsRef.current
+      .filter(
+        (region) =>
+          x >= region.left &&
+          x <= region.right &&
+          y >= region.top &&
+          y <= region.bottom,
+      )
+      .sort((left, right) => {
+        const leftPriority = rolePriority[left.role];
+        const rightPriority = rolePriority[right.role];
+
+        if (leftPriority !== rightPriority) {
+          return leftPriority - rightPriority;
+        }
+
+        const leftArea = (left.right - left.left) * (left.bottom - left.top);
+        const rightArea =
+          (right.right - right.left) * (right.bottom - right.top);
+
+        return leftArea - rightArea;
+      })[0];
+  };
   const resolvedEraLayers = useMemo(
     () =>
       resolveTimelineEraLayersFromOpacityMap(
@@ -792,6 +990,31 @@ export function TimelineCanvas({
     PAD,
   );
   const overlayLaneCount = resolvedOverlayBands[0]?.laneCount ?? 0;
+  const visibleExpandedOverlayId =
+    renderedExpandedOverlayId &&
+    resolvedOverlayBands.some(
+      ({ band }) =>
+        band.id === renderedExpandedOverlayId &&
+        (band.children?.length ?? 0) > 0,
+    )
+      ? renderedExpandedOverlayId
+      : null;
+  const expandedOverlayDetail = useMemo(
+    () =>
+      resolveExpandedOverlayDetail(
+        visibleExpandedOverlayId,
+        resolvedOverlayBands,
+        viewport,
+        width,
+        PAD,
+      ),
+    [resolvedOverlayBands, viewport, visibleExpandedOverlayId, width],
+  );
+  const expandedOverlayBodyHeight = getExpandedOverlayPanelHeight(
+    expandedOverlayDetail,
+  );
+  const expandedOverlayAnimatedHeight =
+    expandedOverlayBodyHeight * expandedOverlayProgress;
   const previewCandidates = useMemo(
     () =>
       siblingEras.some((era) => era.id === activeEra.id)
@@ -863,7 +1086,6 @@ export function TimelineCanvas({
       for (const era of eras) {
         if (era.children?.length) {
           activeIds.add(era.id);
-          const existing = animationStates.get(era.id);
           const nextTarget = getEraChildOpacityTarget(
             era,
             activeEra.id,
@@ -871,8 +1093,10 @@ export function TimelineCanvas({
             width,
             PAD,
             isAnimating,
-            existing?.target ?? 0,
+            animationStates.get(era.id)?.target ?? 0,
           );
+
+          const existing = animationStates.get(era.id);
 
           if (existing) {
             if (existing.target !== nextTarget) {
@@ -946,8 +1170,7 @@ export function TimelineCanvas({
       setAnimatedEraChildOpacityById(createSnapshot());
 
       if (hasActiveAnimation) {
-        eraChildAnimationFrameRef.current =
-          requestAnimationFrame(stepAnimation);
+        eraChildAnimationFrameRef.current = requestAnimationFrame(stepAnimation);
       } else {
         eraChildAnimationFrameRef.current = 0;
       }
@@ -1076,6 +1299,70 @@ export function TimelineCanvas({
   }, [axisTickTargets]);
 
   useEffect(() => {
+    if (expandedOverlayId) {
+      renderedExpandedOverlayIdRef.current = expandedOverlayId;
+    }
+
+    const target = expandedOverlayId ? 1 : 0;
+
+    const stepAnimation = (now: number) => {
+      if (
+        expandedOverlayId &&
+        renderedExpandedOverlayId !== renderedExpandedOverlayIdRef.current
+      ) {
+        setRenderedExpandedOverlayId(renderedExpandedOverlayIdRef.current);
+      }
+
+      const lastTime = expandedOverlayAnimationLastTimeRef.current || now;
+      const dt = Math.max(now - lastTime, 0);
+      expandedOverlayAnimationLastTimeRef.current = now;
+      const factor =
+        1 - Math.exp(-dt / EXPANDED_OVERLAY_ANIMATION_SMOOTHING_MS);
+      const current = expandedOverlayProgressRef.current;
+      let next = current + (target - current) * factor;
+
+      if (Math.abs(target - next) <= 0.002) {
+        next = target;
+      }
+
+      expandedOverlayProgressRef.current = next;
+      setExpandedOverlayProgress(next);
+
+      if (!expandedOverlayId && next <= 0.003) {
+        expandedOverlayProgressRef.current = 0;
+        setExpandedOverlayProgress(0);
+
+        if (renderedExpandedOverlayIdRef.current !== null) {
+          renderedExpandedOverlayIdRef.current = null;
+          setRenderedExpandedOverlayId(null);
+        }
+      }
+
+      if (Math.abs(target - next) > 0.002) {
+        expandedOverlayAnimationFrameRef.current =
+          requestAnimationFrame(stepAnimation);
+      } else {
+        expandedOverlayAnimationFrameRef.current = 0;
+      }
+    };
+
+    if (expandedOverlayAnimationFrameRef.current) {
+      cancelAnimationFrame(expandedOverlayAnimationFrameRef.current);
+    }
+
+    expandedOverlayAnimationLastTimeRef.current = performance.now();
+    expandedOverlayAnimationFrameRef.current =
+      requestAnimationFrame(stepAnimation);
+
+    return () => {
+      if (expandedOverlayAnimationFrameRef.current) {
+        cancelAnimationFrame(expandedOverlayAnimationFrameRef.current);
+        expandedOverlayAnimationFrameRef.current = 0;
+      }
+    };
+  }, [expandedOverlayId, renderedExpandedOverlayId]);
+
+  useEffect(() => {
     return () => {
       if (eraChildAnimationFrameRef.current) {
         cancelAnimationFrame(eraChildAnimationFrameRef.current);
@@ -1085,6 +1372,9 @@ export function TimelineCanvas({
       }
       if (markerPriorityBoostFrameRef.current) {
         cancelAnimationFrame(markerPriorityBoostFrameRef.current);
+      }
+      if (expandedOverlayAnimationFrameRef.current) {
+        cancelAnimationFrame(expandedOverlayAnimationFrameRef.current);
       }
     };
   }, []);
@@ -1124,6 +1414,7 @@ export function TimelineCanvas({
       breadcrumbChain.slice(1).map((era) => era.id),
     );
     const hoverRegions: HoverRegion[] = [];
+    const overlayInteractionRegions: OverlayInteractionRegion[] = [];
     const resolvedAxisTickStates = [...axisTickAnimationRef.current.values()]
       .filter((tick) => tick.visibleProgress > 0.01 || tick.labelOpacity > 0.01)
       .sort((left, right) => left.step - right.step || left.year - right.year);
@@ -1141,9 +1432,12 @@ export function TimelineCanvas({
     context.fillRect(0, 0, width, height);
 
     // Parent era tint in gaps between child era bands
-    if (parentEra && parentEra.color !== "rgba(0, 0, 0, 0)") {
-      const tintColor = parentEra.color.replace(/[\d.]+\)$/, "0.06)");
-      context.fillStyle = tintColor;
+    const parentTintColor = parentEra ? parseColor(parentEra.color) : null;
+
+    if (parentTintColor && parentTintColor.a > 0.001) {
+      context.fillStyle = toCssColor(
+        withAlpha(parentTintColor, PARENT_ERA_TINT_ALPHA),
+      );
       context.fillRect(pad, 0, innerWidth, height);
     }
 
@@ -1160,7 +1454,7 @@ export function TimelineCanvas({
       if (x1 < pad || x0 > width - pad || eraWidth < 2) return;
 
       context.save();
-      context.globalAlpha = opacity;
+      context.globalAlpha = opacity * ERA_BAND_ALPHA;
       context.fillStyle = era.color;
       context.fillRect(clippedLeft, 0, clippedRight - clippedLeft, height);
       context.restore();
@@ -1191,14 +1485,14 @@ export function TimelineCanvas({
 
     if (resolvedOverlayBands.length > 0) {
       for (const overlay of resolvedOverlayBands) {
-        const progress = overlay.visibilityProgress * overlay.renderOpacity;
-
-        if (progress <= 0.01) {
-          continue;
-        }
-
         const bandWidth = overlay.renderWidth;
-        const y = getOverlayLaneY(layout, overlay.laneIndex);
+        const y =
+          getOverlayLaneY(layout, overlay.laneIndex) -
+          getOverlayExpansionShift(
+            overlay.laneIndex,
+            expandedOverlayDetail,
+            expandedOverlayAnimatedHeight,
+          );
 
         hoverRegions.push({
           id: overlay.band.id,
@@ -1213,8 +1507,27 @@ export function TimelineCanvas({
           tooltip: getOverlayTooltipContent(overlay.band),
         });
 
+        if ((overlay.band.children?.length ?? 0) > 0) {
+          overlayInteractionRegions.push({
+            id: overlay.band.id,
+            left: overlay.renderX,
+            right: overlay.renderX + bandWidth,
+            top: y - 4,
+            bottom: y + OVERLAY_LANE_HEIGHT + 4,
+            role: "parent",
+          });
+        }
+
         context.save();
-        context.globalAlpha = 0.92 * progress;
+        const overlayBandOpacity = OVERLAY_BAND_ALPHA;
+        const overlayLabelPaint = getOverlayLabelPaint(
+          overlay.band.color,
+          overlayBandOpacity,
+          labelColor,
+          paper,
+        );
+
+        context.globalAlpha = overlayBandOpacity;
         context.fillStyle = overlay.band.color;
         context.fillRect(overlay.renderX, y, bandWidth, OVERLAY_LANE_HEIGHT);
         context.strokeStyle = lineSoft;
@@ -1244,16 +1557,8 @@ export function TimelineCanvas({
             : 0;
 
         if (chosenLabel && labelOpacity > 0.01) {
-          const overlayBandOpacity = 0.92 * progress;
-          const overlayLabelPaint = getOverlayLabelPaint(
-            overlay.band.color,
-            overlayBandOpacity,
-            labelColor,
-            paper,
-          );
-
           context.fillStyle = overlayLabelPaint.fillStyle;
-          context.globalAlpha = 0.82 * progress * labelOpacity;
+          context.globalAlpha = 0.82 * labelOpacity;
           context.textAlign = "center";
           context.textBaseline = "middle";
           context.fillText(
@@ -1263,8 +1568,230 @@ export function TimelineCanvas({
           );
         }
 
+        if ((overlay.band.children?.length ?? 0) > 0) {
+          const indicatorOpacity = clamp01((bandWidth - 26) / 18);
+
+          if (indicatorOpacity > 0.01) {
+            const indicatorCenterX = overlay.renderX + bandWidth - 10;
+            const indicatorCenterY = y + OVERLAY_LANE_HEIGHT / 2;
+
+            context.strokeStyle = overlayLabelPaint.fillStyle;
+            context.globalAlpha = 0.74 * indicatorOpacity;
+            context.lineWidth = 1.4;
+            context.beginPath();
+
+            if (visibleExpandedOverlayId === overlay.band.id) {
+              context.moveTo(indicatorCenterX - 3.5, indicatorCenterY + 1.5);
+              context.lineTo(indicatorCenterX, indicatorCenterY - 1.5);
+              context.lineTo(indicatorCenterX + 3.5, indicatorCenterY + 1.5);
+            } else {
+              context.moveTo(indicatorCenterX - 3.5, indicatorCenterY - 1.5);
+              context.lineTo(indicatorCenterX, indicatorCenterY + 1.5);
+              context.lineTo(indicatorCenterX + 3.5, indicatorCenterY - 1.5);
+            }
+
+            context.stroke();
+          }
+        }
+
         context.restore();
       }
+    }
+
+    if (expandedOverlayDetail && expandedOverlayAnimatedHeight > 0.5) {
+      const panelHeight = expandedOverlayAnimatedHeight;
+      const baseParentY = getOverlayLaneY(
+        layout,
+        expandedOverlayDetail.parent.laneIndex,
+      );
+      const parentY =
+        baseParentY -
+        getOverlayExpansionShift(
+          expandedOverlayDetail.parent.laneIndex,
+          expandedOverlayDetail,
+          expandedOverlayAnimatedHeight,
+        );
+      const panelTop = parentY + OVERLAY_LANE_HEIGHT;
+      const panelBottom = baseParentY + OVERLAY_LANE_HEIGHT;
+      const panelLeft = expandedOverlayDetail.parent.renderX;
+      const panelRight = panelLeft + expandedOverlayDetail.panelWidth;
+      const panelInnerLeft = panelLeft;
+      const panelInnerRight = panelRight;
+      const parentColor = parseColor(
+        expandedOverlayDetail.parent.band.color,
+      ) ?? {
+        r: 180,
+        g: 120,
+        b: 70,
+        a: 1,
+      };
+      const panelFill = toCssColor(
+        withAlpha(parentColor, EXPANDED_OVERLAY_BODY_ALPHA),
+      );
+      const panelBorder = toCssColor(
+        withAlpha(parentColor, EXPANDED_OVERLAY_BORDER_ALPHA),
+      );
+
+      overlayInteractionRegions.push({
+        id: expandedOverlayDetail.parent.band.id,
+        left: panelLeft,
+        right: panelRight,
+        top: panelTop,
+        bottom: panelBottom,
+        role: "panel",
+        parentId: expandedOverlayDetail.parent.band.id,
+      });
+
+      context.save();
+      context.fillStyle = panelFill;
+      context.fillRect(
+        panelLeft,
+        panelTop,
+        expandedOverlayDetail.panelWidth,
+        panelHeight,
+      );
+      context.restore();
+
+      context.save();
+      context.beginPath();
+      context.rect(
+        panelLeft,
+        parentY,
+        expandedOverlayDetail.panelWidth,
+        OVERLAY_LANE_HEIGHT + panelHeight,
+      );
+      context.clip();
+      context.strokeStyle = panelBorder;
+      context.lineWidth = 1;
+      context.strokeRect(
+        panelLeft,
+        parentY,
+        expandedOverlayDetail.panelWidth,
+        OVERLAY_LANE_HEIGHT + panelHeight,
+      );
+      context.restore();
+
+      context.save();
+      context.beginPath();
+      context.rect(
+        panelLeft,
+        panelTop,
+        expandedOverlayDetail.panelWidth,
+        panelHeight,
+      );
+      context.clip();
+      context.strokeStyle = panelBorder;
+      context.lineWidth = 1;
+      context.beginPath();
+      context.moveTo(panelLeft, panelTop);
+      context.lineTo(panelRight, panelTop);
+      context.stroke();
+
+      for (const child of expandedOverlayDetail.children) {
+        const clippedX0 = Math.max(child.x0, panelInnerLeft);
+        const clippedX1 = Math.min(child.x1, panelInnerRight);
+        const clippedWidth = Math.max(clippedX1 - clippedX0, 0);
+        if (clippedWidth < MIN_VISIBLE_OVERLAY_CHILD_WIDTH) {
+          continue;
+        }
+
+        const renderWidth = clippedWidth;
+        const renderX = clippedX0;
+        const childY =
+          panelTop +
+          EXPANDED_OVERLAY_VERTICAL_PADDING +
+          child.laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP);
+        const childRenderY = childY;
+        const childBandOpacity = OVERLAY_BAND_ALPHA;
+        const childLabelPaint = getOverlayLabelPaint(
+          child.band.color,
+          childBandOpacity,
+          labelColor,
+          paper,
+        );
+
+        overlayInteractionRegions.push({
+          id: child.band.id,
+          left: renderX,
+          right: renderX + renderWidth,
+          top: childRenderY - 3,
+          bottom: childRenderY + OVERLAY_LANE_HEIGHT + 3,
+          role: "child",
+          parentId: expandedOverlayDetail.parent.band.id,
+        });
+
+        hoverRegions.push({
+          id: child.band.id,
+          left: renderX,
+          right: renderX + renderWidth,
+          top: childRenderY - 4,
+          bottom: childRenderY + OVERLAY_LANE_HEIGHT + 4,
+          anchorX: renderX + renderWidth / 2,
+          anchorY: childRenderY + 2,
+          anchorMode: "follow-x",
+          placement: "above",
+          tooltip: getOverlayTooltipContent(child.band),
+        });
+
+        context.save();
+        context.globalAlpha = childBandOpacity;
+        context.fillStyle = child.band.color;
+        context.fillRect(
+          renderX,
+          childRenderY,
+          renderWidth,
+          OVERLAY_LANE_HEIGHT,
+        );
+        context.strokeStyle = panelBorder;
+        context.lineWidth = 1;
+        context.strokeRect(
+          renderX,
+          childRenderY,
+          renderWidth,
+          OVERLAY_LANE_HEIGHT,
+        );
+
+        const fullLabel = child.band.label;
+        const shortLabel = child.band.shortLabel ?? fullLabel;
+        context.font = "11px var(--font-sans)";
+        const fullLabelWidth = context.measureText(fullLabel).width;
+        const shortLabelWidth =
+          shortLabel === fullLabel
+            ? fullLabelWidth
+            : context.measureText(shortLabel).width;
+        const chosenLabel =
+          fullLabelWidth <= Math.max(renderWidth - 10, 0)
+            ? fullLabel
+            : shortLabelWidth <= Math.max(renderWidth - 10, 0)
+              ? shortLabel
+              : "";
+        const chosenLabelWidth =
+          chosenLabel === fullLabel
+            ? fullLabelWidth
+            : chosenLabel === shortLabel
+              ? shortLabelWidth
+              : 0;
+        const labelOpacity =
+          chosenLabelWidth > 0
+            ? clamp01((renderWidth - (chosenLabelWidth + 8)) / 20)
+            : 0;
+
+        if (chosenLabel && labelOpacity > 0.01) {
+          context.fillStyle = childLabelPaint.fillStyle;
+          context.globalAlpha = 0.8 * labelOpacity;
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillText(
+            chosenLabel,
+            renderX + renderWidth / 2,
+            childRenderY + OVERLAY_LANE_HEIGHT / 2,
+          );
+        }
+
+        context.restore();
+      }
+
+      context.restore();
     }
 
     // Timeline breadcrumb (centered)
@@ -2012,6 +2539,7 @@ export function TimelineCanvas({
     }
 
     hoverRegionsRef.current = hoverRegions;
+    overlayInteractionRegionsRef.current = overlayInteractionRegions;
 
     if (lastPointerRef.current && !dragStateRef.current) {
       const currentTooltip = hoveredTooltipRef.current;
@@ -2063,6 +2591,10 @@ export function TimelineCanvas({
   }, [
     activeEra,
     activeChain,
+    expandedOverlayDetail,
+    expandedOverlayAnimatedHeight,
+    expandedOverlayProgress,
+    visibleExpandedOverlayId,
     breadcrumbChain,
     height,
     overlayLaneCount,
@@ -2157,27 +2689,51 @@ export function TimelineCanvas({
     };
   }, [width, viewport, onAnimateZoom, onViewportChange]);
 
-  const handleWheel = (event: WheelEvent<HTMLCanvasElement>) => {
-    if (!width) return;
+  const handleWheel = useCallback(
+    (event: globalThis.WheelEvent, canvas: HTMLCanvasElement) => {
+      if (!width) return;
 
-    event.preventDefault();
-    const rect = event.currentTarget.getBoundingClientRect();
-    const localX = event.clientX - rect.left;
-    const anchorX = getZoomAnchorForCanvasX(localX, width, PAD);
-    const innerW = width - PAD * 2;
-    const horizontalIntent = Math.abs(event.deltaX) > Math.abs(event.deltaY);
+      if (event.cancelable) {
+        event.preventDefault();
+      }
 
-    if (horizontalIntent) {
-      onViewportChange((current) =>
-        panByPixels(current, -event.deltaX, innerW),
-      );
+      const rect = canvas.getBoundingClientRect();
+      const localX = event.clientX - rect.left;
+      const anchorX = getZoomAnchorForCanvasX(localX, width, PAD);
+      const innerW = width - PAD * 2;
+      const horizontalIntent = Math.abs(event.deltaX) > Math.abs(event.deltaY);
+
+      if (horizontalIntent) {
+        onViewportChange((current) =>
+          panByPixels(current, -event.deltaX, innerW),
+        );
+        return;
+      }
+
+      // Use animated zoom for smooth feel
+      const zoomDelta = -event.deltaY * 0.003;
+      onAnimateZoom(zoomDelta, anchorX);
+    },
+    [width, onAnimateZoom, onViewportChange],
+  );
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+
+    if (!canvas || !width) {
       return;
     }
 
-    // Use animated zoom for smooth feel
-    const zoomDelta = -event.deltaY * 0.003;
-    onAnimateZoom(zoomDelta, anchorX);
-  };
+    const handleNativeWheel = (event: globalThis.WheelEvent) => {
+      handleWheel(event, canvas);
+    };
+
+    canvas.addEventListener("wheel", handleNativeWheel, { passive: false });
+
+    return () => {
+      canvas.removeEventListener("wheel", handleNativeWheel);
+    };
+  }, [handleWheel, width]);
 
   const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     event.preventDefault();
@@ -2186,6 +2742,9 @@ export function TimelineCanvas({
     dragStateRef.current = {
       pointerId: event.pointerId,
       lastX: event.clientX,
+      startX: event.clientX,
+      startY: event.clientY,
+      moved: false,
     };
 
     event.currentTarget.focus();
@@ -2197,6 +2756,15 @@ export function TimelineCanvas({
     if (!dragState || dragState.pointerId !== event.pointerId || !width) return;
 
     const deltaX = event.clientX - dragState.lastX;
+    const dragDistance = Math.hypot(
+      event.clientX - dragState.startX,
+      event.clientY - dragState.startY,
+    );
+
+    if (!dragState.moved && dragDistance > CLICK_DRAG_THRESHOLD) {
+      dragState.moved = true;
+    }
+
     dragStateRef.current = { ...dragState, lastX: event.clientX };
 
     onRecordDragSample(deltaX);
@@ -2206,8 +2774,36 @@ export function TimelineCanvas({
 
   const handlePointerUp = (event: PointerEvent<HTMLCanvasElement>) => {
     if (dragStateRef.current?.pointerId === event.pointerId) {
+      const dragState = dragStateRef.current;
+      const wasClick =
+        !dragState.moved &&
+        Math.hypot(
+          event.clientX - dragState.startX,
+          event.clientY - dragState.startY,
+        ) <= CLICK_DRAG_THRESHOLD;
+
       dragStateRef.current = null;
       onReleaseMomentum();
+
+      if (wasClick) {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const clickedRegion = resolveOverlayInteractionRegion(
+          event.clientX - rect.left,
+          event.clientY - rect.top,
+        );
+
+        if (clickedRegion?.role === "parent") {
+          setExpandedOverlayId((current) =>
+            current === clickedRegion.id ? null : clickedRegion.id,
+          );
+        } else if (clickedRegion?.role === "child") {
+          setExpandedOverlayId(clickedRegion.parentId ?? clickedRegion.id);
+        } else if (clickedRegion?.role === "panel") {
+          setExpandedOverlayId(clickedRegion.parentId ?? clickedRegion.id);
+        } else {
+          setExpandedOverlayId(null);
+        }
+      }
     }
 
     event.currentTarget.releasePointerCapture(event.pointerId);
@@ -2379,7 +2975,6 @@ export function TimelineCanvas({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        onWheel={handleWheel}
         onDoubleClick={handleDoubleClick}
         ref={canvasRef}
         tabIndex={0}

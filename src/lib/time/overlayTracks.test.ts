@@ -79,7 +79,6 @@ describe("timeline overlay tracks", () => {
     expect(resolved.map((band) => band.band.id)).toEqual(["a", "b", "c"]);
     expect(resolved.map((band) => band.laneIndex)).toEqual([0, 1, 0]);
     expect(resolved.every((band) => band.laneCount === 2)).toBe(true);
-    expect(resolved.every((band) => band.visibilityProgress === 1)).toBe(true);
   });
 
   it("keeps lane count stable even when only a subset is visible", () => {
@@ -120,7 +119,7 @@ describe("timeline overlay tracks", () => {
     expect(resolved[0].laneCount).toBe(2);
   });
 
-  it("renders technically visible overlays at a minimum width of one pixel", () => {
+  it("renders overlays at their exact clipped width once they cross the visibility threshold", () => {
     const width = 1000;
     const pad = 100;
     const overlays: TimelineOverlayBand[] = [
@@ -142,7 +141,7 @@ describe("timeline overlay tracks", () => {
 
     expect(resolved).toHaveLength(1);
     expect(resolved[0].renderWidth).toBeGreaterThanOrEqual(1);
-    expect(resolved[0].renderOpacity).toBeGreaterThan(0);
+    expect(resolved[0].renderWidth).toBe(resolved[0].visibleWidth);
   });
 
   it("hides overlays once they fall below the tiny-width threshold", () => {
@@ -168,7 +167,7 @@ describe("timeline overlay tracks", () => {
     expect(resolved).toHaveLength(0);
   });
 
-  it("eases overlay visibility in near the zoom threshold", () => {
+  it("switches overlay visibility on cleanly at the zoom threshold", () => {
     const width = 1000;
     const pad = 100;
     const overlays: TimelineOverlayBand[] = [
@@ -182,32 +181,30 @@ describe("timeline overlay tracks", () => {
       },
     ];
 
-    const earlyViewport = {
+    const hiddenViewport = {
       centerYear: -3000,
       zoom: 19.5,
     };
-    const fullViewport = {
+    const visibleViewport = {
       centerYear: -3000,
       zoom: 20.5,
     };
 
-    const earlyResolved = resolveTimelineOverlayTracks(
+    const hiddenResolved = resolveTimelineOverlayTracks(
       overlays,
-      earlyViewport,
+      hiddenViewport,
       width,
       pad,
     );
-    const fullResolved = resolveTimelineOverlayTracks(
+    const visibleResolved = resolveTimelineOverlayTracks(
       overlays,
-      fullViewport,
+      visibleViewport,
       width,
       pad,
     );
 
-    expect(earlyResolved).toHaveLength(1);
-    expect(earlyResolved[0].visibilityProgress).toBeGreaterThan(0);
-    expect(earlyResolved[0].visibilityProgress).toBeLessThan(1);
-    expect(fullResolved[0].visibilityProgress).toBe(1);
+    expect(hiddenResolved).toHaveLength(0);
+    expect(visibleResolved).toHaveLength(1);
   });
 
   it("keeps the expanded civilization overlays in stable lanes when visible", () => {
@@ -229,6 +226,8 @@ describe("timeline overlay tracks", () => {
       "mesopotamia",
       "indus-valley-civilization",
       "ancient-egypt",
+      "hittite-empire",
+      "mycenaean-greece",
       "ancient-greece",
       "achaemenid-persia",
       "roman-republic",
@@ -236,8 +235,8 @@ describe("timeline overlay tracks", () => {
       "han-china",
       "roman-empire",
     ]);
-    expect(new Set(resolved.map((band) => band.laneIndex)).size).toBe(4);
-    expect(resolved.every((band) => band.laneCount === 4)).toBe(true);
+    expect(new Set(resolved.map((band) => band.laneIndex)).size).toBe(5);
+    expect(resolved.every((band) => band.laneCount === 5)).toBe(true);
   });
 
   it("keeps post-classical overlays in stable lanes around 1100 CE", () => {

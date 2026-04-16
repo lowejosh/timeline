@@ -189,7 +189,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Contemporary History",
       startYear: 1945,
       endYear: CURRENT_YEAR,
-      color: "rgba(0, 120, 100, 0.3)",
+      color: "rgb(0, 120, 100)",
       scheme: "world-history",
       sourceRefs: [{ sourceId: "brivatiContemporary" }],
     },

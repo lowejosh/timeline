@@ -6,8 +6,8 @@ function chartRef(note?: string): EraDefinition["sourceRefs"] {
     : [{ sourceId: "icsChart2024" }];
 }
 
-function icsColor(red: number, green: number, blue: number, alpha = 0.42): string {
-  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+function icsColor(red: number, green: number, blue: number): string {
+  return `rgb(${red}, ${green}, ${blue})`;
 }
 
 const QUATERNARY_TRUNCATION_NOTE =
