@@ -46,6 +46,24 @@ describe("era data", () => {
     });
   });
 
+  it("gives every described era at least one clickable source", () => {
+    walkEraTree(ROOT_ERA, (era) => {
+      if (!era.description) {
+        return;
+      }
+
+      const hasLinkedSource = (era.sourceRefs ?? []).some(
+        (reference) => {
+          const source = ERA_SOURCES[reference.sourceId];
+
+          return "url" in source && Boolean(source.url);
+        },
+      );
+
+      expect(hasLinkedSource).toBe(true);
+    });
+  });
+
   it("includes a sourced prehistory path down to the Neolithic", () => {
     const humanHistory = ROOT_ERA.children?.find((era) => era.id === "human-history");
     const neolithic = humanHistory?.children?.find((era) => era.id === "neolithic");
@@ -131,6 +149,7 @@ describe("era data", () => {
     const humanHistory = ROOT_ERA.children?.find((era) => era.id === "human-history");
     const humanChildIds = humanHistory?.children?.map((era) => era.id) ?? [];
     const bronzeAge = humanHistory?.children?.find((era) => era.id === "bronze-age");
+    const ironAge = humanHistory?.children?.find((era) => era.id === "iron-age");
 
     expect(humanChildIds).toEqual([
       "paleolithic",
@@ -151,6 +170,11 @@ describe("era data", () => {
       "early-bronze-age",
       "middle-bronze-age",
       "late-bronze-age",
+    ]);
+    expect(ironAge?.children?.map((era) => era.id)).toEqual([
+      "early-iron-age",
+      "middle-iron-age",
+      "late-iron-age",
     ]);
   });
 });

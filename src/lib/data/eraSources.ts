@@ -246,6 +246,33 @@ export const ERA_SOURCES = {
     notes:
       "Used for the standard Bronze Age to Iron Age sequence and the regional caveat that dates vary, including across the Middle East.",
   },
+  britannicaIronAge: {
+    shortTitle: "Britannica: Iron Age",
+    title: "Iron Age",
+    organization: "Encyclopaedia Britannica",
+    citation: "Encyclopaedia Britannica, \"Iron Age.\"",
+    url: "https://www.britannica.com/topic/Iron-Age",
+    notes:
+      "Used for broad public-facing Iron Age framing: iron tools and weapons becoming widespread after about 1200 BCE, with regional dates varying.",
+  },
+  britannicaClassicalAntiquity: {
+    shortTitle: "Britannica: Classical antiquity",
+    title: "Classical antiquity",
+    organization: "Encyclopaedia Britannica",
+    citation: "Encyclopaedia Britannica, \"Classical antiquity.\"",
+    url: "https://www.britannica.com/event/classical-antiquity",
+    notes:
+      "Used for the broad Greco-Roman framing of classical antiquity and its influence on Mediterranean law, architecture, philosophy, and urban life.",
+  },
+  britannicaMetallurgy: {
+    shortTitle: "Britannica: Metallurgy",
+    title: "metallurgy",
+    organization: "Encyclopaedia Britannica",
+    citation: "Encyclopaedia Britannica, \"metallurgy.\"",
+    url: "https://www.britannica.com/science/metallurgy",
+    notes:
+      "Used for the iron-metallurgy side of the Iron Age: bloom smelting, repeated reheating and hammering into wrought iron, carburization, and the wider spread of ironworking over time.",
+  },
   britannicaMiddleEast: {
     shortTitle: "Britannica: Middle East",
     title: "Middle East",
@@ -638,6 +665,24 @@ export const ERA_SOURCES = {
     notes:
       "Used for the canonical 1939 start year of World War II.",
   },
+  historyIndustrialRevolution: {
+    shortTitle: "History: Industrial Revolution",
+    title: "Industrial Revolution",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Industrial Revolution."',
+    url: "https://www.history.com/articles/industrial-revolution",
+    notes:
+      "Used for industrialization as a transformation of agrarian societies into industrial and urban ones, driven by factories, steam power, coal, and rail transport.",
+  },
+  historyColdWar: {
+    shortTitle: "History: Cold War",
+    title: "Cold War History",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Cold War History."',
+    url: "https://www.history.com/articles/cold-war-history",
+    notes:
+      "Used for the post-1945 Cold War as a period of geopolitical tension, nuclear rivalry, and space-race competition between blocs led by the United States and Soviet Union.",
+  },
   historyPrintingPress: {
     shortTitle: "History: Printing Press",
     title: "Printing Press",
@@ -655,6 +700,24 @@ export const ERA_SOURCES = {
     url: "https://www.history.com/articles/american-revolution-history",
     notes:
       "Used for the 1776 Declaration of Independence as a concise marker for the American Revolution's political break with Britain.",
+  },
+  natGeoGlobalization: {
+    shortTitle: "NatGeo: Globalization",
+    title: "Globalization",
+    organization: "National Geographic Society",
+    citation: 'National Geographic Society, "Globalization."',
+    url: "https://education.nationalgeographic.org/resource/globalization/",
+    notes:
+      "Used for globalization as increasing connectedness and interdependence, especially through trade, technology, transportation, and the information age.",
+  },
+  unDecolonization: {
+    shortTitle: "UN: Decolonization",
+    title: "Decolonization",
+    organization: "United Nations",
+    citation: 'United Nations, "Decolonization."',
+    url: "https://www.un.org/en/global-issues/decolonization",
+    notes:
+      "Used for decolonization after 1945, including the UN-backed wave of independence and self-determination that reshaped the modern world.",
   },
   britannicaHaitianRevolution: {
     shortTitle: "Britannica: Haitian Revolution",

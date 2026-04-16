@@ -348,8 +348,18 @@ const AXIS_DUPLICATE_LABEL_MIN_GAP = 18;
 const AXIS_TICK_ANIMATION_SMOOTHING_MS = 110;
 const ERA_CHILD_TRANSITION_DURATION_MS = 220;
 const MARKER_PRIORITY_BOOST_SMOOTHING_MS = 130;
-const EXPANDED_OVERLAY_ANIMATION_SMOOTHING_MS = 140;
+const EXPANDED_OVERLAY_ANIMATION_SMOOTHING_MS = 170;
 const CONTEXT_BAND_LABEL_TRANSITION_DURATION_MS = 160;
+const EXPANDED_OVERLAY_CHROME_STEM_REVEAL_END = 0.18;
+const EXPANDED_OVERLAY_CHROME_RAIL_REVEAL_START = 0.1;
+const EXPANDED_OVERLAY_CHROME_RAIL_REVEAL_END = 0.32;
+const EXPANDED_OVERLAY_CHILD_REVEAL_START = 0.16;
+const EXPANDED_OVERLAY_CHILD_LANE_STAGGER = 0.1;
+const EXPANDED_OVERLAY_CHILD_REVEAL_DURATION = 0.52;
+const EXPANDED_OVERLAY_CHILD_SLIDE_PX = 8;
+const EXPANDED_OVERLAY_LABEL_REVEAL_DELAY = 0.18;
+const EXPANDED_OVERLAY_LABEL_REVEAL_DURATION = 0.28;
+const EXPANDED_OVERLAY_INTERACTION_REVEAL_THRESHOLD = 0.35;
 const AXIS_LABEL_SECONDARY_STEP_RATIO = 0.82;
 const ERA_BAND_ALPHA = 0.3;
 const OVERLAY_BAND_ALPHA = 1;
@@ -728,6 +738,57 @@ function clamp01(value: number) {
 function smoothstep01(value: number) {
   const t = clamp01(value);
   return t * t * (3 - 2 * t);
+}
+
+function interpolateProgress(progress: number, start: number, end: number) {
+  if (end <= start) {
+    return progress >= end ? 1 : 0;
+  }
+
+  return smoothstep01((progress - start) / (end - start));
+}
+
+function getExpandedOverlayChromeStemRevealProgress(progress: number) {
+  return interpolateProgress(progress, 0, EXPANDED_OVERLAY_CHROME_STEM_REVEAL_END);
+}
+
+function getExpandedOverlayChromeRailRevealProgress(progress: number) {
+  return interpolateProgress(
+    progress,
+    EXPANDED_OVERLAY_CHROME_RAIL_REVEAL_START,
+    EXPANDED_OVERLAY_CHROME_RAIL_REVEAL_END,
+  );
+}
+
+function getExpandedOverlayChildRevealProgress(
+  progress: number,
+  laneIndex: number,
+) {
+  const start =
+    EXPANDED_OVERLAY_CHILD_REVEAL_START +
+    laneIndex * EXPANDED_OVERLAY_CHILD_LANE_STAGGER;
+
+  return interpolateProgress(
+    progress,
+    start,
+    start + EXPANDED_OVERLAY_CHILD_REVEAL_DURATION,
+  );
+}
+
+function getExpandedOverlayLabelRevealProgress(
+  progress: number,
+  laneIndex: number,
+) {
+  const start =
+    EXPANDED_OVERLAY_CHILD_REVEAL_START +
+    laneIndex * EXPANDED_OVERLAY_CHILD_LANE_STAGGER +
+    EXPANDED_OVERLAY_LABEL_REVEAL_DELAY;
+
+  return interpolateProgress(
+    progress,
+    start,
+    start + EXPANDED_OVERLAY_LABEL_REVEAL_DURATION,
+  );
 }
 
 function makeAxisTickKey(tick: Pick<AxisTickRenderState, "step" | "year">) {
@@ -1441,8 +1502,9 @@ export function TimelineCanvas({
       const expandedOverlayFullHeight = getExpandedOverlayPanelHeight(
         expandedOverlayDetail,
       );
+      const expandedOverlayProgress = expandedOverlayProgressRef.current;
       const expandedOverlayAnimatedHeight =
-        expandedOverlayFullHeight * expandedOverlayProgressRef.current;
+        expandedOverlayFullHeight * expandedOverlayProgress;
       const paper = themeRef.current.paper;
       const paperDeep = themeRef.current.paperDeep;
       const line = themeRef.current.line;
@@ -1731,6 +1793,37 @@ export function TimelineCanvas({
         }
       };
 
+      const drawAnimatedOverlayDisclosureIndicator = ({
+        centerX,
+        centerY,
+        strokeStyle,
+        alpha,
+        progress,
+      }: {
+        centerX: number;
+        centerY: number;
+        strokeStyle: string;
+        alpha: number;
+        progress: number;
+      }) => {
+        const easedProgress = smoothstep01(progress);
+
+        context.save();
+        context.translate(centerX, centerY);
+        context.rotate(Math.PI * easedProgress);
+        context.strokeStyle = strokeStyle;
+        context.globalAlpha = alpha;
+        context.lineWidth = 1.4;
+        context.lineCap = "round";
+        context.lineJoin = "round";
+        context.beginPath();
+        context.moveTo(-3.5, -1.5);
+        context.lineTo(0, 1.5);
+        context.lineTo(3.5, -1.5);
+        context.stroke();
+        context.restore();
+      };
+
       for (const layer of visibleEraLayers) {
         renderEra(layer.era, layer.opacity);
       }
@@ -1800,23 +1893,18 @@ export function TimelineCanvas({
             if (indicatorOpacity > 0.01) {
               const indicatorCenterX = overlay.renderX + bandWidth - 10;
               const indicatorCenterY = y + OVERLAY_LANE_HEIGHT / 2;
+              const indicatorProgress =
+                visibleExpandedOverlayId === overlay.band.id
+                  ? expandedOverlayProgress
+                  : 0;
 
-              context.strokeStyle = overlayLabelPaint.fillStyle;
-              context.globalAlpha = 0.74 * indicatorOpacity;
-              context.lineWidth = 1.4;
-              context.beginPath();
-
-              if (visibleExpandedOverlayId === overlay.band.id) {
-                context.moveTo(indicatorCenterX - 3.5, indicatorCenterY + 1.5);
-                context.lineTo(indicatorCenterX, indicatorCenterY - 1.5);
-                context.lineTo(indicatorCenterX + 3.5, indicatorCenterY + 1.5);
-              } else {
-                context.moveTo(indicatorCenterX - 3.5, indicatorCenterY - 1.5);
-                context.lineTo(indicatorCenterX, indicatorCenterY + 1.5);
-                context.lineTo(indicatorCenterX + 3.5, indicatorCenterY - 1.5);
-              }
-
-              context.stroke();
+              drawAnimatedOverlayDisclosureIndicator({
+                centerX: indicatorCenterX,
+                centerY: indicatorCenterY,
+                strokeStyle: overlayLabelPaint.fillStyle,
+                alpha: 0.74 * indicatorOpacity,
+                progress: indicatorProgress,
+              });
             }
           }
 
@@ -1862,6 +1950,24 @@ export function TimelineCanvas({
           parentY + OVERLAY_LANE_HEIGHT,
           panelTop,
         );
+        const chromeStemReveal = getExpandedOverlayChromeStemRevealProgress(
+          expandedOverlayProgress,
+        );
+        const chromeRailReveal = getExpandedOverlayChromeRailRevealProgress(
+          expandedOverlayProgress,
+        );
+        const revealedStemBottom =
+          connectorGeometry.stemTop +
+          (connectorGeometry.stemBottom - connectorGeometry.stemTop) *
+            chromeStemReveal;
+        const revealedRailLeft =
+          connectorGeometry.stemX +
+          (connectorGeometry.railLeft - connectorGeometry.stemX) *
+            chromeRailReveal;
+        const revealedRailRight =
+          connectorGeometry.stemX +
+          (connectorGeometry.railRight - connectorGeometry.stemX) *
+            chromeRailReveal;
 
         overlayInteractionRegions.push({
           id: expandedOverlayDetail.parent.band.id,
@@ -1877,12 +1983,23 @@ export function TimelineCanvas({
         context.strokeStyle = connectorStroke;
         context.lineWidth = EXPANDED_OVERLAY_CONNECTOR_LINE_WIDTH;
         context.lineCap = "round";
-        context.beginPath();
-        context.moveTo(connectorGeometry.stemX, connectorGeometry.stemTop);
-        context.lineTo(connectorGeometry.stemX, connectorGeometry.stemBottom);
-        context.moveTo(connectorGeometry.railLeft, connectorGeometry.railY);
-        context.lineTo(connectorGeometry.railRight, connectorGeometry.railY);
-        context.stroke();
+
+        if (chromeStemReveal > 0.01) {
+          context.globalAlpha = chromeStemReveal;
+          context.beginPath();
+          context.moveTo(connectorGeometry.stemX, connectorGeometry.stemTop);
+          context.lineTo(connectorGeometry.stemX, revealedStemBottom);
+          context.stroke();
+        }
+
+        if (chromeRailReveal > 0.01) {
+          context.globalAlpha = chromeRailReveal;
+          context.beginPath();
+          context.moveTo(revealedRailLeft, connectorGeometry.railY);
+          context.lineTo(revealedRailRight, connectorGeometry.railY);
+          context.stroke();
+        }
+
         context.restore();
 
         for (const child of expandedOverlayDetail.children) {
@@ -1900,6 +2017,21 @@ export function TimelineCanvas({
             panelTop +
             EXPANDED_OVERLAY_TOP_PADDING +
             child.laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP);
+          const childReveal = getExpandedOverlayChildRevealProgress(
+            expandedOverlayProgress,
+            child.laneIndex,
+          );
+
+          if (childReveal <= 0.01) {
+            continue;
+          }
+
+          const childLabelReveal = getExpandedOverlayLabelRevealProgress(
+            expandedOverlayProgress,
+            child.laneIndex,
+          );
+          const childRenderY =
+            childY - (1 - childReveal) * EXPANDED_OVERLAY_CHILD_SLIDE_PX;
           const childConnectorX = renderX + renderWidth / 2;
           const childBandOpacity = OVERLAY_BAND_ALPHA;
           const childLabelPaint = getOverlayLabelPaint(
@@ -1909,48 +2041,68 @@ export function TimelineCanvas({
             paper,
           );
 
-          overlayInteractionRegions.push({
-            id: child.band.id,
-            left: renderX,
-            right: renderX + renderWidth,
-            top: childY - 3,
-            bottom: childY + OVERLAY_LANE_HEIGHT + 3,
-            role: "child",
-            parentId: expandedOverlayDetail.parent.band.id,
-          });
+          if (childReveal >= EXPANDED_OVERLAY_INTERACTION_REVEAL_THRESHOLD) {
+            overlayInteractionRegions.push({
+              id: child.band.id,
+              left: renderX,
+              right: renderX + renderWidth,
+              top: childRenderY - 3,
+              bottom: childRenderY + OVERLAY_LANE_HEIGHT + 3,
+              role: "child",
+              parentId: expandedOverlayDetail.parent.band.id,
+            });
+          }
 
           context.save();
           context.strokeStyle = connectorStroke;
           context.lineWidth = 1;
           context.lineCap = "round";
+          context.globalAlpha = childReveal;
           context.beginPath();
           context.moveTo(childConnectorX, connectorGeometry.railY);
-          context.lineTo(childConnectorX, childY);
+          context.lineTo(
+            childConnectorX,
+            connectorGeometry.railY +
+              (childRenderY - connectorGeometry.railY) * childReveal,
+          );
           context.stroke();
           context.restore();
 
           context.save();
-          context.globalAlpha = childBandOpacity;
+          context.globalAlpha = childBandOpacity * childReveal;
           context.fillStyle = child.band.color;
-          context.fillRect(renderX, childY, renderWidth, OVERLAY_LANE_HEIGHT);
+          context.fillRect(
+            renderX,
+            childRenderY,
+            renderWidth,
+            OVERLAY_LANE_HEIGHT,
+          );
           context.strokeStyle = childBorder;
           context.lineWidth = 1;
-          context.strokeRect(renderX, childY, renderWidth, OVERLAY_LANE_HEIGHT);
+          context.strokeRect(
+            renderX,
+            childRenderY,
+            renderWidth,
+            OVERLAY_LANE_HEIGHT,
+          );
 
           const fullLabel = child.band.label;
           const shortLabel = child.band.shortLabel ?? fullLabel;
-          drawAnimatedOverlayLabel({
-            key: `overlay:${child.band.id}`,
-            fullLabel,
-            shortLabel,
-            renderX,
-            renderWidth,
-            y: childY,
-            fillStyle: childLabelPaint.fillStyle,
-            alpha: 0.8,
-            hoverId: child.band.id,
-            tooltip: getOverlayTooltipContent(child.band),
-          });
+
+          if (childLabelReveal > 0.01) {
+            drawAnimatedOverlayLabel({
+              key: `overlay:${child.band.id}`,
+              fullLabel,
+              shortLabel,
+              renderX,
+              renderWidth,
+              y: childRenderY,
+              fillStyle: childLabelPaint.fillStyle,
+              alpha: 0.8 * childReveal * childLabelReveal,
+              hoverId: child.band.id,
+              tooltip: getOverlayTooltipContent(child.band),
+            });
+          }
 
           context.restore();
         }
@@ -3713,23 +3865,18 @@ export function TimelineCanvas({
           if (indicatorOpacity > 0.01) {
             const indicatorCenterX = overlay.renderX + bandWidth - 10;
             const indicatorCenterY = y + OVERLAY_LANE_HEIGHT / 2;
+            const indicatorProgress =
+              visibleExpandedOverlayId === overlay.band.id
+                ? expandedOverlayProgress
+                : 0;
 
-            context.strokeStyle = overlayLabelPaint.fillStyle;
-            context.globalAlpha = 0.74 * indicatorOpacity;
-            context.lineWidth = 1.4;
-            context.beginPath();
-
-            if (visibleExpandedOverlayId === overlay.band.id) {
-              context.moveTo(indicatorCenterX - 3.5, indicatorCenterY + 1.5);
-              context.lineTo(indicatorCenterX, indicatorCenterY - 1.5);
-              context.lineTo(indicatorCenterX + 3.5, indicatorCenterY + 1.5);
-            } else {
-              context.moveTo(indicatorCenterX - 3.5, indicatorCenterY - 1.5);
-              context.lineTo(indicatorCenterX, indicatorCenterY + 1.5);
-              context.lineTo(indicatorCenterX + 3.5, indicatorCenterY - 1.5);
-            }
-
-            context.stroke();
+            drawAnimatedOverlayDisclosureIndicator({
+              centerX: indicatorCenterX,
+              centerY: indicatorCenterY,
+              strokeStyle: overlayLabelPaint.fillStyle,
+              alpha: 0.74 * indicatorOpacity,
+              progress: indicatorProgress,
+            });
           }
         }
 
@@ -3777,6 +3924,24 @@ export function TimelineCanvas({
         parentY + OVERLAY_LANE_HEIGHT,
         panelTop,
       );
+      const chromeStemReveal = getExpandedOverlayChromeStemRevealProgress(
+        expandedOverlayProgress,
+      );
+      const chromeRailReveal = getExpandedOverlayChromeRailRevealProgress(
+        expandedOverlayProgress,
+      );
+      const revealedStemBottom =
+        connectorGeometry.stemTop +
+        (connectorGeometry.stemBottom - connectorGeometry.stemTop) *
+          chromeStemReveal;
+      const revealedRailLeft =
+        connectorGeometry.stemX +
+        (connectorGeometry.railLeft - connectorGeometry.stemX) *
+          chromeRailReveal;
+      const revealedRailRight =
+        connectorGeometry.stemX +
+        (connectorGeometry.railRight - connectorGeometry.stemX) *
+          chromeRailReveal;
 
       overlayInteractionRegions.push({
         id: expandedOverlayDetail.parent.band.id,
@@ -3792,12 +3957,23 @@ export function TimelineCanvas({
       context.strokeStyle = connectorStroke;
       context.lineWidth = EXPANDED_OVERLAY_CONNECTOR_LINE_WIDTH;
       context.lineCap = "round";
-      context.beginPath();
-      context.moveTo(connectorGeometry.stemX, connectorGeometry.stemTop);
-      context.lineTo(connectorGeometry.stemX, connectorGeometry.stemBottom);
-      context.moveTo(connectorGeometry.railLeft, connectorGeometry.railY);
-      context.lineTo(connectorGeometry.railRight, connectorGeometry.railY);
-      context.stroke();
+
+      if (chromeStemReveal > 0.01) {
+        context.globalAlpha = chromeStemReveal;
+        context.beginPath();
+        context.moveTo(connectorGeometry.stemX, connectorGeometry.stemTop);
+        context.lineTo(connectorGeometry.stemX, revealedStemBottom);
+        context.stroke();
+      }
+
+      if (chromeRailReveal > 0.01) {
+        context.globalAlpha = chromeRailReveal;
+        context.beginPath();
+        context.moveTo(revealedRailLeft, connectorGeometry.railY);
+        context.lineTo(revealedRailRight, connectorGeometry.railY);
+        context.stroke();
+      }
+
       context.restore();
 
       for (const child of expandedOverlayDetail.children) {
@@ -3814,7 +3990,21 @@ export function TimelineCanvas({
           panelTop +
           EXPANDED_OVERLAY_TOP_PADDING +
           child.laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP);
-        const childRenderY = childY;
+        const childReveal = getExpandedOverlayChildRevealProgress(
+          expandedOverlayProgress,
+          child.laneIndex,
+        );
+
+        if (childReveal <= 0.01) {
+          continue;
+        }
+
+        const childLabelReveal = getExpandedOverlayLabelRevealProgress(
+          expandedOverlayProgress,
+          child.laneIndex,
+        );
+        const childRenderY =
+          childY - (1 - childReveal) * EXPANDED_OVERLAY_CHILD_SLIDE_PX;
         const childConnectorX = renderX + renderWidth / 2;
         const childBandOpacity = OVERLAY_BAND_ALPHA;
         const childLabelPaint = getOverlayLabelPaint(
@@ -3824,41 +4014,35 @@ export function TimelineCanvas({
           paper,
         );
 
-        overlayInteractionRegions.push({
-          id: child.band.id,
-          left: renderX,
-          right: renderX + renderWidth,
-          top: childRenderY - 3,
-          bottom: childRenderY + OVERLAY_LANE_HEIGHT + 3,
-          role: "child",
-          parentId: expandedOverlayDetail.parent.band.id,
-        });
-
-        hoverRegions.push({
-          id: child.band.id,
-          left: renderX,
-          right: renderX + renderWidth,
-          top: childRenderY - 4,
-          bottom: childRenderY + OVERLAY_LANE_HEIGHT + 4,
-          anchorX: renderX + renderWidth / 2,
-          anchorY: childRenderY + 2,
-          anchorMode: "follow-x",
-          placement: "above",
-          tooltip: getOverlayTooltipContent(child.band),
-        });
+        if (childReveal >= EXPANDED_OVERLAY_INTERACTION_REVEAL_THRESHOLD) {
+          overlayInteractionRegions.push({
+            id: child.band.id,
+            left: renderX,
+            right: renderX + renderWidth,
+            top: childRenderY - 3,
+            bottom: childRenderY + OVERLAY_LANE_HEIGHT + 3,
+            role: "child",
+            parentId: expandedOverlayDetail.parent.band.id,
+          });
+        }
 
         context.save();
         context.strokeStyle = connectorStroke;
         context.lineWidth = 1;
         context.lineCap = "round";
+        context.globalAlpha = childReveal;
         context.beginPath();
         context.moveTo(childConnectorX, connectorGeometry.railY);
-        context.lineTo(childConnectorX, childRenderY);
+        context.lineTo(
+          childConnectorX,
+          connectorGeometry.railY +
+            (childRenderY - connectorGeometry.railY) * childReveal,
+        );
         context.stroke();
         context.restore();
 
         context.save();
-        context.globalAlpha = childBandOpacity;
+        context.globalAlpha = childBandOpacity * childReveal;
         context.fillStyle = child.band.color;
         context.fillRect(
           renderX,
@@ -3900,9 +4084,33 @@ export function TimelineCanvas({
             ? clamp01((renderWidth - (chosenLabelWidth + 8)) / 20)
             : 0;
 
-        if (chosenLabel && labelOpacity > 0.01) {
+        const animatedLabelOpacity = labelOpacity * childReveal * childLabelReveal;
+
+        if (chosenLabel && animatedLabelOpacity > 0.01) {
+          const hoverBounds = resolveOverlayLabelHoverBounds({
+            centerX: renderX + renderWidth / 2,
+            labelWidth: chosenLabelWidth,
+            bandLeft: renderX,
+            bandRight: renderX + renderWidth,
+            bandTop: childRenderY,
+            bandBottom: childRenderY + OVERLAY_LANE_HEIGHT,
+          });
+
+          hoverRegions.push({
+            id: child.band.id,
+            left: hoverBounds.left,
+            right: hoverBounds.right,
+            top: hoverBounds.top,
+            bottom: hoverBounds.bottom,
+            anchorX: renderX + renderWidth / 2,
+            anchorY: childRenderY + 2,
+            anchorMode: "follow-x",
+            placement: "above",
+            tooltip: getOverlayTooltipContent(child.band),
+          });
+
           context.fillStyle = childLabelPaint.fillStyle;
-          context.globalAlpha = 0.8 * labelOpacity;
+          context.globalAlpha = 0.8 * animatedLabelOpacity;
           context.textAlign = "center";
           context.textBaseline = "middle";
           context.fillText(
