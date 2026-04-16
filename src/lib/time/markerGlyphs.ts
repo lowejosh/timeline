@@ -1,4 +1,4 @@
-import { formatTimelineYear } from "./bands";
+import { formatTimelinePointLabel } from "./bands";
 import type { TimelineMarker } from "../data/timelineTypes";
 
 export type VisibleMarkerPosition = {
@@ -187,7 +187,10 @@ export function resolveMarkerRenderStates(
     (state) => {
       const fullLabel = state.marker.label;
       const shortLabel = state.marker.shortLabel ?? fullLabel;
-      const dateLabel = state.marker.dateLabel ?? formatTimelineYear(state.marker.year, 1);
+      const dateLabel = formatTimelinePointLabel(state.marker.year, {
+        label: state.marker.dateLabel,
+        approximate: state.marker.approximate,
+      });
       const { fullLabelWidth, shortLabelWidth, dateLabelWidth } = measureText(
         state.marker,
         {

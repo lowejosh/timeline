@@ -5,6 +5,19 @@ export type TimelineSourceRef = {
   note?: string;
 };
 
+export type TimelineRegionalScope = {
+  regionalScopeLabel?: string;
+};
+
+export type TimelineApproximatePoint = {
+  approximate?: boolean;
+};
+
+export type TimelineApproximateRange = {
+  approximateStart?: boolean;
+  approximateEnd?: boolean;
+};
+
 export type EraScheme =
   | "app-canonical"
   | "cosmic"
@@ -12,7 +25,7 @@ export type EraScheme =
   | "world-history"
   | "archaeological";
 
-export type Era = {
+export type Era = TimelineRegionalScope & TimelineApproximateRange & {
   id: string;
   name: string;
   startYear: number;
@@ -34,7 +47,7 @@ export type TimelineZoomVisibility = {
   maxZoom?: number;
 };
 
-type TimelineDecorationBase = TimelineZoomVisibility & {
+type TimelineDecorationBase = TimelineZoomVisibility & TimelineRegionalScope & {
   id: string;
   label: string;
   shortLabel?: string;
@@ -43,14 +56,15 @@ type TimelineDecorationBase = TimelineZoomVisibility & {
   sourceRefs?: TimelineSourceRef[];
 };
 
-export type TimelineMarker = TimelineDecorationBase & {
+export type TimelineMarker = TimelineDecorationBase & TimelineApproximatePoint & {
   year: number;
   color?: string;
   dateLabel?: string;
   timeLabel?: string;
 };
 
-export type TimelineOverlayBand = TimelineDecorationBase & {
+export type TimelineOverlayBand =
+  TimelineDecorationBase & TimelineApproximateRange & {
   startYear: number;
   endYear: number;
   color: string;

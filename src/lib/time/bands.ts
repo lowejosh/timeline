@@ -5,6 +5,19 @@ export type TimelineYearFormatOptions = {
   mode?: "default" | "axis";
 };
 
+export type TimelinePointLabelOptions = {
+  label?: string;
+  step?: number;
+  approximate?: boolean;
+  yearFormatOptions?: TimelineYearFormatOptions;
+};
+
+export type TimelineRangeLabelOptions = {
+  step?: number;
+  approximateStart?: boolean;
+  approximateEnd?: boolean;
+};
+
 export type TimelineElapsedLabel = {
   primaryText: string;
   secondaryText?: string;
@@ -397,6 +410,38 @@ export function formatTimelineYear(
   return `${numberFormatter.format(roundedYear)} CE`;
 }
 
-export function formatTimelineRange(startYear: number, endYear: number) {
-  return `${formatTimelineYear(startYear)} — ${formatTimelineYear(endYear)}`;
+export function formatApproximateLabel(label: string, approximate = false) {
+  if (!approximate) {
+    return label;
+  }
+
+  return label.trimStart().startsWith("~") ? label : `~${label}`;
+}
+
+export function formatTimelinePointLabel(
+  year: number,
+  options: TimelinePointLabelOptions = {},
+) {
+  const baseLabel =
+    options.label ??
+    formatTimelineYear(year, options.step ?? 1, options.yearFormatOptions);
+
+  return formatApproximateLabel(baseLabel, options.approximate);
+}
+
+export function formatTimelineRange(
+  startYear: number,
+  endYear: number,
+  options: TimelineRangeLabelOptions = {},
+) {
+  const startLabel = formatTimelinePointLabel(startYear, {
+    step: options.step,
+    approximate: options.approximateStart,
+  });
+  const endLabel = formatTimelinePointLabel(endYear, {
+    step: options.step,
+    approximate: options.approximateEnd,
+  });
+
+  return startLabel === endLabel ? startLabel : `${startLabel} — ${endLabel}`;
 }

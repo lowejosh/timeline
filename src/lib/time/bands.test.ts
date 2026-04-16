@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatApproximateLabel,
   formatTimelineDateLabel,
   formatTimelineElapsedAxisLabel,
   formatTimelineElapsedLabel,
+  formatTimelinePointLabel,
+  formatTimelineRange,
   formatTimelineYear,
   getTimelineYearFromUtcParts,
   getTimelineTicks,
@@ -75,6 +78,37 @@ describe("timeline tick generation", () => {
   it("formats historical BCE years without adding an extra year", () => {
     expect(formatTimelineYear(-27)).toBe("27 BCE");
     expect(formatTimelineYear(-3000)).toBe("3,000 BCE");
+  });
+
+  it("prefixes approximate labels with a tilde only once", () => {
+    expect(formatApproximateLabel("3,000 BCE", true)).toBe("~3,000 BCE");
+    expect(formatApproximateLabel("~3,000 BCE", true)).toBe("~3,000 BCE");
+  });
+
+  it("formats approximate point labels from timeline years", () => {
+    expect(formatTimelinePointLabel(-1200, { approximate: true })).toBe(
+      "~1,200 BCE",
+    );
+    expect(
+      formatTimelinePointLabel(-3000, {
+        label: "3,000 BCE",
+        approximate: true,
+      }),
+    ).toBe("~3,000 BCE");
+  });
+
+  it("formats approximate range labels boundary by boundary", () => {
+    expect(
+      formatTimelineRange(-3300, -1200, {
+        approximateStart: true,
+        approximateEnd: true,
+      }),
+    ).toBe("~3,300 BCE — ~1,200 BCE");
+    expect(
+      formatTimelineRange(-3500, -539, {
+        approximateStart: true,
+      }),
+    ).toBe("~3,500 BCE — 539 BCE");
   });
 
   it("formats sub-year long-ago labels as years and days ago", () => {

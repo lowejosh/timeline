@@ -173,6 +173,16 @@ export const ERA_SOURCES = {
     notes:
       "Used for the emergence of Homo sapiens and broad human-prehistory context.",
   },
+  smithsonianHomoSapiens: {
+    shortTitle: "Smithsonian: Homo sapiens",
+    title: "Homo sapiens",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo sapiens."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-sapiens",
+    notes:
+      "Used for the direct public-facing Smithsonian statement that Homo sapiens evolved in Africa about 300,000 years ago.",
+  },
   khanPaleolithicCulture: {
     shortTitle: "Khan: Paleolithic culture",
     title: "Paleolithic technology, culture, and art",
@@ -183,6 +193,15 @@ export const ERA_SOURCES = {
     notes:
       "Used for standard Stone Age terminology and the broad Paleolithic-to-Neolithic sequence.",
   },
+  kakaduUbirr: {
+    shortTitle: "Kakadu: Ubirr",
+    title: "Ubirr",
+    organization: "Kakadu National Park / Parks Australia",
+    citation: 'Parks Australia, "Ubirr," Kakadu National Park.',
+    url: "https://kakadu.gov.au/things-do/activities/rock-art/ubirr/",
+    notes:
+      "Used for Ubirr as one of Kakadu's outstanding rock art galleries and one of the reasons for Kakadu's dual World Heritage status.",
+  },
   khanNeolithicRevolution: {
     shortTitle: "Khan: Neolithic Revolution",
     title: "The Neolithic Revolution",
@@ -191,6 +210,26 @@ export const ERA_SOURCES = {
     url: "https://www.khanacademy.org/humanities/world-history/world-history-beginnings/origin-humans-early-societies/a/the-neolithic-revolution",
     notes:
       "Used for Near Eastern Neolithic examples such as Pre-Pottery Neolithic B at Jericho.",
+  },
+  metPrehistoricArt: {
+    shortTitle: "Met: Prehistoric Art",
+    title: "Introduction to Prehistoric Art, 20,000–8000 B.C.",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Tedesco, Laura Anne. "Introduction to Prehistoric Art, 20,000–8000 B.C." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/preh/hd_preh.htm",
+    notes:
+      "Used for direct public-facing statements on early ocher markings in African rock art and on Natufian occupation at Eynan/Ain Mallaha around 10,000–8000 B.C.",
+  },
+  metChauvet: {
+    shortTitle: "Met: Chauvet Cave",
+    title: "Chauvet Cave (ca. 30,000 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Clottes, Jean. "Chauvet Cave (ca. 30,000 B.C.)." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/chav/hd_chav.htm",
+    notes:
+      "Used for Chauvet Cave's first major drawing phase around 30,000–32,000 BP and for concise museum-grade framing of its figurative art.",
   },
   berkeleyOriginOfLife: {
     shortTitle: "Berkeley: origin of life",
@@ -209,6 +248,15 @@ export const ERA_SOURCES = {
     url: "https://www.britannica.com/topic/agriculture/The-origin-of-agriculture",
     notes:
       "Used for the broad estimate that agriculture emerged independently in multiple regions, with early agriculture beginning roughly 15,000–10,000 years before present.",
+  },
+  britannicaMehrgarh: {
+    shortTitle: "Britannica: Mehrgarh",
+    title: "Mehrgarh",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Mehrgarh."',
+    url: "https://www.britannica.com/place/Mehrgarh",
+    notes:
+      "Used for Mehrgarh as an early South Asian Neolithic settlement from roughly 8000–5000 BCE with farming, herding, mud-brick houses, and widening exchange.",
   },
   unescoGobekliTepe: {
     shortTitle: "UNESCO: Göbekli Tepe",
@@ -236,6 +284,36 @@ export const ERA_SOURCES = {
     url: "https://whc.unesco.org/en/list/373/",
     notes:
       "Used for the broader Stonehenge and Avebury ceremonial landscape spanning about 3700 to 1600 BCE, with Stonehenge itself commonly anchored to the late Neolithic around 3000 BCE.",
+  },
+  unescoSwabianJura: {
+    shortTitle: "UNESCO: Swabian Jura",
+    title: "Caves and Ice Age Art in the Swabian Jura",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Caves and Ice Age Art in the Swabian Jura."',
+    url: "https://whc.unesco.org/en/list/1527/",
+    notes:
+      "Used for the Swabian Jura caves as a concentration of Aurignacian finds dating from 43,000 to 33,000 years ago, including the oldest musical instruments yet found worldwide.",
+  },
+  unescoChauvet: {
+    shortTitle: "UNESCO: Chauvet",
+    title:
+      "Decorated Cave of Pont d’Arc, known as Grotte Chauvet-Pont d’Arc, Ardèche",
+    organization: "UNESCO World Heritage Centre",
+    citation:
+      'UNESCO World Heritage Centre, "Decorated Cave of Pont d’Arc, known as Grotte Chauvet-Pont d’Arc, Ardèche."',
+    url: "https://whc.unesco.org/en/list/1426/",
+    notes:
+      "Used for the earliest-known figurative drawings in Chauvet Cave, dated to about 30,000–32,000 BP.",
+  },
+  metJiahu: {
+    shortTitle: "Met: Jiahu",
+    title: "Jiahu (ca. 7000–5700 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Tedesco, Laura Anne. "Jiahu (ca. 7000–5700 B.C.)." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/jiah/hd_jiah.htm",
+    notes:
+      "Used for Jiahu as an early Neolithic village in central China with houses, kilns, pottery, and the earliest known playable bone flutes.",
   },
   britannicaBronzeAge: {
     shortTitle: "Britannica: Bronze Age",
@@ -290,6 +368,34 @@ export const ERA_SOURCES = {
     url: "https://www.britannica.com/place/Mesopotamia-historical-region-Asia",
     notes:
       "Used for the late 4th-millennium BCE emergence of writing and early urban civilization in Mesopotamia.",
+  },
+  britannicaErech: {
+    shortTitle: "Britannica: Erech",
+    title: "Erech",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Erech."',
+    url: "https://www.britannica.com/place/Erech",
+    notes:
+      "Used for Uruk / Erech as the key Mesopotamian city illustrating early urban life in the Erech–Jamdat Nasr period.",
+  },
+  metUrukFirstCity: {
+    shortTitle: "Met: Uruk",
+    title: "Uruk: The First City",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "Uruk: The First City." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/uruk/hd_uruk.htm",
+    notes:
+      "Used for the direct museum framing of Uruk as the first city and for its threshold around 3200 B.C. as a true city in southern Mesopotamia.",
+  },
+  britannicaWheel: {
+    shortTitle: "Britannica: wheel",
+    title: "wheel",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "wheel."',
+    url: "https://www.britannica.com/technology/wheel",
+    notes:
+      "Used for the direct statement that a Sumerian Erech pictograph from about 3500 BC shows wheeled transport and that potter's wheels had developed in Mesopotamia by 3500 BC.",
   },
   britannicaAkkad: {
     shortTitle: "Britannica: Akkad",

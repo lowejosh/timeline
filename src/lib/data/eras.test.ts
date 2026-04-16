@@ -76,6 +76,29 @@ describe("era data", () => {
     expect(ppnb?.name).toBe("Pre-Pottery Neolithic B");
   });
 
+  it("flags near eastern archaeological phases as regional and approximate without changing hierarchy", () => {
+    const humanHistory = ROOT_ERA.children?.find((era) => era.id === "human-history");
+    const epipaleolithic = humanHistory?.children?.find(
+      (era) => era.id === "epipaleolithic",
+    );
+    const neolithic = humanHistory?.children?.find((era) => era.id === "neolithic");
+    const bronzeAge = humanHistory?.children?.find((era) => era.id === "bronze-age");
+    const lateIronAge = humanHistory?.children
+      ?.find((era) => era.id === "iron-age")
+      ?.children?.find((era) => era.id === "late-iron-age");
+
+    expect(epipaleolithic?.regionalScopeLabel).toBe("Ancient Near East");
+    expect(epipaleolithic?.approximateStart).toBe(true);
+    expect(epipaleolithic?.approximateEnd).toBe(true);
+    expect(neolithic?.regionalScopeLabel).toBe("Ancient Near East");
+    expect(bronzeAge?.regionalScopeLabel).toBe("Ancient Near East");
+    expect(bronzeAge?.approximateStart).toBe(true);
+    expect(bronzeAge?.approximateEnd).toBe(true);
+    expect(lateIronAge?.regionalScopeLabel).toBe("Ancient Near East");
+    expect(lateIronAge?.approximateStart).toBe(true);
+    expect(lateIronAge?.approximateEnd).toBeUndefined();
+  });
+
   it("uses seeded colors by default and respects explicit geological overrides", () => {
     const humanHistory = ROOT_ERA.children?.find((era) => era.id === "human-history");
     const cambrian = ROOT_ERA.children?.find((era) => era.id === "cambrian");

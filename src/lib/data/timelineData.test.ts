@@ -32,10 +32,22 @@ describe("root timeline display data", () => {
       "end-triassic-mass-extinction",
       "archaeopteryx-first-known-bird",
       "k-pg-asteroid-impact",
+      "homo-sapiens-evolves-in-africa",
+      "ground-ocher-markings-appear-in-africa",
+      "ubirr-rock-art-in-kakadu",
+      "swabian-jura-bone-flutes",
+      "chauvet-cave-figurative-art",
+      "venus-of-dolni-vestonice",
+      "natufian-settled-hunter-gatherers-at-eynan",
       "gobekli-tepe-monuments",
       "agriculture-emerges-in-southwest-asia",
+      "mehrgarh-early-farming-community",
       "catalhoyuk-settled-farming-community",
       "jericho-ritual-community",
+      "jiahu-bone-flutes-and-village-life",
+      "irrigation-reshapes-southern-mesopotamia",
+      "wheeled-transport-appears-in-sumer",
+      "uruk-becomes-the-first-city",
       "cuneiform-writing-emerges",
       "stonehenge-begins",
       "great-pyramid-of-giza-completed",
@@ -77,6 +89,68 @@ describe("root timeline display data", () => {
           index === 0 || markers[index - 1].year <= marker.year,
       ),
     ).toBe(true);
+  });
+
+  it("marks representative ancient markers and overlays with scope and approximation metadata", () => {
+    const agriculture = TIMELINE_DISPLAY.markers.find(
+      (marker) => marker.id === "agriculture-emerges-in-southwest-asia",
+    );
+    const collapse = TIMELINE_DISPLAY.markers.find(
+      (marker) => marker.id === "bronze-age-collapse",
+    );
+    const cuneiform = TIMELINE_DISPLAY.markers.find(
+      (marker) => marker.id === "cuneiform-writing-emerges",
+    );
+    const homoSapiens = TIMELINE_DISPLAY.markers.find(
+      (marker) => marker.id === "homo-sapiens-evolves-in-africa",
+    );
+    const uruk = TIMELINE_DISPLAY.markers.find(
+      (marker) => marker.id === "uruk-becomes-the-first-city",
+    );
+    const mesopotamia = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "mesopotamia",
+    );
+    const hittites = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "hittite-empire",
+    );
+    const akkad = mesopotamia?.children?.find(
+      (band) => band.id === "akkadian-empire",
+    );
+
+    expect(agriculture).toMatchObject({
+      regionalScopeLabel: "Southwest Asia",
+      approximate: true,
+    });
+    expect(collapse).toMatchObject({
+      regionalScopeLabel: "Eastern Mediterranean",
+      approximate: true,
+    });
+    expect(cuneiform).toMatchObject({
+      regionalScopeLabel: "Mesopotamia",
+      approximate: true,
+    });
+    expect(homoSapiens).toMatchObject({
+      regionalScopeLabel: "Africa",
+      approximate: true,
+    });
+    expect(uruk).toMatchObject({
+      regionalScopeLabel: "Southern Mesopotamia",
+      approximate: true,
+    });
+    expect(mesopotamia).toMatchObject({
+      regionalScopeLabel: "Mesopotamia",
+      approximateStart: true,
+    });
+    expect(hittites).toMatchObject({
+      regionalScopeLabel: "Anatolia and northern Syria",
+      approximateStart: true,
+      approximateEnd: true,
+    });
+    expect(akkad).toMatchObject({
+      regionalScopeLabel: "Mesopotamia",
+      approximateStart: true,
+      approximateEnd: true,
+    });
   });
 
   it("includes the historical overlay bands with valid sources", () => {

@@ -5516,6 +5516,11 @@ export function TimelineCanvas({
           <div className="timeline-tooltip__title">
             {hoveredTooltip.tooltip.title}
           </div>
+          {hoveredTooltip.tooltip.regionalScopeLabel ? (
+            <div className="timeline-tooltip__subtitle">
+              {hoveredTooltip.tooltip.regionalScopeLabel}
+            </div>
+          ) : null}
           <div className="timeline-tooltip__time">
             {hoveredTooltip.tooltip.timeLabel}
           </div>

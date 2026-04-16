@@ -146,6 +146,30 @@ describe("marker glyph timing", () => {
     expect(state.dateLabel).toBe("Apr 15, 1912");
   });
 
+  it("adds a tilde to approximate marker labels", () => {
+    const positions: VisibleMarkerPosition[] = [
+      {
+        marker: {
+          id: "bronze-age-collapse",
+          label: "Bronze Age collapse",
+          shortLabel: "Bronze Age Collapse",
+          year: -1200,
+          approximate: true,
+          priority: 100,
+        },
+        x: 160,
+      },
+    ];
+
+    const [state] = resolveMarkerRenderStates(positions, WIDTH, PAD, () => ({
+      fullLabelWidth: 120,
+      shortLabelWidth: 110,
+      dateLabelWidth: 88,
+    }));
+
+    expect(state.dateLabel).toBe("~1,200 BCE");
+  });
+
   it("temporarily lets a hovered marker outrank a nearby higher-priority marker", () => {
     const crowdedStates = resolveStates([
       { id: "anchor", priority: 100, x: 160 },

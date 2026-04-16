@@ -1,4 +1,8 @@
-import { formatTimelineYear } from "../time/bands";
+import {
+  formatApproximateLabel,
+  formatTimelinePointLabel,
+  formatTimelineRange,
+} from "../time/bands";
 import { ERA_SOURCES } from "./eraSources";
 import type {
   Era,
@@ -20,6 +24,7 @@ export type TimelineTooltipContent = {
   kindLabel: string;
   title: string;
   timeLabel: string;
+  regionalScopeLabel?: string;
   description?: string;
   sources: TimelineTooltipSource[];
 };
@@ -47,13 +52,6 @@ function resolveTooltipSources(sourceRefs?: TimelineSourceRef[]) {
   });
 }
 
-function formatTimelineRange(startYear: number, endYear: number) {
-  const startLabel = formatTimelineYear(startYear, 1);
-  const endLabel = formatTimelineYear(endYear, 1);
-
-  return startLabel === endLabel ? startLabel : `${startLabel} — ${endLabel}`;
-}
-
 export function getMarkerTooltipContent(
   marker: TimelineMarker,
 ): TimelineTooltipContent {
@@ -61,8 +59,13 @@ export function getMarkerTooltipContent(
     kind: "marker",
     kindLabel: "Marker",
     title: marker.label,
-    timeLabel:
-      marker.timeLabel ?? marker.dateLabel ?? formatTimelineYear(marker.year, 1),
+    timeLabel: formatApproximateLabel(
+      marker.timeLabel ?? formatTimelinePointLabel(marker.year, {
+        label: marker.dateLabel,
+      }),
+      marker.approximate,
+    ),
+    regionalScopeLabel: marker.regionalScopeLabel,
     description: marker.description,
     sources: resolveTooltipSources(marker.sourceRefs),
   };
@@ -75,7 +78,11 @@ export function getOverlayTooltipContent(
     kind: "overlay",
     kindLabel: "Band",
     title: overlay.label,
-    timeLabel: formatTimelineRange(overlay.startYear, overlay.endYear),
+    timeLabel: formatTimelineRange(overlay.startYear, overlay.endYear, {
+      approximateStart: overlay.approximateStart,
+      approximateEnd: overlay.approximateEnd,
+    }),
+    regionalScopeLabel: overlay.regionalScopeLabel,
     description: overlay.description,
     sources: resolveTooltipSources(overlay.sourceRefs),
   };
@@ -86,7 +93,11 @@ export function getEraTooltipContent(era: Era): TimelineTooltipContent {
     kind: "era",
     kindLabel: "Era",
     title: era.name,
-    timeLabel: formatTimelineRange(era.startYear, era.endYear),
+    timeLabel: formatTimelineRange(era.startYear, era.endYear, {
+      approximateStart: era.approximateStart,
+      approximateEnd: era.approximateEnd,
+    }),
+    regionalScopeLabel: era.regionalScopeLabel,
     description: era.description,
     sources: resolveTooltipSources(era.sourceRefs),
   };

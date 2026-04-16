@@ -51,6 +51,25 @@ describe("timeline tooltip content", () => {
     expect(getOverlayTooltipContent(overlay).timeLabel).toBe("27 BCE — 476 CE");
   });
 
+  it("surfaces region scope and approximate labels for era tooltips", () => {
+    const era: Era = {
+      id: "bronze-age",
+      name: "Bronze Age",
+      startYear: -3300,
+      endYear: -1200,
+      color: "rgba(0, 0, 0, 0.1)",
+      regionalScopeLabel: "Ancient Near East",
+      approximateStart: true,
+      approximateEnd: true,
+      sourceRefs: [{ sourceId: "britannicaBronzeAge" }],
+    };
+
+    expect(getEraTooltipContent(era)).toMatchObject({
+      regionalScopeLabel: "Ancient Near East",
+      timeLabel: "~3,300 BCE — ~1,200 BCE",
+    });
+  });
+
   it("includes optional descriptions on era tooltips", () => {
     const era: Era = {
       id: "test-era",
@@ -92,6 +111,40 @@ describe("timeline tooltip content", () => {
           url: "https://www.britannica.com/topic/Titanic",
         },
       ],
+    });
+  });
+
+  it("shows approximate marker labels and region scope when flagged", () => {
+    const marker: TimelineMarker = {
+      id: "bronze-age-collapse",
+      label: "Bronze Age collapse",
+      year: -1200,
+      approximate: true,
+      regionalScopeLabel: "Eastern Mediterranean",
+      sourceRefs: [{ sourceId: "britannicaBronzeAge" }],
+    };
+
+    expect(getMarkerTooltipContent(marker)).toMatchObject({
+      timeLabel: "~1,200 BCE",
+      regionalScopeLabel: "Eastern Mediterranean",
+    });
+  });
+
+  it("shows approximate overlay labels and region scope when flagged", () => {
+    const overlay: TimelineOverlayBand = {
+      id: "mesopotamia",
+      label: "Mesopotamia",
+      startYear: -3500,
+      endYear: -539,
+      color: "rgba(0, 0, 0, 0.1)",
+      regionalScopeLabel: "Mesopotamia",
+      approximateStart: true,
+      sourceRefs: [{ sourceId: "britannicaMesopotamia" }],
+    };
+
+    expect(getOverlayTooltipContent(overlay)).toMatchObject({
+      timeLabel: "~3,500 BCE — 539 BCE",
+      regionalScopeLabel: "Mesopotamia",
     });
   });
 });

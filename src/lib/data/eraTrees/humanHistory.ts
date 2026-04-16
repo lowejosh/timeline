@@ -40,6 +40,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Epipaleolithic",
       startYear: -20_000,
       endYear: -10_000,
+      regionalScopeLabel: "Ancient Near East",
+      approximateStart: true,
+      approximateEnd: true,
       description:
         "Warming-climate transition when some hunter-gatherer communities grew more settled and locally rooted.",
       scheme: "archaeological",
@@ -55,6 +58,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Neolithic",
       startYear: -10_000,
       endYear: -4_500,
+      regionalScopeLabel: "Ancient Near East",
+      approximateStart: true,
+      approximateEnd: true,
       description:
         "Farming villages, domesticated plants and animals, and more permanent settlement reshape daily life.",
       scheme: "archaeological",
@@ -71,6 +77,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Pre-Pottery Neolithic A",
           startYear: -10_000,
           endYear: -8_800,
+          regionalScopeLabel: "Ancient Near East",
+          approximateStart: true,
+          approximateEnd: true,
           description:
             "Early village phase of cultivation experiments, communal buildings, and life before pottery.",
           scheme: "archaeological",
@@ -81,6 +90,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Pre-Pottery Neolithic B",
           startYear: -8_800,
           endYear: -6_500,
+          regionalScopeLabel: "Ancient Near East",
+          approximateStart: true,
+          approximateEnd: true,
           description:
             "Larger farming communities with domesticated animals, plastered skulls, and expanding village architecture.",
           scheme: "archaeological",
@@ -91,6 +103,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Pottery Neolithic",
           startYear: -6_500,
           endYear: -4_500,
+          regionalScopeLabel: "Ancient Near East",
+          approximateStart: true,
+          approximateEnd: true,
           description:
             "Established farming world of everyday pottery, food storage, and widening local exchange.",
           scheme: "archaeological",
@@ -103,6 +118,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Chalcolithic",
       startYear: -4_500,
       endYear: -3_300,
+      regionalScopeLabel: "Ancient Near East",
+      approximateStart: true,
+      approximateEnd: true,
       description:
         "Copper joins stone tools as villages grow more specialized, unequal, and connected.",
       scheme: "archaeological",
@@ -118,6 +136,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Bronze Age",
       startYear: -3_300,
       endYear: -1_200,
+      regionalScopeLabel: "Ancient Near East",
+      approximateStart: true,
+      approximateEnd: true,
       description:
         "Cities, kingdoms, bronze metallurgy, and long-distance trade tie the ancient Near East into a shared world.",
       scheme: "archaeological",
@@ -131,6 +152,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Early Bronze Age",
           startYear: -3_300,
           endYear: -2_000,
+          regionalScopeLabel: "Ancient Near East",
+          approximateStart: true,
+          approximateEnd: true,
           description:
             "First cities and fortified towns rise as urban life expands across the region.",
           scheme: "archaeological",
@@ -141,6 +165,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Middle Bronze Age",
           startYear: -2_000,
           endYear: -1_550,
+          regionalScopeLabel: "Ancient Near East",
+          approximateStart: true,
+          approximateEnd: true,
           description:
             "Palace kingdoms, chariot warfare, and walled cities define a world of rival courts.",
           scheme: "archaeological",
@@ -151,6 +178,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Late Bronze Age",
           startYear: -1_550,
           endYear: -1_200,
+          regionalScopeLabel: "Ancient Near East",
+          approximateStart: true,
+          approximateEnd: true,
           description:
             "Great-power diplomacy and palace trade link Egypt, Anatolia, Mesopotamia, and the Levant.",
           scheme: "archaeological",
@@ -163,6 +193,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Iron Age",
       startYear: -1_200,
       endYear: -539,
+      regionalScopeLabel: "Ancient Near East",
+      approximateStart: true,
       description:
         "Era when iron smelting and forging spread widely enough for iron tools and weapons to overtake bronze.",
       scheme: "archaeological",
@@ -180,6 +212,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Early Iron Age",
           startYear: -1_200,
           endYear: -900,
+          regionalScopeLabel: "Ancient Near East",
+          approximateStart: true,
+          approximateEnd: true,
           description:
             "Transition phase when ironworking spreads quickly but smiths still labor to turn bloom iron into reliable tools and blades.",
           scheme: "archaeological",
@@ -199,6 +234,9 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Middle Iron Age",
           startYear: -900,
           endYear: -609,
+          regionalScopeLabel: "Ancient Near East",
+          approximateStart: true,
+          approximateEnd: true,
           description:
             "Ironworking becomes more dependable and widespread, supplying tougher farm tools, fittings, and more common weapons.",
           scheme: "archaeological",
@@ -218,6 +256,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Late Iron Age",
           startYear: -609,
           endYear: -539,
+          regionalScopeLabel: "Ancient Near East",
+          approximateStart: true,
           description:
             "By this final phase, iron tools and weapons are established parts of everyday production rather than a newer experiment.",
           scheme: "archaeological",
