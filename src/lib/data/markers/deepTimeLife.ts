@@ -6,6 +6,8 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "Great Oxidation Event",
     shortLabel: "Oxygen Crisis",
     year: -2_400_000_000,
+    description:
+      "As cyanobacteria oxygenated sea and sky, oxygen likely poisoned much of Earth's anaerobic life—though the size of that die-off remains hard to pin down from the fossil record.",
     color: "rgba(94, 132, 154, 0.94)",
     minZoom: 0,
     priority: 96,
@@ -13,6 +15,10 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       {
         sourceId: "ucmpCyanobacteria",
         note: "UCMP explains that cyanobacteria generated the oxygen atmosphere during the Archean and Proterozoic; the app uses c. 2.4 billion years ago as the conventional Great Oxidation Event anchor for that planetary shift.",
+      },
+      {
+        sourceId: "asmGreatOxidationEvent",
+        note: "ASM says oxygen likely acted as a poison and wiped out much of anaerobic life during the Great Oxidation Event, but also notes that precise lineage and species losses are difficult to estimate.",
       },
     ],
   },
@@ -66,6 +72,8 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "Late Ordovician mass extinction",
     shortLabel: "Ordovician Extinction",
     year: -447_000_000,
+    description:
+      "A two-pulse marine crisis driven by climate upheaval that wiped out about 85% of species, shattering reefs and open-ocean ecosystems alike.",
     color: "rgba(124, 97, 149, 0.94)",
     minZoom: 0,
     priority: 94,
@@ -74,6 +82,10 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
         sourceId: "smithsonianExtinctionOverTime",
         note: "Smithsonian dates the Late Ordovician mass extinction to 447 million years ago and summarizes it as a global cooling, glaciation, and sea-level crisis affecting marine life.",
       },
+      {
+        sourceId: "geoscienceworldLateOrdovicianExtinction",
+        note: "GeoScienceWorld summarizes the event as a two-pulse crisis in which around 85% of species were eliminated.",
+      },
     ],
   },
   {
@@ -81,6 +93,8 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "Late Devonian mass extinction",
     shortLabel: "Devonian Extinction",
     year: -378_000_000,
+    description:
+      "A drawn-out reef crisis that unfolded in pulses and eliminated roughly 75% of species, hitting corals, brachiopods, and other marine life especially hard.",
     color: "rgba(116, 86, 139, 0.94)",
     minZoom: 0,
     priority: 93,
@@ -88,6 +102,10 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       {
         sourceId: "smithsonianExtinctionOverTime",
         note: "Smithsonian dates the Late Devonian mass extinction to 378 million years ago and notes that many marine groups, including corals and brachiopods, were heavily affected.",
+      },
+      {
+        sourceId: "nsfLateDevonianExtinction",
+        note: "NSF describes the Late Devonian event as one of the Big Five and says roughly 75% of all species disappeared over two pulses.",
       },
     ],
   },
@@ -141,6 +159,8 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "End-Permian mass extinction",
     shortLabel: "Permian Extinction",
     year: -252_000_000,
+    description:
+      "Earth's worst known extinction: roughly 9 in 10 marine species and 7 in 10 land species vanished as massive volcanism drove runaway warming and ecosystem collapse.",
     color: "rgba(148, 83, 83, 0.94)",
     minZoom: 0,
     priority: 97,
@@ -148,6 +168,14 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       {
         sourceId: "smithsonianExtinctionOverTime",
         note: "Smithsonian dates Earth's largest mass extinction to 252 million years ago and notes that it devastated marine species and many terrestrial groups.",
+      },
+      {
+        sourceId: "nasaGreatDying",
+        note: "NASA describes the end-Permian crisis as the Great Dying and says roughly 9 in 10 marine species and 7 in 10 land species vanished.",
+      },
+      {
+        sourceId: "amnhSixExtinctions",
+        note: "AMNH likewise frames the end-Permian event as the most severe extinction, with more than 95% of marine species and upward of 70% of land vertebrates lost in some estimates.",
       },
     ],
   },
@@ -171,6 +199,8 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "End-Triassic mass extinction",
     shortLabel: "Triassic Extinction",
     year: -199_000_000,
+    description:
+      "A volcanic crisis as the Atlantic began opening that wiped out more than a third of marine species and many large land reptiles, clearing space for dinosaur dominance.",
     color: "rgba(156, 96, 75, 0.94)",
     minZoom: 0,
     priority: 95,
@@ -182,6 +212,10 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       {
         sourceId: "smithsonianTriassicLife",
         note: "Smithsonian's Triassic teaching guide frames this crisis as a major extinction-and-recovery interval closely tied to the rise of dinosaurs.",
+      },
+      {
+        sourceId: "amnhSixExtinctions",
+        note: "AMNH says more than a third of marine species vanished in the end-Triassic crisis, alongside many large amphibians and crocodile-line reptiles.",
       },
     ],
   },
@@ -205,6 +239,8 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "K–Pg asteroid impact",
     shortLabel: "Dinosaur Asteroid",
     year: -66_000_000,
+    description:
+      "The Chicxulub impact triggered abrupt global collapse that wiped out about 75% of species, including all non-avian dinosaurs, while birds and mammals pulled through.",
     color: "rgba(168, 88, 68, 0.96)",
     minZoom: 0,
     priority: 99,
@@ -216,6 +252,10 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       {
         sourceId: "icsChart2024",
         note: "The marker aligns to the formal 66.0 Ma Cretaceous-Paleogene boundary on the ICS chart.",
+      },
+      {
+        sourceId: "amnhSixExtinctions",
+        note: "AMNH estimates that about 75% of species living at the time were wiped out in the end-Cretaceous extinction.",
       },
     ],
   },

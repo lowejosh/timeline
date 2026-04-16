@@ -153,6 +153,56 @@ describe("root timeline display data", () => {
     });
   });
 
+  it("keeps deep-time crisis markers descriptive and source-backed", () => {
+    const crisisMarkerIds = [
+      "great-oxidation-event",
+      "late-ordovician-mass-extinction",
+      "late-devonian-mass-extinction",
+      "end-permian-mass-extinction",
+      "end-triassic-mass-extinction",
+      "k-pg-asteroid-impact",
+    ];
+
+    for (const markerId of crisisMarkerIds) {
+      const marker = TIMELINE_DISPLAY.markers.find(
+        (timelineMarker) => timelineMarker.id === markerId,
+      );
+
+      expect(marker?.description).toBeTruthy();
+      expect(marker?.sourceRefs?.length).toBeGreaterThan(0);
+    }
+
+    expect(
+      TIMELINE_DISPLAY.markers.find(
+        (marker) => marker.id === "late-ordovician-mass-extinction",
+      )?.description,
+    ).toContain("85%");
+    expect(
+      TIMELINE_DISPLAY.markers.find(
+        (marker) => marker.id === "late-devonian-mass-extinction",
+      )?.description,
+    ).toContain("75%");
+    expect(
+      TIMELINE_DISPLAY.markers.find(
+        (marker) => marker.id === "end-permian-mass-extinction",
+      )?.description,
+    ).toContain("9 in 10");
+    expect(
+      TIMELINE_DISPLAY.markers.find(
+        (marker) => marker.id === "end-triassic-mass-extinction",
+      )?.description,
+    ).toContain("more than a third");
+    expect(
+      TIMELINE_DISPLAY.markers.find((marker) => marker.id === "k-pg-asteroid-impact")
+        ?.description,
+    ).toContain("75%");
+    expect(
+      TIMELINE_DISPLAY.markers.find((marker) => marker.id === "great-oxidation-event")
+        ?.sourceRefs
+        ?.some((reference) => reference.sourceId === "asmGreatOxidationEvent"),
+    ).toBe(true);
+  });
+
   it("includes the historical overlay bands with valid sources", () => {
     expect(TIMELINE_DISPLAY.overlays.map((band) => band.id)).toEqual([
       "cambrian-explosion",
@@ -217,6 +267,24 @@ describe("root timeline display data", () => {
     ).toBe(true);
   });
 
+  it("keeps deep-time overlays descriptive and source-backed", () => {
+    const cambrianExplosion = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "cambrian-explosion",
+    );
+    const ageOfDinosaurs = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "age-of-dinosaurs",
+    );
+
+    expect(cambrianExplosion).toMatchObject({
+      description: expect.stringContaining("major animal lineages"),
+    });
+    expect(ageOfDinosaurs).toMatchObject({
+      description: expect.stringContaining("archosaurs"),
+    });
+    expect(cambrianExplosion?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(ageOfDinosaurs?.sourceRefs?.length).toBeGreaterThan(0);
+  });
+
   it("keeps the flattened root era child chronology stitched in the expected order", () => {
     expect(ROOT_TIMELINE.rootEra.children?.map((child) => child.id)).toEqual(
       ROOT_ERA.children?.map((child) => child.id),
@@ -249,7 +317,17 @@ describe("root timeline display data", () => {
       "paleogene",
       "neogene",
       "quaternary",
-      "human-history",
+      "paleolithic",
+      "epipaleolithic",
+      "neolithic",
+      "chalcolithic",
+      "bronze-age",
+      "iron-age",
+      "classical-antiquity",
+      "post-classical-history",
+      "early-modern-period",
+      "age-of-industry-and-empire",
+      "contemporary-history",
     ]);
   });
 });

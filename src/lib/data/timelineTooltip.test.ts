@@ -90,6 +90,22 @@ describe("timeline tooltip content", () => {
     });
   });
 
+  it("prefers explicit era time labels when provided", () => {
+    const era: Era = {
+      id: "quaternary",
+      name: "Quaternary",
+      startYear: -2_580_000,
+      endYear: -300_000,
+      timeLabel: "2.58M years ago — present",
+      color: "rgba(0, 0, 0, 0.1)",
+      sourceRefs: [{ sourceId: "icsChart2024" }],
+    };
+
+    expect(getEraTooltipContent(era)).toMatchObject({
+      timeLabel: "2.58M years ago — present",
+    });
+  });
+
   it("prefers explicit marker date/time labels when provided", () => {
     const marker: TimelineMarker = {
       id: "titanic-sinks",

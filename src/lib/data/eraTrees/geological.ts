@@ -11,7 +11,7 @@ function icsColor(red: number, green: number, blue: number): string {
 }
 
 const QUATERNARY_TRUNCATION_NOTE =
-  "The formal Quaternary continues to the present; this app-level segment stops at the human-history handoff.";
+  "The formal Quaternary continues to the present; the rendered band is clipped where the app hands off to the visible human-history eras.";
 
 const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
   {
@@ -217,6 +217,7 @@ const CENOZOIC_PERIODS: EraDefinition[] = [
     name: "Quaternary",
     startYear: -2_580_000,
     endYear: -300_000,
+    timeLabel: "2.58M years ago — present",
     color: icsColor(249, 249, 127),
     scheme: "chronostratigraphic",
     sourceRefs: chartRef(QUATERNARY_TRUNCATION_NOTE),

@@ -93,10 +93,12 @@ export function getEraTooltipContent(era: Era): TimelineTooltipContent {
     kind: "era",
     kindLabel: "Era",
     title: era.name,
-    timeLabel: formatTimelineRange(era.startYear, era.endYear, {
-      approximateStart: era.approximateStart,
-      approximateEnd: era.approximateEnd,
-    }),
+    timeLabel:
+      era.timeLabel ??
+      formatTimelineRange(era.startYear, era.endYear, {
+        approximateStart: era.approximateStart,
+        approximateEnd: era.approximateEnd,
+      }),
     regionalScopeLabel: era.regionalScopeLabel,
     description: era.description,
     sources: resolveTooltipSources(era.sourceRefs),

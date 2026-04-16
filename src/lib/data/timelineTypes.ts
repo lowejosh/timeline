@@ -31,6 +31,7 @@ export type Era = TimelineRegionalScope & TimelineApproximateRange & {
   startYear: number;
   endYear: number;
   color: string;
+  timeLabel?: string;
   description?: string;
   scheme?: EraScheme;
   sourceRefs?: TimelineSourceRef[];

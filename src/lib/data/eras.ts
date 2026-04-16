@@ -56,6 +56,8 @@ export function getAncestorChain(root: Era, targetId: string): Era[] {
 }
 
 const CURRENT_YEAR = getPresentTimelineYear();
+const HUMAN_HISTORY_VISIBLE_CHILDREN =
+  HUMAN_HISTORY_ERA_DEFINITION.children ?? [];
 
 function hashString(value: string): number {
   let hash = 2166136261;
@@ -138,7 +140,7 @@ export const ROOT_ERA: Era = materializeEra({
   children: [
     ...COSMIC_ERA_DEFINITIONS,
     ...GEOLOGICAL_ERA_DEFINITIONS,
-    HUMAN_HISTORY_ERA_DEFINITION,
+    ...HUMAN_HISTORY_VISIBLE_CHILDREN,
   ],
 });
 

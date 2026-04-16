@@ -85,6 +85,54 @@ export const ERA_SOURCES = {
     notes:
       "Used for a concise, museum-grade framing of the Late Triassic extinction, ecological recovery, and the rise of the dinosaurs.",
   },
+  asmGreatOxidationEvent: {
+    shortTitle: "ASM: Great Oxidation Event",
+    title: "The Great Oxidation Event: How Cyanobacteria Changed Life",
+    organization: "American Society for Microbiology",
+    citation:
+      'American Society for Microbiology, "The Great Oxidation Event: How Cyanobacteria Changed Life."',
+    url: "https://asm.org/articles/2022/february/the-great-oxidation-event-how-cyanobacteria-change",
+    notes:
+      "Used for the public-facing explanation that oxygen likely poisoned much of Earth's anaerobic life during the Great Oxidation Event, while precise losses remain difficult to estimate from the fossil record.",
+  },
+  geoscienceworldLateOrdovicianExtinction: {
+    shortTitle: "GSW: Late Ordovician extinction",
+    title:
+      "Late Ordovician mass extinction caused by volcanism, warming, and anoxia, not cooling and glaciation",
+    organization: "GeoScienceWorld",
+    citation:
+      'GeoScienceWorld, "Late Ordovician mass extinction caused by volcanism, warming, and anoxia, not cooling and glaciation."',
+    notes:
+      "Used for the public-facing estimate that around 85% of species were eliminated in the Late Ordovician extinction's two main pulses.",
+  },
+  nsfLateDevonianExtinction: {
+    shortTitle: "NSF: Late Devonian extinction",
+    title: "Climate change factors in the fossil record that accelerate mass extinction",
+    organization: "U.S. National Science Foundation",
+    citation:
+      'U.S. National Science Foundation, "Climate change factors in the fossil record that accelerate mass extinction."',
+    url: "https://www.nsf.gov/news/climate-change-factors-fossil-record-accelerate",
+    notes:
+      "Used for the public-facing estimate that the Late Devonian extinction eliminated roughly 75% of all species across two pulses.",
+  },
+  nasaGreatDying: {
+    shortTitle: "NASA: Great Dying",
+    title: "The Great Dying",
+    organization: "NASA",
+    citation: 'NASA, "The Great Dying."',
+    url: "https://science.nasa.gov/science-research/earth-science/the-great-dying/",
+    notes:
+      "Used for the broad public-facing estimate that roughly 9 in 10 marine species and 7 in 10 land species vanished in the end-Permian extinction.",
+  },
+  amnhSixExtinctions: {
+    shortTitle: "AMNH: Six extinctions",
+    title: "Six Extinctions",
+    organization: "American Museum of Natural History",
+    citation: 'American Museum of Natural History, "Six Extinctions."',
+    url: "https://www.amnh.org/explore/videos/shelf-life/six-extinctions",
+    notes:
+      "Used for concise, public-facing percentage estimates and consequences for the end-Permian, end-Triassic, and end-Cretaceous extinction crises.",
+  },
   berkeleyCambrianExplosion: {
     shortTitle: "Berkeley: Cambrian explosion",
     title: "The Cambrian explosion",

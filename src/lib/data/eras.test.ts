@@ -65,25 +65,25 @@ describe("era data", () => {
   });
 
   it("includes a sourced prehistory path down to the Neolithic", () => {
-    const humanHistory = ROOT_ERA.children?.find((era) => era.id === "human-history");
-    const neolithic = humanHistory?.children?.find((era) => era.id === "neolithic");
+    const neolithic = ROOT_ERA.children?.find((era) => era.id === "neolithic");
     const ppnb = neolithic?.children?.find(
       (era) => era.id === "pre-pottery-neolithic-b",
     );
 
-    expect(humanHistory?.sourceRefs?.length).toBeGreaterThan(0);
+    const paleolithic = ROOT_ERA.children?.find((era) => era.id === "paleolithic");
+
+    expect(paleolithic?.sourceRefs?.length).toBeGreaterThan(0);
     expect(neolithic?.name).toBe("Neolithic");
     expect(ppnb?.name).toBe("Pre-Pottery Neolithic B");
   });
 
   it("flags near eastern archaeological phases as regional and approximate without changing hierarchy", () => {
-    const humanHistory = ROOT_ERA.children?.find((era) => era.id === "human-history");
-    const epipaleolithic = humanHistory?.children?.find(
+    const epipaleolithic = ROOT_ERA.children?.find(
       (era) => era.id === "epipaleolithic",
     );
-    const neolithic = humanHistory?.children?.find((era) => era.id === "neolithic");
-    const bronzeAge = humanHistory?.children?.find((era) => era.id === "bronze-age");
-    const lateIronAge = humanHistory?.children
+    const neolithic = ROOT_ERA.children?.find((era) => era.id === "neolithic");
+    const bronzeAge = ROOT_ERA.children?.find((era) => era.id === "bronze-age");
+    const lateIronAge = ROOT_ERA.children
       ?.find((era) => era.id === "iron-age")
       ?.children?.find((era) => era.id === "late-iron-age");
 
@@ -100,10 +100,10 @@ describe("era data", () => {
   });
 
   it("uses seeded colors by default and respects explicit geological overrides", () => {
-    const humanHistory = ROOT_ERA.children?.find((era) => era.id === "human-history");
+    const paleolithic = ROOT_ERA.children?.find((era) => era.id === "paleolithic");
     const cambrian = ROOT_ERA.children?.find((era) => era.id === "cambrian");
 
-    expect(humanHistory?.color).toBe(getSeededEraColor("human-history"));
+    expect(paleolithic?.color).toBe(getSeededEraColor("paleolithic"));
     expect(cambrian?.color).toBe("rgb(127, 160, 86)");
     expect(cambrian?.color).not.toBe(getSeededEraColor("cambrian"));
   });
@@ -156,7 +156,8 @@ describe("era data", () => {
     expect(rootChildIds).not.toContain("cenozoic");
     expect(ROOT_ERA.children?.find((era) => era.id === "jurassic")?.name).toBe("Jurassic");
     expect(ROOT_ERA.children?.find((era) => era.id === "cambrian")?.name).toBe("Cambrian");
-    expect(quaternary?.sourceRefs?.[0]?.note).toContain("human-history handoff");
+    expect(quaternary?.timeLabel).toBe("2.58M years ago — present");
+    expect(quaternary?.sourceRefs?.[0]?.note).toContain("visible human-history eras");
   });
 
   it("keeps cosmic phases directly under the root timeline", () => {
@@ -168,13 +169,12 @@ describe("era data", () => {
     expect(rootChildIds).toContain("galaxies-take-shape");
   });
 
-  it("flattens prehistoric and ancient periods directly under human history", () => {
-    const humanHistory = ROOT_ERA.children?.find((era) => era.id === "human-history");
-    const humanChildIds = humanHistory?.children?.map((era) => era.id) ?? [];
-    const bronzeAge = humanHistory?.children?.find((era) => era.id === "bronze-age");
-    const ironAge = humanHistory?.children?.find((era) => era.id === "iron-age");
+  it("keeps prehistoric and historical eras directly under the root timeline", () => {
+    const rootChildIds = ROOT_ERA.children?.map((era) => era.id) ?? [];
+    const bronzeAge = ROOT_ERA.children?.find((era) => era.id === "bronze-age");
+    const ironAge = ROOT_ERA.children?.find((era) => era.id === "iron-age");
 
-    expect(humanChildIds).toEqual([
+    expect(rootChildIds).toEqual(expect.arrayContaining([
       "paleolithic",
       "epipaleolithic",
       "neolithic",
@@ -186,9 +186,10 @@ describe("era data", () => {
       "early-modern-period",
       "age-of-industry-and-empire",
       "contemporary-history",
-    ]);
-    expect(humanChildIds).not.toContain("prehistory");
-    expect(humanChildIds).not.toContain("ancient-history");
+    ]));
+    expect(rootChildIds).not.toContain("human-history");
+    expect(rootChildIds).not.toContain("prehistory");
+    expect(rootChildIds).not.toContain("ancient-history");
     expect(bronzeAge?.children?.map((era) => era.id)).toEqual([
       "early-bronze-age",
       "middle-bronze-age",

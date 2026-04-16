@@ -7,6 +7,8 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     id: "cambrian-explosion",
     label: "Cambrian explosion",
     shortLabel: "Cambrian Explosion",
+    description:
+      "A rapid burst of marine evolution in which most major animal lineages first appear in the fossil record, many with striking new body plans.",
     startYear: -570_000_000,
     endYear: -530_000_000,
     color: "rgb(82, 136, 138)",
@@ -24,6 +26,8 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     id: "age-of-dinosaurs",
     label: "Age of Dinosaurs",
     shortLabel: "Dinosaurs",
+    description:
+      "Dinosaurs and other archosaurs dominated life on land through most of the Mesozoic, while early birds and mammals emerged in their shadow.",
     startYear: -201_400_000,
     endYear: -66_000_000,
     color: "rgb(136, 104, 76)",
