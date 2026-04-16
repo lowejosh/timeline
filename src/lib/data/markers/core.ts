@@ -6,7 +6,6 @@ export const CORE_TIMELINE_MARKERS: TimelineMarker[] = [
     label: "Solar System forms",
     shortLabel: "Solar System",
     year: -4_567_000_000,
-    color: "rgba(125, 88, 48, 0.92)",
     minZoom: 0,
     priority: 90,
     sourceRefs: [
@@ -21,7 +20,6 @@ export const CORE_TIMELINE_MARKERS: TimelineMarker[] = [
     label: "Earth forms",
     shortLabel: "Earth",
     year: -4_540_000_000,
-    color: "rgba(65, 112, 88, 0.92)",
     minZoom: 0,
     priority: 100,
     sourceRefs: [
@@ -36,7 +34,6 @@ export const CORE_TIMELINE_MARKERS: TimelineMarker[] = [
     label: "Earliest evidence of life on Earth",
     shortLabel: "Earliest Life",
     year: -3_500_000_000,
-    color: "rgba(72, 126, 92, 0.92)",
     minZoom: 0,
     priority: 95,
     sourceRefs: [

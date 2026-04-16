@@ -8,7 +8,6 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     year: -300_000,
     regionalScopeLabel: "Africa",
     approximate: true,
-    color: "rgba(124, 98, 78, 0.94)",
     minZoom: 17,
     priority: 83,
     sourceRefs: [
@@ -25,7 +24,6 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     year: -100_000,
     regionalScopeLabel: "Africa",
     approximate: true,
-    color: "rgba(154, 88, 67, 0.94)",
     minZoom: 17,
     priority: 75,
     sourceRefs: [
@@ -42,7 +40,6 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     year: -40_000,
     regionalScopeLabel: "Northern Australia",
     approximate: true,
-    color: "rgba(140, 101, 66, 0.94)",
     minZoom: 18,
     priority: 76,
     sourceRefs: [
@@ -63,7 +60,6 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     year: -35_000,
     regionalScopeLabel: "Central Europe",
     approximate: true,
-    color: "rgba(118, 108, 91, 0.94)",
     minZoom: 18,
     priority: 78,
     sourceRefs: [
@@ -84,7 +80,6 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     year: -30_000,
     regionalScopeLabel: "Southern France",
     approximate: true,
-    color: "rgba(99, 95, 121, 0.94)",
     minZoom: 18,
     priority: 77,
     sourceRefs: [
@@ -105,7 +100,6 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     year: -27_000,
     regionalScopeLabel: "Central Europe",
     approximate: true,
-    color: "rgba(130, 86, 92, 0.94)",
     minZoom: 18,
     priority: 74,
     sourceRefs: [

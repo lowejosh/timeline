@@ -8,7 +8,6 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     year: -3_200,
     regionalScopeLabel: "Mesopotamia",
     approximate: true,
-    color: "rgba(150, 114, 82, 0.94)",
     minZoom: 18,
     priority: 79,
     sourceRefs: [
@@ -29,7 +28,6 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     year: -2_560,
     regionalScopeLabel: "Ancient Egypt",
     approximate: true,
-    color: "rgba(184, 146, 90, 0.94)",
     minZoom: 18,
     priority: 78,
     sourceRefs: [
@@ -46,7 +44,6 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     year: -2_300,
     regionalScopeLabel: "Mesopotamia",
     approximate: true,
-    color: "rgba(176, 104, 83, 0.94)",
     minZoom: 18,
     priority: 80,
     sourceRefs: [
@@ -63,7 +60,6 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     year: -1_750,
     regionalScopeLabel: "Babylonia",
     approximate: true,
-    color: "rgba(148, 114, 140, 0.94)",
     minZoom: 18,
     priority: 81,
     sourceRefs: [
@@ -84,7 +80,6 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     year: -1_300,
     regionalScopeLabel: "North China",
     approximate: true,
-    color: "rgba(92, 128, 152, 0.94)",
     minZoom: 18,
     priority: 77,
     sourceRefs: [

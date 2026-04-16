@@ -6,7 +6,6 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     label: "Alexander the Great dies",
     shortLabel: "Alexander Dies",
     year: -323,
-    color: "rgba(92, 124, 173, 0.94)",
     minZoom: 18,
     priority: 76,
     sourceRefs: [
@@ -25,7 +24,6 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     label: "Caesar crosses the Rubicon",
     shortLabel: "Rubicon",
     year: -49,
-    color: "rgba(146, 88, 71, 0.94)",
     minZoom: 19,
     priority: 74,
     sourceRefs: [

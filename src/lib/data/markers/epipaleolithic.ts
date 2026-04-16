@@ -8,7 +8,6 @@ export const EPIPALEOLITHIC_MARKERS: TimelineMarker[] = [
     year: -10_000,
     regionalScopeLabel: "Levant",
     approximate: true,
-    color: "rgba(118, 112, 82, 0.94)",
     minZoom: 19,
     priority: 72,
     sourceRefs: [

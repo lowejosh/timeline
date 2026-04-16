@@ -8,7 +8,6 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
     year: -4_000,
     regionalScopeLabel: "Southern Mesopotamia",
     approximate: true,
-    color: "rgba(104, 132, 108, 0.94)",
     minZoom: 19,
     priority: 70,
     sourceRefs: [
@@ -25,7 +24,6 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
     year: -3_500,
     regionalScopeLabel: "Sumer",
     approximate: true,
-    color: "rgba(126, 107, 79, 0.94)",
     minZoom: 19,
     priority: 76,
     sourceRefs: [
@@ -42,7 +40,6 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
     year: -3_200,
     regionalScopeLabel: "Southern Mesopotamia",
     approximate: true,
-    color: "rgba(136, 101, 90, 0.94)",
     minZoom: 19,
     priority: 82,
     sourceRefs: [

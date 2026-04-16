@@ -9,7 +9,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: -9_600,
     regionalScopeLabel: "Southeastern Anatolia",
     approximate: true,
-    color: "rgba(135, 101, 74, 0.94)",
     minZoom: 19,
     priority: 69,
     sourceRefs: [
@@ -26,7 +25,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: -9_500,
     regionalScopeLabel: "Southwest Asia",
     approximate: true,
-    color: "rgba(104, 126, 80, 0.94)",
     minZoom: 19,
     priority: 81,
     sourceRefs: [
@@ -47,7 +45,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: -7_400,
     regionalScopeLabel: "Anatolia",
     approximate: true,
-    color: "rgba(162, 112, 82, 0.94)",
     minZoom: 19,
     priority: 68,
     sourceRefs: [
@@ -64,7 +61,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: -7_200,
     regionalScopeLabel: "Levant",
     approximate: true,
-    color: "rgba(149, 119, 95, 0.94)",
     minZoom: 19,
     priority: 67,
     sourceRefs: [
@@ -81,7 +77,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: -3_000,
     regionalScopeLabel: "Southern Britain",
     approximate: true,
-    color: "rgba(112, 121, 138, 0.94)",
     minZoom: 19,
     priority: 66,
     sourceRefs: [
@@ -102,7 +97,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: -1_200,
     regionalScopeLabel: "Eastern Mediterranean",
     approximate: true,
-    color: "rgba(168, 98, 58, 0.94)",
     minZoom: 18,
     priority: 78,
     sourceRefs: [
@@ -121,7 +115,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Augustus becomes first emperor",
     shortLabel: "Augustus becomes emperor",
     year: -27,
-    color: "rgba(163, 102, 67, 0.94)",
     minZoom: 18,
     priority: 83,
     sourceRefs: [
@@ -140,7 +133,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Fall of Western Rome",
     shortLabel: "Western Rome Falls",
     year: 476,
-    color: "rgba(121, 91, 79, 0.94)",
     minZoom: 18,
     priority: 81,
     sourceRefs: [
@@ -155,7 +147,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Muhammad's migration to Medina",
     shortLabel: "Migration to Medina",
     year: 622,
-    color: "rgba(74, 124, 96, 0.94)",
     minZoom: 18,
     priority: 82,
     sourceRefs: [
@@ -170,7 +161,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Charlemagne crowned Holy Roman Emperor",
     shortLabel: "Holy Roman Emperor",
     year: 800,
-    color: "rgba(152, 121, 72, 0.94)",
     minZoom: 18,
     priority: 81,
     sourceRefs: [
@@ -185,7 +175,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Genghis Khan proclaimed ruler",
     shortLabel: "Mongol Empire Begins",
     year: 1206,
-    color: "rgba(123, 104, 86, 0.94)",
     minZoom: 18,
     priority: 83,
     sourceRefs: [
@@ -200,7 +189,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Black Death reaches Europe",
     shortLabel: "Black Death",
     year: 1347,
-    color: "rgba(104, 73, 87, 0.94)",
     minZoom: 18,
     priority: 80,
     sourceRefs: [
@@ -215,7 +203,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Fall of Constantinople",
     shortLabel: "Constantinople",
     year: 1453,
-    color: "rgba(141, 87, 60, 0.94)",
     minZoom: 18,
     priority: 82,
     sourceRefs: [
@@ -230,7 +217,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Gutenberg press",
     shortLabel: "Printing Press",
     year: 1450,
-    color: "rgba(117, 100, 72, 0.94)",
     minZoom: 20,
     priority: 72,
     sourceRefs: [
@@ -245,7 +231,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Columbian Exchange begins",
     shortLabel: "Columbian Exchange",
     year: 1492,
-    color: "rgba(78, 117, 142, 0.94)",
     minZoom: 18,
     priority: 84,
     sourceRefs: [
@@ -260,7 +245,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Protestant Reformation",
     shortLabel: "Reformation",
     year: 1517,
-    color: "rgba(122, 96, 150, 0.94)",
     minZoom: 18,
     priority: 85,
     sourceRefs: [
@@ -275,7 +259,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "American independence declared",
     shortLabel: "American Independence",
     year: 1776,
-    color: "rgba(72, 102, 153, 0.94)",
     minZoom: 20,
     priority: 75,
     sourceRefs: [
@@ -290,7 +273,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "French Revolution begins",
     shortLabel: "French Revolution",
     year: 1789,
-    color: "rgba(176, 88, 72, 0.94)",
     minZoom: 18,
     priority: 86,
     sourceRefs: [
@@ -307,7 +289,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: getTimelineYearFromUtcParts(1912, 3, 15, 2, 20),
     dateLabel: "Apr 15, 1912",
     timeLabel: "Apr 15, 1912, 2:20 AM UTC",
-    color: "rgba(79, 109, 148, 0.94)",
     minZoom: 20,
     priority: 77,
     sourceRefs: [
@@ -322,7 +303,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "World War I begins",
     shortLabel: "World War I",
     year: 1914,
-    color: "rgba(96, 103, 119, 0.94)",
     minZoom: 18,
     priority: 88,
     sourceRefs: [
@@ -337,7 +317,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Russian Revolution",
     shortLabel: "Russian Revolution",
     year: 1917,
-    color: "rgba(155, 78, 78, 0.94)",
     minZoom: 18,
     priority: 87,
     sourceRefs: [
@@ -352,7 +331,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "World War II begins",
     shortLabel: "World War II",
     year: 1939,
-    color: "rgba(88, 92, 112, 0.94)",
     minZoom: 18,
     priority: 90,
     sourceRefs: [
@@ -367,7 +345,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Apollo 11 Moon landing",
     shortLabel: "Moon Landing",
     year: 1969,
-    color: "rgba(103, 110, 150, 0.94)",
     minZoom: 20,
     priority: 79,
     sourceRefs: [

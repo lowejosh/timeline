@@ -6,7 +6,6 @@ export const POST_CLASSICAL_MARKERS: TimelineMarker[] = [
     label: "First Crusade called",
     shortLabel: "First Crusade",
     year: 1095,
-    color: "rgba(128, 98, 154, 0.94)",
     minZoom: 18,
     priority: 74,
     sourceRefs: [

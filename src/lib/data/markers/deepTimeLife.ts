@@ -8,7 +8,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     year: -2_400_000_000,
     description:
       "As cyanobacteria oxygenated sea and sky, oxygen likely poisoned much of Earth's anaerobic life—though the size of that die-off remains hard to pin down from the fossil record.",
-    color: "rgba(94, 132, 154, 0.94)",
     minZoom: 0,
     priority: 96,
     sourceRefs: [
@@ -27,7 +26,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "First eukaryotic cells",
     shortLabel: "First Eukaryotes",
     year: -1_800_000_000,
-    color: "rgba(104, 122, 164, 0.94)",
     minZoom: 0,
     priority: 94,
     sourceRefs: [
@@ -42,7 +40,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "First large multicellular life",
     shortLabel: "Large Multicellular Life",
     year: -575_000_000,
-    color: "rgba(88, 140, 122, 0.94)",
     minZoom: 0,
     priority: 93,
     sourceRefs: [
@@ -57,7 +54,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "First land plants",
     shortLabel: "Land Plants",
     year: -470_000_000,
-    color: "rgba(96, 146, 96, 0.94)",
     minZoom: 0,
     priority: 92,
     sourceRefs: [
@@ -74,7 +70,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     year: -447_000_000,
     description:
       "A two-pulse marine crisis driven by climate upheaval that wiped out about 85% of species, shattering reefs and open-ocean ecosystems alike.",
-    color: "rgba(124, 97, 149, 0.94)",
     minZoom: 0,
     priority: 94,
     sourceRefs: [
@@ -95,7 +90,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     year: -378_000_000,
     description:
       "A drawn-out reef crisis that unfolded in pulses and eliminated roughly 75% of species, hitting corals, brachiopods, and other marine life especially hard.",
-    color: "rgba(116, 86, 139, 0.94)",
     minZoom: 0,
     priority: 93,
     sourceRefs: [
@@ -114,7 +108,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "Early tetrapods move onto land",
     shortLabel: "Tetrapods on Land",
     year: -370_000_000,
-    color: "rgba(84, 124, 96, 0.94)",
     minZoom: 0,
     priority: 92,
     sourceRefs: [
@@ -129,7 +122,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "First reptiles appear",
     shortLabel: "First Reptiles",
     year: -320_000_000,
-    color: "rgba(142, 111, 74, 0.94)",
     minZoom: 0,
     priority: 91,
     sourceRefs: [
@@ -144,7 +136,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "Giant insects fill Carboniferous skies",
     shortLabel: "Giant Insects",
     year: -315_000_000,
-    color: "rgba(98, 128, 74, 0.94)",
     minZoom: 0,
     priority: 88,
     sourceRefs: [
@@ -161,7 +152,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     year: -252_000_000,
     description:
       "Earth's worst known extinction: roughly 9 in 10 marine species and 7 in 10 land species vanished as massive volcanism drove runaway warming and ecosystem collapse.",
-    color: "rgba(148, 83, 83, 0.94)",
     minZoom: 0,
     priority: 97,
     sourceRefs: [
@@ -184,7 +174,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "First mammals appear",
     shortLabel: "First Mammals",
     year: -225_000_000,
-    color: "rgba(126, 109, 148, 0.94)",
     minZoom: 0,
     priority: 90,
     sourceRefs: [
@@ -201,7 +190,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     year: -199_000_000,
     description:
       "A volcanic crisis as the Atlantic began opening that wiped out more than a third of marine species and many large land reptiles, clearing space for dinosaur dominance.",
-    color: "rgba(156, 96, 75, 0.94)",
     minZoom: 0,
     priority: 95,
     sourceRefs: [
@@ -224,7 +212,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "Archaeopteryx, first known bird",
     shortLabel: "Archaeopteryx",
     year: -150_000_000,
-    color: "rgba(84, 118, 152, 0.94)",
     minZoom: 0,
     priority: 89,
     sourceRefs: [
@@ -241,7 +228,6 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     year: -66_000_000,
     description:
       "The Chicxulub impact triggered abrupt global collapse that wiped out about 75% of species, including all non-avian dinosaurs, while birds and mammals pulled through.",
-    color: "rgba(168, 88, 68, 0.96)",
     minZoom: 0,
     priority: 99,
     sourceRefs: [

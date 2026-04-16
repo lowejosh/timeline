@@ -181,6 +181,11 @@ type HoveredTooltipState = {
   tooltip: TimelineTooltipContent;
 };
 
+type RenderedTooltipState = {
+  tooltipState: HoveredTooltipState;
+  phase: "entering" | "present" | "exiting";
+};
+
 type MarkerPriorityBoostState = {
   current: number;
   target: number;
@@ -373,6 +378,7 @@ const MIN_VISIBLE_OVERLAY_CHILD_WIDTH = 1;
 const TOOLTIP_OFFSET = 3;
 const TOOLTIP_MAX_WIDTH = 280;
 const TOOLTIP_BRIDGE_BASE_HALF_WIDTH = 16;
+const TOOLTIP_EXIT_DURATION_MS = 170;
 const CLICK_DRAG_THRESHOLD = 6;
 const PERF_LOG_INTERVAL_MS = 2000;
 const PERF_SLOW_FRAME_MS = 14;
@@ -1282,6 +1288,8 @@ export function TimelineCanvas({
   const hoverRegionsRef = useRef<HoverRegion[]>([]);
   const overlayInteractionRegionsRef = useRef<OverlayInteractionRegion[]>([]);
   const hoveredTooltipRef = useRef<HoveredTooltipState | null>(null);
+  const tooltipExitTimeoutRef = useRef<number | null>(null);
+  const tooltipEnterFrameRef = useRef(0);
   const lastPointerRef = useRef<{
     x: number;
     y: number;
@@ -1317,6 +1325,8 @@ export function TimelineCanvas({
   const pendingWheelAnchorRef = useRef(0);
   const [hoveredTooltip, setHoveredTooltip] =
     useState<HoveredTooltipState | null>(null);
+  const [renderedTooltip, setRenderedTooltip] =
+    useState<RenderedTooltipState | null>(null);
   const [expandedOverlayId, setExpandedOverlayId] = useState<string | null>(
     null,
   );
@@ -1333,6 +1343,14 @@ export function TimelineCanvas({
     return () => {
       if (interactionSettleTimeoutRef.current !== null) {
         window.clearTimeout(interactionSettleTimeoutRef.current);
+      }
+
+      if (tooltipExitTimeoutRef.current !== null) {
+        window.clearTimeout(tooltipExitTimeoutRef.current);
+      }
+
+      if (tooltipEnterFrameRef.current) {
+        cancelAnimationFrame(tooltipEnterFrameRef.current);
       }
     };
   }, []);
@@ -1355,8 +1373,59 @@ export function TimelineCanvas({
         return;
       }
 
+      if (tooltipExitTimeoutRef.current !== null) {
+        window.clearTimeout(tooltipExitTimeoutRef.current);
+        tooltipExitTimeoutRef.current = null;
+      }
+
+      if (tooltipEnterFrameRef.current) {
+        cancelAnimationFrame(tooltipEnterFrameRef.current);
+        tooltipEnterFrameRef.current = 0;
+      }
+
       hoveredTooltipRef.current = nextTooltip;
       setHoveredTooltip(nextTooltip);
+
+      if (!nextTooltip) {
+        setRenderedTooltip((current) =>
+          current
+            ? {
+                ...current,
+                phase: "exiting",
+              }
+            : null,
+        );
+
+        tooltipExitTimeoutRef.current = window.setTimeout(() => {
+          tooltipExitTimeoutRef.current = null;
+          setRenderedTooltip((current) =>
+            current?.phase === "exiting" ? null : current,
+          );
+        }, TOOLTIP_EXIT_DURATION_MS);
+
+        return;
+      }
+
+      setRenderedTooltip({
+        tooltipState: nextTooltip,
+        phase: "entering",
+      });
+
+      tooltipEnterFrameRef.current = requestAnimationFrame(() => {
+        tooltipEnterFrameRef.current = 0;
+        setRenderedTooltip((current) => {
+          if (!current) {
+            return current;
+          }
+
+          return isEquivalentHoveredTooltip(current.tooltipState, nextTooltip)
+            ? {
+                tooltipState: nextTooltip,
+                phase: "present",
+              }
+            : current;
+        });
+      });
     },
     [],
   );
@@ -2739,14 +2808,13 @@ export function TimelineCanvas({
         dotProgress,
         stemProgress,
       } of resolvedMarkerStates) {
-        const markerColor = marker.color ?? line;
+        const markerDotColor = marker.color ?? line;
         const stemStartY = axisY + 2;
         const stemY =
           stemStartY + (layout.markerStemBottom - stemStartY) * stemProgress;
 
         context.save();
-        context.strokeStyle = markerColor;
-        context.fillStyle = markerColor;
+        context.strokeStyle = line;
         context.globalAlpha = 0.18 + stemProgress * 0.72;
         context.lineWidth = 1.5;
 
@@ -2760,7 +2828,8 @@ export function TimelineCanvas({
         const dotRadius = dotProgress > 0.01 ? 0.9 + 1.7 * dotProgress : 0;
 
         if (dotRadius > 0.001) {
-          context.globalAlpha = 0.18 + dotProgress * 0.5;
+          context.fillStyle = markerDotColor;
+          context.globalAlpha = 1;
           context.beginPath();
           context.arc(x, axisY, dotRadius, 0, Math.PI * 2);
           context.fill();
@@ -4495,14 +4564,13 @@ export function TimelineCanvas({
       dotProgress,
       stemProgress,
     } of resolvedMarkerStates) {
-      const markerColor = marker.color ?? line;
+      const markerDotColor = marker.color ?? line;
       const stemStartY = axisY + 2;
       const stemY =
         stemStartY + (layout.markerStemBottom - stemStartY) * stemProgress;
 
       context.save();
-      context.strokeStyle = markerColor;
-      context.fillStyle = markerColor;
+      context.strokeStyle = line;
       context.globalAlpha = 0.18 + stemProgress * 0.72;
       context.lineWidth = 1.5;
 
@@ -4516,7 +4584,8 @@ export function TimelineCanvas({
       const dotRadius = dotProgress > 0.01 ? 0.9 + 1.7 * dotProgress : 0;
 
       if (dotRadius > 0.001) {
-        context.globalAlpha = 0.18 + dotProgress * 0.5;
+        context.fillStyle = markerDotColor;
+        context.globalAlpha = 1;
         context.beginPath();
         context.arc(x, axisY, dotRadius, 0, Math.PI * 2);
         context.fill();
@@ -5436,32 +5505,38 @@ export function TimelineCanvas({
     }
   };
 
+  const displayedTooltip = renderedTooltip?.tooltipState ?? null;
+
   const tooltipStyle:
     | (CSSProperties & Record<string, string | number>)
-    | undefined = hoveredTooltip
+    | undefined = displayedTooltip
     ? {
         left:
-          hoveredTooltip.anchorX > width - TOOLTIP_MAX_WIDTH * 0.4
-            ? hoveredTooltip.anchorX - TOOLTIP_OFFSET
-            : hoveredTooltip.anchorX < TOOLTIP_MAX_WIDTH * 0.4
-              ? hoveredTooltip.anchorX + TOOLTIP_OFFSET
-              : hoveredTooltip.anchorX,
-        top: hoveredTooltip.anchorY,
+          displayedTooltip.anchorX > width - TOOLTIP_MAX_WIDTH * 0.4
+            ? displayedTooltip.anchorX - TOOLTIP_OFFSET
+            : displayedTooltip.anchorX < TOOLTIP_MAX_WIDTH * 0.4
+              ? displayedTooltip.anchorX + TOOLTIP_OFFSET
+              : displayedTooltip.anchorX,
+        top: displayedTooltip.anchorY,
         maxWidth: `${Math.min(TOOLTIP_MAX_WIDTH, Math.max(width - 32, 220))}px`,
         "--tooltip-translate-x":
-          hoveredTooltip.anchorX > width - TOOLTIP_MAX_WIDTH * 0.4
+          displayedTooltip.anchorX > width - TOOLTIP_MAX_WIDTH * 0.4
             ? "-100%"
-            : hoveredTooltip.anchorX < TOOLTIP_MAX_WIDTH * 0.4
+            : displayedTooltip.anchorX < TOOLTIP_MAX_WIDTH * 0.4
               ? "0%"
               : "-50%",
         "--tooltip-translate-y":
-          hoveredTooltip.anchorY < 96 || hoveredTooltip.placement === "below"
+          displayedTooltip.anchorY < 96 || displayedTooltip.placement === "below"
             ? `${TOOLTIP_OFFSET}px`
             : `calc(-100% - ${TOOLTIP_OFFSET}px)`,
         "--tooltip-origin":
-          hoveredTooltip.anchorY < 96 || hoveredTooltip.placement === "below"
+          displayedTooltip.anchorY < 96 || displayedTooltip.placement === "below"
             ? "top center"
             : "bottom center",
+        "--tooltip-motion-offset-y":
+          displayedTooltip.anchorY < 96 || displayedTooltip.placement === "below"
+            ? "-4px"
+            : "4px",
       }
     : undefined;
 
@@ -5522,29 +5597,33 @@ export function TimelineCanvas({
         ref={canvasRef}
         tabIndex={0}
       />
-      {hoveredTooltip ? (
-        <div className="timeline-tooltip" style={tooltipStyle}>
+      {renderedTooltip ? (
+        <div
+          className="timeline-tooltip"
+          data-phase={renderedTooltip.phase}
+          style={tooltipStyle}
+        >
           <div className="timeline-tooltip__title">
-            {hoveredTooltip.tooltip.title}
+            {renderedTooltip.tooltipState.tooltip.title}
           </div>
-          {hoveredTooltip.tooltip.regionalScopeLabel ? (
+          {renderedTooltip.tooltipState.tooltip.regionalScopeLabel ? (
             <div className="timeline-tooltip__subtitle">
-              {hoveredTooltip.tooltip.regionalScopeLabel}
+              {renderedTooltip.tooltipState.tooltip.regionalScopeLabel}
             </div>
           ) : null}
           <div className="timeline-tooltip__time">
-            {hoveredTooltip.tooltip.timeLabel}
+            {renderedTooltip.tooltipState.tooltip.timeLabel}
           </div>
-          {hoveredTooltip.tooltip.description ? (
+          {renderedTooltip.tooltipState.tooltip.description ? (
             <div className="timeline-tooltip__description">
-              {hoveredTooltip.tooltip.description}
+              {renderedTooltip.tooltipState.tooltip.description}
             </div>
           ) : null}
-          {hoveredTooltip.tooltip.sources.length > 0 ? (
+          {renderedTooltip.tooltipState.tooltip.sources.length > 0 ? (
             <div className="timeline-tooltip__sources" ref={tooltipSourcesRef}>
               <div className="timeline-tooltip__sources-label">Sources</div>
               <ul className="timeline-tooltip__source-list">
-                {hoveredTooltip.tooltip.sources.map((source) => (
+                {renderedTooltip.tooltipState.tooltip.sources.map((source) => (
                   <li className="timeline-tooltip__source-item" key={source.id}>
                     {source.url ? (
                       <a

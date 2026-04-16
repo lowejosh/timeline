@@ -375,19 +375,39 @@
   position: absolute;
   z-index: 2;
   pointer-events: none;
+  opacity: 1;
   padding: 0.55rem 0.65rem;
   border-radius: 12px;
   border: 1px solid rgba(77, 61, 47, 0.12);
   background: rgba(251, 247, 239, 0.96);
   box-shadow: 0 8px 20px rgba(44, 31, 20, 0.12);
   color: var(--ink);
+  filter: blur(0);
   backdrop-filter: blur(10px);
   transform:
     translate(var(--tooltip-translate-x, -50%), var(--tooltip-translate-y, calc(-100% - 12px)))
     scale(1);
   transform-origin: var(--tooltip-origin, bottom center);
-  animation: timeline-tooltip-pop 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  will-change: transform, opacity;
+  transition:
+    opacity 160ms ease,
+    filter 180ms ease,
+    transform 190ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity, filter;
+}
+
+.timeline-tooltip[data-phase="entering"],
+.timeline-tooltip[data-phase="exiting"] {
+  opacity: 0;
+  filter: blur(1.5px);
+  transform:
+    translate(
+      var(--tooltip-translate-x, -50%),
+      calc(
+        var(--tooltip-translate-y, calc(-100% - 12px)) +
+        var(--tooltip-motion-offset-y, 4px)
+      )
+    )
+    scale(0.965);
 }
 
 .timeline-tooltip__title {
@@ -455,25 +475,6 @@
   display: block;
   color: rgba(77, 61, 47, 0.7);
   font: 0.66rem/1.2 var(--font-sans);
-}
-
-@keyframes timeline-tooltip-pop {
-  from {
-    opacity: 0;
-    transform:
-      translate(
-        var(--tooltip-translate-x, -50%),
-        calc(var(--tooltip-translate-y, calc(-100% - 12px)) + 4px)
-      )
-      scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform:
-      translate(var(--tooltip-translate-x, -50%), var(--tooltip-translate-y, calc(-100% - 12px)))
-      scale(1);
-  }
 }
 
 @keyframes timeline-sidebar-pop {

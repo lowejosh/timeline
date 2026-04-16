@@ -8,7 +8,6 @@ export const NEOLITHIC_MARKERS: TimelineMarker[] = [
     year: -8_000,
     regionalScopeLabel: "South Asia",
     approximate: true,
-    color: "rgba(171, 128, 86, 0.94)",
     minZoom: 19,
     priority: 74,
     sourceRefs: [
@@ -25,7 +24,6 @@ export const NEOLITHIC_MARKERS: TimelineMarker[] = [
     year: -7_000,
     regionalScopeLabel: "North China",
     approximate: true,
-    color: "rgba(88, 126, 134, 0.94)",
     minZoom: 19,
     priority: 73,
     sourceRefs: [
