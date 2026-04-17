@@ -4,9 +4,7 @@ import {
   TIMELINE_DECORATION_CATEGORY_IDS,
   TIMELINE_DECORATION_GROUPS,
 } from "./timelineDecorations";
-import type {
-  TimelineDisplayConfig,
-} from "./timelineTypes";
+import type { TimelineDisplayConfig } from "./timelineTypes";
 
 export type TimelineSidebarEntryState = {
   id: string;

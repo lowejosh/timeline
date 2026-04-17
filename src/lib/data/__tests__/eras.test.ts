@@ -114,6 +114,48 @@ describe("era data", () => {
     expect(cambrian?.color).not.toBe(getSeededEraColor("cambrian"));
   });
 
+  it("breaks geological systems into ICS series children", () => {
+    const cambrian = ROOT_ERA.children?.find((era) => era.id === "cambrian");
+    const silurian = ROOT_ERA.children?.find((era) => era.id === "silurian");
+    const carboniferous = ROOT_ERA.children?.find(
+      (era) => era.id === "carboniferous",
+    );
+    const quaternary = ROOT_ERA.children?.find(
+      (era) => era.id === "quaternary",
+    );
+
+    expect(cambrian?.children?.map((era) => era.id)).toEqual([
+      "terreneuvian",
+      "cambrian-series-2",
+      "miaolingian",
+      "furongian",
+    ]);
+    expect(cambrian?.children?.[0]?.color).toBe("rgb(140, 176, 108)");
+
+    expect(silurian?.children?.map((era) => era.id)).toEqual([
+      "llandovery",
+      "wenlock",
+      "ludlow",
+      "pridoli",
+    ]);
+
+    expect(carboniferous?.children?.map((era) => era.id)).toEqual([
+      "lower-mississippian",
+      "middle-mississippian",
+      "upper-mississippian",
+      "lower-pennsylvanian",
+      "middle-pennsylvanian",
+      "upper-pennsylvanian",
+    ]);
+
+    expect(quaternary?.children?.map((era) => era.id)).toEqual([
+      "pleistocene",
+    ]);
+    expect(quaternary?.children?.[0]?.sourceRefs?.[0]?.note).toContain(
+      "formal Pleistocene continues",
+    );
+  });
+
   it("keeps geological eras directly under the root timeline", () => {
     const rootChildIds = ROOT_ERA.children?.map((era) => era.id) ?? [];
 

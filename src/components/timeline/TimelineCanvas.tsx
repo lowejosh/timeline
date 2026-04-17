@@ -107,6 +107,7 @@ type TimelineCanvasProps = {
   markers: TimelineMarker[];
   overlayBands: TimelineOverlayBand[];
   enabledGroupIds: ReadonlySet<string>;
+  overlayVisibilityTransitionKey: number;
   parentEra: Era | null;
   isAnimating: boolean;
   onViewportChange: (
@@ -350,6 +351,14 @@ type ExpandedOverlayConnectorGeometry = {
   railY: number;
 };
 
+type AnimatedOverlayBandState = {
+  overlay: ResolvedTimelineOverlayBand;
+  currentOpacity: number;
+  targetOpacity: number;
+  currentY: number;
+  targetY: number;
+};
+
 export const TIMELINE_CANVAS_PAD = 120;
 const PAD = TIMELINE_CANVAS_PAD;
 const OVERLAY_LANE_HEIGHT = 16;
@@ -374,6 +383,13 @@ const ERA_CHILD_TRANSITION_DURATION_MS = 220;
 const MARKER_PRIORITY_BOOST_SMOOTHING_MS = 130;
 const EXPANDED_OVERLAY_ANIMATION_SMOOTHING_MS = 170;
 const CONTEXT_BAND_LABEL_TRANSITION_DURATION_MS = 160;
+const OVERLAY_BAND_FADE_IN_SMOOTHING_MS = 150;
+const OVERLAY_BAND_FADE_OUT_SMOOTHING_MS = 108;
+const OVERLAY_BAND_POSITION_SMOOTHING_MS = 170;
+const OVERLAY_BAND_ENTER_SLIDE_PX = 8;
+const OVERLAY_BAND_EXIT_SLIDE_PX = 10;
+const OVERLAY_BAND_REFLOW_START_OPACITY = 0.08;
+const MIN_EXPANDED_OVERLAY_PARENT_WIDTH = 220;
 const EXPANDED_OVERLAY_CHROME_STEM_REVEAL_END = 0.18;
 const EXPANDED_OVERLAY_CHROME_RAIL_REVEAL_START = 0.1;
 const EXPANDED_OVERLAY_CHROME_RAIL_REVEAL_END = 0.32;
@@ -397,6 +413,13 @@ const EXPANDED_OVERLAY_CHILD_BORDER_ALPHA = 1;
 const PARENT_ERA_TINT_ALPHA = 0.05;
 const MIN_VISIBLE_OVERLAY_CHILD_WIDTH = 1;
 const TOOLTIP_OFFSET = 3;
+
+const canExpandOverlayParent = (bandWidth: number, childCount: number) =>
+  childCount > 0 && bandWidth >= MIN_EXPANDED_OVERLAY_PARENT_WIDTH;
+
+const isOverlayBandStateAnimating = (state: AnimatedOverlayBandState) =>
+  Math.abs(state.targetOpacity - state.currentOpacity) > 0.002 ||
+  Math.abs(state.targetY - state.currentY) > 0.2;
 const TOOLTIP_MAX_WIDTH = 280;
 const TOOLTIP_BRIDGE_BASE_HALF_WIDTH = 16;
 const TOOLTIP_EXIT_DURATION_MS = 170;
@@ -1597,6 +1620,50 @@ function getOverlayLabelPaint(
   });
 }
 
+function drawPaperOverlayBand({
+  context,
+  x,
+  y,
+  width,
+  height,
+  bandColor,
+  alpha,
+  borderStyle,
+  drawBorder,
+}: {
+  context: CanvasRenderingContext2D;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  bandColor: string;
+  alpha: number;
+  borderStyle: string;
+  drawBorder: boolean;
+}) {
+  context.save();
+  context.globalAlpha = alpha;
+  context.shadowColor = "rgba(64, 46, 31, 0.2)";
+  context.shadowBlur = 5;
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 1;
+  context.fillStyle = bandColor;
+  context.fillRect(x, y, width, height);
+
+  if (drawBorder) {
+    context.shadowColor = "rgba(0, 0, 0, 0)";
+    context.shadowBlur = 0;
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 0;
+    context.globalAlpha = Math.min(alpha * 0.72 + 0.08, 0.86);
+    context.strokeStyle = borderStyle;
+    context.lineWidth = 1;
+    context.strokeRect(x, y, width, height);
+  }
+
+  context.restore();
+}
+
 export function TimelineCanvas({
   width,
   height,
@@ -1607,6 +1674,7 @@ export function TimelineCanvas({
   markers,
   overlayBands,
   enabledGroupIds,
+  overlayVisibilityTransitionKey,
   parentEra,
   isAnimating,
   onViewportChange,
@@ -1662,12 +1730,21 @@ export function TimelineCanvas({
   const markerPriorityBoostRef = useRef<Map<string, MarkerPriorityBoostState>>(
     new Map(),
   );
+  const overlayBandAnimationRef = useRef<Map<string, AnimatedOverlayBandState>>(
+    new Map(),
+  );
   const overlayLabelAnimationRef = useRef<
     Map<string, AnimatedContextBandLabelState>
   >(new Map());
   const overlayLabelAnimationInitializedRef = useRef(false);
+  const overlayBandAnimationInitializedRef = useRef(false);
   const markerPriorityBoostFrameRef = useRef(0);
   const markerPriorityBoostLastTimeRef = useRef(0);
+  const overlayBandAnimationFrameRef = useRef(0);
+  const overlayBandAnimationLastTimeRef = useRef(0);
+  const previousOverlayVisibilityTransitionKeyRef = useRef(
+    overlayVisibilityTransitionKey,
+  );
   const expandedOverlayAnimationFrameRef = useRef(0);
   const expandedOverlayAnimationLastTimeRef = useRef(0);
   const expandedOverlayProgressRef = useRef(0);
@@ -1965,7 +2042,23 @@ export function TimelineCanvas({
       const innerWidth = sceneWidth - pad * 2;
       const devicePixelRatio =
         typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
-      const layout = getTimelineLayout(sceneHeight, sceneOverlayLaneCount);
+      const animatedOverlayBands = [...overlayBandAnimationRef.current.values()]
+        .filter((state) => state.currentOpacity > 0.01)
+        .sort(
+          (left, right) =>
+            left.overlay.laneIndex - right.overlay.laneIndex ||
+            compareOverlayBands(left.overlay.band, right.overlay.band),
+        );
+      const animatedOverlayLaneCount = animatedOverlayBands.reduce(
+        (maxLaneCount, state) =>
+          Math.max(
+            maxLaneCount,
+            state.overlay.laneCount,
+            state.overlay.laneIndex + 1,
+          ),
+        sceneOverlayLaneCount,
+      );
+      const layout = getTimelineLayout(sceneHeight, animatedOverlayLaneCount);
       const axisY = layout.axisY;
       const overlayBottomY = getOverlayLaneY(layout, 0);
       const resolvedOverlayLayout = resolveExpandedOverlayLayout(
@@ -1985,6 +2078,9 @@ export function TimelineCanvas({
       );
       const breadcrumbChainIds = new Set(
         breadcrumbChain.slice(1).map((era) => era.id),
+      );
+      const visibleOverlayIds = new Set(
+        sceneResolvedOverlayBands.map(({ band }) => band.id),
       );
       const overlayLabelAnimationStates = overlayLabelAnimationRef.current;
       const activeOverlayLabelKeys = new Set<string>();
@@ -2121,8 +2217,8 @@ export function TimelineCanvas({
         y: number;
         fillStyle: string;
         alpha: number;
-        hoverId: string;
-        tooltip: TimelineTooltipContent;
+        hoverId?: string;
+        tooltip?: TimelineTooltipContent;
       }) => {
         context.font = "11px var(--font-sans)";
         const fullLabelWidth = context.measureText(fullLabel).width;
@@ -2175,7 +2271,7 @@ export function TimelineCanvas({
           null,
         );
 
-        if (dominantLayer) {
+        if (dominantLayer && hoverId && tooltip) {
           const hoverBounds = resolveOverlayLabelHoverBounds({
             centerX: renderX + renderWidth / 2,
             labelWidth: dominantLayer.width,
@@ -2250,14 +2346,27 @@ export function TimelineCanvas({
       }
       markPerf("eraMs");
 
-      if (sceneResolvedOverlayBands.length > 0) {
-        for (const overlay of sceneResolvedOverlayBands) {
+      if (animatedOverlayBands.length > 0) {
+        for (const overlayState of animatedOverlayBands) {
+          const overlay = overlayState.overlay;
           const bandWidth = overlay.renderWidth;
-          const y =
-            resolvedOverlayLayout.yById.get(overlay.band.id) ??
-            getOverlayLaneY(layout, overlay.laneIndex);
+          const isVisibleOverlay = visibleOverlayIds.has(overlay.band.id);
+          const canExpandParent = canExpandOverlayParent(
+            bandWidth,
+            overlay.band.children?.length ?? 0,
+          );
+          const expandedShift = isVisibleOverlay
+            ? (resolvedOverlayLayout.yById.get(overlay.band.id) ??
+                getOverlayLaneY(layout, overlay.laneIndex)) -
+              getOverlayLaneY(layout, overlay.laneIndex)
+            : 0;
+          const motionOffset =
+            overlayState.targetOpacity > overlayState.currentOpacity
+              ? (1 - overlayState.currentOpacity) * OVERLAY_BAND_ENTER_SLIDE_PX
+              : -(1 - overlayState.currentOpacity) * OVERLAY_BAND_EXIT_SLIDE_PX;
+          const y = overlayState.currentY + expandedShift + motionOffset;
 
-          if ((overlay.band.children?.length ?? 0) > 0) {
+          if (isVisibleOverlay && canExpandParent) {
             overlayInteractionRegions.push({
               id: overlay.band.id,
               left: overlay.renderX,
@@ -2277,21 +2386,20 @@ export function TimelineCanvas({
             paper,
           );
 
-          context.globalAlpha =
-            overlayBandOpacity * overlay.renderAlphaMultiplier;
-          context.fillStyle = overlay.band.color;
-          context.fillRect(overlay.renderX, y, bandWidth, OVERLAY_LANE_HEIGHT);
-
-          if (!overlay.isHairline) {
-            context.strokeStyle = lineSoft;
-            context.lineWidth = 1;
-            context.strokeRect(
-              overlay.renderX,
-              y,
-              bandWidth,
-              OVERLAY_LANE_HEIGHT,
-            );
-          }
+          drawPaperOverlayBand({
+            context,
+            x: overlay.renderX,
+            y,
+            width: bandWidth,
+            height: OVERLAY_LANE_HEIGHT,
+            bandColor: overlay.band.color,
+            alpha:
+              overlayBandOpacity *
+              overlay.renderAlphaMultiplier *
+              overlayState.currentOpacity,
+            borderStyle: lineSoft,
+            drawBorder: !overlay.isHairline,
+          });
 
           const fullLabel = overlay.band.label;
           const shortLabel = overlay.band.shortLabel ?? fullLabel;
@@ -2303,12 +2411,14 @@ export function TimelineCanvas({
             renderWidth: bandWidth,
             y,
             fillStyle: overlayLabelPaint.fillStyle,
-            alpha: 0.82,
-            hoverId: overlay.band.id,
-            tooltip: getOverlayTooltipContent(overlay.band),
+            alpha: 0.82 * overlayState.currentOpacity,
+            hoverId: isVisibleOverlay ? overlay.band.id : undefined,
+            tooltip: isVisibleOverlay
+              ? getOverlayTooltipContent(overlay.band)
+              : undefined,
           });
 
-          if ((overlay.band.children?.length ?? 0) > 0) {
+          if (isVisibleOverlay && canExpandParent) {
             const indicatorOpacity = clamp01((bandWidth - 26) / 18);
 
             if (indicatorOpacity > 0.01) {
@@ -2490,22 +2600,17 @@ export function TimelineCanvas({
           context.restore();
 
           context.save();
-          context.globalAlpha = childBandOpacity * childReveal;
-          context.fillStyle = child.band.color;
-          context.fillRect(
-            renderX,
-            childRenderY,
-            renderWidth,
-            OVERLAY_LANE_HEIGHT,
-          );
-          context.strokeStyle = childBorder;
-          context.lineWidth = 1;
-          context.strokeRect(
-            renderX,
-            childRenderY,
-            renderWidth,
-            OVERLAY_LANE_HEIGHT,
-          );
+          drawPaperOverlayBand({
+            context,
+            x: renderX,
+            y: childRenderY,
+            width: renderWidth,
+            height: OVERLAY_LANE_HEIGHT,
+            bandColor: child.band.color,
+            alpha: childBandOpacity * childReveal,
+            borderStyle: childBorder,
+            drawBorder: true,
+          });
 
           const fullLabel = child.band.label;
           const shortLabel = child.band.shortLabel ?? fullLabel;
@@ -3690,6 +3795,210 @@ export function TimelineCanvas({
     [enabledGroupIds, overlayBands, viewport, width],
   );
   const overlayLaneCount = resolvedOverlayBands[0]?.laneCount ?? 0;
+
+  useEffect(() => {
+    const animationStates = overlayBandAnimationRef.current;
+    const activeIds = new Set<string>();
+    const baseLayout = getTimelineLayout(height, overlayLaneCount);
+    const shouldAnimateVisibilityChange =
+      overlayBandAnimationInitializedRef.current &&
+      overlayVisibilityTransitionKey !==
+        previousOverlayVisibilityTransitionKeyRef.current;
+    const hasInFlightAnimation = [...animationStates.values()].some(
+      isOverlayBandStateAnimating,
+    );
+    const shouldPreserveAnimatedState =
+      shouldAnimateVisibilityChange || hasInFlightAnimation;
+
+    previousOverlayVisibilityTransitionKeyRef.current =
+      overlayVisibilityTransitionKey;
+    const targetYById = new Map(
+      resolvedOverlayBands.map((overlay) => [
+        overlay.band.id,
+        getOverlayLaneY(baseLayout, overlay.laneIndex),
+      ]),
+    );
+
+    for (const overlay of resolvedOverlayBands) {
+      activeIds.add(overlay.band.id);
+      const targetY = targetYById.get(overlay.band.id) ?? 0;
+
+      const existing = animationStates.get(overlay.band.id);
+
+      if (existing) {
+        animationStates.set(overlay.band.id, {
+          ...existing,
+          overlay,
+          currentOpacity: shouldPreserveAnimatedState
+            ? existing.currentOpacity
+            : 1,
+          targetOpacity: 1,
+          currentY: shouldPreserveAnimatedState
+            ? existing.currentY
+            : targetY,
+          targetY,
+        });
+        continue;
+      }
+
+      animationStates.set(overlay.band.id, {
+        overlay,
+        currentOpacity:
+          shouldAnimateVisibilityChange && overlayBandAnimationInitializedRef.current
+            ? 0
+            : 1,
+        targetOpacity: 1,
+        currentY: targetY,
+        targetY,
+      });
+    }
+
+    for (const [overlayId, state] of [...animationStates.entries()]) {
+      if (!activeIds.has(overlayId)) {
+        const shouldKeepAnimatingExit =
+          state.targetOpacity < 0.999 || isOverlayBandStateAnimating(state);
+
+        if (!shouldAnimateVisibilityChange && !shouldKeepAnimatingExit) {
+          animationStates.delete(overlayId);
+          continue;
+        }
+
+        animationStates.set(overlayId, {
+          ...state,
+          targetOpacity: 0,
+        });
+      }
+    }
+
+    overlayBandAnimationInitializedRef.current = true;
+
+    if (!shouldPreserveAnimatedState) {
+      if (overlayBandAnimationFrameRef.current) {
+        cancelAnimationFrame(overlayBandAnimationFrameRef.current);
+        overlayBandAnimationFrameRef.current = 0;
+      }
+
+      invalidateCanvas("overlay-band-static-sync");
+
+      return () => {
+        if (overlayBandAnimationFrameRef.current) {
+          cancelAnimationFrame(overlayBandAnimationFrameRef.current);
+          overlayBandAnimationFrameRef.current = 0;
+        }
+      };
+    }
+
+    const hasPendingAnimation = [...animationStates.values()].some(
+      isOverlayBandStateAnimating,
+    );
+
+    if (!hasPendingAnimation) {
+      if (overlayBandAnimationFrameRef.current) {
+        cancelAnimationFrame(overlayBandAnimationFrameRef.current);
+        overlayBandAnimationFrameRef.current = 0;
+      }
+
+      invalidateCanvas("overlay-band-animation");
+
+      return () => {
+        if (overlayBandAnimationFrameRef.current) {
+          cancelAnimationFrame(overlayBandAnimationFrameRef.current);
+          overlayBandAnimationFrameRef.current = 0;
+        }
+      };
+    }
+
+    const stepAnimation = (now: number) => {
+      const lastTime = overlayBandAnimationLastTimeRef.current || now;
+      const dt = Math.max(now - lastTime, 0);
+      overlayBandAnimationLastTimeRef.current = now;
+      const positionFactor =
+        1 - Math.exp(-dt / OVERLAY_BAND_POSITION_SMOOTHING_MS);
+      const hasVisibleExitingOverlays = [...animationStates.values()].some(
+        (state) =>
+          state.targetOpacity < state.currentOpacity - 0.001 &&
+          state.currentOpacity > OVERLAY_BAND_REFLOW_START_OPACITY,
+      );
+      let hasActiveAnimation = false;
+      let didChange = false;
+
+      for (const [overlayId, state] of [...animationStates.entries()]) {
+        const fadeSmoothingMs =
+          state.targetOpacity < state.currentOpacity
+            ? OVERLAY_BAND_FADE_OUT_SMOOTHING_MS
+            : OVERLAY_BAND_FADE_IN_SMOOTHING_MS;
+        const opacityFactor = 1 - Math.exp(-dt / fadeSmoothingMs);
+        const nextOpacity =
+          state.currentOpacity +
+          (state.targetOpacity - state.currentOpacity) * opacityFactor;
+        const nextY =
+          hasVisibleExitingOverlays
+            ? state.currentY
+            : state.currentY +
+              (state.targetY - state.currentY) * positionFactor;
+        const settled = Math.abs(state.targetOpacity - nextOpacity) < 0.002;
+        const settledY = hasVisibleExitingOverlays
+          ? Math.abs(state.targetY - state.currentY) < 0.2
+          : Math.abs(state.targetY - nextY) < 0.2;
+
+        if (!settled || !settledY) {
+          hasActiveAnimation = true;
+        }
+
+        if (Math.abs(nextOpacity - state.currentOpacity) > 0.0005) {
+          didChange = true;
+        }
+
+        if (Math.abs(nextY - state.currentY) > 0.05) {
+          didChange = true;
+        }
+
+        if (state.targetOpacity <= 0.001 && nextOpacity <= 0.003) {
+          animationStates.delete(overlayId);
+          continue;
+        }
+
+        animationStates.set(overlayId, {
+          ...state,
+          currentOpacity: settled ? state.targetOpacity : nextOpacity,
+          currentY: settledY ? state.targetY : nextY,
+        });
+      }
+
+      if (didChange) {
+        invalidateCanvas("overlay-band-animation");
+      }
+
+      if (hasActiveAnimation) {
+        overlayBandAnimationFrameRef.current =
+          requestAnimationFrame(stepAnimation);
+      } else {
+        overlayBandAnimationFrameRef.current = 0;
+      }
+    };
+
+    if (overlayBandAnimationFrameRef.current) {
+      cancelAnimationFrame(overlayBandAnimationFrameRef.current);
+    }
+
+    overlayBandAnimationLastTimeRef.current = performance.now();
+    overlayBandAnimationFrameRef.current =
+      requestAnimationFrame(stepAnimation);
+
+    return () => {
+      if (overlayBandAnimationFrameRef.current) {
+        cancelAnimationFrame(overlayBandAnimationFrameRef.current);
+        overlayBandAnimationFrameRef.current = 0;
+      }
+    };
+  }, [
+    height,
+    invalidateCanvas,
+    overlayLaneCount,
+    overlayVisibilityTransitionKey,
+    resolvedOverlayBands,
+  ]);
+
   const axisTickTargets = useMemo(() => {
     if (width <= PAD * 2) {
       return [] as AxisTickRenderState[];
@@ -4098,6 +4407,24 @@ export function TimelineCanvas({
   }, [axisTickTargets, invalidateCanvas, isViewportInteractionActive]);
 
   useEffect(() => {
+    if (!expandedOverlayId) {
+      return;
+    }
+
+    const expandedParent = resolvedOverlayBands.find(
+      ({ band }) =>
+        band.id === expandedOverlayId && (band.children?.length ?? 0) > 0,
+    );
+
+    if (
+      !expandedParent ||
+      expandedParent.renderWidth < MIN_EXPANDED_OVERLAY_PARENT_WIDTH
+    ) {
+      setExpandedOverlayId(null);
+    }
+  }, [expandedOverlayId, resolvedOverlayBands]);
+
+  useEffect(() => {
     if (expandedOverlayId) {
       renderedExpandedOverlayIdRef.current = expandedOverlayId;
     }
@@ -4162,6 +4489,9 @@ export function TimelineCanvas({
       }
       if (markerPriorityBoostFrameRef.current) {
         cancelAnimationFrame(markerPriorityBoostFrameRef.current);
+      }
+      if (overlayBandAnimationFrameRef.current) {
+        cancelAnimationFrame(overlayBandAnimationFrameRef.current);
       }
       if (expandedOverlayAnimationFrameRef.current) {
         cancelAnimationFrame(expandedOverlayAnimationFrameRef.current);
@@ -4337,6 +4667,10 @@ export function TimelineCanvas({
     if (resolvedOverlayBands.length > 0) {
       for (const overlay of resolvedOverlayBands) {
         const bandWidth = overlay.renderWidth;
+        const canExpandParent = canExpandOverlayParent(
+          bandWidth,
+          overlay.band.children?.length ?? 0,
+        );
         const y =
           getOverlayLaneY(layout, overlay.laneIndex) -
           getOverlayExpansionShift(
@@ -4358,7 +4692,7 @@ export function TimelineCanvas({
           tooltip: getOverlayTooltipContent(overlay.band),
         });
 
-        if ((overlay.band.children?.length ?? 0) > 0) {
+        if (canExpandParent) {
           overlayInteractionRegions.push({
             id: overlay.band.id,
             left: overlay.renderX,
@@ -4378,12 +4712,17 @@ export function TimelineCanvas({
           paper,
         );
 
-        context.globalAlpha = overlayBandOpacity;
-        context.fillStyle = overlay.band.color;
-        context.fillRect(overlay.renderX, y, bandWidth, OVERLAY_LANE_HEIGHT);
-        context.strokeStyle = lineSoft;
-        context.lineWidth = 1;
-        context.strokeRect(overlay.renderX, y, bandWidth, OVERLAY_LANE_HEIGHT);
+        drawPaperOverlayBand({
+          context,
+          x: overlay.renderX,
+          y,
+          width: bandWidth,
+          height: OVERLAY_LANE_HEIGHT,
+          bandColor: overlay.band.color,
+          alpha: overlayBandOpacity,
+          borderStyle: lineSoft,
+          drawBorder: !overlay.isHairline,
+        });
 
         const fullLabel = overlay.band.label;
         const shortLabel = overlay.band.shortLabel ?? fullLabel;
@@ -4419,7 +4758,7 @@ export function TimelineCanvas({
           );
         }
 
-        if ((overlay.band.children?.length ?? 0) > 0) {
+        if (canExpandParent) {
           const indicatorOpacity = clamp01((bandWidth - 26) / 18);
 
           if (indicatorOpacity > 0.01) {
@@ -4602,22 +4941,17 @@ export function TimelineCanvas({
         context.restore();
 
         context.save();
-        context.globalAlpha = childBandOpacity * childReveal;
-        context.fillStyle = child.band.color;
-        context.fillRect(
-          renderX,
-          childRenderY,
-          renderWidth,
-          OVERLAY_LANE_HEIGHT,
-        );
-        context.strokeStyle = childBorder;
-        context.lineWidth = 1;
-        context.strokeRect(
-          renderX,
-          childRenderY,
-          renderWidth,
-          OVERLAY_LANE_HEIGHT,
-        );
+        drawPaperOverlayBand({
+          context,
+          x: renderX,
+          y: childRenderY,
+          width: renderWidth,
+          height: OVERLAY_LANE_HEIGHT,
+          bandColor: child.band.color,
+          alpha: childBandOpacity * childReveal,
+          borderStyle: childBorder,
+          drawBorder: true,
+        });
 
         const fullLabel = child.band.label;
         const shortLabel = child.band.shortLabel ?? fullLabel;

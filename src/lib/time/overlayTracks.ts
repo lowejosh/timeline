@@ -100,7 +100,9 @@ function getPriorityZoomGrace(
 
   return Math.min(
     PRIORITY_ZOOM_GRACE_MAX,
-    Math.floor((priority - PRIORITY_ZOOM_GRACE_START) / PRIORITY_ZOOM_GRACE_STEP) + 1,
+    Math.floor(
+      (priority - PRIORITY_ZOOM_GRACE_START) / PRIORITY_ZOOM_GRACE_STEP,
+    ) + 1,
   );
 }
 
@@ -111,7 +113,9 @@ export function isTimelineDecorationVisibleAtZoom(
   zoom: number,
 ) {
   const effectiveMinZoom =
-    item.minZoom === undefined ? undefined : item.minZoom - getPriorityZoomGrace(item);
+    item.minZoom === undefined
+      ? undefined
+      : item.minZoom - getPriorityZoomGrace(item);
 
   if (effectiveMinZoom !== undefined && zoom < effectiveMinZoom) {
     return false;

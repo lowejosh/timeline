@@ -12,8 +12,7 @@ export const ERA_SOURCES = {
     shortTitle: "NASA: Cosmic History",
     title: "Universe: Cosmic History",
     organization: "NASA",
-    citation:
-      "NASA, \"Universe: Cosmic History,\" Science Mission Directorate.",
+    citation: 'NASA, "Universe: Cosmic History," Science Mission Directorate.',
     url: "https://science.nasa.gov/universe/overview/",
     notes:
       "Used for the age of the universe and the app's broad cosmic-history framing.",
@@ -22,7 +21,7 @@ export const ERA_SOURCES = {
     shortTitle: "NASA: Star Basics",
     title: "Star Basics",
     organization: "NASA",
-    citation: "NASA, \"Star Basics,\" Science Mission Directorate.",
+    citation: 'NASA, "Star Basics," Science Mission Directorate.',
     url: "https://science.nasa.gov/universe/stars/",
     notes:
       "Used for broad context on how stars form from dense clouds of gas and dust.",
@@ -31,7 +30,7 @@ export const ERA_SOURCES = {
     shortTitle: "NASA: Galaxy Basics",
     title: "Galaxy Basics",
     organization: "NASA",
-    citation: "NASA, \"Galaxy Basics,\" Science Mission Directorate.",
+    citation: 'NASA, "Galaxy Basics," Science Mission Directorate.',
     url: "https://science.nasa.gov/universe/galaxies/",
     notes:
       "Used for broad context on galaxy evolution and the Milky Way's place in cosmic history.",
@@ -40,27 +39,24 @@ export const ERA_SOURCES = {
     shortTitle: "NASA: Solar System Facts",
     title: "Solar System Facts",
     organization: "NASA",
-    citation:
-      "NASA, \"Solar System Facts,\" Science Mission Directorate.",
+    citation: 'NASA, "Solar System Facts," Science Mission Directorate.',
     url: "https://science.nasa.gov/solar-system/solar-system-facts/",
-    notes:
-      "Used for the solar system's formation about 4.6 billion years ago.",
+    notes: "Used for the solar system's formation about 4.6 billion years ago.",
   },
   usgsAgeOfEarth: {
     shortTitle: "USGS: Age of Earth",
     title: "How old is Earth?",
     organization: "U.S. Geological Survey",
-    citation: "U.S. Geological Survey, \"How old is Earth?\" FAQ.",
+    citation: 'U.S. Geological Survey, "How old is Earth?" FAQ.',
     url: "https://www.usgs.gov/faqs/how-old-earth",
-    notes:
-      "Used for the Earth's formation at about 4.54 billion years ago.",
+    notes: "Used for the Earth's formation at about 4.54 billion years ago.",
   },
   icsChart2024: {
     shortTitle: "ICS Chart v2024/12",
     title: "International Chronostratigraphic Chart v2024/12",
     organization: "International Commission on Stratigraphy",
     citation:
-      "Cohen, K. M., Finney, S. C., Gibbard, P. L., Fan, J.-X. (2025). \"The ICS international chronostratigraphic chart this decade.\" Episodes. DOI: 10.18814/epiiugs/2025/025001.",
+      'Cohen, K. M., Finney, S. C., Gibbard, P. L., Fan, J.-X. (2025). "The ICS international chronostratigraphic chart this decade." Episodes. DOI: 10.18814/epiiugs/2025/025001.',
     url: "https://stratigraphy.org/chart",
     notes:
       "Used for formal deep-time boundaries. Some app bands are intentionally truncated where the timeline hands off to human-history periods.",
@@ -107,7 +103,8 @@ export const ERA_SOURCES = {
   },
   nsfLateDevonianExtinction: {
     shortTitle: "NSF: Late Devonian extinction",
-    title: "Climate change factors in the fossil record that accelerate mass extinction",
+    title:
+      "Climate change factors in the fossil record that accelerate mass extinction",
     organization: "U.S. National Science Foundation",
     citation:
       'U.S. National Science Foundation, "Climate change factors in the fossil record that accelerate mass extinction."',
@@ -197,7 +194,8 @@ export const ERA_SOURCES = {
     shortTitle: "UCMP: Mesozoic life",
     title: "Mesozoic Era: Life",
     organization: "UC Museum of Paleontology",
-    citation: 'University of California Museum of Paleontology, "Mesozoic Era: Life."',
+    citation:
+      'University of California Museum of Paleontology, "Mesozoic Era: Life."',
     url: "https://ucmp.berkeley.edu/mesozoic/mesozoiclife.html",
     notes:
       "Used for the public-facing framing that dinosaurs and other archosaurs dominated terrestrial life through much of the Mesozoic.",
@@ -216,7 +214,7 @@ export const ERA_SOURCES = {
     title: "Interactive Human Origins Timeline",
     organization: "Smithsonian Institution Human Origins Program",
     citation:
-      "Smithsonian Institution, Human Origins Program, \"Interactive Human Origins Timeline.\"",
+      'Smithsonian Institution, Human Origins Program, "Interactive Human Origins Timeline."',
     url: "https://humanorigins.si.edu/evidence/human-evolution-interactive-timeline",
     notes:
       "Used for the emergence of Homo sapiens and broad human-prehistory context.",
@@ -225,8 +223,7 @@ export const ERA_SOURCES = {
     shortTitle: "Smithsonian: Homo sapiens",
     title: "Homo sapiens",
     organization: "Smithsonian Institution Human Origins Program",
-    citation:
-      'Smithsonian Institution, Human Origins Program, "Homo sapiens."',
+    citation: 'Smithsonian Institution, Human Origins Program, "Homo sapiens."',
     url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-sapiens",
     notes:
       "Used for the direct public-facing Smithsonian statement that Homo sapiens evolved in Africa about 300,000 years ago.",
@@ -305,8 +302,7 @@ export const ERA_SOURCES = {
     shortTitle: "Smithsonian: Homo habilis",
     title: "Homo habilis",
     organization: "Smithsonian Institution Human Origins Program",
-    citation:
-      'Smithsonian Institution, Human Origins Program, "Homo habilis."',
+    citation: 'Smithsonian Institution, Human Origins Program, "Homo habilis."',
     url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-habilis",
     notes:
       "Used for Homo habilis as an early Homo species living 2.4 to 1.4 million years ago and for public-facing statements on early stone tools and butchery.",
@@ -315,8 +311,7 @@ export const ERA_SOURCES = {
     shortTitle: "Smithsonian: Homo erectus",
     title: "Homo erectus",
     organization: "Smithsonian Institution Human Origins Program",
-    citation:
-      'Smithsonian Institution, Human Origins Program, "Homo erectus."',
+    citation: 'Smithsonian Institution, Human Origins Program, "Homo erectus."',
     url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-erectus",
     notes:
       "Used for Homo erectus as the first major human disperser beyond Africa and for the 1.89 million to 110,000 year timeframe in Smithsonian's public chronology.",
@@ -355,8 +350,7 @@ export const ERA_SOURCES = {
     shortTitle: "Smithsonian: Homo naledi",
     title: "Homo naledi",
     organization: "Smithsonian Institution Human Origins Program",
-    citation:
-      'Smithsonian Institution, Human Origins Program, "Homo naledi."',
+    citation: 'Smithsonian Institution, Human Origins Program, "Homo naledi."',
     url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-naledi",
     notes:
       "Used for Homo naledi's 335,000 to 236,000 year range and for Smithsonian's explicit statement that its placement in the Homo tree remains unresolved.",
@@ -455,8 +449,7 @@ export const ERA_SOURCES = {
     shortTitle: "Khan: Paleolithic culture",
     title: "Paleolithic technology, culture, and art",
     organization: "Khan Academy",
-    citation:
-      "Khan Academy, \"Paleolithic technology, culture, and art.\"",
+    citation: 'Khan Academy, "Paleolithic technology, culture, and art."',
     url: "https://www.khanacademy.org/humanities/world-history/world-history-beginnings/origin-humans-early-societies/a/paleolithic-culture-and-technology",
     notes:
       "Used for standard Stone Age terminology and the broad Paleolithic-to-Neolithic sequence.",
@@ -474,7 +467,7 @@ export const ERA_SOURCES = {
     shortTitle: "Khan: Neolithic Revolution",
     title: "The Neolithic Revolution",
     organization: "Khan Academy / Smarthistory",
-    citation: "Khan Academy, \"The Neolithic Revolution.\"",
+    citation: 'Khan Academy, "The Neolithic Revolution."',
     url: "https://www.khanacademy.org/humanities/world-history/world-history-beginnings/origin-humans-early-societies/a/the-neolithic-revolution",
     notes:
       "Used for Near Eastern Neolithic examples such as Pre-Pottery Neolithic B at Jericho.",
@@ -503,7 +496,8 @@ export const ERA_SOURCES = {
     shortTitle: "Berkeley: origin of life",
     title: "When did life originate?",
     organization: "Understanding Evolution / UC Museum of Paleontology",
-    citation: 'Understanding Evolution, "When did life originate?" University of California Museum of Paleontology.',
+    citation:
+      'Understanding Evolution, "When did life originate?" University of California Museum of Paleontology.',
     url: "https://evolution.berkeley.edu/from-soup-to-cells-the-origin-of-life/when-did-life-originate/",
     notes:
       "Used for the cautious estimate that evidence suggests life first evolved around 3.5 billion years ago, based on microfossils and stromatolites.",
@@ -548,7 +542,8 @@ export const ERA_SOURCES = {
     shortTitle: "UNESCO: Stonehenge",
     title: "Stonehenge, Avebury and Associated Sites",
     organization: "UNESCO World Heritage Centre",
-    citation: 'UNESCO World Heritage Centre, "Stonehenge, Avebury and Associated Sites."',
+    citation:
+      'UNESCO World Heritage Centre, "Stonehenge, Avebury and Associated Sites."',
     url: "https://whc.unesco.org/en/list/373/",
     notes:
       "Used for the broader Stonehenge and Avebury ceremonial landscape spanning about 3700 to 1600 BCE, with Stonehenge itself commonly anchored to the late Neolithic around 3000 BCE.",
@@ -557,7 +552,8 @@ export const ERA_SOURCES = {
     shortTitle: "UNESCO: Swabian Jura",
     title: "Caves and Ice Age Art in the Swabian Jura",
     organization: "UNESCO World Heritage Centre",
-    citation: 'UNESCO World Heritage Centre, "Caves and Ice Age Art in the Swabian Jura."',
+    citation:
+      'UNESCO World Heritage Centre, "Caves and Ice Age Art in the Swabian Jura."',
     url: "https://whc.unesco.org/en/list/1527/",
     notes:
       "Used for the Swabian Jura caves as a concentration of Aurignacian finds dating from 43,000 to 33,000 years ago, including the oldest musical instruments yet found worldwide.",
@@ -587,7 +583,7 @@ export const ERA_SOURCES = {
     shortTitle: "Britannica: Bronze Age",
     title: "Bronze Age",
     organization: "Encyclopaedia Britannica",
-    citation: "Encyclopaedia Britannica, \"Bronze Age.\"",
+    citation: 'Encyclopaedia Britannica, "Bronze Age."',
     url: "https://www.britannica.com/topic/Bronze-Age",
     notes:
       "Used for the standard Bronze Age to Iron Age sequence and the regional caveat that dates vary, including across the Middle East.",
@@ -596,7 +592,7 @@ export const ERA_SOURCES = {
     shortTitle: "Britannica: Iron Age",
     title: "Iron Age",
     organization: "Encyclopaedia Britannica",
-    citation: "Encyclopaedia Britannica, \"Iron Age.\"",
+    citation: 'Encyclopaedia Britannica, "Iron Age."',
     url: "https://www.britannica.com/topic/Iron-Age",
     notes:
       "Used for broad public-facing Iron Age framing: iron tools and weapons becoming widespread after about 1200 BCE, with regional dates varying.",
@@ -605,7 +601,7 @@ export const ERA_SOURCES = {
     shortTitle: "Britannica: Classical antiquity",
     title: "Classical antiquity",
     organization: "Encyclopaedia Britannica",
-    citation: "Encyclopaedia Britannica, \"Classical antiquity.\"",
+    citation: 'Encyclopaedia Britannica, "Classical antiquity."',
     url: "https://www.britannica.com/event/classical-antiquity",
     notes:
       "Used for the broad Greco-Roman framing of classical antiquity and its influence on Mediterranean law, architecture, philosophy, and urban life.",
@@ -614,7 +610,7 @@ export const ERA_SOURCES = {
     shortTitle: "Britannica: Metallurgy",
     title: "metallurgy",
     organization: "Encyclopaedia Britannica",
-    citation: "Encyclopaedia Britannica, \"metallurgy.\"",
+    citation: 'Encyclopaedia Britannica, "metallurgy."',
     url: "https://www.britannica.com/science/metallurgy",
     notes:
       "Used for the iron-metallurgy side of the Iron Age: bloom smelting, repeated reheating and hammering into wrought iron, carburization, and the wider spread of ironworking over time.",
@@ -623,7 +619,7 @@ export const ERA_SOURCES = {
     shortTitle: "Britannica: Middle East",
     title: "Middle East",
     organization: "Encyclopaedia Britannica",
-    citation: "Encyclopaedia Britannica, \"Middle East.\"",
+    citation: 'Encyclopaedia Britannica, "Middle East."',
     url: "https://www.britannica.com/place/Middle-East",
     notes:
       "Used for ancient Middle East framing, including Bronze Age and Iron Age influence in the Levant and Mesopotamia.",
@@ -632,7 +628,7 @@ export const ERA_SOURCES = {
     shortTitle: "Britannica: Mesopotamia",
     title: "history of Mesopotamia",
     organization: "Encyclopaedia Britannica",
-    citation: "Encyclopaedia Britannica, \"history of Mesopotamia.\"",
+    citation: 'Encyclopaedia Britannica, "history of Mesopotamia."',
     url: "https://www.britannica.com/place/Mesopotamia-historical-region-Asia",
     notes:
       "Used for the late 4th-millennium BCE emergence of writing and early urban civilization in Mesopotamia.",
@@ -683,16 +679,16 @@ export const ERA_SOURCES = {
     notes:
       "Used for the Sumer/Akkad-to-Babylonia transition, Hammurabi's Babylonian rise, and the broad late-Babylonian endpoint in 539 BCE.",
   },
-    metBabylon: {
-      shortTitle: "Met: Babylon",
-      title: "Babylon",
-      organization: "The Metropolitan Museum of Art",
-      citation:
-        'Seymour, Michael. "Babylon." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
-      url: "https://www.metmuseum.org/toah/hd/babl/hd_babl.htm",
-      notes:
-        "Used for public-facing Babylonian periodization, including the Old Babylonian end in 1595 BCE, Kassite rule afterward, and the broader Babylonian sequence into the first millennium BCE.",
-    },
+  metBabylon: {
+    shortTitle: "Met: Babylon",
+    title: "Babylon",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Seymour, Michael. "Babylon." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/babl/hd_babl.htm",
+    notes:
+      "Used for public-facing Babylonian periodization, including the Old Babylonian end in 1595 BCE, Kassite rule afterward, and the broader Babylonian sequence into the first millennium BCE.",
+  },
   britannicaHammurabi: {
     shortTitle: "Britannica: Hammurabi",
     title: "Hammurabi",
@@ -706,7 +702,7 @@ export const ERA_SOURCES = {
     shortTitle: "Britannica: Ancient Egypt",
     title: "ancient Egypt",
     organization: "Encyclopaedia Britannica",
-    citation: "Encyclopaedia Britannica, \"ancient Egypt.\"",
+    citation: 'Encyclopaedia Britannica, "ancient Egypt."',
     url: "https://www.britannica.com/place/ancient-Egypt",
     notes:
       "Used for the broad span of ancient Egyptian civilization from dynastic unification to Roman annexation.",
@@ -725,7 +721,7 @@ export const ERA_SOURCES = {
     shortTitle: "Britannica: Indus civilization",
     title: "Indus civilization",
     organization: "Encyclopaedia Britannica",
-    citation: "Encyclopaedia Britannica, \"Indus civilization.\"",
+    citation: 'Encyclopaedia Britannica, "Indus civilization."',
     url: "https://www.britannica.com/topic/Indus-civilization",
     notes:
       "Used for the broad Harappan / Indus Valley civilization timeframe in South Asia.",
@@ -743,7 +739,8 @@ export const ERA_SOURCES = {
     shortTitle: "WHE: Great Pyramid",
     title: "Great Pyramid of Giza",
     organization: "World History Encyclopedia",
-    citation: 'Mark, Joshua J., "Great Pyramid of Giza." World History Encyclopedia.',
+    citation:
+      'Mark, Joshua J., "Great Pyramid of Giza." World History Encyclopedia.',
     url: "https://www.worldhistory.org/Great_Pyramid_of_Giza/",
     notes:
       "Used for the familiar c. 2560 BCE completion date of Khufu's pyramid in public-facing ancient-history timelines.",
@@ -757,16 +754,16 @@ export const ERA_SOURCES = {
     notes:
       "Used for the Neo-Assyrian Empire's conventional 912–612 BCE span and public-facing chronology.",
   },
-    metAssyria: {
-      shortTitle: "Met: Assyria",
-      title: "Assyria, 1365–609 B.C.",
-      organization: "The Metropolitan Museum of Art",
-      citation:
-        'Department of Ancient Near Eastern Art. "Assyria, 1365–609 B.C." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
-      url: "https://www.metmuseum.org/toah/hd/assy/hd_assy.htm",
-      notes:
-        "Used for broad Assyrian periodization from Ashur-uballit I's revival in the 14th century BCE through the Middle Assyrian high point and the Neo-Assyrian collapse in 612 BCE.",
-    },
+  metAssyria: {
+    shortTitle: "Met: Assyria",
+    title: "Assyria, 1365–609 B.C.",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "Assyria, 1365–609 B.C." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/assy/hd_assy.htm",
+    notes:
+      "Used for broad Assyrian periodization from Ashur-uballit I's revival in the 14th century BCE through the Middle Assyrian high point and the Neo-Assyrian collapse in 612 BCE.",
+  },
   unescoMycenaeTiryns: {
     shortTitle: "UNESCO: Mycenae",
     title: "Archaeological Sites of Mycenae and Tiryns",
@@ -790,8 +787,7 @@ export const ERA_SOURCES = {
     shortTitle: "Britannica: ancient Greece",
     title: "ancient Greek civilization",
     organization: "Encyclopaedia Britannica",
-    citation:
-      'Encyclopaedia Britannica, "ancient Greek civilization."',
+    citation: 'Encyclopaedia Britannica, "ancient Greek civilization."',
     url: "https://www.britannica.com/place/ancient-Greece",
     notes:
       "Used for the broad ancient Greek civilization span from about 1200 BCE to the death of Alexander in 323 BCE.",
@@ -1000,8 +996,7 @@ export const ERA_SOURCES = {
     organization: "HISTORY",
     citation: 'HISTORY.com Editors, "French Revolution."',
     url: "https://www.history.com/articles/french-revolution",
-    notes:
-      "Used for the standard 1789 start of the French Revolution.",
+    notes: "Used for the standard 1789 start of the French Revolution.",
   },
   historyWorldWarOne: {
     shortTitle: "History: World War I",
@@ -1009,8 +1004,7 @@ export const ERA_SOURCES = {
     organization: "HISTORY",
     citation: 'HISTORY.com Editors, "World War I."',
     url: "https://www.history.com/articles/world-war-i-history",
-    notes:
-      "Used for the canonical 1914 start year of World War I.",
+    notes: "Used for the canonical 1914 start year of World War I.",
   },
   britannicaTitanic: {
     shortTitle: "Britannica: Titanic",
@@ -1027,8 +1021,7 @@ export const ERA_SOURCES = {
     organization: "HISTORY",
     citation: 'HISTORY.com Editors, "Russian Revolution."',
     url: "https://www.history.com/articles/russian-revolution",
-    notes:
-      "Used for the Russian Revolution's canonical 1917 date anchor.",
+    notes: "Used for the Russian Revolution's canonical 1917 date anchor.",
   },
   historyWorldWarTwo: {
     shortTitle: "History: World War II",
@@ -1036,8 +1029,7 @@ export const ERA_SOURCES = {
     organization: "HISTORY",
     citation: 'HISTORY.com Editors, "World War II."',
     url: "https://www.history.com/articles/world-war-ii-history",
-    notes:
-      "Used for the canonical 1939 start year of World War II.",
+    notes: "Used for the canonical 1939 start year of World War II.",
   },
   historyIndustrialRevolution: {
     shortTitle: "History: Industrial Revolution",
@@ -1135,7 +1127,7 @@ export const ERA_SOURCES = {
     title: "Periodization in World History: Challenges and Opportunities",
     organization: "Palgrave / world-history scholarship",
     citation:
-      "Stearns, Peter N. (2017). \"Periodization in World History: Challenges and Opportunities.\" In 21st-Century Narratives of World History: Global and Multidisciplinary Perspectives. Palgrave Macmillan.",
+      'Stearns, Peter N. (2017). "Periodization in World History: Challenges and Opportunities." In 21st-Century Narratives of World History: Global and Multidisciplinary Perspectives. Palgrave Macmillan.',
     notes:
       "Used for world-history macroperiod labels such as ancient, post-classical, early modern, and contemporary.",
   },
@@ -1144,16 +1136,15 @@ export const ERA_SOURCES = {
     title: "Early Modern Europe and the Early Modern World",
     organization: "Rowman & Littlefield / world-history scholarship",
     citation:
-      "Bentley, Jerry H. (2007). \"Early Modern Europe and the Early Modern World.\" In Between the Middle Ages and Modernity: Individual and Community in the Early Modern World. Rowman & Littlefield.",
-    notes:
-      "Supports the app's c. 1500–1800 early-modern framing.",
+      'Bentley, Jerry H. (2007). "Early Modern Europe and the Early Modern World." In Between the Middle Ages and Modernity: Individual and Community in the Early Modern World. Rowman & Littlefield.',
+    notes: "Supports the app's c. 1500–1800 early-modern framing.",
   },
   brivatiContemporary: {
     shortTitle: "Brivati on contemporary history",
     title: "The Contemporary History Handbook",
     organization: "Manchester University Press",
     citation:
-      "Brivati, Brian (1996). \"Introduction.\" In The Contemporary History Handbook. Manchester University Press.",
+      'Brivati, Brian (1996). "Introduction." In The Contemporary History Handbook. Manchester University Press.',
     notes:
       "Supports contemporary history as c. 1945–present in English-language historiography.",
   },

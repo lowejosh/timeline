@@ -13,8 +13,12 @@ import {
   getAncestorChain,
   type Era,
 } from "./lib/data/eras";
-import { getDefaultEnabledTimelineGroupIds } from "./lib/data/timelineDecorations";
+import {
+  TIMELINE_DECORATION_CATEGORY_IDS,
+  getDefaultEnabledTimelineGroupIds,
+} from "./lib/data/timelineDecorations";
 import { resolveTimelineSidebarSections } from "./lib/data/timelineSidebar";
+import { shouldAutoSuppressHumanEvolution } from "./lib/time/timelineLayerAutoToggle";
 import {
   getHomeViewport,
   HOME_RANGE,
@@ -22,15 +26,30 @@ import {
 } from "./lib/time/viewport";
 import "./App.css";
 
+type HumanEvolutionToggleMode = "auto" | "manual-on" | "manual-off";
+
+const HUMAN_EVOLUTION_GROUP_ID =
+  TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
+
 function App() {
   const [stageRef, stageSize] = useElementSize<HTMLDivElement>();
   const innerWidth = Math.max(stageSize.width, 1);
   const animated = useAnimatedViewport(getHomeViewport(1440), innerWidth);
   const [activeEraId, setActiveEraId] = useState(ROOT_ERA.id);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [enabledGroupIds, setEnabledGroupIds] = useState<Set<string>>(() =>
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [overlayVisibilityTransitionKey, setOverlayVisibilityTransitionKey] =
+    useState(0);
+  const defaultEnabledGroupIds = useMemo(
+    () => getDefaultEnabledTimelineGroupIds(),
+    [],
+  );
+  const [manualEnabledGroupIds, setManualEnabledGroupIds] = useState<Set<string>>(() =>
     getDefaultEnabledTimelineGroupIds(),
   );
+  const [humanEvolutionToggleMode, setHumanEvolutionToggleMode] =
+    useState<HumanEvolutionToggleMode>("auto");
+  const [isHumanEvolutionAutoSuppressed, setIsHumanEvolutionAutoSuppressed] =
+    useState(false);
   const autoTransitionFrameRef = useRef(0);
 
   // Use refs for values needed in RAF callbacks to avoid stale closures
@@ -40,6 +59,57 @@ function App() {
     viewportRef.current = animated.viewport;
     innerWidthRef.current = innerWidth;
   });
+
+  useEffect(() => {
+    const nextSuppressed = shouldAutoSuppressHumanEvolution(
+      animated.viewport,
+      innerWidth,
+      TIMELINE_CANVAS_PAD,
+      isHumanEvolutionAutoSuppressed,
+    );
+
+    if (nextSuppressed !== isHumanEvolutionAutoSuppressed) {
+      setIsHumanEvolutionAutoSuppressed(nextSuppressed);
+
+      if (humanEvolutionToggleMode === "auto") {
+        setOverlayVisibilityTransitionKey((current) => current + 1);
+      }
+    }
+  }, [
+    animated.viewport,
+    humanEvolutionToggleMode,
+    innerWidth,
+    isHumanEvolutionAutoSuppressed,
+  ]);
+
+  const enabledGroupIds = useMemo(() => {
+    const next = new Set(manualEnabledGroupIds);
+
+    if (humanEvolutionToggleMode === "manual-on") {
+      next.add(HUMAN_EVOLUTION_GROUP_ID);
+      return next;
+    }
+
+    if (humanEvolutionToggleMode === "manual-off") {
+      next.delete(HUMAN_EVOLUTION_GROUP_ID);
+      return next;
+    }
+
+    if (defaultEnabledGroupIds.has(HUMAN_EVOLUTION_GROUP_ID)) {
+      if (isHumanEvolutionAutoSuppressed) {
+        next.delete(HUMAN_EVOLUTION_GROUP_ID);
+      } else {
+        next.add(HUMAN_EVOLUTION_GROUP_ID);
+      }
+    }
+
+    return next;
+  }, [
+    defaultEnabledGroupIds,
+    humanEvolutionToggleMode,
+    isHumanEvolutionAutoSuppressed,
+    manualEnabledGroupIds,
+  ]);
 
   const activeEra = findEraById(ROOT_ERA, activeEraId) ?? ROOT_ERA;
   const chain = getAncestorChain(ROOT_ERA, activeEraId);
@@ -151,7 +221,13 @@ function App() {
   const handleToggleEntry = useCallback(
     (entryId: string, groupIds: string[], nextEnabled: boolean) => {
       void entryId;
-      setEnabledGroupIds((current) => {
+      if (groupIds.includes(HUMAN_EVOLUTION_GROUP_ID)) {
+        setHumanEvolutionToggleMode(nextEnabled ? "manual-on" : "manual-off");
+      }
+
+      setOverlayVisibilityTransitionKey((current) => current + 1);
+
+      setManualEnabledGroupIds((current) => {
         const next = new Set(current);
 
         for (const groupId of groupIds) {
@@ -174,9 +250,11 @@ function App() {
       data-sidebar-open={isSidebarOpen ? "true" : "false"}
     >
       <button
-        aria-controls="timeline-sidebar-panel"
+        aria-controls="timeline-layers-panel"
         aria-expanded={isSidebarOpen}
-        aria-label="Toggle layers sidebar"
+        aria-label={
+          isSidebarOpen ? "Hide layers controls" : "Show layers controls"
+        }
         className="timeline-sidebar-toggle"
         onClick={() => {
           setIsSidebarOpen((current) => !current);
@@ -190,7 +268,7 @@ function App() {
         aria-hidden={!isSidebarOpen}
         className="timeline-sidebar-shell"
         data-open={isSidebarOpen ? "true" : "false"}
-        id="timeline-sidebar-panel"
+        id="timeline-layers-panel"
       >
         <TimelineSidebar
           sections={sidebarSections}
@@ -209,6 +287,7 @@ function App() {
             markers={TIMELINE_DISPLAY.markers}
             overlayBands={TIMELINE_DISPLAY.overlays}
             enabledGroupIds={enabledGroupIds}
+            overlayVisibilityTransitionKey={overlayVisibilityTransitionKey}
             parentEra={parentEra}
             isAnimating={animated.isAnimating}
             onViewportChange={handleViewportChange}
