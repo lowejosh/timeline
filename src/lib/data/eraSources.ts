@@ -140,6 +140,68 @@ export const ERA_SOURCES = {
     notes:
       "Used for the broad 570–530 million-year framing of the Cambrian explosion and its significance as an early burst of animal diversification.",
   },
+  gsaCambrianSubstrateRevolution: {
+    shortTitle: "GSA: Cambrian substrate revolution",
+    title: "The Cambrian Substrate Revolution",
+    organization: "Geological Society of America",
+    citation:
+      'Bottjer, D. J., Hagadorn, J. W., and Dornbos, S. Q. (2000), "The Cambrian Substrate Revolution." GSA Today.',
+    url: "https://rock.geosociety.org/gsatoday/archive/10/9/article/i1052-5173-10-9-1.htm",
+    notes:
+      "Used for the transition from microbial-mat seafloors to increasingly bioturbated, mixed shallow-marine substrates across roughly the 600–500 Ma interval.",
+  },
+  nhmLateEdiacaranTracks: {
+    shortTitle: "NHM: Ediacaran tracks",
+    title:
+      "Complex animals living millions of years before the Cambrian Explosion revealed by seabed tracks",
+    organization: "Natural History Museum, London",
+    citation:
+      'Natural History Museum, London, "Complex animals living millions of years before the Cambrian Explosion revealed by seabed tracks."',
+    url: "https://www.nhm.ac.uk/discover/news/2025/july/complex-animals-living-before-cambrian-explosion.html",
+    notes:
+      "Used for the public-facing statement that late Ediacaran changes in movement and sensing set the stage for the Cambrian Substrate Revolution and the Cambrian Explosion.",
+  },
+  gsaOrdovicianBiodiversificationEvent: {
+    shortTitle: "GSA: GOBE",
+    title:
+      "Understanding the Great Ordovician Biodiversification Event (GOBE): Influences of paleogeography, paleoclimate, or paleoecology?",
+    organization: "Geological Society of America",
+    citation:
+      'Servais, T., Harper, D. A. T., Munnecke, A., Owen, A. W., and Sheehan, P. M. (2009), "Understanding the Great Ordovician Biodiversification Event (GOBE): Influences of paleogeography, paleoclimate, or paleoecology?" GSA Today.',
+    url: "https://rock.geosociety.org/net/gsatoday/archive/19/4/abstract/i1052-5173-19-4-4.htm",
+    notes:
+      "Used for the Great Ordovician Biodiversification Event as a sustained 25-million-year increase in marine biodiversity that reworked Paleozoic marine ecosystems.",
+  },
+  samNobleOrdovicianCommunities: {
+    shortTitle: "Sam Noble: Ordovician communities",
+    title: "Ordovician communities",
+    organization: "Sam Noble Museum",
+    citation: 'Sam Noble Museum, "Ordovician communities."',
+    url: "https://samnoblemuseum.ou.edu/common-fossils-of-oklahoma/paleocommunities/marine-communities/ordovician-communities/",
+    notes:
+      "Used for the public-facing museum framing that the Ordovician Radiation occurred during the second half of the Ordovician and established marine community types that lasted through the rest of the Paleozoic.",
+  },
+  umdMacroecologyNektonRevolution: {
+    shortTitle: "UMD: Devonian Nekton Revolution",
+    title: "GEOL 331/BSCI 333 Principles of Paleontology: Macroecology",
+    organization: "University of Maryland",
+    citation:
+      'Holtz, T. R. Jr., "GEOL 331/BSCI 333 Principles of Paleontology: Macroecology." University of Maryland, last modified December 7, 2020.',
+    url: "https://www.geol.umd.edu/~tholtz/G331/lectures/331macroecol.html",
+    notes:
+      "Used for a timing-specific public summary stating that the Devonian Nekton Revolution occurred throughout the Devonian, with a great increase in fully nektonic forms such as fish and ammonoids.",
+  },
+  royalSocietyPalaeozoicWaterColumn: {
+    shortTitle: "Royal Society: water-column colonization",
+    title:
+      "The Palaeozoic colonization of the water column and the rise of global nekton",
+    organization: "The Royal Society",
+    citation:
+      'Whalen, C. D., and Briggs, D. E. G. (2018), "The Palaeozoic colonization of the water column and the rise of global nekton." Proceedings of the Royal Society B 285:20180883. doi:10.1098/rspb.2018.0883.',
+    url: "https://royalsocietypublishing.org/rspb/article/285/1883/20180883/84706/The-Palaeozoic-colonization-of-the-water-column",
+    notes:
+      "Used for the explicit review-level caution that the rise of global nekton was more complex and gradual than a single narrow interval, and cannot be attributed to one Palaeozoic slice alone.",
+  },
   berkeleyTetrapodOrigin: {
     shortTitle: "Berkeley: tetrapods",
     title: "The origin of tetrapods",
@@ -159,6 +221,36 @@ export const ERA_SOURCES = {
     url: "https://evolution.berkeley.edu/what-are-evograms/the-origin-of-birds/",
     notes:
       "Used for the Late Jurassic dinosaur-to-bird transition and Archaeopteryx as the first known bird in this public-facing timeline.",
+  },
+  berkeleyMammalAncestors: {
+    shortTitle: "Berkeley: mammal ancestors",
+    title: "Jaws to ears in the ancestors of mammals",
+    organization: "Understanding Evolution / UC Museum of Paleontology",
+    citation:
+      'Understanding Evolution, "Jaws to ears in the ancestors of mammals." University of California Museum of Paleontology.',
+    url: "https://evolution.berkeley.edu/what-are-evograms/jaws-to-ears-in-the-ancestors-of-mammals/",
+    notes:
+      "Used for synapsids as the lineage that gave rise to mammals and for the broader mammal-line transition through deep time.",
+  },
+  ucmpArchaean: {
+    shortTitle: "UCMP: Archaean",
+    title: "Introduction to the Archaean",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "Introduction to the Archaean."',
+    url: "https://ucmp.berkeley.edu/precambrian/archaean.html",
+    notes:
+      "Used for the Archean as a bacterial world with roughly 3.5-billion-year-old fossils and abundant stromatolites built by microbial communities.",
+  },
+  ucmpVendian: {
+    shortTitle: "UCMP: Vendian",
+    title: "Introduction to the Vendian Period",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "Introduction to the Vendian Period."',
+    url: "https://ucmp.berkeley.edu/vendian/vendian.html",
+    notes:
+      "Used for latest-Proterozoic macroscopic soft-bodied fossils in the Vendian/Ediacaran and for a concise public-facing framing of life immediately before the Cambrian explosion.",
   },
   ucmpCyanobacteria: {
     shortTitle: "UCMP: Cyanobacteria",
@@ -190,6 +282,134 @@ export const ERA_SOURCES = {
     notes:
       "Used for the public-facing timeline framing that plants first appeared in the Ordovician and diversified into recognizably modern-looking forms by the Late Silurian and Devonian.",
   },
+  ucmpSilurian: {
+    shortTitle: "UCMP: Silurian",
+    title: "The Silurian",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "The Silurian."',
+    url: "https://ucmp.berkeley.edu/silurian/silurian.html",
+    notes:
+      "Used for the Silurian as the interval of the first coral reefs, first known freshwater fish, first fish with jaws, first good evidence of life on land, and earliest vascular plants.",
+  },
+  museumsVictoria600MillionYears: {
+    shortTitle: "Museums Victoria: 600 Million Years",
+    title: "600 Million Years: Victoria Evolves",
+    organization: "Museums Victoria",
+    citation: 'Museums Victoria, "600 Million Years: Victoria Evolves."',
+    url: "https://museumsvictoria.com.au/melbournemuseum/resources/600-million-years/",
+    notes:
+      "Used for museum-grade Silurian, Devonian, Triassic, Jurassic, and Cretaceous summaries, including expansive Silurian reefs, the first jawed fish, early vascular plants, slow Triassic recovery, and flowering-plant spread in the Cretaceous.",
+  },
+  museumsVictoriaPalaeobotany: {
+    shortTitle: "Museums Victoria: Palaeobotany",
+    title: "Palaeobotany",
+    organization: "Museums Victoria",
+    citation:
+      'Rich, T., Pickering, D. and Pawley, K. (2012), "Palaeobotany." Museums Victoria Collections.',
+    url: "https://collections.museumsvictoria.com.au/collections/14168",
+    notes:
+      "Used for the statement that Baragwanathia and related Silurian and Lower Devonian flora are among the world's oldest known vascular land plants.",
+  },
+  hkuSilurianCoralReefs: {
+    shortTitle: "HKU: Silurian reefs",
+    title: "Silurian Coral Reefs",
+    organization: "Stephen Hui Geological Museum, The University of Hong Kong",
+    citation:
+      'Stephen Hui Geological Museum, The University of Hong Kong, "Silurian Coral Reefs."',
+    url: "https://shmuseum.hku.hk/education/earth-evolution/early-paleozoic/early-paleozoic-biosphere/silurian-coral-reefs",
+    notes:
+      "Used for the Silurian as a time of extensive reef development in shallow tropical seas and for tabulate corals, rugose corals, and stromatoporoids as major reef builders.",
+  },
+  fieldMuseumSilurian: {
+    shortTitle: "Field Museum: Silurian",
+    title: "Silurian",
+    organization: "Field Museum / Milwaukee Public Museum",
+    citation:
+      'Field Museum and Milwaukee Public Museum, "Silurian" (Virtual Silurian Reef project).',
+    url: "https://silurian-reef.fieldmuseum.org/narrative/439",
+    notes:
+      "Used for a public-facing 443 to 417 million-year Silurian reef-sea framing and for large stromatoporoid reefs in Wisconsin and Illinois.",
+  },
+  nationalMuseumEarliestVascularPlants: {
+    shortTitle: "National Museum: earliest vascular plants",
+    title:
+      "The earliest vascular terrestrial plants and polymorphs of the Silurian and Lower Devonian periods in Barrandien, Czech Republic",
+    organization: "National Museum, Prague",
+    citation:
+      'National Museum, Prague, "The earliest vascular terrestrial plants and polymorphs of the Silurian and Lower Devonian periods in Barrandien, Czech Republic."',
+    url: "https://www.nm.cz/en/about-us/science-and-research/the-earliest-vascular-terrestrial-plants-and-polymorphs-of-the-silurian-and-lower-devonian-periods-in-barrandien-czech-republic",
+    notes:
+      "Used for Cooksonia as the oldest vascular plant in the world, dated on the page to about 425 to 427 million years ago.",
+  },
+  nhmEarliestFossilisedForest: {
+    shortTitle: "NHM: earliest fossil forest",
+    title: "Earliest fossilised forest discovered in Somerset",
+    organization: "Natural History Museum, London",
+    citation:
+      'Natural History Museum, London, "Earliest fossilised forest discovered in Somerset."',
+    url: "https://www.nhm.ac.uk/discover/news/2024/march/earliest-fossilised-forest-discovered-in-somerset.html",
+    notes:
+      "Used for the statement that 390-million-year-old fossils from southwest England are the world's oldest known fossilised forest.",
+  },
+  nysmOldestTrees: {
+    shortTitle: "NYSM: oldest trees",
+    title: "Re-Examining the Earth's Oldest Trees",
+    organization: "New York State Museum",
+    citation:
+      'New York State Museum, "Re-Examining the Earth\'s Oldest Trees."',
+    url: "https://nysm.nysed.gov/paleontology/paleobotany/news/re-examining-earths-oldest-trees",
+    notes:
+      "Used for Gilboa's Eospermatopteris trees, dated on the page to roughly 380 to 385 million years ago and described as among the first tree-like plants on Earth.",
+  },
+  australianMuseumCretaceous: {
+    shortTitle: "Australian Museum: Cretaceous",
+    title: "The Cretaceous Period (146-65 million years ago)",
+    organization: "Australian Museum",
+    citation:
+      'Australian Museum, "The Cretaceous Period (146-65 million years ago)."',
+    url: "https://australian.museum/learn/australia-over-time/evolving-landscape/the-cretaceous-period/",
+    notes:
+      "Used for Archaefructus as the earliest known flowering plant at about 125 million years old and for flowering plants spreading through the Cretaceous world.",
+  },
+  universityMelbourneFlowersReachedAustralia: {
+    shortTitle: "Unimelb: flowers reached Australia",
+    title: "When flowers reached Australia",
+    organization: "The University of Melbourne",
+    citation: 'The University of Melbourne, "When flowers reached Australia."',
+    url: "https://www.unimelb.edu.au/newsroom/news/2019/december/when-flowers-reached-australia",
+    notes:
+      "Used for Australia's oldest flowering plants at 126 million years old and for earliest southern Australian flower-bearing forests between 126 and 100 million years ago.",
+  },
+  britannicaDevonianPeriod: {
+    shortTitle: "Britannica: Devonian",
+    title: "Devonian Period",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Devonian Period."',
+    url: "https://www.britannica.com/science/Devonian-Period",
+    notes:
+      "Used for the Devonian as the Age of Fishes and for the first known in-place forests dating from the Middle Devonian.",
+  },
+  ucmpDevonian: {
+    shortTitle: "UCMP: Devonian",
+    title: "The Devonian",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "The Devonian."',
+    url: "https://ucmp.berkeley.edu/devonian/devonian.html",
+    notes:
+      "Used for the Devonian appearance of the first tetrapods, terrestrial arthropods, first trees, and first forests.",
+  },
+  ucmpCarboniferous: {
+    shortTitle: "UCMP: Carboniferous",
+    title: "The Carboniferous",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "The Carboniferous."',
+    url: "https://ucmp.berkeley.edu/carboniferous/carboniferous.html",
+    notes:
+      "Used for vast Carboniferous coal swamps and for the amniote egg as a key evolutionary innovation that let vertebrates reproduce farther from water.",
+  },
   ucmpMesozoicLife: {
     shortTitle: "UCMP: Mesozoic life",
     title: "Mesozoic Era: Life",
@@ -200,6 +420,26 @@ export const ERA_SOURCES = {
     notes:
       "Used for the public-facing framing that dinosaurs and other archosaurs dominated terrestrial life through much of the Mesozoic.",
   },
+  ucmpJurassicLife: {
+    shortTitle: "UCMP: Jurassic life",
+    title: "Jurassic Period: Life",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "Jurassic Period: Life."',
+    url: "https://ucmp.berkeley.edu/mesozoic/jurassic/jurassiclife.html",
+    notes:
+      "Used for Jurassic dinosaur dominance, giant sauropods, first birds including Archaeopteryx, marine reptiles, and gymnosperm-dominated plant life.",
+  },
+  ucmpCretaceousPeriod: {
+    shortTitle: "UCMP: Cretaceous",
+    title: "The Cretaceous Period",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "The Cretaceous Period."',
+    url: "https://ucmp.berkeley.edu/mesozoic/cretaceous/cretaceous.html",
+    notes:
+      "Used for first flowering plants, first fossils of many insect groups, first modern mammal and bird groups, and the appearance of new dinosaur groups such as ceratopsians and pachycephalosaurs.",
+  },
   britannicaCarboniferousPeriod: {
     shortTitle: "Britannica: Carboniferous",
     title: "Carboniferous Period",
@@ -208,6 +448,24 @@ export const ERA_SOURCES = {
     url: "https://www.britannica.com/science/Carboniferous-Period",
     notes:
       "Used for Carboniferous coal-swamp environments, giant insects in Pennsylvanian skies, and the earliest reptiles such as Hylonomus.",
+  },
+  ucmpPermian: {
+    shortTitle: "UCMP: Permian",
+    title: "The Permian",
+    organization: "UC Museum of Paleontology",
+    citation: 'University of California Museum of Paleontology, "The Permian."',
+    url: "https://ucmp.berkeley.edu/permian/permian.html",
+    notes:
+      "Used for the Permian as a turning point after which modern conifers appear in the fossil record and later Mesozoic land faunas take shape.",
+  },
+  britannicaPermianPeriod: {
+    shortTitle: "Britannica: Permian",
+    title: "Permian Period",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Permian Period."',
+    url: "https://www.britannica.com/science/Permian-Period",
+    notes:
+      "Used for synapsid diversification from Early Permian pelycosaurs into more advanced therapsids as Pangaea grew drier and climates harsher.",
   },
   smithsonianHumanOrigins: {
     shortTitle: "Smithsonian Human Origins",
@@ -501,6 +759,67 @@ export const ERA_SOURCES = {
     url: "https://evolution.berkeley.edu/from-soup-to-cells-the-origin-of-life/when-did-life-originate/",
     notes:
       "Used for the cautious estimate that evidence suggests life first evolved around 3.5 billion years ago, based on microfossils and stromatolites.",
+  },
+  nhmFirstLandPlants: {
+    shortTitle: "NHM: first land plants",
+    title: "New group of plants was one of the first to colonise the land",
+    organization: "Natural History Museum, London",
+    citation:
+      'Natural History Museum, London, "New group of plants was one of the first to colonise the land."',
+    url: "https://www.nhm.ac.uk/discover/news/2022/february/new-group-plants-was-one-first-colonise-land.html",
+    notes:
+      "Used for the public-facing statement that the ancestors of modern flora first moved onto land between 450 and 500 million years ago, with cryptospores dating back to around 470 million years ago.",
+  },
+  nhmCarboniferousRainforestCollapse: {
+    shortTitle: "NHM: Carboniferous collapse",
+    title:
+      "New species of “living fossil” had jaws unlike anything seen before",
+    organization: "Natural History Museum, London",
+    citation:
+      'Natural History Museum, London, "New species of “living fossil” had jaws unlike anything seen before."',
+    url: "https://www.nhm.ac.uk/discover/news/2026/march/new-species-living-fossil-had-jaws-unlike-anything-seen-before.html",
+    notes:
+      "Used for the public-facing statement that the Carboniferous rainforest collapse drove widespread extinction as moist habitats gave way to drier ones.",
+  },
+  frontiersTriassicRevolution: {
+    shortTitle: "Frontiers: Triassic Revolution",
+    title: "Triassic Revolution",
+    organization: "Frontiers in Earth Science",
+    citation:
+      'Benton, M. J., and Wu, F. (2022), "Triassic Revolution." Frontiers in Earth Science 10:899541. doi:10.3389/feart.2022.899541.',
+    url: "https://www.frontiersin.org/journals/earth-science/articles/10.3389/feart.2022.899541/full",
+    notes:
+      "Used for the review-level framing that the Mesozoic Marine Revolution began much earlier than once thought, with initiation from the Early Triassic onward and major escalation later in the Triassic.",
+  },
+  amnhPaleoceneEoceneThermalMaximum: {
+    shortTitle: "AMNH: PETM",
+    title: "PETM: Unearthing Ancient Climate Change",
+    organization: "American Museum of Natural History",
+    citation:
+      'American Museum of Natural History, "PETM: Unearthing Ancient Climate Change."',
+    url: "https://www.amnh.org/explore/videos/earth-and-climate/paleocene-eocene-thermal-maximum",
+    notes:
+      "Used for the public-facing statement that the PETM occurred about 55 million years ago, raised global surface temperature by 5 to 9°C, lasted upwards of 170,000 years, and dramatically affected life on land and in the oceans.",
+  },
+  nhmPaleoceneEoceneThermalMaximum: {
+    shortTitle: "NHM: PETM",
+    title: "Paleocene-Eocene Thermal Maximum (PETM)",
+    organization: "Natural History Museum, London",
+    citation:
+      'Natural History Museum, London, "Paleocene-Eocene Thermal Maximum (PETM)."',
+    url: "https://www.nhm.ac.uk/our-science/research/projects/paleocene-eocene-thermal-maximum.html",
+    notes:
+      "Used for the public-facing timing that the PETM occurred around 55.8 million years ago and for the framing of the event as the most rapid and significant climatic warming pulse of the past 65 million years, with extinctions among some deep-sea organisms, plankton, and terrestrial mammals.",
+  },
+  birminghamCarboniferousCurios: {
+    shortTitle: "Birmingham: Alveley footprints",
+    title: "Carboniferous Curios: the Alveley Footprints",
+    organization: "University of Birmingham",
+    citation:
+      'University of Birmingham, "Carboniferous Curios: the Alveley Footprints."',
+    url: "https://www.birmingham.ac.uk/news/2024/carboniferous-curios-the-alveley-footprints",
+    notes:
+      "Used for the public-facing statement that a major environmental change around 307 million years ago, termed the Carboniferous Rainforest Collapse, marked a transition from humid rainforest habitats toward drier Permian-style ecosystems.",
   },
   britannicaOriginAgriculture: {
     shortTitle: "Britannica: origins of agriculture",

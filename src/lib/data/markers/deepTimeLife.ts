@@ -48,8 +48,8 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     priority: 93,
     sourceRefs: [
       {
-        sourceId: "icsChart2024",
-        note: "This marker sits in the late Ediacaran, the interval immediately before the Cambrian explosion; the app uses c. 575 million years ago as a clean public-facing anchor for the first large multicellular organisms commonly highlighted in Earth-history overviews.",
+        sourceId: "museumsVictoria600MillionYears",
+        note: "Museums Victoria says the earliest fossils of these multicelled animals are preserved in rocks that are about 575 million years old.",
       },
     ],
   },
@@ -59,12 +59,14 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     approximate: true,
     shortLabel: "Land Plants",
     year: yearsAgo(470_000_000),
+    description:
+      "Tiny early plants were among the first to colonise land, beginning the long transformation of bare continents into living landscapes.",
     minZoom: 0,
     priority: 92,
     sourceRefs: [
       {
-        sourceId: "ucmpPlantae",
-        note: "UCMP says plants first appeared in the Ordovician; the app uses c. 470 million years ago as a clean mid-Ordovician anchor for the earliest land plants.",
+        sourceId: "nhmFirstLandPlants",
+        note: "The Natural History Museum says the ancestors of modern flora first moved onto land at some point between 450 and 500 million years ago, and that cryptospores date back to around 470 million years ago.",
       },
     ],
   },
@@ -86,6 +88,48 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       {
         sourceId: "geoscienceworldLateOrdovicianExtinction",
         note: "GeoScienceWorld summarizes the event as a two-pulse crisis in which around 85% of species were eliminated.",
+      },
+    ],
+  },
+  {
+    id: "earliest-vascular-plants-appear",
+    label: "Cooksonia, oldest known vascular plant",
+    shortLabel: "Cooksonia",
+    approximate: true,
+    year: yearsAgo(426_000_000),
+    description:
+      "Cooksonia appears among the oldest known vascular plants, marking an early step toward taller and more complex land floras.",
+    minZoom: 0,
+    priority: 89,
+    sourceRefs: [
+      {
+        sourceId: "nationalMuseumEarliestVascularPlants",
+        note: "The National Museum in Prague says Cooksonia from the Motol Formation is considered the oldest vascular plant in the world and dates it to about 425 to 427 million years ago.",
+      },
+      {
+        sourceId: "museumsVictoriaPalaeobotany",
+        note: "Museums Victoria notes that its Baragwanathia and related Silurian and Lower Devonian flora are among the world's oldest known vascular land plants, reinforcing this early vascular-plant interval.",
+      },
+    ],
+  },
+  {
+    id: "first-forests-appear",
+    label: "Earliest known fossil forest",
+    shortLabel: "Oldest Forest",
+    approximate: true,
+    year: yearsAgo(390_000_000),
+    description:
+      "Calamophyton trees formed the world's oldest known fossil forest, an early Devonian woodland already reshaping soils, rivers, and life on land.",
+    minZoom: 0,
+    priority: 92,
+    sourceRefs: [
+      {
+        sourceId: "nhmEarliestFossilisedForest",
+        note: "The Natural History Museum says 390-million-year-old fossils from southwest England are the world's oldest known fossilised forest.",
+      },
+      {
+        sourceId: "nysmOldestTrees",
+        note: "The New York State Museum says Gilboa's Eospermatopteris trees date to roughly 380 to 385 million years ago and were among the first plants on Earth to have a tree-like form.",
       },
     ],
   },
@@ -232,6 +276,27 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       {
         sourceId: "berkeleyBirdOrigin",
         note: "Understanding Evolution identifies Archaeopteryx as the first known bird and places the dinosaur-to-bird transition in the Late Jurassic; the app uses c. 150 Ma as a familiar Late Jurassic anchor.",
+      },
+    ],
+  },
+  {
+    id: "first-flowering-plants-appear",
+    label: "Earliest known flowering plant fossils",
+    shortLabel: "Earliest Flowers",
+    approximate: true,
+    year: yearsAgo(125_000_000),
+    description:
+      "Fossils such as Archaefructus show flowering plants were already present by about 125 million years ago, with southern Australian flower-bearing forests appearing soon after.",
+    minZoom: 0,
+    priority: 90,
+    sourceRefs: [
+      {
+        sourceId: "australianMuseumCretaceous",
+        note: "The Australian Museum says Archaefructus liaoningensis is the earliest known flowering plant and that its fossils are about 125 million years old.",
+      },
+      {
+        sourceId: "universityMelbourneFlowersReachedAustralia",
+        note: "The University of Melbourne says Australia's oldest flowering plants are 126 million years old and reconstructs flower-bearing forests in southern Australia from 126 to 100 million years ago.",
       },
     ],
   },

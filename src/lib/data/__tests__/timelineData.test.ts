@@ -76,7 +76,16 @@ describe("root timeline display data", () => {
     expect(
       TIMELINE_DISPLAY.overlays
         .filter((band) =>
-          ["cambrian-explosion", "age-of-dinosaurs"].includes(band.id),
+          [
+            "cambrian-explosion",
+            "cambrian-substrate-revolution",
+            "great-ordovician-biodiversification-event",
+            "devonian-nekton-revolution",
+            "carboniferous-rainforest-collapse",
+            "mesozoic-marine-revolution",
+            "age-of-dinosaurs",
+            "paleocene-eocene-thermal-maximum",
+          ].includes(band.id),
         )
         .every((band) => band.groupId === "deep-time-life"),
     ).toBe(true);
@@ -92,6 +101,8 @@ describe("root timeline display data", () => {
       "first-large-multicellular-life",
       "first-land-plants",
       "late-ordovician-mass-extinction",
+      "earliest-vascular-plants-appear",
+      "first-forests-appear",
       "late-devonian-mass-extinction",
       "first-tetrapods-step-onto-land",
       "first-reptiles-appear",
@@ -100,6 +111,7 @@ describe("root timeline display data", () => {
       "first-mammals-appear",
       "end-triassic-mass-extinction",
       "archaeopteryx-first-known-bird",
+      "first-flowering-plants-appear",
       "k-pg-asteroid-impact",
       "earliest-likely-bipedal-hominins-appear",
       "early-bipedal-femur-evidence-in-kenya",
@@ -285,8 +297,14 @@ describe("root timeline display data", () => {
 
   it("includes the historical overlay bands with valid sources", () => {
     expect(TIMELINE_DISPLAY.overlays.map((band) => band.id)).toEqual([
+      "cambrian-substrate-revolution",
       "cambrian-explosion",
+      "great-ordovician-biodiversification-event",
+      "devonian-nekton-revolution",
+      "carboniferous-rainforest-collapse",
+      "mesozoic-marine-revolution",
       "age-of-dinosaurs",
+      "paleocene-eocene-thermal-maximum",
       "sahelanthropus-tchadensis",
       "orrorin-tugenensis",
       "ardipithecus-kadabba",
@@ -377,24 +395,85 @@ describe("root timeline display data", () => {
           index === 0 || bands[index - 1].startYear <= band.startYear,
       ),
     ).toBe(true);
+
+    expect(
+      TIMELINE_DISPLAY.overlays
+        .find((band) => band.id === "age-of-dinosaurs")
+        ?.children?.map((band) => band.id),
+    ).toBeUndefined();
   });
 
   it("keeps deep-time overlays descriptive and source-backed", () => {
     const cambrianExplosion = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "cambrian-explosion",
     );
+    const substrateRevolution = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "cambrian-substrate-revolution",
+    );
+    const gobe = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "great-ordovician-biodiversification-event",
+    );
+    const nektonRevolution = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "devonian-nekton-revolution",
+    );
+    const rainforestCollapse = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "carboniferous-rainforest-collapse",
+    );
+    const marineRevolution = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "mesozoic-marine-revolution",
+    );
     const ageOfDinosaurs = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "age-of-dinosaurs",
+    );
+    const petm = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "paleocene-eocene-thermal-maximum",
     );
 
     expect(cambrianExplosion).toMatchObject({
       description: expect.stringContaining("major animal lineages"),
     });
+    expect(substrateRevolution).toMatchObject({
+      description: expect.stringContaining("burrowed, mixed sediments"),
+      approximateStart: true,
+      approximateEnd: true,
+    });
+    expect(gobe).toMatchObject({
+      description: expect.stringContaining("marine communities diversified"),
+      approximateStart: true,
+      approximateEnd: true,
+    });
+    expect(nektonRevolution).toMatchObject({
+      description: expect.stringContaining("open water column"),
+      approximateStart: true,
+      approximateEnd: true,
+    });
+    expect(rainforestCollapse).toMatchObject({
+      description: expect.stringContaining("humid coal-forest habitats"),
+      approximateStart: true,
+      approximateEnd: true,
+    });
+    expect(marineRevolution).toMatchObject({
+      description: expect.stringContaining("predator-prey arms race"),
+      approximateStart: true,
+      approximateEnd: true,
+    });
     expect(ageOfDinosaurs).toMatchObject({
       description: expect.stringContaining("archosaurs"),
     });
+    expect(petm).toMatchObject({
+      description: expect.stringContaining("5 to 9°C"),
+      approximateStart: true,
+      approximateEnd: true,
+    });
     expect(cambrianExplosion?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(substrateRevolution?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(gobe?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(nektonRevolution?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(rainforestCollapse?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(marineRevolution?.sourceRefs?.length).toBeGreaterThan(0);
     expect(ageOfDinosaurs?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(petm?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(ageOfDinosaurs?.children).toBeUndefined();
   });
 
   it("keeps the flattened root era child chronology stitched in the expected order", () => {
