@@ -1,11 +1,12 @@
 import type { TimelineMarker } from "../timelineTypes";
+import { bce } from "../timelineDateBuilders";
 
 export const EPIPALEOLITHIC_MARKERS: TimelineMarker[] = [
   {
     id: "natufian-settled-hunter-gatherers-at-eynan",
     label: "Natufian settled hunter-gatherers at Eynan",
     shortLabel: "Eynan",
-    year: -10_000,
+    year: bce(9000),
     regionalScopeLabel: "Levant",
     approximate: true,
     minZoom: 19,

@@ -1,8 +1,17 @@
-import { YEARS_AGO_CUTOFF, type TimelineElapsedReference } from "./bands";
+import {
+  getDominantTimelineDateReference,
+  type TimelineElapsedReference,
+} from "./bands";
 import {
   getLogarithmicScreenDeltaFromYearsDelta,
   resolveLogarithmicAxisGeometry,
 } from "./logarithmicAxis";
+import {
+  getYearsAfterBigBang,
+  getYearsAgoFromPresent,
+  getTimelineYearFromYearsAfterBigBang,
+  getTimelineYearFromYearsAgo,
+} from "./timelineYears";
 import {
   addPreciseTimelineYears,
   comparePreciseTimelineYears,
@@ -39,6 +48,11 @@ type AxisStepDefinition =
       step: number;
     }
   | {
+      kind: "elapsed";
+      step: number;
+      reference: TimelineElapsedReference;
+    }
+  | {
       kind: "calendar";
       unit: "month" | "day";
       count: number;
@@ -68,6 +82,7 @@ type AxisTickLayerState = {
 };
 
 export type ResolveAxisTickOptions = {
+  elapsedReference?: TimelineElapsedReference;
   elapsedSubYearReference?: TimelineElapsedReference;
   preciseStartYear?: PreciseTimelineYear;
   preciseEndYear?: PreciseTimelineYear;
@@ -295,7 +310,9 @@ function getCalendarTicksForStep(
 function getElapsedDayTicksForStep(
   startYear: number,
   endYear: number,
-  stepDefinition: Extract<AxisStepDefinition, { kind: "elapsed-day" }>,
+  stepDefinition:
+    | Extract<AxisStepDefinition, { kind: "elapsed-day" }>
+    | Extract<AxisStepDefinition, { kind: "elapsed" }>,
   reference: TimelineElapsedReference,
   preciseStartYear?: PreciseTimelineYear,
   preciseEndYear?: PreciseTimelineYear,
@@ -381,6 +398,67 @@ function getElapsedDayTicksForStep(
   return ticks;
 }
 
+function getElapsedTicksForStep(
+  startYear: number,
+  endYear: number,
+  stepDefinition: Extract<AxisStepDefinition, { kind: "elapsed" }>,
+  preciseStartYear?: PreciseTimelineYear,
+  preciseEndYear?: PreciseTimelineYear,
+) {
+  const clampedStart = Math.max(
+    Math.min(startYear, endYear),
+    TIMELINE_MIN_YEAR,
+  );
+  const clampedEnd = Math.min(Math.max(startYear, endYear), TIMELINE_MAX_YEAR);
+
+  if (clampedEnd < clampedStart) {
+    return [];
+  }
+
+  const orderedPreciseStart =
+    preciseStartYear && preciseEndYear
+      ? comparePreciseTimelineYears(preciseStartYear, preciseEndYear) <= 0
+        ? preciseStartYear
+        : preciseEndYear
+      : splitTimelineYear(clampedStart);
+  const orderedPreciseEnd =
+    preciseStartYear && preciseEndYear
+      ? comparePreciseTimelineYears(preciseStartYear, preciseEndYear) <= 0
+        ? preciseEndYear
+        : preciseStartYear
+      : splitTimelineYear(clampedEnd);
+  const step = stepDefinition.step;
+  const ticks: ExplicitTick[] = [];
+  const minElapsed =
+    stepDefinition.reference === "after-big-bang"
+      ? Math.max(0, getYearsAfterBigBang(orderedPreciseStart))
+      : Math.max(0, getYearsAgoFromPresent(orderedPreciseEnd));
+  const maxElapsed =
+    stepDefinition.reference === "after-big-bang"
+      ? Math.max(0, getYearsAfterBigBang(orderedPreciseEnd))
+      : Math.max(0, getYearsAgoFromPresent(orderedPreciseStart));
+  const firstElapsed = Math.ceil((minElapsed - EPSILON) / step) * step;
+
+  for (
+    let elapsed = firstElapsed;
+    elapsed <= maxElapsed + EPSILON;
+    elapsed += step
+  ) {
+    const approximateYear =
+      stepDefinition.reference === "after-big-bang"
+        ? getTimelineYearFromYearsAfterBigBang(elapsed)
+        : getTimelineYearFromYearsAgo(elapsed);
+    const preciseYear = splitTimelineYear(approximateYear);
+
+    ticks.push({
+      year: approximateYear,
+      preciseYear,
+    });
+  }
+
+  return ticks;
+}
+
 function getPreciseNumericTicksForStep(
   step: number,
   preciseStartYear: PreciseTimelineYear,
@@ -435,6 +513,16 @@ function getExplicitTicksForStep(
   stepDefinition: AxisStepDefinition,
   options: ResolveAxisTickOptions,
 ): ExplicitTick[] {
+  if (stepDefinition.kind === "elapsed") {
+    return getElapsedTicksForStep(
+      startYear,
+      endYear,
+      stepDefinition,
+      options.preciseStartYear,
+      options.preciseEndYear,
+    );
+  }
+
   if (stepDefinition.kind === "calendar") {
     return getCalendarTicksForStep(startYear, endYear, stepDefinition);
   }
@@ -536,6 +624,20 @@ function getNumericCandidateSteps(
     .map<AxisStepDefinition>((step) => ({ kind: "numeric", step }));
 }
 
+function getElapsedCandidateSteps(
+  idealMajorStep: number,
+  yearsPerPixel: number,
+  reference: TimelineElapsedReference,
+) {
+  return getNumericCandidateSteps(idealMajorStep, yearsPerPixel).map(
+    (stepDefinition) => ({
+      kind: "elapsed" as const,
+      step: stepDefinition.step,
+      reference,
+    }),
+  );
+}
+
 function getCalendarCandidateSteps(yearsPerPixel: number) {
   return [...CALENDAR_STEP_DEFINITIONS]
     .filter((stepDefinition) => {
@@ -566,8 +668,17 @@ function getCandidateSteps(
   idealMajorStep: number,
   yearsPerPixel: number,
   subYearMode: "numeric" | "calendar" | "elapsed-day",
+  elapsedReference?: TimelineElapsedReference,
 ) {
   if (idealMajorStep >= 1) {
+    if (elapsedReference) {
+      return getElapsedCandidateSteps(
+        idealMajorStep,
+        yearsPerPixel,
+        elapsedReference,
+      );
+    }
+
     return getNumericCandidateSteps(idealMajorStep, yearsPerPixel);
   }
 
@@ -704,8 +815,17 @@ function getVisibleTickLayers(
 function getLogarithmicStepDefinition(
   targetStep: number,
   subYearMode: "numeric" | "calendar" | "elapsed-day",
+  elapsedReference?: TimelineElapsedReference,
 ): AxisStepDefinition {
   if (targetStep >= 1 || subYearMode === "numeric") {
+    if (targetStep >= 1 && elapsedReference) {
+      return {
+        kind: "elapsed",
+        step: targetStep,
+        reference: elapsedReference,
+      };
+    }
+
     return {
       kind: "numeric",
       step: targetStep,
@@ -722,6 +842,7 @@ function getLogarithmicStepDefinition(
 function getLogarithmicVisibleTickLayers(
   yearsPerPixel: number,
   subYearMode: "numeric" | "calendar" | "elapsed-day",
+  elapsedReference?: TimelineElapsedReference,
 ) {
   const geometry = resolveLogarithmicAxisGeometry(yearsPerPixel);
   const currentStep = 10 ** Math.ceil(geometry.decadeValue);
@@ -746,7 +867,11 @@ function getLogarithmicVisibleTickLayers(
     generationIndex: number,
     generationAlpha: number,
   ): AxisTickLayerState => {
-    const stepDefinition = getLogarithmicStepDefinition(targetStep, subYearMode);
+    const stepDefinition = getLogarithmicStepDefinition(
+      targetStep,
+      subYearMode,
+      elapsedReference,
+    );
     const step = stepDefinition.step;
     const pixelsPerStep = Math.abs(
       getLogarithmicScreenDeltaFromYearsDelta(step, geometry),
@@ -832,17 +957,40 @@ export function resolveAxisTickRenderStates(
     Math.floor(safeWidth / TARGET_MAJOR_SPACING_PX),
   );
   const idealMajorStep = Math.max(span / majorCount, EPSILON);
+  const dominantReference = getDominantTimelineDateReference(
+    preciseRangeStart,
+    preciseRangeEnd,
+  );
+  const elapsedReference =
+    dominantReference === "elapsed"
+      ? options.elapsedReference ?? options.elapsedSubYearReference ?? "ago"
+      : undefined;
   const subYearMode =
     idealMajorStep < 1
-      ? preciseRangeStart.wholeYear > -YEARS_AGO_CUTOFF
-        ? "calendar"
-        : "elapsed-day"
+      ? (() => {
+          if (dominantReference === null) {
+            return "numeric";
+          }
+
+          return dominantReference === "elapsed"
+            ? "elapsed-day"
+            : "calendar";
+        })()
       : "numeric";
   const visibleLayers =
     scaleMode === "logarithmic"
-      ? getLogarithmicVisibleTickLayers(yearsPerPixel, subYearMode)
+      ? getLogarithmicVisibleTickLayers(
+          yearsPerPixel,
+          subYearMode,
+          elapsedReference,
+        )
       : getVisibleTickLayers(
-          getCandidateSteps(idealMajorStep, yearsPerPixel, subYearMode),
+          getCandidateSteps(
+            idealMajorStep,
+            yearsPerPixel,
+            subYearMode,
+            elapsedReference,
+          ),
           yearsPerPixel,
           span,
         );

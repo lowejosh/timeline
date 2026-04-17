@@ -1,4 +1,4 @@
-import { getPresentTimelineYear } from "./present";
+import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "./timelineYears";
 import {
   getLogarithmicAxisRangeFactor,
   getLogarithmicScreenDeltaFromYearsDelta,
@@ -21,8 +21,6 @@ export type PreciseTimelineYear = {
   fraction: number;
 };
 
-export const TIMELINE_MIN_YEAR = -13_800_000_000;
-export const TIMELINE_MAX_YEAR = getPresentTimelineYear();
 export const MIN_ZOOM = 0;
 export const MAX_ZOOM = 80;
 export const BASE_YEARS_PER_PIXEL = 50_000_000;
@@ -31,6 +29,8 @@ const DAYS_PER_YEAR = 365.2425;
 export const MIN_VISIBLE_RANGE_DAYS = 2;
 export const MAX_ZOOM_DAY_TICK_SPACING_PX = 120;
 const PRECISION_YEARS_PER_PIXEL_FACTOR = 2;
+
+export { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "./timelineYears";
 
 export function getMinVisibleRangeDaysForWidth(width: number) {
   const safeWidth = Math.max(width, 1);

@@ -3,6 +3,7 @@ import {
   createExactCalendarTimestamp,
   getTimelineYearFromExactTimestamp,
 } from "../../time/exactTimestamp";
+import { bce, ce } from "../timelineDateBuilders";
 
 const TITANIC_SINKS_AT = createExactCalendarTimestamp({
   era: "ce",
@@ -19,7 +20,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "gobekli-tepe-monuments",
     label: "Göbekli Tepe monuments",
     shortLabel: "Göbekli Tepe",
-    year: -9_600,
+    year: bce(9_600),
     regionalScopeLabel: "Southeastern Anatolia",
     approximate: true,
     minZoom: 19,
@@ -35,7 +36,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "agriculture-emerges-in-southwest-asia",
     label: "Agriculture emerges in Southwest Asia",
     shortLabel: "Early Agriculture",
-    year: -9_500,
+    year: bce(9_500),
     regionalScopeLabel: "Southwest Asia",
     approximate: true,
     minZoom: 19,
@@ -55,7 +56,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "catalhoyuk-settled-farming-community",
     label: "Çatalhöyük settled farming community",
     shortLabel: "Çatalhöyük",
-    year: -7_400,
+    year: bce(7_400),
     regionalScopeLabel: "Anatolia",
     approximate: true,
     minZoom: 19,
@@ -71,7 +72,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "jericho-ritual-community",
     label: "Jericho ritual community",
     shortLabel: "Jericho",
-    year: -7_200,
+    year: bce(7_200),
     regionalScopeLabel: "Levant",
     approximate: true,
     minZoom: 19,
@@ -87,7 +88,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "stonehenge-begins",
     label: "Stonehenge construction begins",
     shortLabel: "Stonehenge",
-    year: -3_000,
+    year: bce(3_000),
     regionalScopeLabel: "Southern Britain",
     approximate: true,
     minZoom: 19,
@@ -107,7 +108,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "bronze-age-collapse",
     label: "Bronze Age collapse",
     shortLabel: "Bronze Age Collapse",
-    year: -1_200,
+    year: bce(1_200),
     regionalScopeLabel: "Eastern Mediterranean",
     approximate: true,
     minZoom: 18,
@@ -127,7 +128,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "augustus-becomes-emperor",
     label: "Augustus becomes first emperor",
     shortLabel: "Augustus becomes emperor",
-    year: -27,
+    year: bce(27),
     minZoom: 18,
     priority: 83,
     sourceRefs: [
@@ -145,7 +146,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "fall-of-western-rome",
     label: "Fall of Western Rome",
     shortLabel: "Western Rome Falls",
-    year: 476,
+    year: ce(476),
     minZoom: 18,
     priority: 81,
     sourceRefs: [
@@ -159,7 +160,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "hijra",
     label: "Muhammad's migration to Medina",
     shortLabel: "Migration to Medina",
-    year: 622,
+    year: ce(622),
     minZoom: 18,
     priority: 82,
     sourceRefs: [
@@ -173,7 +174,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "charlemagne-crowned-emperor",
     label: "Charlemagne crowned Holy Roman Emperor",
     shortLabel: "Holy Roman Emperor",
-    year: 800,
+    year: ce(800),
     minZoom: 18,
     priority: 81,
     sourceRefs: [
@@ -187,7 +188,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "genghis-khan-proclaimed",
     label: "Genghis Khan proclaimed ruler",
     shortLabel: "Mongol Empire Begins",
-    year: 1206,
+    year: ce(1206),
     minZoom: 18,
     priority: 83,
     sourceRefs: [
@@ -201,7 +202,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "black-death",
     label: "Black Death reaches Europe",
     shortLabel: "Black Death",
-    year: 1347,
+    year: ce(1347),
     minZoom: 18,
     priority: 80,
     sourceRefs: [
@@ -215,7 +216,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "fall-of-constantinople",
     label: "Fall of Constantinople",
     shortLabel: "Constantinople",
-    year: 1453,
+    year: ce(1453),
     minZoom: 18,
     priority: 82,
     sourceRefs: [
@@ -229,7 +230,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "gutenberg-press",
     label: "Gutenberg press",
     shortLabel: "Printing Press",
-    year: 1450,
+    year: ce(1450),
     minZoom: 20,
     priority: 72,
     sourceRefs: [
@@ -243,7 +244,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "columbian-exchange-begins",
     label: "Columbian Exchange begins",
     shortLabel: "Columbian Exchange",
-    year: 1492,
+    year: ce(1492),
     minZoom: 18,
     priority: 84,
     sourceRefs: [
@@ -257,7 +258,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "protestant-reformation",
     label: "Protestant Reformation",
     shortLabel: "Reformation",
-    year: 1517,
+    year: ce(1517),
     minZoom: 18,
     priority: 85,
     sourceRefs: [
@@ -271,7 +272,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "american-independence-declared",
     label: "American independence declared",
     shortLabel: "American Independence",
-    year: 1776,
+    year: ce(1776),
     minZoom: 20,
     priority: 75,
     sourceRefs: [
@@ -285,7 +286,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "french-revolution",
     label: "French Revolution begins",
     shortLabel: "French Revolution",
-    year: 1789,
+    year: ce(1789),
     minZoom: 18,
     priority: 86,
     sourceRefs: [
@@ -315,7 +316,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "world-war-i",
     label: "World War I begins",
     shortLabel: "World War I",
-    year: 1914,
+    year: ce(1914),
     minZoom: 18,
     priority: 88,
     sourceRefs: [
@@ -329,7 +330,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "russian-revolution",
     label: "Russian Revolution",
     shortLabel: "Russian Revolution",
-    year: 1917,
+    year: ce(1917),
     minZoom: 18,
     priority: 87,
     sourceRefs: [
@@ -343,7 +344,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "world-war-ii",
     label: "World War II begins",
     shortLabel: "World War II",
-    year: 1939,
+    year: ce(1939),
     minZoom: 18,
     priority: 90,
     sourceRefs: [
@@ -357,7 +358,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "apollo-11-moon-landing",
     label: "Apollo 11 Moon landing",
     shortLabel: "Moon Landing",
-    year: 1969,
+    year: ce(1969),
     minZoom: 20,
     priority: 79,
     sourceRefs: [

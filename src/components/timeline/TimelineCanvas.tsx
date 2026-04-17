@@ -11,8 +11,8 @@ import {
   formatTimelineDateLabel,
   formatTimelineElapsedAxisLabel,
   formatTimelineElapsedAxisLabelLines,
+  getDominantTimelineDateReference,
   formatTimelineYear,
-  YEARS_AGO_CUTOFF,
 } from "../../lib/time/bands";
 import {
   type Era,
@@ -2706,11 +2706,20 @@ export function TimelineCanvas({
       })();
       const fineGrainedAxisMode =
         edgeLabelStep < 1
-          ? edgeLeftYear > -YEARS_AGO_CUTOFF
-            ? "calendar"
-            : edgeRightYear <= -YEARS_AGO_CUTOFF
-              ? "elapsed"
-              : null
+          ? (() => {
+              const dominantReference = getDominantTimelineDateReference(
+                edgeLeftPreciseYear,
+                edgeRightPreciseYear,
+              );
+
+              if (dominantReference !== null) {
+                return dominantReference === "elapsed"
+                  ? "elapsed"
+                  : "calendar";
+              }
+
+              return null;
+            })()
           : null;
       const visibleSpan = Math.max(
         Math.abs(
@@ -4058,6 +4067,7 @@ export function TimelineCanvas({
         primordialOverlap / visibleSpan >= 0.75);
 
     return resolveAxisTickRenderStates(tickStart, tickEnd, innerWidth, {
+      elapsedReference: isPrimordialFocused ? "after-big-bang" : "ago",
       elapsedSubYearReference: isPrimordialFocused ? "after-big-bang" : "ago",
       preciseStartYear: preciseRangeStart,
       preciseEndYear: preciseRangeEnd,
@@ -5092,11 +5102,18 @@ export function TimelineCanvas({
     })();
     const fineGrainedAxisMode =
       edgeLabelStep < 1
-        ? edgeLeftYear > -YEARS_AGO_CUTOFF
-          ? "calendar"
-          : edgeRightYear <= -YEARS_AGO_CUTOFF
-            ? "elapsed"
-            : null
+        ? (() => {
+            const dominantReference = getDominantTimelineDateReference(
+              edgeLeftYear,
+              edgeRightYear,
+            );
+
+            if (dominantReference !== null) {
+              return dominantReference === "elapsed" ? "elapsed" : "calendar";
+            }
+
+            return null;
+          })()
         : null;
     const visibleSpan = Math.max(edgeRightYear - edgeLeftYear, 1e-9);
     const primordialOverlapStart = Math.max(

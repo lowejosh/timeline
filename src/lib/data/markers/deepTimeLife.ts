@@ -1,4 +1,5 @@
 import type { TimelineMarker } from "../timelineTypes";
+import { yearsAgo } from "../timelineDateBuilders";
 
 export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
   {
@@ -6,7 +7,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "Great Oxidation Event",
     shortLabel: "Oxygen Crisis",
     approximate: true,
-    year: -2_400_000_000,
+    year: yearsAgo(2_400_000_000),
     description:
       "As cyanobacteria oxygenated sea and sky, oxygen likely poisoned much of Earth's anaerobic life—though the size of that die-off remains hard to pin down from the fossil record.",
     minZoom: 0,
@@ -27,7 +28,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "First eukaryotic cells",
     shortLabel: "First Eukaryotes",
     approximate: true,
-    year: -1_800_000_000,
+    year: yearsAgo(1_800_000_000),
     minZoom: 0,
     priority: 94,
     sourceRefs: [
@@ -42,7 +43,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "First large multicellular life",
     shortLabel: "Large Multicellular Life",
     approximate: true,
-    year: -575_000_000,
+    year: yearsAgo(575_000_000),
     minZoom: 0,
     priority: 93,
     sourceRefs: [
@@ -57,7 +58,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "First land plants",
     approximate: true,
     shortLabel: "Land Plants",
-    year: -470_000_000,
+    year: yearsAgo(470_000_000),
     minZoom: 0,
     priority: 92,
     sourceRefs: [
@@ -71,7 +72,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     id: "late-ordovician-mass-extinction",
     label: "Late Ordovician mass extinction",
     shortLabel: "Ordovician Extinction",
-    year: -447_000_000,
+    year: yearsAgo(447_000_000),
     approximate: true,
     description:
       "A two-pulse marine crisis driven by climate upheaval that wiped out about 85% of species, shattering reefs and open-ocean ecosystems alike.",
@@ -92,7 +93,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     id: "late-devonian-mass-extinction",
     label: "Late Devonian mass extinction",
     shortLabel: "Devonian Extinction",
-    year: -378_000_000,
+    year: yearsAgo(378_000_000),
     approximate: true,
     description:
       "A drawn-out reef crisis that unfolded in pulses and eliminated roughly 75% of species, hitting corals, brachiopods, and other marine life especially hard.",
@@ -114,7 +115,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "Early tetrapods move onto land",
     approximate: true,
     shortLabel: "Tetrapods on Land",
-    year: -370_000_000,
+    year: yearsAgo(370_000_000),
     minZoom: 0,
     priority: 92,
     sourceRefs: [
@@ -129,7 +130,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "First reptiles appear",
     approximate: true,
     shortLabel: "First Reptiles",
-    year: -320_000_000,
+    year: yearsAgo(320_000_000),
     minZoom: 0,
     priority: 91,
     sourceRefs: [
@@ -144,7 +145,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "Giant insects fill Carboniferous skies",
     shortLabel: "Giant Insects",
     approximate: true,
-    year: -315_000_000,
+    year: yearsAgo(315_000_000),
     minZoom: 0,
     priority: 88,
     sourceRefs: [
@@ -159,7 +160,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "End-Permian mass extinction",
     shortLabel: "Permian Extinction",
     approximate: true,
-    year: -252_000_000,
+    year: yearsAgo(252_000_000),
     description:
       "Earth's worst known extinction: roughly 9 in 10 marine species and 7 in 10 land species vanished as massive volcanism drove runaway warming and ecosystem collapse.",
     minZoom: 0,
@@ -184,7 +185,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "First mammals appear",
     shortLabel: "First Mammals",
     approximate: true,
-    year: -225_000_000,
+    year: yearsAgo(225_000_000),
     minZoom: 0,
     priority: 90,
     sourceRefs: [
@@ -199,7 +200,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     label: "End-Triassic mass extinction",
     shortLabel: "Triassic Extinction",
     approximate: true,
-    year: -199_000_000,
+    year: yearsAgo(199_000_000),
     description:
       "A volcanic crisis as the Atlantic began opening that wiped out more than a third of marine species and many large land reptiles, clearing space for dinosaur dominance.",
     minZoom: 0,
@@ -223,7 +224,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     id: "archaeopteryx-first-known-bird",
     label: "Archaeopteryx, first known bird",
     shortLabel: "Archaeopteryx",
-    year: -150_000_000,
+    year: yearsAgo(150_000_000),
     approximate: true,
     minZoom: 0,
     priority: 89,
@@ -238,7 +239,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     id: "k-pg-asteroid-impact",
     label: "K–Pg asteroid impact",
     shortLabel: "Dinosaur Asteroid",
-    year: -66_000_000,
+    year: yearsAgo(66_000_000),
     approximate: true,
     description:
       "The Chicxulub impact triggered abrupt global collapse that wiped out about 75% of species, including all non-avian dinosaurs, while birds and mammals pulled through.",

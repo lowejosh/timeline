@@ -5,6 +5,7 @@ import {
   TIMELINE_DECORATION_CATEGORIES,
   TIMELINE_DECORATION_GROUPS,
 } from "../timelineDecorations";
+import { bce, yearsAgo } from "../timelineDateBuilders";
 import type { TimelineOverlayBand } from "../timelineTypes";
 
 function flattenOverlayBands(
@@ -50,13 +51,13 @@ describe("root timeline display data", () => {
 
     expect(
       TIMELINE_DISPLAY.markers
-        .filter((marker) => marker.year >= -12_000)
+        .filter((marker) => marker.year >= bce(12_000))
         .every((marker) => marker.groupId === "human-history"),
     ).toBe(true);
 
     expect(
       TIMELINE_DISPLAY.overlays
-        .filter((band) => band.startYear >= -3_500)
+        .filter((band) => band.startYear >= bce(3_500))
         .every((band) => band.groupId === "civilizations"),
     ).toBe(true);
   });
@@ -92,8 +93,6 @@ describe("root timeline display data", () => {
       "ground-ocher-markings-appear-in-africa",
       "last-known-homo-floresiensis-survives-on-flores",
       "last-neanderthals-disappear",
-      "ubirr-rock-art-in-kakadu",
-      "swabian-jura-bone-flutes",
       "chauvet-cave-figurative-art",
       "venus-of-dolni-vestonice",
       "natufian-settled-hunter-gatherers-at-eynan",
@@ -325,7 +324,11 @@ describe("root timeline display data", () => {
 
     expect(
       TIMELINE_DISPLAY.overlays
-        .filter((band) => band.startYear <= -100_000 && band.endYear <= -40_000)
+        .filter(
+          (band) =>
+            band.startYear <= yearsAgo(100_000) &&
+            band.endYear <= yearsAgo(40_000),
+        )
         .some((band) => band.id === "homo-neanderthalensis"),
     ).toBe(true);
 

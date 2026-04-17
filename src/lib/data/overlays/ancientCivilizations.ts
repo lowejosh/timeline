@@ -1,4 +1,5 @@
 import type { TimelineOverlayBand } from "../timelineTypes";
+import { bce, ce } from "../timelineDateBuilders";
 
 const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
   {
@@ -7,8 +8,8 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     shortLabel: "Sumer",
     description:
       "Early civilization of southern Mesopotamia organized around independent city-states such as Uruk, Ur, and Lagash.",
-    startYear: -3_500,
-    endYear: -2_334,
+    startYear: bce(3_500),
+    endYear: bce(2_334),
     regionalScopeLabel: "Southern Mesopotamia",
     approximateStart: true,
     color: "rgb(202, 156, 105)",
@@ -29,8 +30,8 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     shortLabel: "Akkad",
     description:
       "The first large Mesopotamian empire built by Sargon of Akkad and his successors.",
-    startYear: -2_334,
-    endYear: -2_154,
+    startYear: bce(2_334),
+    endYear: bce(2_154),
     regionalScopeLabel: "Mesopotamia",
     approximateStart: true,
     approximateEnd: true,
@@ -48,8 +49,8 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     shortLabel: "Ur III",
     description:
       "Neo-Sumerian kingdom centered on Ur, known for restoring centralized rule in southern Mesopotamia after the Akkadian collapse.",
-    startYear: -2_112,
-    endYear: -2_004,
+    startYear: bce(2_112),
+    endYear: bce(2_004),
     regionalScopeLabel: "Southern Mesopotamia",
     color: "rgb(182, 144, 101)",
     sourceRefs: [
@@ -65,8 +66,8 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     shortLabel: "Babylon",
     description:
       "The Amorite-era Babylonian kingdom best known for Hammurabi's reign and laws.",
-    startYear: -1_894,
-    endYear: -1_595,
+    startYear: bce(1_894),
+    endYear: bce(1_595),
     regionalScopeLabel: "Babylonia",
     approximateStart: true,
     color: "rgb(168, 132, 88)",
@@ -87,8 +88,8 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     shortLabel: "Kassites",
     description:
       "The long-lasting Kassite dynasty that ruled Babylonia after the Old Babylonian collapse and anchored much of southern Mesopotamia in the later Bronze Age.",
-    startYear: -1_595,
-    endYear: -1_155,
+    startYear: bce(1_595),
+    endYear: bce(1_155),
     regionalScopeLabel: "Babylonia",
     approximateEnd: true,
     color: "rgb(154, 126, 96)",
@@ -109,8 +110,8 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     shortLabel: "Mid Assyria",
     description:
       "Assyrian kingdom and expanding empire of the late second millennium BCE, centered in northern Mesopotamia.",
-    startYear: -1_365,
-    endYear: -1_050,
+    startYear: bce(1_365),
+    endYear: bce(1_050),
     regionalScopeLabel: "Northern Mesopotamia",
     approximateStart: true,
     approximateEnd: true,
@@ -132,8 +133,8 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     shortLabel: "Assyria",
     description:
       "The late expansionist Assyrian superpower centered on cities such as Nineveh and Ashur.",
-    startYear: -912,
-    endYear: -612,
+    startYear: bce(912),
+    endYear: bce(612),
     regionalScopeLabel: "Northern Mesopotamia",
     color: "rgb(129, 106, 154)",
     sourceRefs: [
@@ -149,8 +150,8 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     shortLabel: "Neo-Babylon",
     description:
       "The final great independent Babylonian phase before the Persian conquest.",
-    startYear: -626,
-    endYear: -539,
+    startYear: bce(626),
+    endYear: bce(539),
     regionalScopeLabel: "Babylonia",
     color: "rgb(153, 114, 172)",
     sourceRefs: [
@@ -168,8 +169,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Mesopotamia",
     description:
       "Ancient civilization of the Tigris-Euphrates river valley, home to some of the world's earliest cities, states, and writing systems.",
-    startYear: -3_500,
-    endYear: -539,
+    startYear: bce(3_500),
+    endYear: bce(539),
     regionalScopeLabel: "Mesopotamia",
     approximateStart: true,
     color: "rgb(180, 120, 70)",
@@ -189,8 +190,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Indus Valley",
     description:
       "Bronze Age civilization of South Asia with carefully planned cities, sophisticated drainage, and far-reaching trade.",
-    startYear: -3_300,
-    endYear: -1_300,
+    startYear: bce(3_300),
+    endYear: bce(1_300),
     regionalScopeLabel: "South Asia",
     approximateStart: true,
     approximateEnd: true,
@@ -209,8 +210,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Ancient Egypt",
     description:
       "Civilization of the Nile valley shaped by pharaohs, monumental building, and religious traditions that endured for millennia.",
-    startYear: -3_100,
-    endYear: -30,
+    startYear: bce(3_100),
+    endYear: bce(30),
     regionalScopeLabel: "Nile Valley",
     approximateStart: true,
     color: "rgb(166, 149, 94)",
@@ -229,8 +230,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Hittites",
     description:
       "An Anatolian Bronze Age great power centered on Hattusa and active across northern Syria.",
-    startYear: -1_650,
-    endYear: -1_180,
+    startYear: bce(1_650),
+    endYear: bce(1_180),
     regionalScopeLabel: "Anatolia and northern Syria",
     approximateStart: true,
     approximateEnd: true,
@@ -250,8 +251,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Mycenae",
     description:
       "Late Bronze Age civilization of mainland Greece centered on fortified palace kingdoms such as Mycenae and Tiryns.",
-    startYear: -1_600,
-    endYear: -1_100,
+    startYear: bce(1_600),
+    endYear: bce(1_100),
     regionalScopeLabel: "Mainland Greece",
     approximateStart: true,
     approximateEnd: true,
@@ -270,8 +271,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Ancient Greece",
     description:
       "Greek civilization of city-states, philosophy, drama, and new ways of thinking about politics and citizenship.",
-    startYear: -1_200,
-    endYear: -323,
+    startYear: bce(1_200),
+    endYear: bce(323),
     regionalScopeLabel: "Aegean and eastern Mediterranean",
     approximateStart: true,
     color: "rgb(93, 119, 183)",
@@ -290,8 +291,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Achaemenids",
     description:
       "Vast empire founded by Cyrus the Great, bringing many peoples of the ancient Near East under Persian rule.",
-    startYear: -550,
-    endYear: -330,
+    startYear: bce(550),
+    endYear: bce(330),
     regionalScopeLabel: "Iranian Plateau and ancient Near East",
     color: "rgb(135, 92, 142)",
     minZoom: 0,
@@ -308,8 +309,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Roman Republic",
     description:
       "Roman state before the emperors, marked by the Senate, elected magistrates, and steady expansion across the Mediterranean.",
-    startYear: -509,
-    endYear: -27,
+    startYear: bce(509),
+    endYear: bce(27),
     regionalScopeLabel: "Mediterranean",
     color: "rgb(159, 91, 70)",
     minZoom: 0,
@@ -331,8 +332,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Hellenistic",
     description:
       "Age after Alexander when Greek culture mingled with Egyptian, Persian, and Asian traditions across a network of kingdoms.",
-    startYear: -323,
-    endYear: -30,
+    startYear: bce(323),
+    endYear: bce(30),
     regionalScopeLabel: "Eastern Mediterranean and Southwest Asia",
     color: "rgb(87, 142, 166)",
     minZoom: 0,
@@ -350,8 +351,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Han",
     description:
       "Chinese dynasty of strong imperial rule, expanding trade routes, and a flourishing Silk Road.",
-    startYear: -206,
-    endYear: 220,
+    startYear: bce(206),
+    endYear: ce(220),
     regionalScopeLabel: "China",
     color: "rgb(72, 132, 108)",
     minZoom: 0,
@@ -368,8 +369,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Roman Empire",
     description:
       "Mediterranean superpower built on law, roads, cities, and imperial rule, shaping surrounding regions for centuries.",
-    startYear: -27,
-    endYear: 476,
+    startYear: bce(27),
+    endYear: ce(476),
     regionalScopeLabel: "Mediterranean",
     color: "rgb(136, 78, 64)",
     minZoom: 0,

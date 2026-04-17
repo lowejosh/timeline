@@ -1,11 +1,12 @@
 import type { TimelineMarker } from "../timelineTypes";
+import { ce } from "../timelineDateBuilders";
 
 export const POST_CLASSICAL_MARKERS: TimelineMarker[] = [
   {
     id: "first-crusade-called",
     label: "First Crusade called",
     shortLabel: "First Crusade",
-    year: 1095,
+    year: ce(1095),
     minZoom: 18,
     priority: 74,
     sourceRefs: [

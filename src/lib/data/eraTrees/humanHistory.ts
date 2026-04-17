@@ -1,12 +1,13 @@
 import type { EraDefinition } from "../timelineTypes";
-import { getPresentTimelineYear } from "../../time/present";
+import { TIMELINE_MAX_YEAR } from "../../time/timelineYears";
+import { bce, ce, yearsAgo } from "../timelineDateBuilders";
 
-const CURRENT_YEAR = getPresentTimelineYear();
+const CURRENT_YEAR = TIMELINE_MAX_YEAR;
 
 export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
   id: "human-history",
   name: "Human History",
-  startYear: -300_000,
+  startYear: yearsAgo(300_000),
   endYear: CURRENT_YEAR,
   description:
     "From stone tools to global networks, this track follows the broad story of human societies.",
@@ -22,8 +23,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "paleolithic",
       name: "Paleolithic",
-      startYear: -300_000,
-      endYear: -20_000,
+      startYear: yearsAgo(300_000),
+      endYear: bce(20_000),
       description:
         "Long era of mobile hunter-gatherers, stone tools, and the first known art.",
       scheme: "archaeological",
@@ -38,8 +39,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "epipaleolithic",
       name: "Epipaleolithic",
-      startYear: -20_000,
-      endYear: -10_000,
+      startYear: bce(20_000),
+      endYear: bce(10_000),
       regionalScopeLabel: "Ancient Near East",
       approximateStart: true,
       approximateEnd: true,
@@ -56,8 +57,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "neolithic",
       name: "Neolithic",
-      startYear: -10_000,
-      endYear: -4_500,
+      startYear: bce(10_000),
+      endYear: bce(4_500),
       regionalScopeLabel: "Ancient Near East",
       approximateStart: true,
       approximateEnd: true,
@@ -75,8 +76,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
         {
           id: "pre-pottery-neolithic-a",
           name: "Pre-Pottery Neolithic A",
-          startYear: -10_000,
-          endYear: -8_800,
+          startYear: bce(10_000),
+          endYear: bce(8_800),
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -88,8 +89,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
         {
           id: "pre-pottery-neolithic-b",
           name: "Pre-Pottery Neolithic B",
-          startYear: -8_800,
-          endYear: -6_500,
+          startYear: bce(8_800),
+          endYear: bce(6_500),
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -101,8 +102,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
         {
           id: "pottery-neolithic",
           name: "Pottery Neolithic",
-          startYear: -6_500,
-          endYear: -4_500,
+          startYear: bce(6_500),
+          endYear: bce(4_500),
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -116,8 +117,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "chalcolithic",
       name: "Chalcolithic",
-      startYear: -4_500,
-      endYear: -3_300,
+      startYear: bce(4_500),
+      endYear: bce(3_300),
       regionalScopeLabel: "Ancient Near East",
       approximateStart: true,
       approximateEnd: true,
@@ -134,8 +135,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "bronze-age",
       name: "Bronze Age",
-      startYear: -3_300,
-      endYear: -1_200,
+      startYear: bce(3_300),
+      endYear: bce(1_200),
       regionalScopeLabel: "Ancient Near East",
       approximateStart: true,
       approximateEnd: true,
@@ -150,8 +151,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
         {
           id: "early-bronze-age",
           name: "Early Bronze Age",
-          startYear: -3_300,
-          endYear: -2_000,
+          startYear: bce(3_300),
+          endYear: bce(2_000),
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -163,8 +164,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
         {
           id: "middle-bronze-age",
           name: "Middle Bronze Age",
-          startYear: -2_000,
-          endYear: -1_550,
+          startYear: bce(2_000),
+          endYear: bce(1_550),
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -176,8 +177,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
         {
           id: "late-bronze-age",
           name: "Late Bronze Age",
-          startYear: -1_550,
-          endYear: -1_200,
+          startYear: bce(1_550),
+          endYear: bce(1_200),
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -191,8 +192,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "iron-age",
       name: "Iron Age",
-      startYear: -1_200,
-      endYear: -539,
+      startYear: bce(1_200),
+      endYear: bce(539),
       regionalScopeLabel: "Ancient Near East",
       approximateStart: true,
       description:
@@ -210,8 +211,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
         {
           id: "early-iron-age",
           name: "Early Iron Age",
-          startYear: -1_200,
-          endYear: -900,
+          startYear: bce(1_200),
+          endYear: bce(900),
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -232,8 +233,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
         {
           id: "middle-iron-age",
           name: "Middle Iron Age",
-          startYear: -900,
-          endYear: -609,
+          startYear: bce(900),
+          endYear: bce(609),
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -254,8 +255,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
         {
           id: "late-iron-age",
           name: "Late Iron Age",
-          startYear: -609,
-          endYear: -539,
+          startYear: bce(609),
+          endYear: bce(539),
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           description:
@@ -277,8 +278,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "classical-antiquity",
       name: "Classical Antiquity",
-      startYear: -539,
-      endYear: 500,
+      startYear: bce(539),
+      endYear: ce(500),
       description:
         "Greco-Roman age that shaped Mediterranean law, architecture, philosophy, and urban life.",
       scheme: "world-history",
@@ -287,8 +288,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "post-classical-history",
       name: "Post-classical History",
-      startYear: 500,
-      endYear: 1500,
+      startYear: ce(500),
+      endYear: ce(1500),
       description:
         "Major religions, caravan routes, and maritime trade bind Afro-Eurasia more tightly.",
       scheme: "world-history",
@@ -301,8 +302,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "early-modern-period",
       name: "Early Modern Period",
-      startYear: 1500,
-      endYear: 1800,
+      startYear: ce(1500),
+      endYear: ce(1800),
       description:
         "Print culture, oceanic empires, gunpowder states, and global exchange redraw the world.",
       scheme: "world-history",
@@ -315,8 +316,8 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "age-of-industry-and-empire",
       name: "Age of Industry & Empire",
-      startYear: 1800,
-      endYear: 1945,
+      startYear: ce(1800),
+      endYear: ce(1945),
       description:
         "Factories, coal, steam transport, and industrial war transform work, cities, and state power.",
       scheme: "world-history",
@@ -329,7 +330,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
     {
       id: "contemporary-history",
       name: "Contemporary History",
-      startYear: 1945,
+      startYear: ce(1945),
       endYear: CURRENT_YEAR,
       color: "rgb(0, 120, 100)",
       description:

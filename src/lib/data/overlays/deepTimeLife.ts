@@ -1,4 +1,5 @@
 import type { TimelineOverlayBand } from "../timelineTypes";
+import { yearsAgo } from "../timelineDateBuilders";
 
 export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
   {
@@ -7,8 +8,8 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Cambrian Explosion",
     description:
       "A rapid burst of marine evolution in which most major animal lineages first appear in the fossil record, many with striking new body plans.",
-    startYear: -570_000_000,
-    endYear: -530_000_000,
+    startYear: yearsAgo(570_000_000),
+    endYear: yearsAgo(530_000_000),
     color: "rgb(82, 136, 138)",
     minZoom: 0,
     priority: 86,
@@ -25,8 +26,8 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Dinosaurs",
     description:
       "Dinosaurs and other archosaurs dominated life on land through most of the Mesozoic, while early birds and mammals emerged in their shadow.",
-    startYear: -201_400_000,
-    endYear: -66_000_000,
+    startYear: yearsAgo(201_400_000),
+    endYear: yearsAgo(66_000_000),
     color: "rgb(136, 104, 76)",
     minZoom: 0,
     priority: 88,

@@ -92,6 +92,73 @@ describe("timeline sidebar selectors", () => {
     });
   });
 
+  it("hides suppressed civilization entries from the sidebar", () => {
+    const display: TimelineDisplayConfig = {
+      markers: [],
+      overlays: [
+        {
+          id: "post-classical-overlay",
+          label: "Post-classical overlay",
+          startYear: 800,
+          endYear: 1400,
+          color: "rgba(0, 0, 0, 0.1)",
+          groupId: "civilizations",
+        },
+      ],
+    };
+
+    const sections = resolveTimelineSidebarSections(
+      display,
+      {
+        centerYear: 1100,
+        zoom: 24,
+      },
+      1000,
+      120,
+      new Set(["civilizations"]),
+      new Set(["civilizations"]),
+    );
+
+    expect(sections).toEqual([]);
+  });
+
+  it("hides civilizations when human-history markers are no longer zoom-visible", () => {
+    const display: TimelineDisplayConfig = {
+      markers: [
+        {
+          id: "late-history-marker",
+          label: "Late history marker",
+          year: 1200,
+          minZoom: 20,
+          groupId: "human-history",
+        },
+      ],
+      overlays: [
+        {
+          id: "post-classical-overlay",
+          label: "Post-classical overlay",
+          startYear: 800,
+          endYear: 1400,
+          color: "rgba(0, 0, 0, 0.1)",
+          groupId: "civilizations",
+        },
+      ],
+    };
+
+    const sections = resolveTimelineSidebarSections(
+      display,
+      {
+        centerYear: 1100,
+        zoom: 10,
+      },
+      1000,
+      120,
+      new Set(["human-history", "civilizations"]),
+    );
+
+    expect(sections).toEqual([]);
+  });
+
   it("surfaces the human evolution layer in overlays and counts both markers and overlays", () => {
     const display: TimelineDisplayConfig = {
       markers: [

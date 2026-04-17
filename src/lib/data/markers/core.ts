@@ -1,11 +1,12 @@
 import type { TimelineMarker } from "../timelineTypes";
+import { yearsAgo } from "../timelineDateBuilders";
 
 export const CORE_TIMELINE_MARKERS: TimelineMarker[] = [
   {
     id: "solar-system-formation",
     label: "Solar System forms",
     shortLabel: "Solar System",
-    year: -4_567_000_000,
+    year: yearsAgo(4_567_000_000),
     approximate: true,
     minZoom: 0,
     priority: 90,
@@ -20,7 +21,7 @@ export const CORE_TIMELINE_MARKERS: TimelineMarker[] = [
     id: "earth-formation",
     label: "Earth forms",
     shortLabel: "Earth",
-    year: -4_540_000_000,
+    year: yearsAgo(4_540_000_000),
     approximate: true,
     minZoom: 0,
     priority: 100,
@@ -35,7 +36,7 @@ export const CORE_TIMELINE_MARKERS: TimelineMarker[] = [
     id: "earliest-evidence-of-life",
     label: "Earliest evidence of life on Earth",
     shortLabel: "Earliest Life",
-    year: -3_500_000_000,
+    year: yearsAgo(3_500_000_000),
     approximate: true,
     minZoom: 0,
     priority: 95,

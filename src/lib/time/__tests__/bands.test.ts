@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  BCE_YEARS_AGO_HANDOFF_YEAR,
   formatApproximateLabel,
   formatTimelineDateLabel,
   formatTimelineElapsedAxisLabel,
@@ -8,6 +9,7 @@ import {
   formatTimelinePointLabel,
   formatTimelineRange,
   formatTimelineYear,
+  getDominantTimelineDateReference,
   getTimelineYearFromUtcParts,
   getTimelineTicks,
 } from "../bands";
@@ -15,7 +17,10 @@ import {
   createExactCalendarTimestamp,
   getTimelineYearFromExactTimestamp,
 } from "../exactTimestamp";
-import { TIMELINE_MIN_YEAR } from "../viewport";
+import { splitTimelineYear, TIMELINE_MIN_YEAR } from "../viewport";
+import { getYearsAgoFromPresent } from "../timelineYears";
+
+const numberFormatter = new Intl.NumberFormat("en-US");
 
 describe("timeline tick generation", () => {
   it("creates a manageable number of ticks across a cosmic range", () => {
@@ -49,17 +54,25 @@ describe("timeline tick generation", () => {
   });
 
   it("uses thousands for mid-range prehistoric axis labels while they stay readable", () => {
+    const yearsAgo = getYearsAgoFromPresent(-543_210);
+
     expect(formatTimelineYear(-543_210, 100, { mode: "axis" })).toBe(
-      "543.2k years ago",
+      `${new Intl.NumberFormat("en-US", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }).format(yearsAgo / 1_000)}k years ago`,
     );
   });
 
   it("falls back to raw axis labels when abbreviated units get too nitty-gritty", () => {
+    const elapsedYears = Math.round(getYearsAgoFromPresent(-54_321));
+    const deepTimeElapsedYears = Math.round(getYearsAgoFromPresent(-13_800_123));
+
     expect(formatTimelineYear(-54_321, 10, { mode: "axis" })).toBe(
-      "54,321 years ago",
+      `${numberFormatter.format(elapsedYears)} years ago`,
     );
     expect(formatTimelineYear(-13_800_123, 100, { mode: "axis" })).toBe(
-      "13,800,123 years ago",
+      `${numberFormatter.format(deepTimeElapsedYears)} years ago`,
     );
   });
 
@@ -119,6 +132,20 @@ describe("timeline tick generation", () => {
     expect(formatTimelineYear(-3000)).toBe("3,000 BCE");
   });
 
+  it("hands off from BCE labels to years-ago labels at 10,000 BCE", () => {
+    expect(formatTimelineYear(BCE_YEARS_AGO_HANDOFF_YEAR)).toContain(
+      "years ago",
+    );
+    expect(formatTimelineYear(-9_000)).toBe("9,000 BCE");
+  });
+
+  it("keeps the dominant date reference when only a tiny slice crosses the hand-off", () => {
+    expect(getDominantTimelineDateReference(-10_000.8, -9_998.95)).toBe(
+      "elapsed",
+    );
+    expect(getDominantTimelineDateReference(-9_999.4, -9_998.6)).toBeNull();
+  });
+
   it("prefixes approximate labels with a tilde only once", () => {
     expect(formatApproximateLabel("3,000 BCE", true)).toBe("~3,000 BCE");
     expect(formatApproximateLabel("~3,000 BCE", true)).toBe("~3,000 BCE");
@@ -151,8 +178,12 @@ describe("timeline tick generation", () => {
   });
 
   it("formats sub-year long-ago labels as years and days ago", () => {
+    const wholeYears = Math.floor(getYearsAgoFromPresent(-54_321.5));
+
     expect(formatTimelineElapsedLabel(-54_321.5)).toMatchObject({
-      primaryText: "56,347 years and 288 days",
+      primaryText: expect.stringMatching(
+        new RegExp(`^${numberFormatter.format(wholeYears)} years and \\d+ days$`),
+      ),
     });
     expect(formatTimelineElapsedLabel(-54_321.5)?.secondaryText).toMatch(
       /hours.*ago$/,
@@ -169,8 +200,12 @@ describe("timeline tick generation", () => {
   });
 
   it("formats elapsed sub-day labels with explicit named units", () => {
+    const wholeYears = Math.floor(getYearsAgoFromPresent(-54_321.500001));
+
     expect(formatTimelineElapsedLabel(-54_321.500001)).toMatchObject({
-      primaryText: "56,347 years and 288 days",
+      primaryText: expect.stringMatching(
+        new RegExp(`^${numberFormatter.format(wholeYears)} years and \\d+ days$`),
+      ),
       secondaryText: expect.stringContaining("seconds"),
     });
     expect(
@@ -223,12 +258,13 @@ describe("timeline tick generation", () => {
 
   it("never prefixes Big Bang microsecond labels with zero years", () => {
     const yearsPerMicrosecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000_000;
+    const bigBangYear = splitTimelineYear(TIMELINE_MIN_YEAR);
 
     expect(
       formatTimelineElapsedAxisLabelLines(
         {
-          wholeYear: TIMELINE_MIN_YEAR,
-          fraction: yearsPerMicrosecond * 64,
+          wholeYear: bigBangYear.wholeYear,
+          fraction: bigBangYear.fraction + yearsPerMicrosecond * 64,
         },
         yearsPerMicrosecond,
         "after-big-bang",

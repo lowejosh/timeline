@@ -64,12 +64,23 @@ const SIDEBAR_SECTIONS = [
   { id: "markers", label: "Markers" },
 ] as const;
 
+const HUMAN_HISTORY_GROUP_IDS = new Set(
+  SIDEBAR_ENTRY_DEFINITIONS.find((definition) => definition.id === "human-history")
+    ?.groupIds ?? [],
+);
+
+const CIVILIZATION_GROUP_IDS = new Set(
+  SIDEBAR_ENTRY_DEFINITIONS.find((definition) => definition.id === "civilizations")
+    ?.groupIds ?? [],
+);
+
 export function resolveTimelineSidebarSections(
   display: TimelineDisplayConfig,
   viewport: TimelineViewport,
   width: number,
   pad: number,
   enabledGroupIds: ReadonlySet<string>,
+  suppressedGroupIds: ReadonlySet<string> = new Set(),
 ): TimelineSidebarSectionState[] {
   if (width <= pad * 2) {
     return [];
@@ -77,6 +88,15 @@ export function resolveTimelineSidebarSections(
 
   const innerWidth = Math.max(width - pad * 2, 1);
   const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
+  const hasHumanHistoryContent = display.markers.some(
+    (marker) => marker.groupId && HUMAN_HISTORY_GROUP_IDS.has(marker.groupId),
+  );
+  const hasZoomVisibleHumanHistoryMarkers = display.markers.some(
+    (marker) =>
+      marker.groupId &&
+      HUMAN_HISTORY_GROUP_IDS.has(marker.groupId) &&
+      isTimelineDecorationVisibleAtZoom(marker, viewport.zoom),
+  );
   const countsByGroupId = new Map<
     string,
     {
@@ -88,6 +108,7 @@ export function resolveTimelineSidebarSections(
   for (const marker of display.markers) {
     if (
       !marker.groupId ||
+      suppressedGroupIds.has(marker.groupId) ||
       !isTimelineDecorationVisibleAtZoom(marker, viewport.zoom) ||
       marker.year < visibleStart ||
       marker.year > visibleEnd
@@ -106,6 +127,7 @@ export function resolveTimelineSidebarSections(
   for (const overlay of display.overlays) {
     if (
       !overlay.groupId ||
+      suppressedGroupIds.has(overlay.groupId) ||
       !isTimelineDecorationVisibleAtZoom(overlay, viewport.zoom) ||
       overlay.endYear < visibleStart ||
       overlay.startYear > visibleEnd
@@ -145,6 +167,15 @@ export function resolveTimelineSidebarSections(
     const relevantItemCount = counts.markerCount + counts.overlayCount;
 
     if (relevantItemCount === 0) {
+      return accumulator;
+    }
+
+    if (
+      definition.id === "civilizations" &&
+      hasHumanHistoryContent &&
+      !hasZoomVisibleHumanHistoryMarkers &&
+      definition.groupIds.some((groupId) => CIVILIZATION_GROUP_IDS.has(groupId))
+    ) {
       return accumulator;
     }
 

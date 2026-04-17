@@ -1,11 +1,12 @@
 import type { TimelineMarker } from "../timelineTypes";
+import { bce } from "../timelineDateBuilders";
 
 export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
   {
     id: "alexander-dies-hellenistic-age-begins",
     label: "Alexander the Great dies",
     shortLabel: "Alexander Dies",
-    year: -323,
+    year: bce(323),
     minZoom: 18,
     priority: 76,
     sourceRefs: [
@@ -23,7 +24,7 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     id: "caesar-crosses-the-rubicon",
     label: "Caesar crosses the Rubicon",
     shortLabel: "Rubicon",
-    year: -49,
+    year: bce(49),
     minZoom: 19,
     priority: 74,
     sourceRefs: [

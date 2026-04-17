@@ -1,7 +1,8 @@
-import { getPresentTimelineYear } from "../../time/present";
+import { TIMELINE_MAX_YEAR } from "../../time/timelineYears";
 import type { TimelineOverlayBand } from "../timelineTypes";
+import { yearsAgo } from "../timelineDateBuilders";
 
-const CURRENT_YEAR = getPresentTimelineYear();
+const CURRENT_YEAR = TIMELINE_MAX_YEAR;
 const HUMAN_EVOLUTION_MIN_ZOOM = 8;
 
 export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
@@ -11,8 +12,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Sahelanthropus",
     description:
       "Very early hominin from Chad, often shown near the base of the tree because its skull preserves some of the oldest evidence linked to upright posture.",
-    startYear: -7_000_000,
-    endYear: -6_000_000,
+    startYear: yearsAgo(7_000_000),
+    endYear: yearsAgo(6_000_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "West-Central Africa",
@@ -30,8 +31,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Orrorin",
     description:
       "Early Kenyan hominin known especially from femora that suggest bipedal walking alongside climbing.",
-    startYear: -6_200_000,
-    endYear: -5_800_000,
+    startYear: yearsAgo(6_200_000),
+    endYear: yearsAgo(5_800_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern Africa",
@@ -46,8 +47,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Ar. kadabba",
     description:
       "Sparse but important Ethiopian hominin from the late Miocene, with early evidence for bipedal push-off.",
-    startYear: -5_800_000,
-    endYear: -5_200_000,
+    startYear: yearsAgo(5_800_000),
+    endYear: yearsAgo(5_200_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern Africa",
@@ -62,8 +63,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Ar. ramidus",
     description:
       "Woodland hominin combining climbing traits with evidence for bipedal movement.",
-    startYear: -4_500_000,
-    endYear: -4_300_000,
+    startYear: yearsAgo(4_500_000),
+    endYear: yearsAgo(4_300_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern Africa",
@@ -78,8 +79,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Au. anamensis",
     description:
       "Early upright-walking australopith that still kept strong climbing traits.",
-    startYear: -4_200_000,
-    endYear: -3_800_000,
+    startYear: yearsAgo(4_200_000),
+    endYear: yearsAgo(3_800_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern Africa",
@@ -94,8 +95,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Au. afarensis",
     description:
       "Lucy’s species, a long-lived upright-walking australopith best known from East Africa and the Laetoli footprints.",
-    startYear: -3_850_000,
-    endYear: -2_950_000,
+    startYear: yearsAgo(3_850_000),
+    endYear: yearsAgo(2_950_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern Africa",
@@ -110,8 +111,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Kenyanthropus",
     description:
       "A debated flat-faced 3.5 million-year-old Kenyan branch that may represent real diversity—or a distorted skull.",
-    startYear: -3_550_000,
-    endYear: -3_450_000,
+    startYear: yearsAgo(3_550_000),
+    endYear: yearsAgo(3_450_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern Africa",
@@ -126,8 +127,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Au. africanus",
     description:
       "Southern African australopith often treated as a plausible candidate on the broader route toward Homo.",
-    startYear: -3_300_000,
-    endYear: -2_100_000,
+    startYear: yearsAgo(3_300_000),
+    endYear: yearsAgo(2_100_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Southern Africa",
@@ -142,8 +143,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "P. aethiopicus",
     description:
       "Earliest widely recognized robust australopith and likely predecessor of eastern robust lineages.",
-    startYear: -2_700_000,
-    endYear: -2_300_000,
+    startYear: yearsAgo(2_700_000),
+    endYear: yearsAgo(2_300_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern Africa",
@@ -158,8 +159,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Au. garhi",
     description:
       "Poorly known Ethiopian species from a murky interval that some researchers link to the transition toward Homo.",
-    startYear: -2_550_000,
-    endYear: -2_450_000,
+    startYear: yearsAgo(2_550_000),
+    endYear: yearsAgo(2_450_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern Africa",
@@ -174,8 +175,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "H. habilis",
     description:
       "Early Homo with a slightly larger brain and a close association with the earliest stone tools.",
-    startYear: -2_400_000,
-    endYear: -1_400_000,
+    startYear: yearsAgo(2_400_000),
+    endYear: yearsAgo(1_400_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern and Southern Africa",
@@ -190,8 +191,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "P. boisei",
     description:
       "Robust eastern African cousin lineage specialized for powerful chewing and not on the Homo sapiens line.",
-    startYear: -2_300_000,
-    endYear: -1_200_000,
+    startYear: yearsAgo(2_300_000),
+    endYear: yearsAgo(1_200_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern Africa",
@@ -206,8 +207,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Au. sediba",
     description:
       "Very late australopith from South Africa with a debated relationship to Homo and a strangely modern-looking mix of traits.",
-    startYear: -1_980_000,
-    endYear: -1_977_000,
+    startYear: yearsAgo(1_980_000),
+    endYear: yearsAgo(1_977_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Southern Africa",
@@ -222,8 +223,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "H. rudolfensis",
     description:
       "Debated early Homo lineage with a larger braincase and broader face than Homo habilis.",
-    startYear: -1_900_000,
-    endYear: -1_800_000,
+    startYear: yearsAgo(1_900_000),
+    endYear: yearsAgo(1_800_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Eastern Africa",
@@ -238,8 +239,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "H. erectus",
     description:
       "Long-ranging Homo species with modern body proportions, handaxes, and the first major expansion beyond Africa.",
-    startYear: -1_890_000,
-    endYear: -110_000,
+    startYear: yearsAgo(1_890_000),
+    endYear: yearsAgo(110_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Africa and Asia",
@@ -254,8 +255,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "P. robustus",
     description:
       "Southern African robust cousin lineage, separate from Homo but part of the same crowded evolutionary neighborhood.",
-    startYear: -1_800_000,
-    endYear: -1_200_000,
+    startYear: yearsAgo(1_800_000),
+    endYear: yearsAgo(1_200_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Southern Africa",
@@ -270,8 +271,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "H. heidelbergensis",
     description:
       "Large-brained Middle Pleistocene human often treated as the common stock behind Neanderthals and Homo sapiens.",
-    startYear: -700_000,
-    endYear: -200_000,
+    startYear: yearsAgo(700_000),
+    endYear: yearsAgo(200_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Africa and Eurasia",
@@ -286,8 +287,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Neanderthals",
     description:
       "Cold-adapted Eurasian humans, our closest extinct relatives, who overlapped and interbred with Homo sapiens.",
-    startYear: -400_000,
-    endYear: -40_000,
+    startYear: yearsAgo(400_000),
+    endYear: yearsAgo(40_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Europe and western to central Asia",
@@ -302,8 +303,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "H. naledi",
     description:
       "Late South African Homo species with a striking mix of ancient and modern traits and an unresolved place in the tree.",
-    startYear: -335_000,
-    endYear: -236_000,
+    startYear: yearsAgo(335_000),
+    endYear: yearsAgo(236_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "South Africa",
@@ -318,7 +319,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "H. sapiens",
     description:
       "Our species, evolving in Africa and eventually becoming the lone surviving human lineage.",
-    startYear: -300_000,
+    startYear: yearsAgo(300_000),
     endYear: CURRENT_YEAR,
     approximateStart: true,
     regionalScopeLabel: "Africa to worldwide",
@@ -333,8 +334,8 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "H. floresiensis",
     description:
       "Small-bodied island human from Flores, surviving surprisingly late in Southeast Asia.",
-    startYear: -100_000,
-    endYear: -50_000,
+    startYear: yearsAgo(100_000),
+    endYear: yearsAgo(50_000),
     approximateStart: true,
     approximateEnd: true,
     regionalScopeLabel: "Flores, Indonesia",

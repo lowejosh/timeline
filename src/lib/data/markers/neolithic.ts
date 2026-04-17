@@ -1,11 +1,12 @@
 import type { TimelineMarker } from "../timelineTypes";
+import { bce } from "../timelineDateBuilders";
 
 export const NEOLITHIC_MARKERS: TimelineMarker[] = [
   {
     id: "mehrgarh-early-farming-community",
     label: "Mehrgarh early farming community",
     shortLabel: "Mehrgarh",
-    year: -8_000,
+    year: bce(8_000),
     regionalScopeLabel: "South Asia",
     approximate: true,
     minZoom: 19,
@@ -21,7 +22,7 @@ export const NEOLITHIC_MARKERS: TimelineMarker[] = [
     id: "jiahu-bone-flutes-and-village-life",
     label: "Jiahu bone flutes and village life",
     shortLabel: "Jiahu",
-    year: -7_000,
+    year: bce(7_000),
     regionalScopeLabel: "North China",
     approximate: true,
     minZoom: 19,

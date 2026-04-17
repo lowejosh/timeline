@@ -5,6 +5,7 @@ import {
   getOverlayTooltipContent,
 } from "../timelineTooltip";
 import { createExactCalendarTimestamp } from "../../time/exactTimestamp";
+import { bce } from "../timelineDateBuilders";
 import type {
   Era,
   TimelineMarker,
@@ -199,6 +200,18 @@ describe("timeline tooltip content", () => {
       timeLabel: "~1,200 BCE",
       regionalScopeLabel: "Eastern Mediterranean",
     });
+  });
+
+  it("switches tooltip point labels to years ago at the 10,000 BCE handoff", () => {
+    const marker: TimelineMarker = {
+      id: "ubirr",
+      label: "Ubirr rock art in Kakadu",
+      year: bce(10_000),
+      approximate: true,
+      sourceRefs: [{ sourceId: "kakaduUbirr" }],
+    };
+
+    expect(getMarkerTooltipContent(marker).timeLabel).toMatch(/years ago$/);
   });
 
   it("shows approximate overlay labels and region scope when flagged", () => {

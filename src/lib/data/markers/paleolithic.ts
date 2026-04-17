@@ -1,11 +1,12 @@
 import type { TimelineMarker } from "../timelineTypes";
+import { yearsAgo } from "../timelineDateBuilders";
 
 export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
   {
     id: "homo-sapiens-evolves-in-africa",
     label: "Homo sapiens evolves in Africa",
     shortLabel: "Homo sapiens",
-    year: -300_000,
+    year: yearsAgo(300_000),
     regionalScopeLabel: "Africa",
     approximate: true,
     minZoom: 17,
@@ -21,7 +22,7 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     id: "ground-ocher-markings-appear-in-africa",
     label: "Ground ocher markings appear in African rock art",
     shortLabel: "Ocher Markings",
-    year: -100_000,
+    year: yearsAgo(100_000),
     regionalScopeLabel: "Africa",
     approximate: true,
     minZoom: 17,
@@ -34,50 +35,10 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     ],
   },
   {
-    id: "ubirr-rock-art-in-kakadu",
-    label: "Ubirr rock art in Kakadu",
-    shortLabel: "Ubirr",
-    year: -40_000,
-    regionalScopeLabel: "Northern Australia",
-    approximate: true,
-    minZoom: 18,
-    priority: 76,
-    sourceRefs: [
-      {
-        sourceId: "kakaduUbirr",
-        note: "Parks Australia's Ubirr page identifies Ubirr as one of Kakadu's outstanding rock art galleries and one of the reasons for the park's dual World Heritage status.",
-      },
-      {
-        sourceId: "metPrehistoricArt",
-        note: "The Met's prehistoric-art introduction says Aboriginal rock art at Ubirr in northern Australia may begin as early as 40,000 B.C.; the app uses c. 40,000 BCE as a cautious anchor for Ubirr's exceptionally old rock art tradition.",
-      },
-    ],
-  },
-  {
-    id: "swabian-jura-bone-flutes",
-    label: "Swabian Jura bone flutes",
-    shortLabel: "Bone Flutes",
-    year: -35_000,
-    regionalScopeLabel: "Central Europe",
-    approximate: true,
-    minZoom: 18,
-    priority: 78,
-    sourceRefs: [
-      {
-        sourceId: "unescoSwabianJura",
-        note: "UNESCO says the Swabian Jura caves contain the oldest musical instruments yet found worldwide and that their key Aurignacian layers date from 43,000 to 33,000 years ago.",
-      },
-      {
-        sourceId: "metPrehistoricArt",
-        note: "The Met's prehistoric-art introduction says Paleolithic bone flutes from Europe are richly documented in the ca. 35,000–10,000 B.C. range; the app uses c. 35,000 BCE as a clean public-facing anchor for these early instruments.",
-      },
-    ],
-  },
-  {
     id: "chauvet-cave-figurative-art",
     label: "Chauvet Cave figurative art",
     shortLabel: "Chauvet Cave",
-    year: -30_000,
+    year: yearsAgo(30_000),
     regionalScopeLabel: "Southern France",
     approximate: true,
     minZoom: 18,
@@ -97,7 +58,7 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     id: "venus-of-dolni-vestonice",
     label: "Venus of Dolní Věstonice",
     shortLabel: "Dolní Věstonice",
-    year: -27_000,
+    year: yearsAgo(27_000),
     regionalScopeLabel: "Central Europe",
     approximate: true,
     minZoom: 18,

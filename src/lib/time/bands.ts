@@ -1,12 +1,16 @@
 import { ticks, tickStep } from "d3-array";
 import {
-  subtractPreciseTimelineYears,
   splitTimelineYear,
-  TIMELINE_MAX_YEAR,
-  TIMELINE_MIN_YEAR,
   toApproximateTimelineYear,
   type PreciseTimelineYear,
 } from "./viewport";
+import {
+  getPreciseTimelineYearDelta,
+  getYearsAfterBigBang,
+  getYearsAgoFromPresent,
+  TIMELINE_MAX_YEAR,
+  TIMELINE_MIN_YEAR,
+} from "./timelineYears";
 
 export type TimelineYearFormatOptions = {
   mode?: "default" | "axis";
@@ -31,6 +35,7 @@ export type TimelineElapsedLabel = {
 };
 
 export type TimelineElapsedReference = "ago" | "after-big-bang";
+export type TimelineDateReference = "calendar" | "elapsed";
 
 export type TimelineTicks = {
   major: number[];
@@ -40,7 +45,11 @@ export type TimelineTicks = {
 
 const numberFormatter = new Intl.NumberFormat("en-US");
 const AVERAGE_DAYS_PER_YEAR = 365.2425;
-export const YEARS_AGO_CUTOFF = 10_000;
+export const BCE_YEARS_AGO_HANDOFF_YEAR = -10_000;
+export const YEARS_AGO_CUTOFF = getYearsAgoFromPresent(
+  BCE_YEARS_AGO_HANDOFF_YEAR,
+);
+export const TIMELINE_DATE_REFERENCE_DOMINANCE_THRESHOLD = 0.85;
 const ELAPSED_ZERO_EPSILON = 1e-18;
 const HOURS_PER_DAY = 24;
 const MINUTES_PER_HOUR = 60;
@@ -219,6 +228,56 @@ function resolvePreciseTimelineYear(
   return typeof year === "number" ? splitTimelineYear(year) : year;
 }
 
+export function getTimelineDateReference(
+  year: number | PreciseTimelineYear,
+): TimelineDateReference {
+  return resolvePreciseTimelineYear(year).wholeYear <= BCE_YEARS_AGO_HANDOFF_YEAR
+    ? "elapsed"
+    : "calendar";
+}
+
+export function getDominantTimelineDateReference(
+  startYear: number | PreciseTimelineYear,
+  endYear: number | PreciseTimelineYear,
+  dominanceThreshold = TIMELINE_DATE_REFERENCE_DOMINANCE_THRESHOLD,
+): TimelineDateReference | null {
+  const orderedStart = Math.min(
+    toApproximateTimelineYear(resolvePreciseTimelineYear(startYear)),
+    toApproximateTimelineYear(resolvePreciseTimelineYear(endYear)),
+  );
+  const orderedEnd = Math.max(
+    toApproximateTimelineYear(resolvePreciseTimelineYear(startYear)),
+    toApproximateTimelineYear(resolvePreciseTimelineYear(endYear)),
+  );
+  const startReference = getTimelineDateReference(startYear);
+  const endReference = getTimelineDateReference(endYear);
+
+  if (startReference === endReference) {
+    return startReference;
+  }
+
+  const totalSpan = Math.max(orderedEnd - orderedStart, 1e-18);
+  const calendarStartYear = BCE_YEARS_AGO_HANDOFF_YEAR + 1;
+  const elapsedSpan = Math.max(
+    0,
+    Math.min(orderedEnd, calendarStartYear) - orderedStart,
+  );
+  const calendarSpan = Math.max(
+    0,
+    orderedEnd - Math.max(orderedStart, calendarStartYear),
+  );
+
+  if (elapsedSpan / totalSpan >= dominanceThreshold) {
+    return "elapsed";
+  }
+
+  if (calendarSpan / totalSpan >= dominanceThreshold) {
+    return "calendar";
+  }
+
+  return null;
+}
+
 function splitElapsedDuration(totalYears: number): TimelineElapsedDuration {
   let years = Math.max(0, Math.floor(totalYears + ELAPSED_ZERO_EPSILON));
   let remainingYears = Math.max(totalYears - years, 0);
@@ -350,30 +409,10 @@ function getPreciseElapsedDuration(
   year: number | PreciseTimelineYear,
   reference: TimelineElapsedReference,
 ): TimelineElapsedDuration {
-  const preciseYear = resolvePreciseTimelineYear(year);
-  const referenceYear =
+  const { wholeYears, fractionalYears } =
     reference === "after-big-bang"
-      ? splitTimelineYear(TIMELINE_MIN_YEAR)
-      : splitTimelineYear(TIMELINE_MAX_YEAR);
-  const rawWholeYears =
-    reference === "after-big-bang"
-      ? preciseYear.wholeYear - referenceYear.wholeYear
-      : referenceYear.wholeYear - preciseYear.wholeYear;
-  let wholeYears = rawWholeYears;
-  let fractionalYears =
-    reference === "after-big-bang"
-      ? preciseYear.fraction - referenceYear.fraction
-      : referenceYear.fraction - preciseYear.fraction;
-
-  if (fractionalYears < 0) {
-    wholeYears -= 1;
-    fractionalYears += 1;
-  }
-
-  if (fractionalYears >= 1) {
-    wholeYears += 1;
-    fractionalYears -= 1;
-  }
+      ? getPreciseTimelineYearDelta(year, TIMELINE_MIN_YEAR)
+      : getPreciseTimelineYearDelta(TIMELINE_MAX_YEAR, year);
 
   if (wholeYears < 0) {
     return {
@@ -387,7 +426,7 @@ function getPreciseElapsedDuration(
     };
   }
 
-  const subYear = splitElapsedFractionalYear(fractionalYears);
+  const subYear = splitElapsedFractionalYear(Math.max(fractionalYears, 0));
 
   return {
     years: wholeYears,
@@ -429,10 +468,12 @@ function formatPreciseElapsedAxisLabel(
 ): TimelineElapsedAxisLabel {
   if (reference === "after-big-bang") {
     const preciseYear = resolvePreciseTimelineYear(year);
+    const bigBangYear = splitTimelineYear(TIMELINE_MIN_YEAR);
 
     if (
-      preciseYear.wholeYear === TIMELINE_MIN_YEAR &&
-      Math.abs(preciseYear.fraction) <= ELAPSED_ZERO_EPSILON
+      preciseYear.wholeYear === bigBangYear.wholeYear &&
+      Math.abs(preciseYear.fraction - bigBangYear.fraction) <=
+        ELAPSED_ZERO_EPSILON
     ) {
       return { primaryText: "Big Bang" };
     }
@@ -658,17 +699,10 @@ export function formatTimelineElapsedAxisLabel(
   reference: TimelineElapsedReference,
 ) {
   if (step >= 1) {
-    const preciseYear = resolvePreciseTimelineYear(year);
     const elapsedYears =
       reference === "after-big-bang"
-        ? subtractPreciseTimelineYears(
-            preciseYear,
-            splitTimelineYear(TIMELINE_MIN_YEAR),
-          )
-        : subtractPreciseTimelineYears(
-            splitTimelineYear(TIMELINE_MAX_YEAR),
-            preciseYear,
-          );
+        ? getYearsAfterBigBang(year)
+        : getYearsAgoFromPresent(year);
 
     return formatAxisElapsedYears(Math.max(0, elapsedYears), step, reference);
   }
@@ -698,14 +732,14 @@ export function formatTimelineElapsedLabel(
   year: number,
   reference: TimelineElapsedReference = "ago",
 ): TimelineElapsedLabel | null {
-  if (year > -YEARS_AGO_CUTOFF) {
+  if (reference === "ago" && getTimelineDateReference(year) !== "elapsed") {
     return null;
   }
 
   const isAfterBigBang = reference === "after-big-bang";
   const totalYears = isAfterBigBang
-    ? year - TIMELINE_MIN_YEAR
-    : TIMELINE_MAX_YEAR - year;
+    ? getYearsAfterBigBang(year)
+    : getYearsAgoFromPresent(year);
   const duration = splitElapsedDuration(totalYears);
   const parts = [
     duration.years > 0 ? formatUnitCount(duration.years, "year") : null,
@@ -857,14 +891,14 @@ export function formatTimelineYear(
 ) {
   const preciseYear = resolvePreciseTimelineYear(year);
   const approximateYear = toApproximateTimelineYear(preciseYear);
-  const absolute = Math.abs(approximateYear);
+  const yearsAgo = getYearsAgoFromPresent(preciseYear);
   const safeStep = Math.max(Math.abs(step), 1e-18);
   const containingYear = preciseYear.wholeYear;
 
-  if (approximateYear <= -YEARS_AGO_CUTOFF) {
+  if (getTimelineDateReference(preciseYear) === "elapsed") {
     return options.mode === "axis"
-      ? formatAxisYearsAgo(absolute, safeStep)
-      : formatDefaultYearsAgo(absolute, safeStep);
+      ? formatAxisYearsAgo(yearsAgo, safeStep)
+      : formatDefaultYearsAgo(yearsAgo, safeStep);
   }
 
   if (approximateYear < 1) {

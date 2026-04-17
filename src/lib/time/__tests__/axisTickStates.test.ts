@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { resolveAxisTickRenderStates } from "../axisTickStates";
+import {
+  getTimelineYearFromYearsAgo,
+  getYearsAgoFromPresent,
+} from "../timelineYears";
 import { splitTimelineYear, TIMELINE_MIN_YEAR } from "../viewport";
 
 const DAY_IN_MS = 86_400_000;
@@ -281,6 +285,52 @@ describe("axis tick render states", () => {
     expect(states.some((state) => state.visibleProgress > 0.5)).toBe(true);
   });
 
+  it("keeps elapsed day ticks when only a tiny calendar slice is visible", () => {
+    const states = resolveAxisTickRenderStates(-10_000.8, -9_998.95, 1_200, {
+      elapsedSubYearReference: "ago",
+    });
+    const dailyStep = 1 / 365.2425;
+
+    expect(
+      states.some((state) => Math.abs(state.step - dailyStep) < 1e-9),
+    ).toBe(true);
+  });
+
+  it("aligns elapsed whole-year ticks to exact years-ago intervals", () => {
+    const olderYear = getTimelineYearFromYearsAgo(20_030);
+    const newerYear = getTimelineYearFromYearsAgo(20_000);
+    const states = resolveAxisTickRenderStates(olderYear, newerYear, 1_200, {
+      elapsedReference: "ago",
+      preciseStartYear: splitTimelineYear(olderYear),
+      preciseEndYear: splitTimelineYear(newerYear),
+    });
+    const wholeYearTicks = states.filter(
+      (state) => state.step >= 1 && state.visibleProgress > 0.01,
+    );
+
+    expect(wholeYearTicks.length).toBeGreaterThan(0);
+
+    for (const state of wholeYearTicks) {
+      const preciseYear =
+        state.wholeYear !== undefined && state.yearFraction !== undefined
+          ? {
+              wholeYear: state.wholeYear,
+              fraction: state.yearFraction,
+            }
+          : state.year;
+      const elapsedYears = getYearsAgoFromPresent(preciseYear);
+      const stepMultiple = elapsedYears / state.step;
+
+      expect(stepMultiple).toBeCloseTo(Math.round(stepMultiple), 6);
+    }
+
+    expect(
+      wholeYearTicks.some(
+        (state) => Math.abs(getYearsAgoFromPresent(state.year) - 20_000) < 1e-6,
+      ),
+    ).toBe(true);
+  });
+
   it("resolves parent, current, and child generations in logarithmic mode", () => {
     const states = resolveAxisTickRenderStates(-200_000, 200_000, 1_000, {
       scaleMode: "logarithmic",
@@ -353,8 +403,8 @@ describe("axis tick render states", () => {
     const yearsPerDay = 1 / 365.2425;
     const preciseStart = splitTimelineYear(TIMELINE_MIN_YEAR);
     const preciseEnd = {
-      wholeYear: TIMELINE_MIN_YEAR,
-      fraction: yearsPerDay * 7.5,
+      wholeYear: preciseStart.wholeYear,
+      fraction: preciseStart.fraction + yearsPerDay * 7.5,
     };
     const states = resolveAxisTickRenderStates(
       TIMELINE_MIN_YEAR,
@@ -381,10 +431,10 @@ describe("axis tick render states", () => {
     ).toBe(true);
 
     for (const state of states.filter((state) => state.step < 1)) {
-      expect(state.wholeYear).toBe(TIMELINE_MIN_YEAR);
+      expect(state.wholeYear).toBe(preciseStart.wholeYear);
       expect(state.yearFraction).toBeDefined();
-      expect((state.yearFraction ?? 0) * 365.2425).toBeCloseTo(
-        Math.round((state.yearFraction ?? 0) * 365.2425),
+      expect(((state.yearFraction ?? 0) - preciseStart.fraction) * 365.2425).toBeCloseTo(
+        Math.round(((state.yearFraction ?? 0) - preciseStart.fraction) * 365.2425),
         6,
       );
     }

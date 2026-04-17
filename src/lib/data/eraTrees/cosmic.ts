@@ -1,8 +1,9 @@
 import type { EraDefinition } from "../timelineTypes";
+import { afterBigBang, yearsAgo } from "../timelineDateBuilders";
 
 export const PRIMORDIAL_UNIVERSE_ID = "primordial-universe";
-export const PRIMORDIAL_UNIVERSE_START_YEAR = -13_800_000_000;
-export const PRIMORDIAL_UNIVERSE_END_YEAR = -13_600_000_000;
+export const PRIMORDIAL_UNIVERSE_START_YEAR = afterBigBang(0);
+export const PRIMORDIAL_UNIVERSE_END_YEAR = afterBigBang(200_000_000);
 
 export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
   {
@@ -21,8 +22,8 @@ export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
   {
     id: "cosmic-dawn",
     name: "Cosmic Dawn",
-    startYear: -13_600_000_000,
-    endYear: -12_800_000_000,
+    startYear: PRIMORDIAL_UNIVERSE_END_YEAR,
+    endYear: afterBigBang(1_000_000_000),
     scheme: "cosmic",
     sourceRefs: [
       {
@@ -38,8 +39,8 @@ export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
   {
     id: "galaxies-take-shape",
     name: "Galaxies Take Shape",
-    startYear: -12_800_000_000,
-    endYear: -4_567_000_000,
+    startYear: afterBigBang(1_000_000_000),
+    endYear: yearsAgo(4_567_000_000),
     scheme: "cosmic",
     sourceRefs: [
       {

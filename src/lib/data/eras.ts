@@ -2,7 +2,7 @@ import { COSMIC_ERA_DEFINITIONS } from "./eraTrees/cosmic";
 import { GEOLOGICAL_ERA_DEFINITIONS } from "./eraTrees/geological";
 import { HUMAN_HISTORY_ERA_DEFINITION } from "./eraTrees/humanHistory";
 import { TIMELINE_DISPLAY } from "./timelineDecorations";
-import { getPresentTimelineYear } from "../time/present";
+import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "../time/timelineYears";
 import type {
   Era,
   EraDefinition,
@@ -43,7 +43,7 @@ export function getAncestorChain(root: Era, targetId: string): Era[] {
   return [];
 }
 
-const CURRENT_YEAR = getPresentTimelineYear();
+const CURRENT_YEAR = TIMELINE_MAX_YEAR;
 const HUMAN_HISTORY_VISIBLE_CHILDREN =
   HUMAN_HISTORY_ERA_DEFINITION.children ?? [];
 
@@ -115,7 +115,7 @@ function materializeEra(definition: EraDefinition): Era {
 export const ROOT_ERA: Era = materializeEra({
   id: "universe",
   name: "Universe",
-  startYear: -13_800_000_000,
+  startYear: TIMELINE_MIN_YEAR,
   endYear: CURRENT_YEAR,
   color: "rgba(0, 0, 0, 0)",
   scheme: "app-canonical",

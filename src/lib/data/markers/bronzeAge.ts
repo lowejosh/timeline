@@ -1,11 +1,12 @@
 import type { TimelineMarker } from "../timelineTypes";
+import { bce } from "../timelineDateBuilders";
 
 export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
   {
     id: "cuneiform-writing-emerges",
     label: "Cuneiform writing emerges",
     shortLabel: "Cuneiform",
-    year: -3_200,
+    year: bce(3_200),
     regionalScopeLabel: "Mesopotamia",
     approximate: true,
     minZoom: 18,
@@ -25,7 +26,7 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     id: "great-pyramid-of-giza-completed",
     label: "Great Pyramid of Giza completed",
     shortLabel: "Great Pyramid",
-    year: -2_560,
+    year: bce(2_560),
     regionalScopeLabel: "Ancient Egypt",
     approximate: true,
     minZoom: 18,
@@ -41,7 +42,7 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     id: "sargon-of-akkad-builds-an-empire",
     label: "Sargon of Akkad builds an empire",
     shortLabel: "Sargon's Empire",
-    year: -2_300,
+    year: bce(2_300),
     regionalScopeLabel: "Mesopotamia",
     approximate: true,
     minZoom: 18,
@@ -57,7 +58,7 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     id: "hammurabi-promulgates-his-laws",
     label: "Hammurabi promulgates his laws",
     shortLabel: "Hammurabi's Laws",
-    year: -1_750,
+    year: bce(1_750),
     regionalScopeLabel: "Babylonia",
     approximate: true,
     minZoom: 18,
@@ -77,7 +78,7 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     id: "earliest-attested-chinese-writing",
     label: "Earliest attested Chinese writing",
     shortLabel: "Chinese Writing",
-    year: -1_300,
+    year: bce(1_300),
     regionalScopeLabel: "North China",
     approximate: true,
     minZoom: 18,

@@ -1,11 +1,12 @@
 import type { TimelineMarker } from "../timelineTypes";
+import { bce } from "../timelineDateBuilders";
 
 export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
   {
     id: "irrigation-reshapes-southern-mesopotamia",
     label: "Irrigation reshapes southern Mesopotamia",
     shortLabel: "Irrigation",
-    year: -4_000,
+    year: bce(4_000),
     regionalScopeLabel: "Southern Mesopotamia",
     approximate: true,
     minZoom: 19,
@@ -21,7 +22,7 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
     id: "wheeled-transport-appears-in-sumer",
     label: "Wheeled transport appears in Sumer",
     shortLabel: "Wheel",
-    year: -3_500,
+    year: bce(3_500),
     regionalScopeLabel: "Sumer",
     approximate: true,
     minZoom: 19,
@@ -37,7 +38,7 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
     id: "uruk-becomes-the-first-city",
     label: "Uruk becomes the first city",
     shortLabel: "Uruk",
-    year: -3_200,
+    year: bce(3_200),
     regionalScopeLabel: "Southern Mesopotamia",
     approximate: true,
     minZoom: 19,

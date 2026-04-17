@@ -1,4 +1,8 @@
-import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "./viewport";
+import {
+  getTimelineYearFromAstronomicalYearValue,
+  getTimelineYearFromYearsAfterBigBang,
+  getTimelineYearFromYearsAgo,
+} from "./timelineYears";
 
 export type TimelineElapsedReference = "ago" | "after-big-bang";
 export type TimelineTimestampPrecision =
@@ -139,10 +143,6 @@ function getAstronomicalYear(era: TimelineCalendarEra, year: number) {
   assertIntegerInRange(year, 1, Number.MAX_SAFE_INTEGER, "Calendar year");
 
   return era === "ce" ? year : 1 - year;
-}
-
-function getTimelineYearFromAstronomicalYear(year: number) {
-  return year <= 0 ? year - 1 : year;
 }
 
 function createTimelineUtcDate(
@@ -402,7 +402,9 @@ export function getTimelineYearFromCalendarTimestamp(
 ) {
   const normalized = normalizeCalendarTimestamp(timestamp);
   const astronomicalYear = getAstronomicalYear(normalized.era, normalized.year);
-  const timelineYear = getTimelineYearFromAstronomicalYear(astronomicalYear);
+  const timelineYear = getTimelineYearFromAstronomicalYearValue(
+    astronomicalYear,
+  );
   const start = getTimelineYearStart(astronomicalYear);
   const end = getTimelineYearStart(astronomicalYear + 1);
   const date = createTimelineUtcDate(
@@ -444,8 +446,8 @@ export function getTimelineYearFromElapsedTimestamp(
       AVERAGE_DAYS_PER_YEAR;
 
   return normalized.reference === "after-big-bang"
-    ? TIMELINE_MIN_YEAR + totalYears
-    : TIMELINE_MAX_YEAR - totalYears;
+    ? getTimelineYearFromYearsAfterBigBang(totalYears)
+    : getTimelineYearFromYearsAgo(totalYears);
 }
 
 export function getTimelineYearFromExactTimestamp(

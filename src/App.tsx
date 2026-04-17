@@ -18,7 +18,10 @@ import {
   getDefaultEnabledTimelineGroupIds,
 } from "./lib/data/timelineDecorations";
 import { resolveTimelineSidebarSections } from "./lib/data/timelineSidebar";
-import { shouldAutoSuppressHumanEvolution } from "./lib/time/timelineLayerAutoToggle";
+import {
+  shouldAutoSuppressCivilizations,
+  shouldAutoSuppressHumanEvolution,
+} from "./lib/time/timelineLayerAutoToggle";
 import {
   getHomeViewport,
   HOME_RANGE,
@@ -26,10 +29,11 @@ import {
 } from "./lib/time/viewport";
 import "./App.css";
 
-type HumanEvolutionToggleMode = "auto" | "manual-on" | "manual-off";
+type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
 
 const HUMAN_EVOLUTION_GROUP_ID =
   TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
+const CIVILIZATIONS_GROUP_ID = TIMELINE_DECORATION_CATEGORY_IDS.civilizations;
 
 function App() {
   const [stageRef, stageSize] = useElementSize<HTMLDivElement>();
@@ -47,8 +51,10 @@ function App() {
     getDefaultEnabledTimelineGroupIds(),
   );
   const [humanEvolutionToggleMode, setHumanEvolutionToggleMode] =
-    useState<HumanEvolutionToggleMode>("auto");
+    useState<LayerAutoToggleMode>("auto");
   const [isHumanEvolutionAutoSuppressed, setIsHumanEvolutionAutoSuppressed] =
+    useState(false);
+  const [isCivilizationsAutoHidden, setIsCivilizationsAutoHidden] =
     useState(false);
   const autoTransitionFrameRef = useRef(0);
 
@@ -61,24 +67,41 @@ function App() {
   });
 
   useEffect(() => {
-    const nextSuppressed = shouldAutoSuppressHumanEvolution(
+    const nextHumanEvolutionSuppressed = shouldAutoSuppressHumanEvolution(
       animated.viewport,
       innerWidth,
       TIMELINE_CANVAS_PAD,
       isHumanEvolutionAutoSuppressed,
     );
+    const nextCivilizationsSuppressed = shouldAutoSuppressCivilizations(
+      animated.viewport,
+      innerWidth,
+      TIMELINE_CANVAS_PAD,
+      isCivilizationsAutoHidden,
+    );
+    let shouldBumpOverlayVisibilityKey = false;
 
-    if (nextSuppressed !== isHumanEvolutionAutoSuppressed) {
-      setIsHumanEvolutionAutoSuppressed(nextSuppressed);
+    if (nextHumanEvolutionSuppressed !== isHumanEvolutionAutoSuppressed) {
+      setIsHumanEvolutionAutoSuppressed(nextHumanEvolutionSuppressed);
 
       if (humanEvolutionToggleMode === "auto") {
-        setOverlayVisibilityTransitionKey((current) => current + 1);
+        shouldBumpOverlayVisibilityKey = true;
       }
+    }
+
+    if (nextCivilizationsSuppressed !== isCivilizationsAutoHidden) {
+      setIsCivilizationsAutoHidden(nextCivilizationsSuppressed);
+      shouldBumpOverlayVisibilityKey = true;
+    }
+
+    if (shouldBumpOverlayVisibilityKey) {
+      setOverlayVisibilityTransitionKey((current) => current + 1);
     }
   }, [
     animated.viewport,
-    humanEvolutionToggleMode,
     innerWidth,
+    isCivilizationsAutoHidden,
+    humanEvolutionToggleMode,
     isHumanEvolutionAutoSuppressed,
   ]);
 
@@ -87,19 +110,21 @@ function App() {
 
     if (humanEvolutionToggleMode === "manual-on") {
       next.add(HUMAN_EVOLUTION_GROUP_ID);
-      return next;
-    }
-
-    if (humanEvolutionToggleMode === "manual-off") {
+    } else if (humanEvolutionToggleMode === "manual-off") {
       next.delete(HUMAN_EVOLUTION_GROUP_ID);
-      return next;
-    }
-
-    if (defaultEnabledGroupIds.has(HUMAN_EVOLUTION_GROUP_ID)) {
+    } else if (defaultEnabledGroupIds.has(HUMAN_EVOLUTION_GROUP_ID)) {
       if (isHumanEvolutionAutoSuppressed) {
         next.delete(HUMAN_EVOLUTION_GROUP_ID);
       } else {
         next.add(HUMAN_EVOLUTION_GROUP_ID);
+      }
+    }
+
+    if (defaultEnabledGroupIds.has(CIVILIZATIONS_GROUP_ID)) {
+      if (manualEnabledGroupIds.has(CIVILIZATIONS_GROUP_ID)) {
+        next.add(CIVILIZATIONS_GROUP_ID);
+      } else {
+        next.delete(CIVILIZATIONS_GROUP_ID);
       }
     }
 
@@ -110,6 +135,19 @@ function App() {
     isHumanEvolutionAutoSuppressed,
     manualEnabledGroupIds,
   ]);
+
+  const renderEnabledGroupIds = useMemo(() => {
+    const next = new Set(enabledGroupIds);
+
+    if (
+      isCivilizationsAutoHidden &&
+      next.has(CIVILIZATIONS_GROUP_ID)
+    ) {
+      next.delete(CIVILIZATIONS_GROUP_ID);
+    }
+
+    return next;
+  }, [enabledGroupIds, isCivilizationsAutoHidden]);
 
   const activeEra = findEraById(ROOT_ERA, activeEraId) ?? ROOT_ERA;
   const chain = getAncestorChain(ROOT_ERA, activeEraId);
@@ -214,8 +252,11 @@ function App() {
         innerWidth,
         TIMELINE_CANVAS_PAD,
         enabledGroupIds,
+        isCivilizationsAutoHidden
+          ? new Set([CIVILIZATIONS_GROUP_ID])
+          : new Set(),
       ),
-    [animated.viewport, enabledGroupIds, innerWidth],
+    [animated.viewport, enabledGroupIds, innerWidth, isCivilizationsAutoHidden],
   );
 
   const handleToggleEntry = useCallback(
@@ -224,7 +265,6 @@ function App() {
       if (groupIds.includes(HUMAN_EVOLUTION_GROUP_ID)) {
         setHumanEvolutionToggleMode(nextEnabled ? "manual-on" : "manual-off");
       }
-
       setOverlayVisibilityTransitionKey((current) => current + 1);
 
       setManualEnabledGroupIds((current) => {
@@ -286,7 +326,7 @@ function App() {
             siblingEras={siblingEras}
             markers={TIMELINE_DISPLAY.markers}
             overlayBands={TIMELINE_DISPLAY.overlays}
-            enabledGroupIds={enabledGroupIds}
+            enabledGroupIds={renderEnabledGroupIds}
             overlayVisibilityTransitionKey={overlayVisibilityTransitionKey}
             parentEra={parentEra}
             isAnimating={animated.isAnimating}
