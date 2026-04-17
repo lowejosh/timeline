@@ -1,6 +1,5 @@
 import type { TimelineOverlayBand } from "../timelineTypes";
 
-const POST_CLASSICAL_GROUP_ID = "post-classical-early-modern";
 const POST_CLASSICAL_MIN_ZOOM = 15;
 
 export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
@@ -13,7 +12,6 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(96, 109, 170)",
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
-    groupId: POST_CLASSICAL_GROUP_ID,
     sourceRefs: [
       {
         sourceId: "metByzantium",
@@ -34,7 +32,6 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(78, 133, 99)",
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 75,
-    groupId: POST_CLASSICAL_GROUP_ID,
     sourceRefs: [
       {
         sourceId: "khanGoldenAgeOfIslam",
@@ -51,7 +48,6 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(82, 130, 156)",
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 74,
-    groupId: POST_CLASSICAL_GROUP_ID,
     sourceRefs: [
       {
         sourceId: "khanSongChina",
@@ -68,7 +64,6 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(134, 108, 84)",
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 78,
-    groupId: POST_CLASSICAL_GROUP_ID,
     sourceRefs: [
       {
         sourceId: "britannicaMongolEmpire",
@@ -89,7 +84,6 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(111, 137, 92)",
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 77,
-    groupId: POST_CLASSICAL_GROUP_ID,
     sourceRefs: [
       {
         sourceId: "historyOttomanEmpire",
@@ -106,7 +100,6 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(163, 95, 86)",
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 73,
-    groupId: POST_CLASSICAL_GROUP_ID,
     sourceRefs: [
       {
         sourceId: "historyMingDynasty",
@@ -123,7 +116,6 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(160, 121, 68)",
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 71,
-    groupId: POST_CLASSICAL_GROUP_ID,
     sourceRefs: [
       {
         sourceId: "historyAztecs",
@@ -140,7 +132,6 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(182, 135, 78)",
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 70,
-    groupId: POST_CLASSICAL_GROUP_ID,
     sourceRefs: [
       {
         sourceId: "historyInca",

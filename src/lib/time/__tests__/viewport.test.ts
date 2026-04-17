@@ -56,7 +56,9 @@ describe("timeline viewport math", () => {
     const [visibleStart, visibleEnd] = getVisibleRange(viewport, 1200);
 
     expect(visibleStart).toBeLessThanOrEqual(1500);
-    expect(visibleEnd + FLOAT_EPSILON).toBeGreaterThanOrEqual(TIMELINE_MAX_YEAR);
+    expect(visibleEnd + FLOAT_EPSILON).toBeGreaterThanOrEqual(
+      TIMELINE_MAX_YEAR,
+    );
   });
 
   it("fits the full timeline exactly at minimum zoom", () => {
@@ -171,10 +173,7 @@ describe("timeline viewport math", () => {
       getViewportPrecisionLimitedYearsPerPixel(viewport) * width * 365.2425;
     const effectiveVisibleRangeDays = getMinVisibleRangeDaysForWidth(width);
 
-    expect(viewport.zoom).toBeCloseTo(
-      getMaxZoomForWidth(width),
-      6,
-    );
+    expect(viewport.zoom).toBeCloseTo(getMaxZoomForWidth(width), 6);
     expect(effectiveVisibleRangeDays).toBeGreaterThanOrEqual(
       MIN_VISIBLE_RANGE_DAYS,
     );
@@ -182,7 +181,9 @@ describe("timeline viewport math", () => {
       width / MAX_ZOOM_DAY_TICK_SPACING_PX,
       6,
     );
-    expect(visibleDays).toBeGreaterThanOrEqual(effectiveVisibleRangeDays * 0.99);
+    expect(visibleDays).toBeGreaterThanOrEqual(
+      effectiveVisibleRangeDays * 0.99,
+    );
     expect(visibleDays).toBeLessThanOrEqual(effectiveVisibleRangeDays * 1.01);
     expect(precisionLimitedDays).toBeLessThan(effectiveVisibleRangeDays);
   });

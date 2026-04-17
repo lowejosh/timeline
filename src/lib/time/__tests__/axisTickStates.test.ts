@@ -197,9 +197,9 @@ describe("axis tick render states", () => {
     const states = resolveAxisTickRenderStates(2025.57, 2025.58, 1_200);
 
     expect(states.length).toBeGreaterThan(0);
-    expect(
-      states.every((state) => state.step >= yearsPerDay - 1e-12),
-    ).toBe(true);
+    expect(states.every((state) => state.step >= yearsPerDay - 1e-12)).toBe(
+      true,
+    );
   });
 
   it("keeps discrete daily ticks across a deep Big Bang day span", () => {
@@ -224,9 +224,7 @@ describe("axis tick render states", () => {
     );
 
     expect(dailyStates.length).toBeGreaterThanOrEqual(13);
-    expect(dailyStates.some((state) => state.hierarchyDepth === 0)).toBe(
-      true,
-    );
+    expect(dailyStates.some((state) => state.hierarchyDepth === 0)).toBe(true);
   });
 
   it("keeps numeric levels contiguous through the 1-2-5 ladder", () => {
@@ -265,16 +263,19 @@ describe("axis tick render states", () => {
 
     expect(states.length).toBeGreaterThan(0);
     expect(
-      states.some(
-        (state) => Math.abs(state.step - yearsPerDay) < 1e-9,
-      ),
+      states.some((state) => Math.abs(state.step - yearsPerDay) < 1e-9),
     ).toBe(true);
   });
 
   it("keeps elapsed ticks available for medium sub-year spans", () => {
-    const states = resolveAxisTickRenderStates(-7_997_289_173.75, -7_997_289_172.1, 1_200, {
-      elapsedSubYearReference: "ago",
-    });
+    const states = resolveAxisTickRenderStates(
+      -7_997_289_173.75,
+      -7_997_289_172.1,
+      1_200,
+      {
+        elapsedSubYearReference: "ago",
+      },
+    );
 
     expect(states.length).toBeGreaterThan(0);
     expect(states.some((state) => state.visibleProgress > 0.5)).toBe(true);
@@ -289,7 +290,8 @@ describe("axis tick render states", () => {
     const stepsByGeneration = new Map<number, Set<number>>();
 
     for (const state of states) {
-      const existing = stepsByGeneration.get(state.generationIndex) ?? new Set<number>();
+      const existing =
+        stepsByGeneration.get(state.generationIndex) ?? new Set<number>();
       existing.add(state.step);
       stepsByGeneration.set(state.generationIndex, existing);
     }
@@ -337,8 +339,12 @@ describe("axis tick render states", () => {
       anchorYear: 25_000,
     });
 
-    const leftKeys = new Set(left.map((state) => `${state.step}:${state.year}`));
-    const rightKeys = new Set(right.map((state) => `${state.step}:${state.year}`));
+    const leftKeys = new Set(
+      left.map((state) => `${state.step}:${state.year}`),
+    );
+    const rightKeys = new Set(
+      right.map((state) => `${state.step}:${state.year}`),
+    );
 
     expect(leftKeys).toEqual(rightKeys);
   });
@@ -368,7 +374,11 @@ describe("axis tick render states", () => {
     );
 
     expect(daySteps.size).toBeGreaterThan(0);
-    expect([...daySteps].every((step) => [1, 2, 7, 14, 30, 60, 90, 180].includes(step))).toBe(true);
+    expect(
+      [...daySteps].every((step) =>
+        [1, 2, 7, 14, 30, 60, 90, 180].includes(step),
+      ),
+    ).toBe(true);
 
     for (const state of states.filter((state) => state.step < 1)) {
       expect(state.wholeYear).toBe(TIMELINE_MIN_YEAR);

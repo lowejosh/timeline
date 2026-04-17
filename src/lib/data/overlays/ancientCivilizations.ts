@@ -175,7 +175,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(180, 120, 70)",
     minZoom: 0,
     priority: 95,
-    groupId: "ancient-civilizations",
     children: MESOPOTAMIA_SUB_BANDS,
     sourceRefs: [
       {
@@ -198,7 +197,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(107, 136, 166)",
     minZoom: 0,
     priority: 90,
-    groupId: "ancient-civilizations",
     sourceRefs: [
       {
         sourceId: "britannicaIndusCivilization",
@@ -218,7 +216,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(166, 149, 94)",
     minZoom: 0,
     priority: 92,
-    groupId: "ancient-civilizations",
     sourceRefs: [
       {
         sourceId: "britannicaAncientEgypt",
@@ -240,7 +237,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(157, 106, 126)",
     minZoom: 0,
     priority: 89,
-    groupId: "ancient-civilizations",
     sourceRefs: [
       {
         sourceId: "britannicaHittiteEmpire",
@@ -262,7 +258,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(118, 132, 186)",
     minZoom: 0,
     priority: 88,
-    groupId: "ancient-civilizations",
     sourceRefs: [
       {
         sourceId: "unescoMycenaeTiryns",
@@ -282,7 +277,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(93, 119, 183)",
     minZoom: 0,
     priority: 88,
-    groupId: "ancient-civilizations",
     sourceRefs: [
       {
         sourceId: "britannicaAncientGreece",
@@ -302,7 +296,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(135, 92, 142)",
     minZoom: 0,
     priority: 86,
-    groupId: "ancient-civilizations",
     sourceRefs: [
       {
         sourceId: "historyPersianEmpire",
@@ -321,7 +314,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(159, 91, 70)",
     minZoom: 0,
     priority: 84,
-    groupId: "ancient-civilizations",
     sourceRefs: [
       {
         sourceId: "historyAncientRome",
@@ -345,7 +337,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(87, 142, 166)",
     minZoom: 0,
     priority: 82,
-    groupId: "ancient-civilizations",
     sourceRefs: [
       {
         sourceId: "britannicaHellenisticAge",
@@ -365,7 +356,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(72, 132, 108)",
     minZoom: 0,
     priority: 80,
-    groupId: "ancient-civilizations",
     sourceRefs: [
       {
         sourceId: "britannicaHanDynasty",
@@ -384,7 +374,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(136, 78, 64)",
     minZoom: 0,
     priority: 78,
-    groupId: "ancient-civilizations",
     sourceRefs: [
       {
         sourceId: "historyAncientRome",

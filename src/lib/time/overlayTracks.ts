@@ -36,6 +36,9 @@ type CachedOverlayLaneAssignment = {
 };
 
 const OVERLAY_MIN_VISIBLE_WIDTH_DEVICE_PX = 0.5;
+const PRIORITY_ZOOM_GRACE_START = 75;
+const PRIORITY_ZOOM_GRACE_STEP = 5;
+const PRIORITY_ZOOM_GRACE_MAX = 5;
 const overlayLaneAssignmentCache = new WeakMap<
   TimelineOverlayBand[],
   CachedOverlayLaneAssignment
@@ -84,8 +87,33 @@ function resolveOverlayRenderGeometry(
   };
 }
 
-function isVisibleAtZoom(item: TimelineZoomVisibility, zoom: number) {
-  if (item.minZoom !== undefined && zoom < item.minZoom) {
+function getPriorityZoomGrace(
+  item: TimelineZoomVisibility & {
+    priority?: number;
+  },
+) {
+  const priority = item.priority ?? 0;
+
+  if (priority < PRIORITY_ZOOM_GRACE_START) {
+    return 0;
+  }
+
+  return Math.min(
+    PRIORITY_ZOOM_GRACE_MAX,
+    Math.floor((priority - PRIORITY_ZOOM_GRACE_START) / PRIORITY_ZOOM_GRACE_STEP) + 1,
+  );
+}
+
+export function isTimelineDecorationVisibleAtZoom(
+  item: TimelineZoomVisibility & {
+    priority?: number;
+  },
+  zoom: number,
+) {
+  const effectiveMinZoom =
+    item.minZoom === undefined ? undefined : item.minZoom - getPriorityZoomGrace(item);
+
+  if (effectiveMinZoom !== undefined && zoom < effectiveMinZoom) {
     return false;
   }
 
@@ -267,7 +295,7 @@ export function getVisibleTimelineMarkers(
       const marker = markers[index];
 
       if (
-        isVisibleAtZoom(marker, viewport.zoom) &&
+        isTimelineDecorationVisibleAtZoom(marker, viewport.zoom) &&
         isDecorationGroupEnabled(marker, enabledGroupIds)
       ) {
         visibleMarkers.push(marker);
@@ -281,7 +309,7 @@ export function getVisibleTimelineMarkers(
     .filter(
       (marker) =>
         isDecorationGroupEnabled(marker, enabledGroupIds) &&
-        isVisibleAtZoom(marker, viewport.zoom) &&
+        isTimelineDecorationVisibleAtZoom(marker, viewport.zoom) &&
         marker.year >= visibleStart &&
         marker.year <= visibleEnd,
     )
@@ -329,7 +357,10 @@ export function resolveTimelineOverlayTracks(
       break;
     }
 
-    if (!isVisibleAtZoom(band, viewport.zoom) || band.endYear < visibleStart) {
+    if (
+      !isTimelineDecorationVisibleAtZoom(band, viewport.zoom) ||
+      band.endYear < visibleStart
+    ) {
       continue;
     }
 

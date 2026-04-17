@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import { ERA_SOURCES } from "../eraSources";
 import { ROOT_ERA, getSeededEraColor, type Era } from "../eras";
 
-function walkEraTree(era: Era, visit: (era: Era, parent?: Era) => void, parent?: Era) {
+function walkEraTree(
+  era: Era,
+  visit: (era: Era, parent?: Era) => void,
+  parent?: Era,
+) {
   visit(era, parent);
   for (const child of era.children ?? []) {
     walkEraTree(child, visit, era);
@@ -52,13 +56,11 @@ describe("era data", () => {
         return;
       }
 
-      const hasLinkedSource = (era.sourceRefs ?? []).some(
-        (reference) => {
-          const source = ERA_SOURCES[reference.sourceId];
+      const hasLinkedSource = (era.sourceRefs ?? []).some((reference) => {
+        const source = ERA_SOURCES[reference.sourceId];
 
-          return "url" in source && Boolean(source.url);
-        },
-      );
+        return "url" in source && Boolean(source.url);
+      });
 
       expect(hasLinkedSource).toBe(true);
     });
@@ -70,7 +72,9 @@ describe("era data", () => {
       (era) => era.id === "pre-pottery-neolithic-b",
     );
 
-    const paleolithic = ROOT_ERA.children?.find((era) => era.id === "paleolithic");
+    const paleolithic = ROOT_ERA.children?.find(
+      (era) => era.id === "paleolithic",
+    );
 
     expect(paleolithic?.sourceRefs?.length).toBeGreaterThan(0);
     expect(neolithic?.name).toBe("Neolithic");
@@ -100,7 +104,9 @@ describe("era data", () => {
   });
 
   it("uses seeded colors by default and respects explicit geological overrides", () => {
-    const paleolithic = ROOT_ERA.children?.find((era) => era.id === "paleolithic");
+    const paleolithic = ROOT_ERA.children?.find(
+      (era) => era.id === "paleolithic",
+    );
     const cambrian = ROOT_ERA.children?.find((era) => era.id === "cambrian");
 
     expect(paleolithic?.color).toBe(getSeededEraColor("paleolithic"));
@@ -122,42 +128,52 @@ describe("era data", () => {
     const hadean = ROOT_ERA.children?.find((era) => era.id === "hadean");
     const archean = ROOT_ERA.children?.find((era) => era.id === "archean");
     const rootChildIds = ROOT_ERA.children?.map((era) => era.id) ?? [];
-    const quaternary = ROOT_ERA.children?.find((era) => era.id === "quaternary");
+    const quaternary = ROOT_ERA.children?.find(
+      (era) => era.id === "quaternary",
+    );
 
     expect(hadean?.children).toBeUndefined();
     expect(archean?.children).toBeUndefined();
-    expect(rootChildIds).toEqual(expect.arrayContaining([
-      "siderian",
-      "rhyacian",
-      "orosirian",
-      "statherian",
-      "calymmian",
-      "ectasian",
-      "stenian",
-      "tonian",
-      "cryogenian",
-      "ediacaran",
-      "cambrian",
-      "ordovician",
-      "silurian",
-      "devonian",
-      "carboniferous",
-      "permian",
-      "triassic",
-      "jurassic",
-      "cretaceous",
-      "paleogene",
-      "neogene",
-      "quaternary",
-    ]));
+    expect(rootChildIds).toEqual(
+      expect.arrayContaining([
+        "siderian",
+        "rhyacian",
+        "orosirian",
+        "statherian",
+        "calymmian",
+        "ectasian",
+        "stenian",
+        "tonian",
+        "cryogenian",
+        "ediacaran",
+        "cambrian",
+        "ordovician",
+        "silurian",
+        "devonian",
+        "carboniferous",
+        "permian",
+        "triassic",
+        "jurassic",
+        "cretaceous",
+        "paleogene",
+        "neogene",
+        "quaternary",
+      ]),
+    );
     expect(rootChildIds).not.toContain("proterozoic");
     expect(rootChildIds).not.toContain("paleozoic");
     expect(rootChildIds).not.toContain("mesozoic");
     expect(rootChildIds).not.toContain("cenozoic");
-    expect(ROOT_ERA.children?.find((era) => era.id === "jurassic")?.name).toBe("Jurassic");
-    expect(ROOT_ERA.children?.find((era) => era.id === "cambrian")?.name).toBe("Cambrian");
+    expect(ROOT_ERA.children?.find((era) => era.id === "jurassic")?.name).toBe(
+      "Jurassic",
+    );
+    expect(ROOT_ERA.children?.find((era) => era.id === "cambrian")?.name).toBe(
+      "Cambrian",
+    );
     expect(quaternary?.timeLabel).toBe("2.58M years ago — present");
-    expect(quaternary?.sourceRefs?.[0]?.note).toContain("visible human-history eras");
+    expect(quaternary?.sourceRefs?.[0]?.note).toContain(
+      "visible human-history eras",
+    );
   });
 
   it("keeps cosmic phases directly under the root timeline", () => {
@@ -174,19 +190,21 @@ describe("era data", () => {
     const bronzeAge = ROOT_ERA.children?.find((era) => era.id === "bronze-age");
     const ironAge = ROOT_ERA.children?.find((era) => era.id === "iron-age");
 
-    expect(rootChildIds).toEqual(expect.arrayContaining([
-      "paleolithic",
-      "epipaleolithic",
-      "neolithic",
-      "chalcolithic",
-      "bronze-age",
-      "iron-age",
-      "classical-antiquity",
-      "post-classical-history",
-      "early-modern-period",
-      "age-of-industry-and-empire",
-      "contemporary-history",
-    ]));
+    expect(rootChildIds).toEqual(
+      expect.arrayContaining([
+        "paleolithic",
+        "epipaleolithic",
+        "neolithic",
+        "chalcolithic",
+        "bronze-age",
+        "iron-age",
+        "classical-antiquity",
+        "post-classical-history",
+        "early-modern-period",
+        "age-of-industry-and-empire",
+        "contemporary-history",
+      ]),
+    );
     expect(rootChildIds).not.toContain("human-history");
     expect(rootChildIds).not.toContain("prehistory");
     expect(rootChildIds).not.toContain("ancient-history");

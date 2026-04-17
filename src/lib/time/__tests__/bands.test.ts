@@ -90,7 +90,15 @@ describe("timeline tick generation", () => {
   });
 
   it("formats CE sub-year labels down to milliseconds", () => {
-    const titanicSinksAt = getTimelineYearFromUtcParts(1912, 3, 15, 2, 20, 0, 123);
+    const titanicSinksAt = getTimelineYearFromUtcParts(
+      1912,
+      3,
+      15,
+      2,
+      20,
+      0,
+      123,
+    );
 
     expect(formatTimelineDateLabel(titanicSinksAt, 1e-7)).toBe("02:20:00");
     expect(formatTimelineDateLabel(titanicSinksAt, 1e-12)).toMatch(
@@ -161,9 +169,7 @@ describe("timeline tick generation", () => {
   });
 
   it("formats elapsed sub-day labels with explicit named units", () => {
-    expect(
-      formatTimelineElapsedLabel(-54_321.500001),
-    ).toMatchObject({
+    expect(formatTimelineElapsedLabel(-54_321.500001)).toMatchObject({
       primaryText: "56,347 years and 288 days",
       secondaryText: expect.stringContaining("seconds"),
     });
@@ -210,9 +216,9 @@ describe("timeline tick generation", () => {
       "ago",
     );
 
-    expect(`${firstLabel.primaryText} ${firstLabel.secondaryText ?? ""}`).not.toBe(
-      `${secondLabel.primaryText} ${secondLabel.secondaryText ?? ""}`,
-    );
+    expect(
+      `${firstLabel.primaryText} ${firstLabel.secondaryText ?? ""}`,
+    ).not.toBe(`${secondLabel.primaryText} ${secondLabel.secondaryText ?? ""}`);
   });
 
   it("never prefixes Big Bang microsecond labels with zero years", () => {

@@ -28,7 +28,10 @@ describe("timeline child layers", () => {
     const viewport = getViewportForRange(-100, 100, innerWidth, 0);
     const era = makeEra("left-half", -200, 0);
 
-    expect(getVisibleEraFillRatio(era, viewport, width, pad)).toBeCloseTo(0.5, 1);
+    expect(getVisibleEraFillRatio(era, viewport, width, pad)).toBeCloseTo(
+      0.5,
+      1,
+    );
   });
 
   it("can resolve multiple sibling descendant layers at once", () => {
@@ -63,9 +66,9 @@ describe("timeline child layers", () => {
     const era = makeEra("focus", -100, 0);
     era.children = [makeEra("focus-child", -100, -50)];
 
-    expect(
-      getEraChildOpacity(era, "focus", viewport, width, pad, true),
-    ).toBe(1);
+    expect(getEraChildOpacity(era, "focus", viewport, width, pad, true)).toBe(
+      1,
+    );
   });
 
   it("uses hysteresis when deciding whether child eras stay expanded", () => {
@@ -75,8 +78,18 @@ describe("timeline child layers", () => {
     const era = makeEra("focus", -100, 0);
     era.children = [makeEra("focus-child", -100, -50)];
 
-    const barelyExpandedViewport = getViewportForRange(-150, 14.2857142857, innerWidth, 0);
-    const mostlyCollapsedViewport = getViewportForRange(-200, 200, innerWidth, 0);
+    const barelyExpandedViewport = getViewportForRange(
+      -150,
+      14.2857142857,
+      innerWidth,
+      0,
+    );
+    const mostlyCollapsedViewport = getViewportForRange(
+      -200,
+      200,
+      innerWidth,
+      0,
+    );
 
     expect(
       getEraChildOpacityTarget(
@@ -138,7 +151,9 @@ describe("timeline child layers", () => {
 
     expect(hiddenLayers.some((layer) => layer.era.id === "child")).toBe(false);
     expect(shownLayers.some((layer) => layer.era.id === "child")).toBe(true);
-    expect(shownLayers.some((layer) => layer.era.id === "grandchild")).toBe(true);
+    expect(shownLayers.some((layer) => layer.era.id === "grandchild")).toBe(
+      true,
+    );
   });
 
   it("resolves grandchildren when a child fills enough of the viewport", () => {
@@ -184,9 +199,10 @@ describe("timeline child layers", () => {
       false,
     );
 
-    expect(getPreviewFocusChain([geology, humanHistory], layers).map((era) => era.id)).toEqual([
-      "human-history",
-      "bronze-age",
-    ]);
+    expect(
+      getPreviewFocusChain([geology, humanHistory], layers).map(
+        (era) => era.id,
+      ),
+    ).toEqual(["human-history", "bronze-age"]);
   });
 });

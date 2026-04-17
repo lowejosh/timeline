@@ -1,11 +1,11 @@
 import { getVisibleRange, type TimelineViewport } from "../time/viewport";
+import { isTimelineDecorationVisibleAtZoom } from "../time/overlayTracks";
 import {
   TIMELINE_DECORATION_CATEGORY_IDS,
   TIMELINE_DECORATION_GROUPS,
 } from "./timelineDecorations";
 import type {
   TimelineDisplayConfig,
-  TimelineZoomVisibility,
 } from "./timelineTypes";
 
 export type TimelineSidebarEntryState = {
@@ -30,6 +30,15 @@ type TimelineSidebarResolvedEntry = TimelineSidebarEntryState & {
 };
 
 const SIDEBAR_ENTRY_DEFINITIONS = [
+  {
+    id: "human-evolution",
+    label: "Human Evolution",
+    sectionId: "overlays",
+    groupIds: TIMELINE_DECORATION_GROUPS.filter(
+      (group) =>
+        group.categoryId === TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution,
+    ).map((group) => group.id),
+  },
   {
     id: "civilizations",
     label: "Civilizations",
@@ -57,18 +66,6 @@ const SIDEBAR_SECTIONS = [
   { id: "markers", label: "Markers" },
 ] as const;
 
-function isVisibleAtZoom(item: TimelineZoomVisibility, zoom: number) {
-  if (item.minZoom !== undefined && zoom < item.minZoom) {
-    return false;
-  }
-
-  if (item.maxZoom !== undefined && zoom > item.maxZoom) {
-    return false;
-  }
-
-  return true;
-}
-
 export function resolveTimelineSidebarSections(
   display: TimelineDisplayConfig,
   viewport: TimelineViewport,
@@ -93,7 +90,7 @@ export function resolveTimelineSidebarSections(
   for (const marker of display.markers) {
     if (
       !marker.groupId ||
-      !isVisibleAtZoom(marker, viewport.zoom) ||
+      !isTimelineDecorationVisibleAtZoom(marker, viewport.zoom) ||
       marker.year < visibleStart ||
       marker.year > visibleEnd
     ) {
@@ -111,7 +108,7 @@ export function resolveTimelineSidebarSections(
   for (const overlay of display.overlays) {
     if (
       !overlay.groupId ||
-      !isVisibleAtZoom(overlay, viewport.zoom) ||
+      !isTimelineDecorationVisibleAtZoom(overlay, viewport.zoom) ||
       overlay.endYear < visibleStart ||
       overlay.startYear > visibleEnd
     ) {

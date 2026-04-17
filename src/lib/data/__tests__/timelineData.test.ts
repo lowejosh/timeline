@@ -38,14 +38,26 @@ describe("root timeline display data", () => {
 
     expect(
       TIMELINE_DISPLAY.markers.every(
-        (marker) => marker.groupId && groupIds.has(marker.groupId),
+        (marker) => !marker.groupId || groupIds.has(marker.groupId),
       ),
     ).toBe(true);
 
     expect(
       flattenOverlayBands(TIMELINE_DISPLAY.overlays).every(
-        (band) => band.groupId && groupIds.has(band.groupId),
+        (band) => !band.groupId || groupIds.has(band.groupId),
       ),
+    ).toBe(true);
+
+    expect(
+      TIMELINE_DISPLAY.markers
+        .filter((marker) => marker.year >= -12_000)
+        .every((marker) => marker.groupId === "human-history"),
+    ).toBe(true);
+
+    expect(
+      TIMELINE_DISPLAY.overlays
+        .filter((band) => band.startYear >= -3_500)
+        .every((band) => band.groupId === "civilizations"),
     ).toBe(true);
   });
 
@@ -68,8 +80,18 @@ describe("root timeline display data", () => {
       "end-triassic-mass-extinction",
       "archaeopteryx-first-known-bird",
       "k-pg-asteroid-impact",
+      "earliest-likely-bipedal-hominins-appear",
+      "early-bipedal-femur-evidence-in-kenya",
+      "earliest-stone-tools-associated-with-early-homo",
+      "genus-homo-emerges",
+      "early-humans-expand-beyond-africa",
+      "acheulean-handaxes-appear",
+      "hearths-and-fireplaces-appear-in-heidelbergensis-era",
+      "neanderthal-and-modern-human-lineages-diverge",
       "homo-sapiens-evolves-in-africa",
       "ground-ocher-markings-appear-in-africa",
+      "last-known-homo-floresiensis-survives-on-flores",
+      "last-neanderthals-disappear",
       "ubirr-rock-art-in-kakadu",
       "swabian-jura-bone-flutes",
       "chauvet-cave-figurative-art",
@@ -246,6 +268,27 @@ describe("root timeline display data", () => {
     expect(TIMELINE_DISPLAY.overlays.map((band) => band.id)).toEqual([
       "cambrian-explosion",
       "age-of-dinosaurs",
+      "sahelanthropus-tchadensis",
+      "orrorin-tugenensis",
+      "ardipithecus-kadabba",
+      "ardipithecus-ramidus",
+      "australopithecus-anamensis",
+      "australopithecus-afarensis",
+      "kenyanthropus-platyops",
+      "australopithecus-africanus",
+      "paranthropus-aethiopicus",
+      "australopithecus-garhi",
+      "homo-habilis",
+      "paranthropus-boisei",
+      "australopithecus-sediba",
+      "homo-rudolfensis",
+      "homo-erectus",
+      "paranthropus-robustus",
+      "homo-heidelbergensis",
+      "homo-neanderthalensis",
+      "homo-naledi",
+      "homo-sapiens",
+      "homo-floresiensis",
       "mesopotamia",
       "indus-valley-civilization",
       "ancient-egypt",
@@ -278,6 +321,12 @@ describe("root timeline display data", () => {
         (band, index, bands) =>
           index === 0 || bands[index - 1].startYear <= band.startYear,
       ),
+    ).toBe(true);
+
+    expect(
+      TIMELINE_DISPLAY.overlays
+        .filter((band) => band.startYear <= -100_000 && band.endYear <= -40_000)
+        .some((band) => band.id === "homo-neanderthalensis"),
     ).toBe(true);
 
     expect(

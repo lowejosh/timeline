@@ -10,13 +10,13 @@ describe("timeline sidebar selectors", () => {
           id: "neolithic-marker",
           label: "Neolithic marker",
           year: -9000,
-          groupId: "neolithic",
+          groupId: "human-history",
         },
         {
           id: "post-classical-marker",
           label: "Post-classical marker",
           year: 1200,
-          groupId: "post-classical-history",
+          groupId: "human-history",
         },
       ],
       overlays: [
@@ -26,7 +26,7 @@ describe("timeline sidebar selectors", () => {
           startYear: -500,
           endYear: 200,
           color: "rgba(0, 0, 0, 0.1)",
-          groupId: "ancient-civilizations",
+          groupId: "civilizations",
         },
       ],
     };
@@ -39,7 +39,7 @@ describe("timeline sidebar selectors", () => {
       },
       1000,
       120,
-      new Set(["post-classical-history"]),
+      new Set(["human-history"]),
     );
 
     expect(sections.map((section) => section.label)).toEqual(["Markers"]);
@@ -48,8 +48,8 @@ describe("timeline sidebar selectors", () => {
     ]);
     expect(sections[0].entries[0]).toMatchObject({
       label: "Human History",
-      enabled: false,
-      mixed: true,
+      enabled: true,
+      mixed: false,
       markerCount: 1,
       overlayCount: 0,
       relevantItemCount: 1,
@@ -66,7 +66,7 @@ describe("timeline sidebar selectors", () => {
           startYear: 800,
           endYear: 1400,
           color: "rgba(0, 0, 0, 0.1)",
-          groupId: "post-classical-early-modern",
+          groupId: "civilizations",
         },
       ],
     };
@@ -89,6 +89,55 @@ describe("timeline sidebar selectors", () => {
       mixed: false,
       overlayCount: 1,
       relevantItemCount: 1,
+    });
+  });
+
+  it("surfaces the human evolution layer in overlays and counts both markers and overlays", () => {
+    const display: TimelineDisplayConfig = {
+      markers: [
+        {
+          id: "early-biped-marker",
+          label: "Early biped marker",
+          year: -7_000_000,
+          minZoom: 10,
+          priority: 92,
+          groupId: "human-evolution",
+        },
+      ],
+      overlays: [
+        {
+          id: "sahelanthropus",
+          label: "Sahelanthropus",
+          startYear: -7_000_000,
+          endYear: -6_000_000,
+          minZoom: 8,
+          priority: 95,
+          color: "rgba(0, 0, 0, 0.1)",
+          groupId: "human-evolution",
+        },
+      ],
+    };
+
+    const sections = resolveTimelineSidebarSections(
+      display,
+      {
+        centerYear: -6_500_000,
+        zoom: 6,
+      },
+      1000,
+      120,
+      new Set(["human-evolution"]),
+    );
+
+    expect(sections.map((section) => section.label)).toEqual(["Overlays"]);
+    expect(sections[0].entries[0]).toMatchObject({
+      id: "human-evolution",
+      label: "Human Evolution",
+      enabled: true,
+      mixed: false,
+      markerCount: 1,
+      overlayCount: 1,
+      relevantItemCount: 2,
     });
   });
 });

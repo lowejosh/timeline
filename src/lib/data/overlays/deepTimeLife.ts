@@ -1,7 +1,5 @@
 import type { TimelineOverlayBand } from "../timelineTypes";
 
-const DEEP_TIME_LIFE_GROUP_ID = "deep-time-life";
-
 export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
   {
     id: "cambrian-explosion",
@@ -14,7 +12,6 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(82, 136, 138)",
     minZoom: 0,
     priority: 86,
-    groupId: DEEP_TIME_LIFE_GROUP_ID,
     sourceRefs: [
       {
         sourceId: "berkeleyCambrianExplosion",
@@ -33,7 +30,6 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(136, 104, 76)",
     minZoom: 0,
     priority: 88,
-    groupId: DEEP_TIME_LIFE_GROUP_ID,
     sourceRefs: [
       {
         sourceId: "ucmpMesozoicLife",

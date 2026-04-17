@@ -231,6 +231,226 @@ export const ERA_SOURCES = {
     notes:
       "Used for the direct public-facing Smithsonian statement that Homo sapiens evolved in Africa about 300,000 years ago.",
   },
+  smithsonianHumanEvolutionIntro: {
+    shortTitle: "Smithsonian: Human evolution intro",
+    title: "Introduction to Human Evolution",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Introduction to Human Evolution."',
+    url: "https://humanorigins.si.edu/education/introduction-human-evolution",
+    notes:
+      "Used for broad public-facing timing on early bipedalism, early human dispersal, and the overall six-million-year arc of human evolution.",
+  },
+  smithsonianHumanFamilyTree: {
+    shortTitle: "Smithsonian: Family tree",
+    title: "Human Family Tree",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Human Family Tree."',
+    url: "https://humanorigins.si.edu/evidence/human-family-tree",
+    notes:
+      "Used for the broad branching structure of the human family tree and the main public-facing lineup of ancestor and cousin species.",
+  },
+  smithsonianSahelanthropus: {
+    shortTitle: "Smithsonian: Sahelanthropus",
+    title: "Sahelanthropus tchadensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Sahelanthropus tchadensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/sahelanthropus-tchadensis",
+    notes:
+      "Used for Sahelanthropus as one of the oldest known hominins, living between about 7 and 6 million years ago, with early evidence linked to upright posture.",
+  },
+  smithsonianOrrorin: {
+    shortTitle: "Smithsonian: Orrorin",
+    title: "Orrorin tugenensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Orrorin tugenensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/orrorin-tugenensis",
+    notes:
+      "Used for Orrorin's 6.2 to 5.8 million-year range and for femoral evidence tied to early bipedal walking.",
+  },
+  smithsonianArdipithecusRamidus: {
+    shortTitle: "Smithsonian: Ardipithecus ramidus",
+    title: "Ardipithecus ramidus",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Ardipithecus ramidus."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/ardipithecus-ramidus",
+    notes:
+      "Used for Ardipithecus ramidus as a woodland hominin around 4.4 million years ago combining climbing traits with evidence for bipedal movement.",
+  },
+  smithsonianAustralopithecusAnamensis: {
+    shortTitle: "Smithsonian: Au. anamensis",
+    title: "Australopithecus anamensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Australopithecus anamensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-anamensis",
+    notes:
+      "Used for Australopithecus anamensis as an early upright-walking australopith living about 4.2 to 3.8 million years ago.",
+  },
+  smithsonianAustralopithecusAfarensis: {
+    shortTitle: "Smithsonian: Au. afarensis",
+    title: "Australopithecus afarensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Australopithecus afarensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-afarensis",
+    notes:
+      "Used for Lucy's species, its 3.85 to 2.95 million-year span, and its close association with habitual upright walking.",
+  },
+  smithsonianHomoHabilis: {
+    shortTitle: "Smithsonian: Homo habilis",
+    title: "Homo habilis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo habilis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-habilis",
+    notes:
+      "Used for Homo habilis as an early Homo species living 2.4 to 1.4 million years ago and for public-facing statements on early stone tools and butchery.",
+  },
+  smithsonianHomoErectus: {
+    shortTitle: "Smithsonian: Homo erectus",
+    title: "Homo erectus",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo erectus."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-erectus",
+    notes:
+      "Used for Homo erectus as the first major human disperser beyond Africa and for the 1.89 million to 110,000 year timeframe in Smithsonian's public chronology.",
+  },
+  smithsonianHomoHeidelbergensis: {
+    shortTitle: "Smithsonian: Homo heidelbergensis",
+    title: "Homo heidelbergensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo heidelbergensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-heidelbergensis",
+    notes:
+      "Used for Homo heidelbergensis as a likely common stock behind Neanderthals and Homo sapiens, and for evidence of hearths, spears, and shelters in its timeframe.",
+  },
+  smithsonianHomoNeanderthalensis: {
+    shortTitle: "Smithsonian: Neanderthals",
+    title: "Homo neanderthalensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo neanderthalensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-neanderthalensis",
+    notes:
+      "Used for Neanderthals as our closest extinct relatives, their 400,000 to 40,000 year span, and their overlap with Homo sapiens.",
+  },
+  smithsonianHomoFloresiensis: {
+    shortTitle: "Smithsonian: Homo floresiensis",
+    title: "Homo floresiensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo floresiensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-floresiensis",
+    notes:
+      "Used for the late-surviving Flores lineage, summarized by Smithsonian as living about 100,000 to 50,000 years ago.",
+  },
+  smithsonianHomoNaledi: {
+    shortTitle: "Smithsonian: Homo naledi",
+    title: "Homo naledi",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo naledi."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-naledi",
+    notes:
+      "Used for Homo naledi's 335,000 to 236,000 year range and for Smithsonian's explicit statement that its placement in the Homo tree remains unresolved.",
+  },
+  smithsonianParanthropusBoisei: {
+    shortTitle: "Smithsonian: P. boisei",
+    title: "Paranthropus boisei",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Paranthropus boisei."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/paranthropus-boisei",
+    notes:
+      "Used for Paranthropus boisei as a long-lived side branch that coexisted with early Homo in eastern Africa.",
+  },
+  smithsonianArdipithecusKadabba: {
+    shortTitle: "Smithsonian: Ardipithecus kadabba",
+    title: "Ardipithecus kadabba",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Ardipithecus kadabba."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/ardipithecus-kadabba",
+    notes:
+      "Used for Ardipithecus kadabba as an early bipedal hominin from Ethiopia living between about 5.8 and 5.2 million years ago.",
+  },
+  smithsonianAustralopithecusAfricanus: {
+    shortTitle: "Smithsonian: Au. africanus",
+    title: "Australopithecus africanus",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Australopithecus africanus."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-africanus",
+    notes:
+      "Used for Australopithecus africanus as a southern African biped living about 3.3 to 2.1 million years ago and as a possible candidate for ancestry within the Homo line.",
+  },
+  smithsonianAustralopithecusGarhi: {
+    shortTitle: "Smithsonian: Au. garhi",
+    title: "Australopithecus garhi",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Australopithecus garhi."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-garhi",
+    notes:
+      "Used for Australopithecus garhi as a poorly documented but potentially important 2.5 million-year-old Ethiopian taxon near the transition toward Homo.",
+  },
+  smithsonianAustralopithecusSediba: {
+    shortTitle: "Smithsonian: Au. sediba",
+    title: "Australopithecus sediba",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Australopithecus sediba."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-sediba",
+    notes:
+      "Used for Australopithecus sediba as a very late australopith with a debated relationship to Homo, dated between 1.977 and 1.98 million years ago.",
+  },
+  smithsonianKenyanthropusPlatyops: {
+    shortTitle: "Smithsonian: Kenyanthropus",
+    title: "Kenyanthropus platyops",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Kenyanthropus platyops."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/kenyanthropus-platyops",
+    notes:
+      "Used for Kenyanthropus platyops as a debated flat-faced 3.5 million-year-old East African branch.",
+  },
+  smithsonianHomoRudolfensis: {
+    shortTitle: "Smithsonian: H. rudolfensis",
+    title: "Homo rudolfensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo rudolfensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-rudolfensis",
+    notes:
+      "Used for Homo rudolfensis as a debated early Homo lineage living about 1.9 to 1.8 million years ago in eastern Africa.",
+  },
+  smithsonianParanthropusAethiopicus: {
+    shortTitle: "Smithsonian: P. aethiopicus",
+    title: "Paranthropus aethiopicus",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Paranthropus aethiopicus."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/paranthropus-aethiopicus",
+    notes:
+      "Used for Paranthropus aethiopicus as the earliest widely recognized robust australopith, living about 2.7 to 2.3 million years ago.",
+  },
+  smithsonianParanthropusRobustus: {
+    shortTitle: "Smithsonian: P. robustus",
+    title: "Paranthropus robustus",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Paranthropus robustus."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/paranthropus-robustus",
+    notes:
+      "Used for Paranthropus robustus as a southern African robust cousin lineage living about 1.8 to 1.2 million years ago.",
+  },
   khanPaleolithicCulture: {
     shortTitle: "Khan: Paleolithic culture",
     title: "Paleolithic technology, culture, and art",

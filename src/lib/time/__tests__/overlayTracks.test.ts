@@ -83,6 +83,38 @@ describe("timeline overlay tracks", () => {
     ).toEqual(["enabled-marker"]);
   });
 
+  it("keeps higher-priority markers visible below their nominal min zoom", () => {
+    const width = 1000;
+    const pad = 100;
+    const markers: TimelineMarker[] = [
+      {
+        id: "high-priority",
+        label: "High priority marker",
+        year: -4_560_000_000,
+        minZoom: 10,
+        priority: 92,
+      },
+      {
+        id: "low-priority",
+        label: "Low priority marker",
+        year: -4_550_000_000,
+        minZoom: 10,
+        priority: 72,
+      },
+    ];
+
+    const viewport = {
+      centerYear: -4_555_000_000,
+      zoom: 7,
+    };
+
+    expect(
+      getVisibleTimelineMarkers(markers, viewport, width, pad).map(
+        (marker) => marker.id,
+      ),
+    ).toEqual(["high-priority"]);
+  });
+
   it("packs overlapping overlays into separate lanes and reuses free lanes", () => {
     const width = 1000;
     const pad = 100;
@@ -166,6 +198,47 @@ describe("timeline overlay tracks", () => {
     expect(resolved.map((band) => band.band.id)).toEqual(["enabled-overlay"]);
     expect(resolved[0].laneIndex).toBe(0);
     expect(resolved[0].laneCount).toBe(1);
+  });
+
+  it("keeps higher-priority overlays visible below their nominal min zoom", () => {
+    const width = 1000;
+    const pad = 100;
+    const overlays: TimelineOverlayBand[] = [
+      {
+        id: "high-priority-overlay",
+        label: "High priority overlay",
+        startYear: -7_000_000,
+        endYear: -6_000_000,
+        minZoom: 8,
+        priority: 95,
+        color: "rgba(0, 0, 0, 0.1)",
+      },
+      {
+        id: "low-priority-overlay",
+        label: "Low priority overlay",
+        startYear: -6_200_000,
+        endYear: -5_800_000,
+        minZoom: 8,
+        priority: 72,
+        color: "rgba(0, 0, 0, 0.1)",
+      },
+    ];
+
+    const viewport = {
+      centerYear: -6_400_000,
+      zoom: 7,
+    };
+
+    const resolved = resolveTimelineOverlayTracks(
+      overlays,
+      viewport,
+      width,
+      pad,
+    );
+
+    expect(resolved.map((band) => band.band.id)).toEqual([
+      "high-priority-overlay",
+    ]);
   });
 
   it("keeps lane count stable even when only a subset is visible", () => {

@@ -40,13 +40,15 @@ describe("exact timeline timestamps", () => {
     expect(formatTimelineExactTimestamp(timestamp)).toBe(
       "Mar 15, 44 BCE, 12:00 UTC",
     );
-    expect(getTimelineYearFromExactTimestamp(
-      createExactCalendarTimestamp({
-        era: "bce",
-        year: 1,
-        precision: "year",
-      }),
-    )).toBeCloseTo(-1, 9);
+    expect(
+      getTimelineYearFromExactTimestamp(
+        createExactCalendarTimestamp({
+          era: "bce",
+          year: 1,
+          precision: "year",
+        }),
+      ),
+    ).toBeCloseTo(-1, 9);
   });
 
   it("formats elapsed timestamps with explicit named units", () => {

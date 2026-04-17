@@ -5,6 +5,7 @@ import {
   CORE_TIMELINE_MARKERS,
   DEEP_TIME_LIFE_MARKERS,
   EPIPALEOLITHIC_MARKERS,
+  HUMAN_EVOLUTION_MARKERS,
   HISTORICAL_TURNING_POINT_MARKERS,
   NEOLITHIC_MARKERS,
   PALEOLITHIC_MARKERS,
@@ -13,6 +14,7 @@ import {
 import {
   ANCIENT_CIVILIZATION_OVERLAYS,
   DEEP_TIME_LIFE_OVERLAYS,
+  HUMAN_EVOLUTION_OVERLAYS,
   POST_CLASSICAL_EARLY_MODERN_OVERLAYS,
 } from "./overlays";
 import type {
@@ -23,192 +25,110 @@ import type {
   TimelineOverlayBand,
 } from "./timelineTypes";
 
-const PLANET_AND_LIFE_CATEGORY_ID = "planet-and-life";
 const HUMAN_HISTORY_CATEGORY_ID = "human-history";
+const HUMAN_EVOLUTION_CATEGORY_ID = "human-evolution";
 const CIVILIZATIONS_CATEGORY_ID = "civilizations";
 
 export const TIMELINE_DECORATION_CATEGORY_IDS = {
-  planetAndLife: PLANET_AND_LIFE_CATEGORY_ID,
   humanHistory: HUMAN_HISTORY_CATEGORY_ID,
+  humanEvolution: HUMAN_EVOLUTION_CATEGORY_ID,
   civilizations: CIVILIZATIONS_CATEGORY_ID,
 } as const;
 
-const PLANETARY_FOUNDATIONS_GROUP_ID = "planetary-foundations";
-const DEEP_TIME_LIFE_GROUP_ID = "deep-time-life";
-const PALEOLITHIC_GROUP_ID = "paleolithic";
-const EPIPALEOLITHIC_GROUP_ID = "epipaleolithic";
-const NEOLITHIC_GROUP_ID = "neolithic";
-const CHALCOLITHIC_GROUP_ID = "chalcolithic";
-const BRONZE_AGE_GROUP_ID = "bronze-age";
-const CLASSICAL_ANTIQUITY_GROUP_ID = "classical-antiquity";
-const POST_CLASSICAL_HISTORY_GROUP_ID = "post-classical-history";
-const HISTORICAL_TURNING_POINTS_GROUP_ID = "historical-turning-points";
-const ANCIENT_CIVILIZATIONS_GROUP_ID = "ancient-civilizations";
-const POST_CLASSICAL_EARLY_MODERN_GROUP_ID = "post-classical-early-modern";
+const HUMAN_HISTORY_GROUP_ID = HUMAN_HISTORY_CATEGORY_ID;
+const HUMAN_EVOLUTION_GROUP_ID = HUMAN_EVOLUTION_CATEGORY_ID;
+const CIVILIZATIONS_GROUP_ID = CIVILIZATIONS_CATEGORY_ID;
 
 export const TIMELINE_DECORATION_CATEGORIES: TimelineDecorationCategory[] = [
   {
-    id: PLANET_AND_LIFE_CATEGORY_ID,
-    label: "Planet & Life",
-    description: "Foundational deep-time layers, thresholds, and life signals.",
+    id: HUMAN_HISTORY_CATEGORY_ID,
+    label: "Human History",
+    description: "All toggleable human-history marker collections.",
     order: 0,
   },
   {
-    id: HUMAN_HISTORY_CATEGORY_ID,
-    label: "Human History",
-    description: "Archaeological and historical marker sets across human time.",
+    id: HUMAN_EVOLUTION_CATEGORY_ID,
+    label: "Human Evolution",
+    description: "Toggleable hominin overlays and milestone markers.",
     order: 1,
   },
   {
     id: CIVILIZATIONS_CATEGORY_ID,
     label: "Civilizations",
-    description: "Long-running civilization overlays and state-scale bands.",
+    description: "All toggleable civilization overlay bands.",
     order: 2,
   },
 ];
 
 export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
   {
-    id: PLANETARY_FOUNDATIONS_GROUP_ID,
-    categoryId: PLANET_AND_LIFE_CATEGORY_ID,
-    label: "Planetary Foundations",
-    description: "Solar System, Earth, and earliest planetary thresholds.",
+    id: HUMAN_HISTORY_GROUP_ID,
+    categoryId: HUMAN_HISTORY_CATEGORY_ID,
+    label: "Human History",
+    description: "Archaeological and historical markers across human time.",
     contentType: "markers",
     order: 0,
   },
   {
-    id: DEEP_TIME_LIFE_GROUP_ID,
-    categoryId: PLANET_AND_LIFE_CATEGORY_ID,
-    label: "Deep Time Life",
-    description:
-      "Life milestones, extinction shocks, and broad biosphere overlays.",
+    id: HUMAN_EVOLUTION_GROUP_ID,
+    categoryId: HUMAN_EVOLUTION_CATEGORY_ID,
+    label: "Human Evolution",
+    description: "Branching hominin overlays and major evolutionary markers.",
     contentType: "mixed",
-    order: 1,
-  },
-  {
-    id: PALEOLITHIC_GROUP_ID,
-    categoryId: HUMAN_HISTORY_CATEGORY_ID,
-    label: "Paleolithic",
-    description:
-      "Early Homo sapiens, symbolic expression, and Upper Paleolithic culture.",
-    contentType: "markers",
     order: 0,
   },
   {
-    id: EPIPALEOLITHIC_GROUP_ID,
-    categoryId: HUMAN_HISTORY_CATEGORY_ID,
-    label: "Epipaleolithic",
-    description: "Settled foragers and late hunter-gatherer transitions.",
-    contentType: "markers",
-    order: 1,
-  },
-  {
-    id: NEOLITHIC_GROUP_ID,
-    categoryId: HUMAN_HISTORY_CATEGORY_ID,
-    label: "Neolithic",
-    description: "Farming villages, monuments, and early settled life.",
-    contentType: "markers",
-    order: 2,
-  },
-  {
-    id: CHALCOLITHIC_GROUP_ID,
-    categoryId: HUMAN_HISTORY_CATEGORY_ID,
-    label: "Chalcolithic",
-    description: "Copper Age experiments, irrigation, and urban thresholds.",
-    contentType: "markers",
-    order: 3,
-  },
-  {
-    id: BRONZE_AGE_GROUP_ID,
-    categoryId: HUMAN_HISTORY_CATEGORY_ID,
-    label: "Bronze Age",
-    description: "States, writing, and Bronze Age upheavals.",
-    contentType: "markers",
-    order: 4,
-  },
-  {
-    id: CLASSICAL_ANTIQUITY_GROUP_ID,
-    categoryId: HUMAN_HISTORY_CATEGORY_ID,
-    label: "Classical Antiquity",
-    description: "Mediterranean turning points from Alexander to Rome.",
-    contentType: "markers",
-    order: 5,
-  },
-  {
-    id: POST_CLASSICAL_HISTORY_GROUP_ID,
-    categoryId: HUMAN_HISTORY_CATEGORY_ID,
-    label: "Post-classical Milestones",
-    description: "Major markers from late antiquity into the modern world.",
-    contentType: "markers",
-    order: 6,
-  },
-  {
-    id: HISTORICAL_TURNING_POINTS_GROUP_ID,
-    categoryId: HUMAN_HISTORY_CATEGORY_ID,
-    label: "Turning Points",
-    description: "Cross-civilizational threshold events and global shocks.",
-    contentType: "markers",
-    order: 7,
-  },
-  {
-    id: ANCIENT_CIVILIZATIONS_GROUP_ID,
+    id: CIVILIZATIONS_GROUP_ID,
     categoryId: CIVILIZATIONS_CATEGORY_ID,
-    label: "Ancient Civilizations",
-    description:
-      "Ancient Nile, Near Eastern, Mediterranean, and Asian overlays.",
+    label: "Civilizations",
+    description: "Ancient through early-modern civilization overlays.",
     contentType: "overlays",
     order: 0,
-  },
-  {
-    id: POST_CLASSICAL_EARLY_MODERN_GROUP_ID,
-    categoryId: CIVILIZATIONS_CATEGORY_ID,
-    label: "Post-classical & Early Modern",
-    description: "Imperial and dynastic overlays after late antiquity.",
-    contentType: "overlays",
-    order: 1,
   },
 ];
 
 type TimelineMarkerCollection = {
-  groupId: string;
+  groupId?: string;
   items: TimelineMarker[];
 };
 
 type TimelineOverlayCollection = {
-  groupId: string;
+  groupId?: string;
   items: TimelineOverlayBand[];
 };
 
 const TIMELINE_MARKER_COLLECTIONS: TimelineMarkerCollection[] = [
-  { groupId: PLANETARY_FOUNDATIONS_GROUP_ID, items: CORE_TIMELINE_MARKERS },
-  { groupId: DEEP_TIME_LIFE_GROUP_ID, items: DEEP_TIME_LIFE_MARKERS },
-  { groupId: PALEOLITHIC_GROUP_ID, items: PALEOLITHIC_MARKERS },
-  { groupId: EPIPALEOLITHIC_GROUP_ID, items: EPIPALEOLITHIC_MARKERS },
-  { groupId: NEOLITHIC_GROUP_ID, items: NEOLITHIC_MARKERS },
-  { groupId: CHALCOLITHIC_GROUP_ID, items: CHALCOLITHIC_MARKERS },
-  { groupId: BRONZE_AGE_GROUP_ID, items: BRONZE_AGE_MARKERS },
+  { items: CORE_TIMELINE_MARKERS },
+  { items: DEEP_TIME_LIFE_MARKERS },
+  { groupId: HUMAN_EVOLUTION_GROUP_ID, items: HUMAN_EVOLUTION_MARKERS },
+  { groupId: HUMAN_HISTORY_GROUP_ID, items: PALEOLITHIC_MARKERS },
+  { groupId: HUMAN_HISTORY_GROUP_ID, items: EPIPALEOLITHIC_MARKERS },
+  { groupId: HUMAN_HISTORY_GROUP_ID, items: NEOLITHIC_MARKERS },
+  { groupId: HUMAN_HISTORY_GROUP_ID, items: CHALCOLITHIC_MARKERS },
+  { groupId: HUMAN_HISTORY_GROUP_ID, items: BRONZE_AGE_MARKERS },
   {
-    groupId: HISTORICAL_TURNING_POINTS_GROUP_ID,
+    groupId: HUMAN_HISTORY_GROUP_ID,
     items: HISTORICAL_TURNING_POINT_MARKERS,
   },
   {
-    groupId: CLASSICAL_ANTIQUITY_GROUP_ID,
+    groupId: HUMAN_HISTORY_GROUP_ID,
     items: CLASSICAL_ANTIQUITY_MARKERS,
   },
   {
-    groupId: POST_CLASSICAL_HISTORY_GROUP_ID,
+    groupId: HUMAN_HISTORY_GROUP_ID,
     items: POST_CLASSICAL_MARKERS,
   },
 ];
 
 const TIMELINE_OVERLAY_COLLECTIONS: TimelineOverlayCollection[] = [
-  { groupId: DEEP_TIME_LIFE_GROUP_ID, items: DEEP_TIME_LIFE_OVERLAYS },
+  { items: DEEP_TIME_LIFE_OVERLAYS },
+  { groupId: HUMAN_EVOLUTION_GROUP_ID, items: HUMAN_EVOLUTION_OVERLAYS },
   {
-    groupId: ANCIENT_CIVILIZATIONS_GROUP_ID,
+    groupId: CIVILIZATIONS_GROUP_ID,
     items: ANCIENT_CIVILIZATION_OVERLAYS,
   },
   {
-    groupId: POST_CLASSICAL_EARLY_MODERN_GROUP_ID,
+    groupId: CIVILIZATIONS_GROUP_ID,
     items: POST_CLASSICAL_EARLY_MODERN_OVERLAYS,
   },
 ];
@@ -230,7 +150,7 @@ function sortOverlays(left: TimelineOverlayBand, right: TimelineOverlayBand) {
   );
 }
 
-function assignMarkerGroupId(markers: TimelineMarker[], groupId: string) {
+function assignMarkerGroupId(markers: TimelineMarker[], groupId?: string) {
   return markers.map((marker) => ({
     ...marker,
     groupId,
@@ -239,13 +159,13 @@ function assignMarkerGroupId(markers: TimelineMarker[], groupId: string) {
 
 function assignOverlayGroupId(
   overlays: TimelineOverlayBand[],
-  groupId: string,
+  groupId?: string,
 ): TimelineOverlayBand[] {
   return overlays.map((overlay) => ({
     ...overlay,
-    groupId: overlay.groupId ?? groupId,
+    groupId,
     children: overlay.children
-      ? assignOverlayGroupId(overlay.children, overlay.groupId ?? groupId)
+      ? assignOverlayGroupId(overlay.children, groupId)
       : undefined,
   }));
 }
