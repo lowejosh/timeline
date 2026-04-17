@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { getTimelineYearFromUtcParts } from "./bands";
+import { getTimelineYearFromUtcParts } from "../bands";
 import {
   createExactCalendarTimestamp,
   createExactElapsedTimestamp,
   formatTimelineExactTimestamp,
   getTimelineYearFromExactTimestamp,
-} from "./exactTimestamp";
+} from "../exactTimestamp";
 
 describe("exact timeline timestamps", () => {
   it("formats CE calendar timestamps with microsecond precision", () => {

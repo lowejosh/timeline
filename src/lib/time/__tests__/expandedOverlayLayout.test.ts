@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getExpandedOverlayPanelBounds,
   resolveExpandedOverlayLayout,
-} from "./expandedOverlayLayout";
+} from "../expandedOverlayLayout";
 
 describe("expanded overlay layout", () => {
   it("globally repacks visible overlays into the lowest valid positions", () => {

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { TimelineMarker } from "../data/timelineTypes";
+import type { TimelineMarker } from "../../data/timelineTypes";
 import {
   resolveMarkerRenderStates,
   type ResolveMarkerRenderOptions,
   type MarkerTextMeasurer,
   type VisibleMarkerPosition,
-} from "./markerGlyphs";
+} from "../markerGlyphs";
 
 const WIDTH = 1000;
 const PAD = 100;

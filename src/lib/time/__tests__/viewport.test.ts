@@ -18,13 +18,13 @@ import {
   TIMELINE_MIN_YEAR,
   worldToScreen,
   zoomAtPosition,
-} from "./viewport";
+} from "../viewport";
 import {
   getLogarithmicAxisRangeFactor,
   getLogarithmicScreenDeltaFromYearsDelta,
   getLogarithmicYearsDeltaFromScreenDelta,
   resolveLogarithmicAxisGeometry,
-} from "./logarithmicAxis";
+} from "../logarithmicAxis";
 
 const FLOAT_EPSILON = 1e-9;
 

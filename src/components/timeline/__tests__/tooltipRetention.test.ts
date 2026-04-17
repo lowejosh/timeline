@@ -3,7 +3,7 @@ import {
   shouldRetainTooltipAtPoint,
   type TooltipRect,
   type TooltipRetentionAnchor,
-} from "./tooltipRetention";
+} from "../tooltipRetention";
 
 const SHELL_RECT: TooltipRect = {
   left: 0,

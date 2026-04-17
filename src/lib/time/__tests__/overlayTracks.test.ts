@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { ANCIENT_CIVILIZATION_OVERLAYS } from "../data/overlays/ancientCivilizations";
-import { POST_CLASSICAL_EARLY_MODERN_OVERLAYS } from "../data/overlays/postClassicalEarlyModern";
+import { ANCIENT_CIVILIZATION_OVERLAYS } from "../../data/overlays/ancientCivilizations";
+import { POST_CLASSICAL_EARLY_MODERN_OVERLAYS } from "../../data/overlays/postClassicalEarlyModern";
 import type {
   TimelineMarker,
   TimelineOverlayBand,
-} from "../data/timelineTypes";
+} from "../../data/timelineTypes";
 import {
   getVisibleTimelineMarkers,
   resolveTimelineOverlayTracks,
-} from "./overlayTracks";
+} from "../overlayTracks";
 
 describe("timeline overlay tracks", () => {
   it("filters markers by zoom visibility and viewport range", () => {

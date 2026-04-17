@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   resolveOverlayLabelHoverBounds,
   resolveTextHoverBounds,
-} from "./overlayLabelHover";
+} from "../overlayLabelHover";
 
 describe("text hover bounds", () => {
   it("wraps a freestanding label with a small grace area", () => {

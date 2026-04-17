@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { syncAnimatedEraChildState } from "./eraChildAnimation";
+import { syncAnimatedEraChildState } from "../eraChildAnimation";
 
 describe("era child animation state", () => {
   it("starts newly visible descendant eras from zero so they can fade in immediately", () => {

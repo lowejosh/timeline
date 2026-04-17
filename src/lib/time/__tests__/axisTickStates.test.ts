@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { resolveAxisTickRenderStates } from "./axisTickStates";
-import { splitTimelineYear, TIMELINE_MIN_YEAR } from "./viewport";
+import { resolveAxisTickRenderStates } from "../axisTickStates";
+import { splitTimelineYear, TIMELINE_MIN_YEAR } from "../viewport";
 
 const DAY_IN_MS = 86_400_000;
 

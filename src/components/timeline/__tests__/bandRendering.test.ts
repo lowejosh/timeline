@@ -7,7 +7,7 @@ import {
   resolveOverlayLabelPaint,
   stepAnimatedContextBandLabelState,
   syncAnimatedContextBandLabelState,
-} from "./bandRendering";
+} from "../bandRendering";
 
 describe("band rendering helpers", () => {
   it("switches medium-dark overlay bands to light text more aggressively", () => {

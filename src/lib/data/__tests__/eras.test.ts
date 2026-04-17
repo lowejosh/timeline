@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ERA_SOURCES } from "./eraSources";
-import { ROOT_ERA, getSeededEraColor, type Era } from "./eras";
+import { ERA_SOURCES } from "../eraSources";
+import { ROOT_ERA, getSeededEraColor, type Era } from "../eras";
 
 function walkEraTree(era: Era, visit: (era: Era, parent?: Era) => void, parent?: Era) {
   visit(era, parent);

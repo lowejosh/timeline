@@ -3,9 +3,9 @@ import {
   getEraTooltipContent,
   getMarkerTooltipContent,
   getOverlayTooltipContent,
-} from "./timelineTooltip";
-import { createExactCalendarTimestamp } from "../time/exactTimestamp";
-import type { Era, TimelineMarker, TimelineOverlayBand } from "./timelineTypes";
+} from "../timelineTooltip";
+import { createExactCalendarTimestamp } from "../../time/exactTimestamp";
+import type { Era, TimelineMarker, TimelineOverlayBand } from "../timelineTypes";
 
 describe("timeline tooltip content", () => {
   it("deduplicates sources and omits source-ref notes from marker tooltips", () => {

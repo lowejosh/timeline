@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getAllowedAxisLabelSteps,
   getPrimaryAxisLabelStepFromResolvedLabels,
-} from "./axisLabelSelection";
+} from "../axisLabelSelection";
 
 describe("axis label selection hysteresis", () => {
   it("keeps the preferred readable sub-year step while a finer step only wins narrowly", () => {

@@ -10,12 +10,12 @@ import {
   formatTimelineYear,
   getTimelineYearFromUtcParts,
   getTimelineTicks,
-} from "./bands";
+} from "../bands";
 import {
   createExactCalendarTimestamp,
   getTimelineYearFromExactTimestamp,
-} from "./exactTimestamp";
-import { TIMELINE_MIN_YEAR } from "./viewport";
+} from "../exactTimestamp";
+import { TIMELINE_MIN_YEAR } from "../viewport";
 
 describe("timeline tick generation", () => {
   it("creates a manageable number of ticks across a cosmic range", () => {

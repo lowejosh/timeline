@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { ERA_SOURCES } from "./eraSources";
-import { ROOT_ERA, ROOT_TIMELINE, TIMELINE_DISPLAY } from "./eras";
+import { ERA_SOURCES } from "../eraSources";
+import { ROOT_ERA, ROOT_TIMELINE, TIMELINE_DISPLAY } from "../eras";
 import {
   TIMELINE_DECORATION_CATEGORIES,
   TIMELINE_DECORATION_GROUPS,
-} from "./timelineDecorations";
-import type { TimelineOverlayBand } from "./timelineTypes";
+} from "../timelineDecorations";
+import type { TimelineOverlayBand } from "../timelineTypes";
 
 function flattenOverlayBands(
   bands: TimelineOverlayBand[],

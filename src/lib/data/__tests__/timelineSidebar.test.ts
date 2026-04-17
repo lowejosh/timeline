@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { resolveTimelineSidebarSections } from "./timelineSidebar";
-import type { TimelineDisplayConfig } from "./timelineTypes";
+import { resolveTimelineSidebarSections } from "../timelineSidebar";
+import type { TimelineDisplayConfig } from "../timelineTypes";
 
 describe("timeline sidebar selectors", () => {
   it("returns only context-relevant flat sections for the current viewport", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Era } from "../data/eras";
+import type { Era } from "../../data/eras";
 import {
   getEraChildOpacity,
   getEraChildOpacityTarget,
@@ -7,8 +7,8 @@ import {
   getVisibleEraFillRatio,
   resolveTimelineEraLayers,
   resolveTimelineEraLayersFromOpacityMap,
-} from "./childLayers";
-import { getViewportForRange } from "./viewport";
+} from "../childLayers";
+import { getViewportForRange } from "../viewport";
 
 function makeEra(id: string, startYear: number, endYear: number): Era {
   return {
