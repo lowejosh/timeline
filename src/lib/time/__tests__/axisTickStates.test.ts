@@ -433,8 +433,12 @@ describe("axis tick render states", () => {
     for (const state of states.filter((state) => state.step < 1)) {
       expect(state.wholeYear).toBe(preciseStart.wholeYear);
       expect(state.yearFraction).toBeDefined();
-      expect(((state.yearFraction ?? 0) - preciseStart.fraction) * 365.2425).toBeCloseTo(
-        Math.round(((state.yearFraction ?? 0) - preciseStart.fraction) * 365.2425),
+      expect(
+        ((state.yearFraction ?? 0) - preciseStart.fraction) * 365.2425,
+      ).toBeCloseTo(
+        Math.round(
+          ((state.yearFraction ?? 0) - preciseStart.fraction) * 365.2425,
+        ),
         6,
       );
     }

@@ -29,6 +29,15 @@ type TimelineSidebarResolvedEntry = TimelineSidebarEntryState & {
 
 const SIDEBAR_ENTRY_DEFINITIONS = [
   {
+    id: "deep-time-life",
+    label: "Deep Time Life",
+    sectionId: "overlays",
+    groupIds: TIMELINE_DECORATION_GROUPS.filter(
+      (group) =>
+        group.categoryId === TIMELINE_DECORATION_CATEGORY_IDS.deepTimeLife,
+    ).map((group) => group.id),
+  },
+  {
     id: "human-evolution",
     label: "Human Evolution",
     sectionId: "overlays",
@@ -65,13 +74,15 @@ const SIDEBAR_SECTIONS = [
 ] as const;
 
 const HUMAN_HISTORY_GROUP_IDS = new Set(
-  SIDEBAR_ENTRY_DEFINITIONS.find((definition) => definition.id === "human-history")
-    ?.groupIds ?? [],
+  SIDEBAR_ENTRY_DEFINITIONS.find(
+    (definition) => definition.id === "human-history",
+  )?.groupIds ?? [],
 );
 
 const CIVILIZATION_GROUP_IDS = new Set(
-  SIDEBAR_ENTRY_DEFINITIONS.find((definition) => definition.id === "civilizations")
-    ?.groupIds ?? [],
+  SIDEBAR_ENTRY_DEFINITIONS.find(
+    (definition) => definition.id === "civilizations",
+  )?.groupIds ?? [],
 );
 
 export function resolveTimelineSidebarSections(

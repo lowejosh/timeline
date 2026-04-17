@@ -60,6 +60,26 @@ describe("root timeline display data", () => {
         .filter((band) => band.startYear >= bce(3_500))
         .every((band) => band.groupId === "civilizations"),
     ).toBe(true);
+
+    expect(
+      TIMELINE_DISPLAY.markers
+        .filter((marker) =>
+          [
+            "great-oxidation-event",
+            "first-eukaryotic-cells",
+            "k-pg-asteroid-impact",
+          ].includes(marker.id),
+        )
+        .every((marker) => marker.groupId === "deep-time-life"),
+    ).toBe(true);
+
+    expect(
+      TIMELINE_DISPLAY.overlays
+        .filter((band) =>
+          ["cambrian-explosion", "age-of-dinosaurs"].includes(band.id),
+        )
+        .every((band) => band.groupId === "deep-time-life"),
+    ).toBe(true);
   });
 
   it("keeps core markers ordered chronologically with valid sources", () => {
@@ -95,9 +115,9 @@ describe("root timeline display data", () => {
       "last-neanderthals-disappear",
       "chauvet-cave-figurative-art",
       "venus-of-dolni-vestonice",
-      "natufian-settled-hunter-gatherers-at-eynan",
       "gobekli-tepe-monuments",
       "agriculture-emerges-in-southwest-asia",
+      "natufian-settled-hunter-gatherers-at-eynan",
       "mehrgarh-early-farming-community",
       "catalhoyuk-settled-farming-community",
       "jericho-ritual-community",

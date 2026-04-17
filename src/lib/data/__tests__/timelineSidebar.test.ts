@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { yearsAgo } from "../timelineDateBuilders";
 import { resolveTimelineSidebarSections } from "../timelineSidebar";
 import type { TimelineDisplayConfig } from "../timelineTypes";
 
@@ -206,5 +207,65 @@ describe("timeline sidebar selectors", () => {
       overlayCount: 1,
       relevantItemCount: 2,
     });
+  });
+
+  it("surfaces deep time life in overlays and hides it once the viewport is far more recent", () => {
+    const display: TimelineDisplayConfig = {
+      markers: [
+        {
+          id: "ordovician-extinction",
+          label: "Ordovician extinction",
+          year: yearsAgo(447_000_000),
+          groupId: "deep-time-life",
+        },
+      ],
+      overlays: [
+        {
+          id: "cambrian-explosion",
+          label: "Cambrian Explosion",
+          startYear: yearsAgo(570_000_000),
+          endYear: yearsAgo(530_000_000),
+          color: "rgba(0, 0, 0, 0.1)",
+          groupId: "deep-time-life",
+        },
+      ],
+    };
+
+    const deepTimeSections = resolveTimelineSidebarSections(
+      display,
+      {
+        centerYear: yearsAgo(500_000_000),
+        zoom: 0.3,
+      },
+      1000,
+      120,
+      new Set(["deep-time-life"]),
+    );
+
+    expect(deepTimeSections.map((section) => section.label)).toEqual([
+      "Overlays",
+    ]);
+    expect(deepTimeSections[0].entries[0]).toMatchObject({
+      id: "deep-time-life",
+      label: "Deep Time Life",
+      enabled: true,
+      mixed: false,
+      markerCount: 1,
+      overlayCount: 1,
+      relevantItemCount: 2,
+    });
+
+    const recentSections = resolveTimelineSidebarSections(
+      display,
+      {
+        centerYear: 1200,
+        zoom: 24,
+      },
+      1000,
+      120,
+      new Set(["deep-time-life"]),
+    );
+
+    expect(recentSections).toEqual([]);
   });
 });

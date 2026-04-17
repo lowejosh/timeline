@@ -47,9 +47,9 @@ function App() {
     () => getDefaultEnabledTimelineGroupIds(),
     [],
   );
-  const [manualEnabledGroupIds, setManualEnabledGroupIds] = useState<Set<string>>(() =>
-    getDefaultEnabledTimelineGroupIds(),
-  );
+  const [manualEnabledGroupIds, setManualEnabledGroupIds] = useState<
+    Set<string>
+  >(() => getDefaultEnabledTimelineGroupIds());
   const [humanEvolutionToggleMode, setHumanEvolutionToggleMode] =
     useState<LayerAutoToggleMode>("auto");
   const [isHumanEvolutionAutoSuppressed, setIsHumanEvolutionAutoSuppressed] =
@@ -139,10 +139,7 @@ function App() {
   const renderEnabledGroupIds = useMemo(() => {
     const next = new Set(enabledGroupIds);
 
-    if (
-      isCivilizationsAutoHidden &&
-      next.has(CIVILIZATIONS_GROUP_ID)
-    ) {
+    if (isCivilizationsAutoHidden && next.has(CIVILIZATIONS_GROUP_ID)) {
       next.delete(CIVILIZATIONS_GROUP_ID);
     }
 

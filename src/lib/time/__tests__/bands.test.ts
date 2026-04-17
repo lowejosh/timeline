@@ -66,7 +66,9 @@ describe("timeline tick generation", () => {
 
   it("falls back to raw axis labels when abbreviated units get too nitty-gritty", () => {
     const elapsedYears = Math.round(getYearsAgoFromPresent(-54_321));
-    const deepTimeElapsedYears = Math.round(getYearsAgoFromPresent(-13_800_123));
+    const deepTimeElapsedYears = Math.round(
+      getYearsAgoFromPresent(-13_800_123),
+    );
 
     expect(formatTimelineYear(-54_321, 10, { mode: "axis" })).toBe(
       `${numberFormatter.format(elapsedYears)} years ago`,
@@ -182,7 +184,9 @@ describe("timeline tick generation", () => {
 
     expect(formatTimelineElapsedLabel(-54_321.5)).toMatchObject({
       primaryText: expect.stringMatching(
-        new RegExp(`^${numberFormatter.format(wholeYears)} years and \\d+ days$`),
+        new RegExp(
+          `^${numberFormatter.format(wholeYears)} years and \\d+ days$`,
+        ),
       ),
     });
     expect(formatTimelineElapsedLabel(-54_321.5)?.secondaryText).toMatch(
@@ -204,7 +208,9 @@ describe("timeline tick generation", () => {
 
     expect(formatTimelineElapsedLabel(-54_321.500001)).toMatchObject({
       primaryText: expect.stringMatching(
-        new RegExp(`^${numberFormatter.format(wholeYears)} years and \\d+ days$`),
+        new RegExp(
+          `^${numberFormatter.format(wholeYears)} years and \\d+ days$`,
+        ),
       ),
       secondaryText: expect.stringContaining("seconds"),
     });

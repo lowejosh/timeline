@@ -941,8 +941,7 @@ function getPreferredAxisEdgeLabelStep(ticks: AxisTickRenderState[]) {
         metrics.minPixelsPerStep >= SUBYEAR_EDGE_LABEL_MIN_SPACING_PX,
     )
     .sort(
-      (left, right) =>
-        left[0] - right[0] || right[1].score - left[1].score,
+      (left, right) => left[0] - right[0] || right[1].score - left[1].score,
     )[0]?.[0];
 
   if (finestReadableSubYearStep !== undefined) {
@@ -1042,13 +1041,11 @@ function getAllowedAxisLabelSteps(
             entry.maxWidth + SUBYEAR_LABEL_MIN_CLEARANCE_PX,
       )
       .sort(
-        (left, right) =>
-          left.step - right.step || right.score - left.score,
+        (left, right) => left.step - right.step || right.score - left.score,
       );
     const preferredEntry = pickPreferredEntry(
       entries.sort(
-        (left, right) =>
-          right.score - left.score || right.step - left.step,
+        (left, right) => right.score - left.score || right.step - left.step,
       ),
       readableEntries,
     );
@@ -1056,8 +1053,7 @@ function getAllowedAxisLabelSteps(
     allowedSteps.add(preferredEntry.step);
 
     const sortedReadableEntries = [...readableEntries].sort(
-      (left, right) =>
-        right.score - left.score || right.step - left.step,
+      (left, right) => right.score - left.score || right.step - left.step,
     );
 
     for (const entry of sortedReadableEntries) {
@@ -1198,8 +1194,10 @@ function resolveAxisLabelCandidates(
         Math.max(existing.width, candidate.width) +
         (options.relaxedSpacing ? 6 : AXIS_DUPLICATE_LABEL_MIN_GAP);
 
-      return Math.abs(existing.x - candidate.x) <
-        (options.dedupeByTextOnly ? duplicateGap * 0.65 : duplicateGap);
+      return (
+        Math.abs(existing.x - candidate.x) <
+        (options.dedupeByTextOnly ? duplicateGap * 0.65 : duplicateGap)
+      );
     });
 
     if (hasNearbyDuplicateLabel) {
@@ -1237,7 +1235,11 @@ function resolveAxisLabelCandidatesWithFallback(
     centerX?: number;
   } = {},
 ) {
-  const resolved = resolveAxisLabelCandidates(candidates, occupiedSeed, options);
+  const resolved = resolveAxisLabelCandidates(
+    candidates,
+    occupiedSeed,
+    options,
+  );
 
   if (resolved.length > 0 || candidates.length === 0) {
     return resolved;
@@ -1261,7 +1263,9 @@ function resolveAxisLabelCandidatesWithFallback(
       left.x - right.x,
   )[0];
 
-  return fallbackCandidate ? [{ ...fallbackCandidate, alpha: fallbackCandidate.alpha * 0.9 }] : [];
+  return fallbackCandidate
+    ? [{ ...fallbackCandidate, alpha: fallbackCandidate.alpha * 0.9 }]
+    : [];
 }
 
 function measureAxisLabelWidth(
@@ -2713,9 +2717,7 @@ export function TimelineCanvas({
               );
 
               if (dominantReference !== null) {
-                return dominantReference === "elapsed"
-                  ? "elapsed"
-                  : "calendar";
+                return dominantReference === "elapsed" ? "elapsed" : "calendar";
               }
 
               return null;
@@ -2723,7 +2725,10 @@ export function TimelineCanvas({
           : null;
       const visibleSpan = Math.max(
         Math.abs(
-          subtractPreciseTimelineYears(edgeRightPreciseYear, edgeLeftPreciseYear),
+          subtractPreciseTimelineYears(
+            edgeRightPreciseYear,
+            edgeLeftPreciseYear,
+          ),
         ),
         1e-18,
       );
@@ -2764,8 +2769,7 @@ export function TimelineCanvas({
       const formatAxisDate = (
         year: number | PreciseTimelineYear,
         step: number,
-      ) =>
-        formatTimelineDateLabel(year, step);
+      ) => formatTimelineDateLabel(year, step);
       const formatElapsedAxisLabel = (
         year: number | PreciseTimelineYear,
         step: number,
@@ -2819,14 +2823,12 @@ export function TimelineCanvas({
             tick.labelOpacity * 0.7,
           );
           const baseFade =
-            edgeFade *
-            (1 - emphasisProgress + emphasisProgress * boundaryFade);
+            edgeFade * (1 - emphasisProgress + emphasisProgress * boundaryFade);
           const overlayFade = edgeFade * boundaryFade;
           const baseMinorExtent = 2.4 + 10.4 * Math.pow(scaleProgress, 0.88);
           const minorExtent =
             baseMinorExtent * (0.42 + tick.visibleProgress * 0.58);
-          const top =
-            axisY - minorExtent - majorExtraAbove * emphasisProgress;
+          const top = axisY - minorExtent - majorExtraAbove * emphasisProgress;
           const bottom =
             axisY + minorExtent + majorExtraBelow * emphasisProgress;
 
@@ -2968,7 +2970,8 @@ export function TimelineCanvas({
           : null;
         const labelText = calendarLabel
           ? calendarLabel.text
-          : elapsedLabel?.primaryText ?? formatAxisLabel(tickYear, tick.labelStep);
+          : (elapsedLabel?.primaryText ??
+            formatAxisLabel(tickYear, tick.labelStep));
         const secondaryText =
           calendarLabel?.secondaryText ?? elapsedLabel?.secondaryText;
 
@@ -3020,11 +3023,9 @@ export function TimelineCanvas({
       const {
         allowedSteps: allowedLabelSteps,
         primaryStep: primaryAllowedStep,
-      } = getAllowedAxisLabelSteps(
-        axisLabelCandidates,
-        useSubYearAxis,
-        { preferredStep: preferredAxisLabelStepRef.current },
-      );
+      } = getAllowedAxisLabelSteps(axisLabelCandidates, useSubYearAxis, {
+        preferredStep: preferredAxisLabelStepRef.current,
+      });
 
       const primaryEdgeLabelEntries = [
         {
@@ -3842,9 +3843,7 @@ export function TimelineCanvas({
             ? existing.currentOpacity
             : 1,
           targetOpacity: 1,
-          currentY: shouldPreserveAnimatedState
-            ? existing.currentY
-            : targetY,
+          currentY: shouldPreserveAnimatedState ? existing.currentY : targetY,
           targetY,
         });
         continue;
@@ -3853,7 +3852,8 @@ export function TimelineCanvas({
       animationStates.set(overlay.band.id, {
         overlay,
         currentOpacity:
-          shouldAnimateVisibilityChange && overlayBandAnimationInitializedRef.current
+          shouldAnimateVisibilityChange &&
+          overlayBandAnimationInitializedRef.current
             ? 0
             : 1,
         targetOpacity: 1,
@@ -3940,11 +3940,9 @@ export function TimelineCanvas({
         const nextOpacity =
           state.currentOpacity +
           (state.targetOpacity - state.currentOpacity) * opacityFactor;
-        const nextY =
-          hasVisibleExitingOverlays
-            ? state.currentY
-            : state.currentY +
-              (state.targetY - state.currentY) * positionFactor;
+        const nextY = hasVisibleExitingOverlays
+          ? state.currentY
+          : state.currentY + (state.targetY - state.currentY) * positionFactor;
         const settled = Math.abs(state.targetOpacity - nextOpacity) < 0.002;
         const settledY = hasVisibleExitingOverlays
           ? Math.abs(state.targetY - state.currentY) < 0.2
@@ -3991,8 +3989,7 @@ export function TimelineCanvas({
     }
 
     overlayBandAnimationLastTimeRef.current = performance.now();
-    overlayBandAnimationFrameRef.current =
-      requestAnimationFrame(stepAnimation);
+    overlayBandAnimationFrameRef.current = requestAnimationFrame(stepAnimation);
 
     return () => {
       if (overlayBandAnimationFrameRef.current) {
@@ -4037,7 +4034,9 @@ export function TimelineCanvas({
       TIMELINE_MAX_YEAR,
     );
     const visibleSpan = Math.max(
-      Math.abs(subtractPreciseTimelineYears(preciseRangeEnd, preciseRangeStart)),
+      Math.abs(
+        subtractPreciseTimelineYears(preciseRangeEnd, preciseRangeStart),
+      ),
       1e-18,
     );
     const primordialOverlapStart = Math.max(

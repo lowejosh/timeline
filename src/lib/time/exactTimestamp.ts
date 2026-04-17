@@ -101,7 +101,9 @@ function assertIntegerInRange(
   label: string,
 ) {
   if (!Number.isInteger(value) || value < minimum || value > maximum) {
-    throw new Error(`${label} must be an integer between ${minimum} and ${maximum}.`);
+    throw new Error(
+      `${label} must be an integer between ${minimum} and ${maximum}.`,
+    );
   }
 }
 
@@ -170,7 +172,9 @@ function getTimelineYearStart(year: number) {
 
 function normalizeCalendarTimestamp(
   timestamp: TimelineCalendarTimestamp,
-): Required<Omit<TimelineCalendarTimestamp, "kind" | "era" | "year" | "precision">> &
+): Required<
+  Omit<TimelineCalendarTimestamp, "kind" | "era" | "year" | "precision">
+> &
   Pick<TimelineCalendarTimestamp, "era" | "year" | "precision"> {
   const { precision } = timestamp;
 
@@ -187,11 +191,15 @@ function normalizeCalendarTimestamp(
   const microsecond = timestamp.microsecond ?? 0;
 
   if (hasPrecision(precision, "month") && timestamp.month === undefined) {
-    throw new Error("Calendar timestamps at month precision or finer must include a month.");
+    throw new Error(
+      "Calendar timestamps at month precision or finer must include a month.",
+    );
   }
 
   if (hasPrecision(precision, "day") && timestamp.day === undefined) {
-    throw new Error("Calendar timestamps at day precision or finer must include a day.");
+    throw new Error(
+      "Calendar timestamps at day precision or finer must include a day.",
+    );
   }
 
   assertIntegerInRange(month, 1, 12, "Month");
@@ -402,9 +410,8 @@ export function getTimelineYearFromCalendarTimestamp(
 ) {
   const normalized = normalizeCalendarTimestamp(timestamp);
   const astronomicalYear = getAstronomicalYear(normalized.era, normalized.year);
-  const timelineYear = getTimelineYearFromAstronomicalYearValue(
-    astronomicalYear,
-  );
+  const timelineYear =
+    getTimelineYearFromAstronomicalYearValue(astronomicalYear);
   const start = getTimelineYearStart(astronomicalYear);
   const end = getTimelineYearStart(astronomicalYear + 1);
   const date = createTimelineUtcDate(

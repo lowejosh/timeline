@@ -231,7 +231,8 @@ function resolvePreciseTimelineYear(
 export function getTimelineDateReference(
   year: number | PreciseTimelineYear,
 ): TimelineDateReference {
-  return resolvePreciseTimelineYear(year).wholeYear <= BCE_YEARS_AGO_HANDOFF_YEAR
+  return resolvePreciseTimelineYear(year).wholeYear <=
+    BCE_YEARS_AGO_HANDOFF_YEAR
     ? "elapsed"
     : "calendar";
 }
@@ -506,9 +507,7 @@ function formatPreciseElapsedAxisLabel(
     return {
       primaryText: leadingParts.join(" "),
       secondaryText:
-        detailParts.length > 0
-          ? `${detailParts.join(" ")} ${suffix}`
-          : suffix,
+        detailParts.length > 0 ? `${detailParts.join(" ")} ${suffix}` : suffix,
     };
   }
 
@@ -640,7 +639,9 @@ function formatAxisElapsedYears(
             : step >= YEARS_PER_MILLISECOND
               ? 5
               : 6;
-    const trimmedParts = parts.filter((_, index) => index <= finestRelevantIndex);
+    const trimmedParts = parts.filter(
+      (_, index) => index <= finestRelevantIndex,
+    );
 
     return `${trimmedParts.length > 0 ? trimmedParts.join(" ") : step >= YEARS_PER_MILLISECOND ? "0ms" : "0µs"} ${suffix}`;
   }
@@ -675,9 +676,7 @@ function formatAxisElapsedYears(
   if (absolute < 1) {
     const duration = splitElapsedDuration(absolute);
     const parts = formatElapsedAxisDurationParts(duration);
-    const nonNullParts = parts.filter(
-      (part): part is string => part !== null,
-    );
+    const nonNullParts = parts.filter((part): part is string => part !== null);
 
     if (nonNullParts.length > 0) {
       return `${nonNullParts.slice(0, 2).join(" ")} ${suffix}`;
@@ -760,7 +759,9 @@ export function formatTimelineElapsedLabel(
   }
 
   if (parts.length <= 2) {
-    const label = joinNaturalLanguage(parts.length > 0 ? parts : ["0 microseconds"]);
+    const label = joinNaturalLanguage(
+      parts.length > 0 ? parts : ["0 microseconds"],
+    );
 
     return {
       primaryText: isAfterBigBang

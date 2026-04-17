@@ -19,7 +19,9 @@ function splitApproximateTimelineYear(year: number) {
 }
 
 function resolvePreciseTimelineYear(value: TimelineYearLike) {
-  return typeof value === "number" ? splitApproximateTimelineYear(value) : value;
+  return typeof value === "number"
+    ? splitApproximateTimelineYear(value)
+    : value;
 }
 
 function toApproximateTimelineYear(value: TimelineYearLike) {
@@ -58,7 +60,8 @@ export function getTimelineYearDelta(
   const earlierPreciseYear = toAstronomicalPreciseTimelineYear(earlier);
 
   return (
-    laterPreciseYear.wholeYear - earlierPreciseYear.wholeYear +
+    laterPreciseYear.wholeYear -
+    earlierPreciseYear.wholeYear +
     (laterPreciseYear.fraction - earlierPreciseYear.fraction)
   );
 }
@@ -103,7 +106,9 @@ export function getTimelineYearFromYearsAgo(
   );
 }
 
-export function getTimelineYearFromYearsAfterBigBang(yearsAfterBigBang: number) {
+export function getTimelineYearFromYearsAfterBigBang(
+  yearsAfterBigBang: number,
+) {
   return getTimelineYearFromAstronomicalYearValue(
     getAstronomicalTimelineYear(TIMELINE_MIN_YEAR) + yearsAfterBigBang,
   );

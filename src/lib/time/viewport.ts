@@ -105,7 +105,10 @@ export function addPreciseTimelineYears(
   year: PreciseTimelineYear,
   deltaYears: number,
 ) {
-  return normalizePreciseTimelineYear(year.wholeYear, year.fraction + deltaYears);
+  return normalizePreciseTimelineYear(
+    year.wholeYear,
+    year.fraction + deltaYears,
+  );
 }
 
 export function subtractPreciseTimelineYears(
@@ -119,10 +122,7 @@ export function comparePreciseTimelineYears(
   left: PreciseTimelineYear,
   right: PreciseTimelineYear,
 ) {
-  return (
-    left.wholeYear - right.wholeYear ||
-    left.fraction - right.fraction
-  );
+  return left.wholeYear - right.wholeYear || left.fraction - right.fraction;
 }
 
 export function getViewportCenterYear(
@@ -227,9 +227,8 @@ export function getMaxZoomForTimelineViewport(
     safeWidth,
     getTimelineScaleMode(viewport),
   );
-  const precisionYearsPerPixel = getViewportPrecisionLimitedYearsPerPixel(
-    viewport,
-  );
+  const precisionYearsPerPixel =
+    getViewportPrecisionLimitedYearsPerPixel(viewport);
   const maxZoomForPrecision = Math.log2(
     BASE_YEARS_PER_PIXEL / precisionYearsPerPixel,
   );
@@ -294,8 +293,16 @@ function clampCenterYear(
   scaleMode: TimelineScaleMode = "linear",
 ) {
   const safeWidth = Math.max(width, 1);
-  const leftOffset = getYearDeltaForScreenDelta(-safeWidth / 2, zoom, scaleMode);
-  const rightOffset = getYearDeltaForScreenDelta(safeWidth / 2, zoom, scaleMode);
+  const leftOffset = getYearDeltaForScreenDelta(
+    -safeWidth / 2,
+    zoom,
+    scaleMode,
+  );
+  const rightOffset = getYearDeltaForScreenDelta(
+    safeWidth / 2,
+    zoom,
+    scaleMode,
+  );
   const visibleRange = rightOffset - leftOffset;
   const totalRange = TIMELINE_MAX_YEAR - TIMELINE_MIN_YEAR;
 
@@ -486,11 +493,7 @@ export function panByPixels(
         );
 
   return normalizeViewport(
-    createViewportFromCenterYear(
-      nextCenterYear,
-      normalized.zoom,
-      scaleMode,
-    ),
+    createViewportFromCenterYear(nextCenterYear, normalized.zoom, scaleMode),
     safeWidth,
   );
 }
@@ -537,5 +540,11 @@ export function getHomeViewport(
   width: number,
   scaleMode: TimelineScaleMode = "linear",
 ) {
-  return getViewportForRange(HOME_RANGE[0], HOME_RANGE[1], width, 0.12, scaleMode);
+  return getViewportForRange(
+    HOME_RANGE[0],
+    HOME_RANGE[1],
+    width,
+    0.12,
+    scaleMode,
+  );
 }
