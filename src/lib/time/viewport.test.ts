@@ -1,14 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
   getMaxZoomForViewport,
-  getMaxZoomForTimelineViewport,
+  getMinZoomForWidth,
   getZoomAnchorForCanvasX,
   getMaxZoomForWidth,
   getPrecisionLimitedYearsPerPixel,
   getViewportPrecisionLimitedYearsPerPixel,
   getVisibleRange,
-  getMinZoomForWidth,
-  MIN_VISIBLE_RANGE_MICROSECONDS,
+  getMinVisibleRangeDaysForWidth,
+  MIN_VISIBLE_RANGE_DAYS,
+  MAX_ZOOM_DAY_TICK_SPACING_PX,
   getViewportForRange,
   normalizeViewport,
   panByPixels,
@@ -18,6 +19,12 @@ import {
   worldToScreen,
   zoomAtPosition,
 } from "./viewport";
+import {
+  getLogarithmicAxisRangeFactor,
+  getLogarithmicScreenDeltaFromYearsDelta,
+  getLogarithmicYearsDeltaFromScreenDelta,
+  resolveLogarithmicAxisGeometry,
+} from "./logarithmicAxis";
 
 const FLOAT_EPSILON = 1e-9;
 
@@ -149,7 +156,7 @@ describe("timeline viewport math", () => {
     expect(rightAfter).toBeCloseTo(rightBefore, 3);
   });
 
-  it("uses split-year center precision to reach the microsecond-scale visible-range floor", () => {
+  it("uses a width-aware day-scale visible-range floor at maximum zoom", () => {
     const width = 1200;
     const viewport = normalizeViewport(
       {
@@ -159,55 +166,31 @@ describe("timeline viewport math", () => {
       width,
     );
     const [visibleStart, visibleEnd] = getVisibleRange(viewport, width);
-    const visibleMicroseconds =
-      (visibleEnd - visibleStart) * 365.2425 * 24 * 60 * 60 * 1_000_000;
-    const precisionLimitedMicroseconds =
-      getViewportPrecisionLimitedYearsPerPixel(viewport) *
-      width *
-      365.2425 *
-      24 *
-      60 *
-      60 *
-      1_000_000;
-    const effectiveVisibleRangeFloor = Math.max(
-      MIN_VISIBLE_RANGE_MICROSECONDS,
-      precisionLimitedMicroseconds,
-    );
+    const visibleDays = (visibleEnd - visibleStart) * 365.2425;
+    const precisionLimitedDays =
+      getViewportPrecisionLimitedYearsPerPixel(viewport) * width * 365.2425;
+    const effectiveVisibleRangeDays = getMinVisibleRangeDaysForWidth(width);
 
     expect(viewport.zoom).toBeCloseTo(
-      getMaxZoomForTimelineViewport(
-        {
-          centerYear: TIMELINE_MAX_YEAR,
-          zoom: 0,
-        },
-        width,
-      ),
+      getMaxZoomForWidth(width),
       6,
     );
-    expect(visibleMicroseconds).toBeGreaterThanOrEqual(
-      effectiveVisibleRangeFloor * 0.85,
+    expect(effectiveVisibleRangeDays).toBeGreaterThanOrEqual(
+      MIN_VISIBLE_RANGE_DAYS,
     );
-    expect(visibleMicroseconds).toBeLessThanOrEqual(
-      effectiveVisibleRangeFloor * 1.05,
+    expect(effectiveVisibleRangeDays).toBeCloseTo(
+      width / MAX_ZOOM_DAY_TICK_SPACING_PX,
+      6,
     );
-    expect(getMaxZoomForTimelineViewport(
-      {
-        centerYear: TIMELINE_MAX_YEAR,
-        zoom: 0,
-      },
-      width,
-    )).toBeGreaterThan(
-      getMaxZoomForViewport(TIMELINE_MAX_YEAR, width),
-    );
-    expect(precisionLimitedMicroseconds).toBeGreaterThan(
-      MIN_VISIBLE_RANGE_MICROSECONDS,
-    );
+    expect(visibleDays).toBeGreaterThanOrEqual(effectiveVisibleRangeDays * 0.99);
+    expect(visibleDays).toBeLessThanOrEqual(effectiveVisibleRangeDays * 1.01);
+    expect(precisionLimitedDays).toBeLessThan(effectiveVisibleRangeDays);
   });
 
   it("reduces allowed zoom further for very large-magnitude center years", () => {
     const width = 1200;
 
-    expect(getMaxZoomForViewport(-13_800_000_000, width)).toBeLessThan(
+    expect(getMaxZoomForViewport(-13_800_000_000, width)).toBeLessThanOrEqual(
       getMaxZoomForViewport(TIMELINE_MAX_YEAR, width),
     );
     expect(getPrecisionLimitedYearsPerPixel(-13_800_000_000)).toBeGreaterThan(
@@ -218,5 +201,66 @@ describe("timeline viewport math", () => {
   it("tracks the present boundary past January first", () => {
     expect(TIMELINE_MAX_YEAR).toBeGreaterThan(new Date().getUTCFullYear());
     expect(TIMELINE_MAX_YEAR).toBeLessThan(new Date().getUTCFullYear() + 1);
+  });
+
+  it("round-trips logarithmic axis deltas", () => {
+    const geometry = resolveLogarithmicAxisGeometry(25);
+    const sourceDelta = 123_456_789;
+    const screenDelta = getLogarithmicScreenDeltaFromYearsDelta(
+      sourceDelta,
+      geometry,
+    );
+
+    expect(
+      getLogarithmicYearsDeltaFromScreenDelta(screenDelta, geometry),
+    ).toBeCloseTo(sourceDelta, 6);
+    expect(getLogarithmicAxisRangeFactor(1200)).toBeGreaterThan(1200);
+  });
+
+  it("round-trips between world and screen coordinates in logarithmic mode", () => {
+    const viewport = {
+      centerYear: -1_000_000,
+      zoom: 20,
+      scaleMode: "logarithmic" as const,
+    };
+    const width = 1200;
+    const sourceYear = -987_654.321;
+
+    const screenX = worldToScreen(sourceYear, viewport, width);
+    const roundTrip = screenToWorld(screenX, viewport, width);
+
+    expect(roundTrip).toBeCloseTo(sourceYear, 6);
+  });
+
+  it("preserves the zoom anchor in logarithmic mode", () => {
+    const viewport = {
+      centerYear: -50_000,
+      zoom: 18,
+      scaleMode: "logarithmic" as const,
+    };
+    const width = 1000;
+    const anchorX = 320;
+    const anchoredYear = screenToWorld(anchorX, viewport, width);
+
+    const zoomed = zoomAtPosition(viewport, viewport.zoom + 3, anchorX, width);
+
+    expect(screenToWorld(anchorX, zoomed, width)).toBeCloseTo(anchoredYear, 6);
+  });
+
+  it("fits the full timeline exactly at minimum zoom in logarithmic mode", () => {
+    const width = 1200;
+    const viewport = normalizeViewport(
+      {
+        centerYear: (TIMELINE_MIN_YEAR + TIMELINE_MAX_YEAR) / 2,
+        zoom: getMinZoomForWidth(width, "logarithmic"),
+        scaleMode: "logarithmic",
+      },
+      width,
+    );
+
+    const [visibleStart, visibleEnd] = getVisibleRange(viewport, width);
+
+    expect(visibleStart).toBeCloseTo(TIMELINE_MIN_YEAR, 3);
+    expect(visibleEnd).toBeCloseTo(TIMELINE_MAX_YEAR, 3);
   });
 });

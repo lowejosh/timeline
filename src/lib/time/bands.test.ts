@@ -243,6 +243,34 @@ describe("timeline tick generation", () => {
     ).toBe("50M years after the Big Bang");
   });
 
+  it("includes day detail on elapsed axis label lines for sub-year zoom levels", () => {
+    expect(
+      formatTimelineElapsedAxisLabelLines(
+        TIMELINE_MIN_YEAR + 1.5,
+        1 / 12,
+        "after-big-bang",
+      ),
+    ).toEqual({
+      primaryText: "1y 182d",
+      secondaryText: "after the Big Bang",
+    });
+  });
+
+  it("keeps years and days visible on the primary elapsed line while finer units move to the secondary line", () => {
+    const yearsPerHour = 1 / 365.2425 / 24;
+
+    expect(
+      formatTimelineElapsedAxisLabelLines(
+        TIMELINE_MIN_YEAR + 1.5,
+        yearsPerHour,
+        "after-big-bang",
+      ),
+    ).toEqual({
+      primaryText: "1y 182d",
+      secondaryText: "14h after the Big Bang",
+    });
+  });
+
   it("formats exact zero elapsed primordial time as Big Bang", () => {
     expect(
       formatTimelineElapsedAxisLabel(TIMELINE_MIN_YEAR, 1, "after-big-bang"),

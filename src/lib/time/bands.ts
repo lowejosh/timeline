@@ -52,7 +52,6 @@ const YEARS_PER_HOUR = YEARS_PER_DAY / HOURS_PER_DAY;
 const YEARS_PER_MINUTE = YEARS_PER_HOUR / MINUTES_PER_HOUR;
 const YEARS_PER_SECOND = YEARS_PER_MINUTE / SECONDS_PER_MINUTE;
 const YEARS_PER_MILLISECOND = YEARS_PER_SECOND / MILLISECONDS_PER_SECOND;
-const YEARS_PER_MICROSECOND = YEARS_PER_MILLISECOND / MICROSECONDS_PER_MILLISECOND;
 const MONTH_LABELS = [
   "Jan",
   "Feb",
@@ -443,10 +442,8 @@ function formatPreciseElapsedAxisLabel(
   const duration = getPreciseElapsedDuration(year, reference);
   const parts = formatElapsedAxisDurationParts(duration);
   const finestRelevantIndex = getElapsedAxisFinestUnitIndex(step);
-  const leadingPrecisionIndex =
-    step < YEARS_PER_DAY && (duration.years > 0 || duration.days > 0) ? 2 : 0;
   const includedParts = parts
-    .slice(leadingPrecisionIndex, finestRelevantIndex + 1)
+    .slice(0, finestRelevantIndex + 1)
     .filter((part): part is string => part !== null);
 
   if (includedParts.length === 0) {
@@ -455,23 +452,42 @@ function formatPreciseElapsedAxisLabel(
     };
   }
 
+  const leadingParts =
+    duration.years > 0 || duration.days > 0
+      ? includedParts.slice(0, Math.min(2, includedParts.length))
+      : [];
+  const detailParts =
+    leadingParts.length > 0
+      ? includedParts.slice(leadingParts.length)
+      : includedParts;
+
+  if (leadingParts.length > 0) {
+    return {
+      primaryText: leadingParts.join(" "),
+      secondaryText:
+        detailParts.length > 0
+          ? `${detailParts.join(" ")} ${suffix}`
+          : suffix,
+    };
+  }
+
   if (reference === "after-big-bang") {
     return {
-      primaryText: includedParts.join(" "),
+      primaryText: detailParts.join(" "),
       secondaryText: suffix,
     };
   }
 
-  if (includedParts.length <= 2) {
+  if (detailParts.length <= 2) {
     return {
-      primaryText: includedParts.join(" "),
+      primaryText: detailParts.join(" "),
       secondaryText: suffix,
     };
   }
 
   return {
-    primaryText: includedParts.slice(0, 2).join(" "),
-    secondaryText: `${includedParts.slice(2).join(" ")} ${suffix}`,
+    primaryText: detailParts.slice(0, 2).join(" "),
+    secondaryText: `${detailParts.slice(2).join(" ")} ${suffix}`,
   };
 }
 
@@ -496,16 +512,6 @@ function createTimelineUtcDate(
 
 function getTimelineYearStart(year: number) {
   return createTimelineUtcDate(year, 0, 1).getTime();
-}
-
-function getTimelineDateFromYear(year: number) {
-  const wholeYear = Math.floor(year);
-  const fraction = year - wholeYear;
-  const astronomicalYear = getAstronomicalYearFromTimelineYear(wholeYear);
-  const start = getTimelineYearStart(astronomicalYear);
-  const end = getTimelineYearStart(astronomicalYear + 1);
-
-  return new Date(start + fraction * (end - start));
 }
 
 export function getTimelineYearFromUtcDate(date: Date) {
@@ -651,7 +657,7 @@ export function formatTimelineElapsedAxisLabel(
   step: number,
   reference: TimelineElapsedReference,
 ) {
-  if (step >= YEARS_PER_DAY) {
+  if (step >= 1) {
     const preciseYear = resolvePreciseTimelineYear(year);
     const elapsedYears =
       reference === "after-big-bang"
@@ -679,7 +685,7 @@ export function formatTimelineElapsedAxisLabelLines(
   step: number,
   reference: TimelineElapsedReference,
 ) {
-  if (step >= YEARS_PER_DAY) {
+  if (step >= 1) {
     return {
       primaryText: formatTimelineElapsedAxisLabel(year, step, reference),
     };

@@ -17,8 +17,8 @@ import { getDefaultEnabledTimelineGroupIds } from "./lib/data/timelineDecoration
 import { resolveTimelineSidebarSections } from "./lib/data/timelineSidebar";
 import {
   getHomeViewport,
-  getYearsPerPixel,
   HOME_RANGE,
+  worldToScreen,
 } from "./lib/time/viewport";
 import "./App.css";
 
@@ -34,10 +34,10 @@ function App() {
   const autoTransitionFrameRef = useRef(0);
 
   // Use refs for values needed in RAF callbacks to avoid stale closures
-  const zoomRef = useRef(animated.viewport.zoom);
+  const viewportRef = useRef(animated.viewport);
   const innerWidthRef = useRef(innerWidth);
   useEffect(() => {
-    zoomRef.current = animated.viewport.zoom;
+    viewportRef.current = animated.viewport;
     innerWidthRef.current = innerWidth;
   });
 
@@ -56,8 +56,14 @@ function App() {
       const ch = getAncestorChain(ROOT_ERA, currentId);
       if (ch.length <= 1 || currentId === ROOT_ERA.id) return currentId;
 
-      const ypp = getYearsPerPixel(zoomRef.current);
-      const eraPixelWidth = (era.endYear - era.startYear) / ypp;
+      const eraPixelWidth = Math.abs(
+        worldToScreen(era.endYear, viewportRef.current, innerWidthRef.current) -
+          worldToScreen(
+            era.startYear,
+            viewportRef.current,
+            innerWidthRef.current,
+          ),
+      );
       const fillRatio = eraPixelWidth / innerWidthRef.current;
 
       // Auto-collapse: if drilled in and era is too small, go back to parent

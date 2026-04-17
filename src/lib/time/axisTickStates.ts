@@ -1,5 +1,9 @@
 import { YEARS_AGO_CUTOFF, type TimelineElapsedReference } from "./bands";
 import {
+  getLogarithmicScreenDeltaFromYearsDelta,
+  resolveLogarithmicAxisGeometry,
+} from "./logarithmicAxis";
+import {
   addPreciseTimelineYears,
   comparePreciseTimelineYears,
   normalizePreciseTimelineYear,
@@ -8,6 +12,7 @@ import {
   TIMELINE_MAX_YEAR,
   TIMELINE_MIN_YEAR,
   toApproximateTimelineYear,
+  type TimelineScaleMode,
   type PreciseTimelineYear,
 } from "./viewport";
 
@@ -23,6 +28,9 @@ export type AxisTickRenderState = {
   majorProgress: number;
   labelOpacity: number;
   labelStep: number;
+  generationIndex: number;
+  generationAlpha: number;
+  generationProgress: number;
 };
 
 type AxisStepDefinition =
@@ -54,12 +62,18 @@ type AxisTickLayerState = {
   labelProgress: number;
   majorBandProgress: number;
   labelBandProgress: number;
+  generationIndex: number;
+  generationAlpha: number;
+  generationProgress: number;
 };
 
 export type ResolveAxisTickOptions = {
   elapsedSubYearReference?: TimelineElapsedReference;
   preciseStartYear?: PreciseTimelineYear;
   preciseEndYear?: PreciseTimelineYear;
+  anchorYear?: number;
+  preciseAnchorYear?: PreciseTimelineYear;
+  scaleMode?: TimelineScaleMode;
 };
 
 type ExplicitTick = {
@@ -85,11 +99,8 @@ const EPSILON = 1e-18;
 const DAY_IN_MS = 86_400_000;
 const AVERAGE_DAYS_PER_YEAR = 365.2425;
 const YEARS_PER_DAY = 1 / AVERAGE_DAYS_PER_YEAR;
-const YEARS_PER_HOUR = YEARS_PER_DAY / 24;
-const YEARS_PER_MINUTE = YEARS_PER_HOUR / 60;
-const YEARS_PER_SECOND = YEARS_PER_MINUTE / 60;
-const YEARS_PER_MILLISECOND = YEARS_PER_SECOND / 1_000;
-const YEARS_PER_MICROSECOND = YEARS_PER_MILLISECOND / 1_000;
+const LOGARITHMIC_GENERATION_REVEAL_START_PX = 200;
+const LOGARITHMIC_GENERATION_REVEAL_END_PX = 230;
 const CALENDAR_STEP_DEFINITIONS: readonly AxisStepDefinition[] = [
   { kind: "calendar", unit: "month", count: 6, step: 0.5 },
   { kind: "calendar", unit: "month", count: 3, step: 0.25 },
@@ -108,45 +119,6 @@ const ELAPSED_DAY_STEP_DEFINITIONS: readonly AxisStepDefinition[] = [
   { kind: "elapsed-day", count: 7, step: 7 * YEARS_PER_DAY },
   { kind: "elapsed-day", count: 2, step: 2 * YEARS_PER_DAY },
   { kind: "elapsed-day", count: 1, step: YEARS_PER_DAY },
-] as const;
-const SUB_DAY_STEP_DEFINITIONS: readonly AxisStepDefinition[] = [
-  { kind: "numeric", step: 12 * YEARS_PER_HOUR },
-  { kind: "numeric", step: 6 * YEARS_PER_HOUR },
-  { kind: "numeric", step: 3 * YEARS_PER_HOUR },
-  { kind: "numeric", step: 2 * YEARS_PER_HOUR },
-  { kind: "numeric", step: YEARS_PER_HOUR },
-  { kind: "numeric", step: 30 * YEARS_PER_MINUTE },
-  { kind: "numeric", step: 20 * YEARS_PER_MINUTE },
-  { kind: "numeric", step: 15 * YEARS_PER_MINUTE },
-  { kind: "numeric", step: 10 * YEARS_PER_MINUTE },
-  { kind: "numeric", step: 5 * YEARS_PER_MINUTE },
-  { kind: "numeric", step: 2 * YEARS_PER_MINUTE },
-  { kind: "numeric", step: YEARS_PER_MINUTE },
-  { kind: "numeric", step: 30 * YEARS_PER_SECOND },
-  { kind: "numeric", step: 20 * YEARS_PER_SECOND },
-  { kind: "numeric", step: 15 * YEARS_PER_SECOND },
-  { kind: "numeric", step: 10 * YEARS_PER_SECOND },
-  { kind: "numeric", step: 5 * YEARS_PER_SECOND },
-  { kind: "numeric", step: 2 * YEARS_PER_SECOND },
-  { kind: "numeric", step: YEARS_PER_SECOND },
-  { kind: "numeric", step: 500 * YEARS_PER_MILLISECOND },
-  { kind: "numeric", step: 200 * YEARS_PER_MILLISECOND },
-  { kind: "numeric", step: 100 * YEARS_PER_MILLISECOND },
-  { kind: "numeric", step: 50 * YEARS_PER_MILLISECOND },
-  { kind: "numeric", step: 20 * YEARS_PER_MILLISECOND },
-  { kind: "numeric", step: 10 * YEARS_PER_MILLISECOND },
-  { kind: "numeric", step: 5 * YEARS_PER_MILLISECOND },
-  { kind: "numeric", step: 2 * YEARS_PER_MILLISECOND },
-  { kind: "numeric", step: YEARS_PER_MILLISECOND },
-  { kind: "numeric", step: 500 * YEARS_PER_MICROSECOND },
-  { kind: "numeric", step: 200 * YEARS_PER_MICROSECOND },
-  { kind: "numeric", step: 100 * YEARS_PER_MICROSECOND },
-  { kind: "numeric", step: 50 * YEARS_PER_MICROSECOND },
-  { kind: "numeric", step: 20 * YEARS_PER_MICROSECOND },
-  { kind: "numeric", step: 10 * YEARS_PER_MICROSECOND },
-  { kind: "numeric", step: 5 * YEARS_PER_MICROSECOND },
-  { kind: "numeric", step: 2 * YEARS_PER_MICROSECOND },
-  { kind: "numeric", step: YEARS_PER_MICROSECOND },
 ] as const;
 
 function clamp01(value: number) {
@@ -325,6 +297,8 @@ function getElapsedDayTicksForStep(
   endYear: number,
   stepDefinition: Extract<AxisStepDefinition, { kind: "elapsed-day" }>,
   reference: TimelineElapsedReference,
+  preciseStartYear?: PreciseTimelineYear,
+  preciseEndYear?: PreciseTimelineYear,
 ): ExplicitTick[] {
   const clampedStart = Math.max(
     Math.min(startYear, endYear),
@@ -339,10 +313,29 @@ function getElapsedDayTicksForStep(
   const step = stepDefinition.step;
   const ticks: ExplicitTick[] = [];
   const isAfterBigBangRange = reference === "after-big-bang";
+  const orderedPreciseStart =
+    preciseStartYear && preciseEndYear
+      ? comparePreciseTimelineYears(preciseStartYear, preciseEndYear) <= 0
+        ? preciseStartYear
+        : preciseEndYear
+      : splitTimelineYear(clampedStart);
+  const orderedPreciseEnd =
+    preciseStartYear && preciseEndYear
+      ? comparePreciseTimelineYears(preciseStartYear, preciseEndYear) <= 0
+        ? preciseEndYear
+        : preciseStartYear
+      : splitTimelineYear(clampedEnd);
 
   if (isAfterBigBangRange) {
-    const minElapsed = Math.max(0, clampedStart - TIMELINE_MIN_YEAR);
-    const maxElapsed = Math.max(0, clampedEnd - TIMELINE_MIN_YEAR);
+    const referenceYear = splitTimelineYear(TIMELINE_MIN_YEAR);
+    const minElapsed = Math.max(
+      0,
+      subtractPreciseTimelineYears(orderedPreciseStart, referenceYear),
+    );
+    const maxElapsed = Math.max(
+      0,
+      subtractPreciseTimelineYears(orderedPreciseEnd, referenceYear),
+    );
     const firstElapsed = Math.ceil((minElapsed - EPSILON) / step) * step;
 
     for (
@@ -350,14 +343,26 @@ function getElapsedDayTicksForStep(
       elapsed <= maxElapsed + EPSILON;
       elapsed += step
     ) {
-      ticks.push({ year: TIMELINE_MIN_YEAR + elapsed });
+      const preciseYear = addPreciseTimelineYears(referenceYear, elapsed);
+
+      ticks.push({
+        year: toApproximateTimelineYear(preciseYear),
+        preciseYear,
+      });
     }
 
     return ticks;
   }
 
-  const minElapsed = Math.max(0, TIMELINE_MAX_YEAR - clampedEnd);
-  const maxElapsed = Math.max(0, TIMELINE_MAX_YEAR - clampedStart);
+  const referenceYear = splitTimelineYear(TIMELINE_MAX_YEAR);
+  const minElapsed = Math.max(
+    0,
+    subtractPreciseTimelineYears(referenceYear, orderedPreciseEnd),
+  );
+  const maxElapsed = Math.max(
+    0,
+    subtractPreciseTimelineYears(referenceYear, orderedPreciseStart),
+  );
   const firstElapsed = Math.ceil((minElapsed - EPSILON) / step) * step;
 
   for (
@@ -365,7 +370,12 @@ function getElapsedDayTicksForStep(
     elapsed <= maxElapsed + EPSILON;
     elapsed += step
   ) {
-    ticks.push({ year: TIMELINE_MAX_YEAR - elapsed });
+    const preciseYear = addPreciseTimelineYears(referenceYear, -elapsed);
+
+    ticks.push({
+      year: toApproximateTimelineYear(preciseYear),
+      preciseYear,
+    });
   }
 
   return ticks;
@@ -435,6 +445,8 @@ function getExplicitTicksForStep(
       endYear,
       stepDefinition,
       options.elapsedSubYearReference ?? "ago",
+      options.preciseStartYear,
+      options.preciseEndYear,
     );
   }
 
@@ -525,7 +537,7 @@ function getNumericCandidateSteps(
 }
 
 function getCalendarCandidateSteps(yearsPerPixel: number) {
-  return [...CALENDAR_STEP_DEFINITIONS, ...SUB_DAY_STEP_DEFINITIONS]
+  return [...CALENDAR_STEP_DEFINITIONS]
     .filter((stepDefinition) => {
     const pixelsPerStep = stepDefinition.step / yearsPerPixel;
 
@@ -538,7 +550,7 @@ function getCalendarCandidateSteps(yearsPerPixel: number) {
 }
 
 function getElapsedDayCandidateSteps(yearsPerPixel: number) {
-  return [...ELAPSED_DAY_STEP_DEFINITIONS, ...SUB_DAY_STEP_DEFINITIONS]
+  return [...ELAPSED_DAY_STEP_DEFINITIONS]
     .filter((stepDefinition) => {
     const pixelsPerStep = stepDefinition.step / yearsPerPixel;
 
@@ -568,6 +580,22 @@ function getCandidateSteps(
   }
 
   return getNumericCandidateSteps(idealMajorStep, yearsPerPixel);
+}
+
+function getClosestDiscreteStepDefinition(
+  targetStep: number,
+  definitions: readonly AxisStepDefinition[],
+) {
+  return definitions.reduce((best, candidate) => {
+    const bestDistance = Math.abs(Math.log(best.step / targetStep));
+    const candidateDistance = Math.abs(Math.log(candidate.step / targetStep));
+
+    if (Math.abs(candidateDistance - bestDistance) > 1e-9) {
+      return candidateDistance < bestDistance ? candidate : best;
+    }
+
+    return candidate.step < best.step ? candidate : best;
+  });
 }
 
 function getVisibleTickLayers(
@@ -602,6 +630,9 @@ function getVisibleTickLayers(
         labelProgress: 0,
         majorBandProgress: 0,
         labelBandProgress: 0,
+        generationIndex: 0,
+        generationAlpha: 1,
+        generationProgress: 1,
       };
     })
     .filter((layer) => layer.visibleProgress > 0.01);
@@ -663,8 +694,116 @@ function getVisibleTickLayers(
         majorBandProgress: smoothstep01(majorT),
         labelBandProgress:
           index === resolvedLabelIndex ? smoothstep01(labelT) : 0,
+        generationIndex: 0,
+        generationAlpha: 1,
+        generationProgress: 1,
       };
     });
+}
+
+function getLogarithmicStepDefinition(
+  targetStep: number,
+  subYearMode: "numeric" | "calendar" | "elapsed-day",
+): AxisStepDefinition {
+  if (targetStep >= 1 || subYearMode === "numeric") {
+    return {
+      kind: "numeric",
+      step: targetStep,
+    };
+  }
+
+  if (subYearMode === "calendar") {
+    return getClosestDiscreteStepDefinition(targetStep, CALENDAR_STEP_DEFINITIONS);
+  }
+
+  return getClosestDiscreteStepDefinition(targetStep, ELAPSED_DAY_STEP_DEFINITIONS);
+}
+
+function getLogarithmicVisibleTickLayers(
+  yearsPerPixel: number,
+  subYearMode: "numeric" | "calendar" | "elapsed-day",
+) {
+  const geometry = resolveLogarithmicAxisGeometry(yearsPerPixel);
+  const currentStep = 10 ** Math.ceil(geometry.decadeValue);
+  const childStep = currentStep / 10;
+  const parentStep = currentStep * 10;
+  const currentPixelsPerStep = getLogarithmicScreenDeltaFromYearsDelta(
+    currentStep,
+    geometry,
+  );
+  const transitionT = smoothstep01(1 - geometry.decadeRemainder);
+  const revealT = smoothstep01(
+    clamp01(
+      (currentPixelsPerStep - LOGARITHMIC_GENERATION_REVEAL_START_PX) /
+        (LOGARITHMIC_GENERATION_REVEAL_END_PX -
+          LOGARITHMIC_GENERATION_REVEAL_START_PX),
+    ),
+  );
+  const childGenerationAlpha = Math.max(transitionT, revealT * 0.35);
+  const parentGenerationAlpha = 1 - transitionT;
+  const makeLayer = (
+    targetStep: number,
+    generationIndex: number,
+    generationAlpha: number,
+  ): AxisTickLayerState => {
+    const stepDefinition = getLogarithmicStepDefinition(targetStep, subYearMode);
+    const step = stepDefinition.step;
+    const pixelsPerStep = Math.abs(
+      getLogarithmicScreenDeltaFromYearsDelta(step, geometry),
+    );
+    const visibleT = clamp01(
+      (pixelsPerStep - TICK_REVEAL_START_PX) /
+        (TICK_FULL_VISIBILITY_PX - TICK_REVEAL_START_PX),
+    );
+    const labelT = clamp01(
+      (pixelsPerStep - LABEL_MIN_SPACING_PX) /
+        (LABEL_FULL_SPACING_PX - LABEL_MIN_SPACING_PX),
+    );
+
+    return {
+      stepDefinition,
+      step,
+      hierarchyDepth: -generationIndex,
+      pixelsPerStep,
+      growthProgress: smoothstep01(visibleT) * generationAlpha,
+      retainProgress: smoothstep01(visibleT) * generationAlpha,
+      visibleProgress: smoothstep01(visibleT) * generationAlpha,
+      majorProgress:
+        generationIndex === 0
+          ? 1
+          : 0.45 + generationAlpha * 0.55,
+      labelProgress:
+        generationIndex === 0 ? smoothstep01(labelT) : 0,
+      majorBandProgress:
+        generationIndex === 0
+          ? 1
+          : 0.45 + generationAlpha * 0.55,
+      labelBandProgress:
+        generationIndex === 0 ? smoothstep01(labelT) : 0,
+      generationIndex,
+      generationAlpha,
+      generationProgress: transitionT,
+    };
+  };
+
+  const dedupedLayers = new Map<string, AxisTickLayerState>();
+
+  for (const layer of [
+    makeLayer(parentStep, -1, parentGenerationAlpha),
+    makeLayer(currentStep, 0, 1),
+    makeLayer(childStep, 1, childGenerationAlpha),
+  ]) {
+    const key = `${layer.stepDefinition.kind}:${layer.step.toPrecision(15)}`;
+    const existing = dedupedLayers.get(key);
+
+    if (!existing || Math.abs(layer.generationIndex) < Math.abs(existing.generationIndex)) {
+      dedupedLayers.set(key, layer);
+    }
+  }
+
+  return [...dedupedLayers.values()]
+    .filter((layer) => layer.visibleProgress > 0.01 || layer.generationAlpha > 0.01)
+    .sort((left, right) => left.step - right.step);
 }
 
 export function resolveAxisTickRenderStates(
@@ -687,6 +826,7 @@ export function resolveAxisTickRenderStates(
     EPSILON,
   );
   const yearsPerPixel = span / safeWidth;
+  const scaleMode = options.scaleMode ?? "linear";
   const majorCount = Math.max(
     2,
     Math.floor(safeWidth / TARGET_MAJOR_SPACING_PX),
@@ -696,20 +836,16 @@ export function resolveAxisTickRenderStates(
     idealMajorStep < 1
       ? preciseRangeStart.wholeYear > -YEARS_AGO_CUTOFF
         ? "calendar"
-        : preciseRangeEnd.wholeYear <= -YEARS_AGO_CUTOFF
-          ? "elapsed-day"
-          : "numeric"
+        : "elapsed-day"
       : "numeric";
-  const candidateSteps = getCandidateSteps(
-    idealMajorStep,
-    yearsPerPixel,
-    subYearMode,
-  );
-  const visibleLayers = getVisibleTickLayers(
-    candidateSteps,
-    yearsPerPixel,
-    span,
-  );
+  const visibleLayers =
+    scaleMode === "logarithmic"
+      ? getLogarithmicVisibleTickLayers(yearsPerPixel, subYearMode)
+      : getVisibleTickLayers(
+          getCandidateSteps(idealMajorStep, yearsPerPixel, subYearMode),
+          yearsPerPixel,
+          span,
+        );
   const states: AxisTickRenderState[] = [];
 
   for (const layer of visibleLayers) {
@@ -733,6 +869,9 @@ export function resolveAxisTickRenderStates(
         majorProgress: layer.majorProgress,
         labelOpacity: layer.labelProgress,
         labelStep: layer.step,
+        generationIndex: layer.generationIndex,
+        generationAlpha: layer.generationAlpha,
+        generationProgress: layer.generationProgress,
       });
     }
   }

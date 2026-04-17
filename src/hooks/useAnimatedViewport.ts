@@ -4,12 +4,14 @@ import {
   normalizeViewport,
   panByPixels,
   zoomAtPosition,
+  type TimelineScaleMode,
   type TimelineViewport,
 } from "../lib/time/viewport";
 
 type AnimationTarget = {
   centerYear: number;
   zoom: number;
+  scaleMode?: TimelineScaleMode;
   startTime: number;
   duration: number;
   from: TimelineViewport;
@@ -51,7 +53,16 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
         anim.from.centerYear + (anim.centerYear - anim.from.centerYear) * t;
       const zoom = anim.from.zoom + (anim.zoom - anim.from.zoom) * t;
 
-      setViewport(normalizeViewport({ centerYear, zoom }, Math.max(width, 1)));
+      setViewport(
+        normalizeViewport(
+          {
+            centerYear,
+            zoom,
+            scaleMode: anim.scaleMode ?? anim.from.scaleMode,
+          },
+          Math.max(width, 1),
+        ),
+      );
 
       if (rawT >= 1) {
         animationRef.current = null;
@@ -114,12 +125,14 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
         endYear,
         Math.max(width, 1),
         paddingRatio,
+        viewport.scaleMode,
       );
       setIsAnimating(true);
       setViewport((current) => {
         animationRef.current = {
           centerYear: target.centerYear,
           zoom: target.zoom,
+          scaleMode: target.scaleMode,
           startTime: performance.now(),
           duration: ANIMATION_DURATION,
           from: { ...current },
@@ -128,7 +141,7 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
         return current;
       });
     },
-    [width, startRaf],
+    [startRaf, viewport.scaleMode, width],
   );
 
   const animateZoom = useCallback(

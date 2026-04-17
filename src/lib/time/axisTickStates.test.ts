@@ -60,12 +60,12 @@ describe("axis tick render states", () => {
     expect(sharedTick.some((state) => state.step === 500)).toBe(true);
   });
 
-  it("keeps subdivision ticks available instead of dropping to zero between zoom bands", () => {
+  it("brings subdivision ticks in once they enter the visible ladder window", () => {
     const hidden = getTickState(-1_000, 100_000, 1_000);
     const emerging = getTickState(-1_000, 16_000, 1_000);
     const grown = getTickState(-1_000, 9_000, 1_000);
 
-    expect(hidden?.visibleProgress ?? 0).toBeGreaterThan(0.5);
+    expect(hidden).toBeUndefined();
     expect(emerging?.visibleProgress ?? 0).toBeGreaterThan(0.5);
     expect(grown?.visibleProgress ?? 0).toBe(1);
     expect(grown?.growthProgress ?? 0).toBe(1);
@@ -192,27 +192,22 @@ describe("axis tick render states", () => {
     }
   });
 
-  it("offers microsecond-scale ticks for extremely narrow calendar ranges", () => {
-    const yearsPerMicrosecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000_000;
-    const states = resolveAxisTickRenderStates(
-      1912.286,
-      1912.286 + yearsPerMicrosecond * 4,
-      1_200,
-    );
+  it("does not resolve sub-day steps for narrow calendar ranges", () => {
+    const yearsPerDay = 1 / 365.2425;
+    const states = resolveAxisTickRenderStates(2025.57, 2025.58, 1_200);
 
+    expect(states.length).toBeGreaterThan(0);
     expect(
-      states.some(
-        (state) => Math.abs(state.step - yearsPerMicrosecond) < yearsPerMicrosecond * 0.05,
-      ),
+      states.every((state) => state.step >= yearsPerDay - 1e-12),
     ).toBe(true);
   });
 
-  it("keeps discrete one-microsecond ticks across a Big Bang microsecond span", () => {
-    const yearsPerMicrosecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000_000;
+  it("keeps discrete daily ticks across a deep Big Bang day span", () => {
+    const yearsPerDay = 1 / 365.2425;
     const preciseStart = splitTimelineYear(TIMELINE_MIN_YEAR);
     const preciseEnd = {
       wholeYear: TIMELINE_MIN_YEAR,
-      fraction: yearsPerMicrosecond * 13,
+      fraction: yearsPerDay * 13,
     };
     const states = resolveAxisTickRenderStates(
       TIMELINE_MIN_YEAR,
@@ -224,54 +219,14 @@ describe("axis tick render states", () => {
         preciseEndYear: preciseEnd,
       },
     );
-    const microsecondStates = states.filter(
-      (state) =>
-        Math.abs(state.step - yearsPerMicrosecond) < yearsPerMicrosecond * 0.05,
+    const dailyStates = states.filter(
+      (state) => Math.abs(state.step - yearsPerDay) < 1e-9,
     );
 
-    expect(microsecondStates.length).toBeGreaterThanOrEqual(13);
-    expect(microsecondStates.some((state) => state.hierarchyDepth === 0)).toBe(
+    expect(dailyStates.length).toBeGreaterThanOrEqual(13);
+    expect(dailyStates.some((state) => state.hierarchyDepth === 0)).toBe(
       true,
     );
-  });
-
-  it("uses a contiguous 1-2-5-10 microsecond ladder at deep Big Bang zoom", () => {
-    const yearsPerMicrosecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000_000;
-    const preciseStart = splitTimelineYear(TIMELINE_MIN_YEAR);
-    const preciseEnd = {
-      wholeYear: TIMELINE_MIN_YEAR,
-      fraction: yearsPerMicrosecond * 13,
-    };
-    const states = resolveAxisTickRenderStates(
-      TIMELINE_MIN_YEAR,
-      TIMELINE_MIN_YEAR,
-      1_800,
-      {
-        elapsedSubYearReference: "after-big-bang",
-        preciseStartYear: preciseStart,
-        preciseEndYear: preciseEnd,
-      },
-    );
-    const visibleSteps = new Set(
-      states.map((state) =>
-        Math.round((state.step / yearsPerMicrosecond) * 1_000) / 1_000,
-      ),
-    );
-    const labeledSteps = new Set(
-      states
-        .filter((state) => state.labelOpacity > 0.01)
-        .map(
-          (state) =>
-            Math.round((state.labelStep / yearsPerMicrosecond) * 1_000) / 1_000,
-        ),
-    );
-
-    expect(visibleSteps.has(1)).toBe(true);
-    expect(visibleSteps.has(2)).toBe(true);
-    expect(visibleSteps.has(5)).toBe(true);
-    expect(visibleSteps.has(10)).toBe(true);
-    expect(visibleSteps.has(50)).toBe(false);
-    expect(labeledSteps).toEqual(new Set([1]));
   });
 
   it("keeps numeric levels contiguous through the 1-2-5 ladder", () => {
@@ -290,12 +245,12 @@ describe("axis tick render states", () => {
     expect(visibleSteps.has(1_000_000)).toBe(true);
   });
 
-  it("keeps sub-year ticks alive at Big Bang deep zoom using precise range data", () => {
-    const yearsPerMicrosecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000_000;
+  it("keeps day ticks alive at Big Bang deep zoom using precise range data", () => {
+    const yearsPerDay = 1 / 365.2425;
     const preciseStart = splitTimelineYear(TIMELINE_MIN_YEAR);
     const preciseEnd = {
       wholeYear: TIMELINE_MIN_YEAR,
-      fraction: yearsPerMicrosecond * 4,
+      fraction: yearsPerDay * 4,
     };
     const states = resolveAxisTickRenderStates(
       TIMELINE_MIN_YEAR,
@@ -311,9 +266,7 @@ describe("axis tick render states", () => {
     expect(states.length).toBeGreaterThan(0);
     expect(
       states.some(
-        (state) =>
-          Math.abs(state.step - yearsPerMicrosecond) <
-          yearsPerMicrosecond * 0.05,
+        (state) => Math.abs(state.step - yearsPerDay) < 1e-9,
       ),
     ).toBe(true);
   });
@@ -325,5 +278,105 @@ describe("axis tick render states", () => {
 
     expect(states.length).toBeGreaterThan(0);
     expect(states.some((state) => state.visibleProgress > 0.5)).toBe(true);
+  });
+
+  it("resolves parent, current, and child generations in logarithmic mode", () => {
+    const states = resolveAxisTickRenderStates(-200_000, 200_000, 1_000, {
+      scaleMode: "logarithmic",
+      anchorYear: 1_234,
+    });
+    const generations = new Set(states.map((state) => state.generationIndex));
+    const stepsByGeneration = new Map<number, Set<number>>();
+
+    for (const state of states) {
+      const existing = stepsByGeneration.get(state.generationIndex) ?? new Set<number>();
+      existing.add(state.step);
+      stepsByGeneration.set(state.generationIndex, existing);
+    }
+
+    expect(generations).toEqual(new Set([-1, 0, 1]));
+    expect(stepsByGeneration.get(-1)).toEqual(new Set([1_000_000]));
+    expect(stepsByGeneration.get(0)).toEqual(new Set([100_000]));
+    expect(stepsByGeneration.get(1)).toEqual(new Set([10_000]));
+    expect(states.some((state) => Math.abs(state.year) < 1e-9)).toBe(true);
+  });
+
+  it("cross-fades logarithmic generations from parent to child using decade progress", () => {
+    const states = resolveAxisTickRenderStates(-200_000, 200_000, 1_000, {
+      scaleMode: "logarithmic",
+      anchorYear: 0,
+    });
+    const parentState = states.find((state) => state.generationIndex === -1);
+    const currentState = states.find((state) => state.generationIndex === 0);
+    const childState = states.find((state) => state.generationIndex === 1);
+
+    expect(parentState).toBeDefined();
+    expect(currentState).toBeDefined();
+    expect(childState).toBeDefined();
+    expect(parentState?.generationAlpha ?? 0).toBeGreaterThan(0);
+    expect(parentState?.generationAlpha ?? 0).toBeLessThan(1);
+    expect(currentState?.generationAlpha ?? 0).toBe(1);
+    expect(childState?.generationAlpha ?? 0).toBeGreaterThan(0);
+    expect(childState?.generationAlpha ?? 0).toBeLessThan(1);
+    expect(parentState?.generationProgress ?? 0).toBeCloseTo(
+      childState?.generationProgress ?? 0,
+      6,
+    );
+    expect(currentState?.labelOpacity ?? 0).toBeGreaterThan(0);
+    expect(parentState?.labelOpacity ?? 0).toBe(0);
+    expect(childState?.labelOpacity ?? 0).toBe(0);
+  });
+
+  it("keeps logarithmic tick years stable when the anchor shifts during panning", () => {
+    const left = resolveAxisTickRenderStates(-200_000, 200_000, 1_000, {
+      scaleMode: "logarithmic",
+      anchorYear: -25_000,
+    });
+    const right = resolveAxisTickRenderStates(-200_000, 200_000, 1_000, {
+      scaleMode: "logarithmic",
+      anchorYear: 25_000,
+    });
+
+    const leftKeys = new Set(left.map((state) => `${state.step}:${state.year}`));
+    const rightKeys = new Set(right.map((state) => `${state.step}:${state.year}`));
+
+    expect(leftKeys).toEqual(rightKeys);
+  });
+
+  it("snaps logarithmic Big Bang sub-year layers to discrete elapsed-day steps", () => {
+    const yearsPerDay = 1 / 365.2425;
+    const preciseStart = splitTimelineYear(TIMELINE_MIN_YEAR);
+    const preciseEnd = {
+      wholeYear: TIMELINE_MIN_YEAR,
+      fraction: yearsPerDay * 7.5,
+    };
+    const states = resolveAxisTickRenderStates(
+      TIMELINE_MIN_YEAR,
+      TIMELINE_MIN_YEAR,
+      1_200,
+      {
+        scaleMode: "logarithmic",
+        elapsedSubYearReference: "after-big-bang",
+        preciseStartYear: preciseStart,
+        preciseEndYear: preciseEnd,
+      },
+    );
+    const daySteps = new Set(
+      states
+        .map((state) => Number((state.step / yearsPerDay).toFixed(6)))
+        .filter((step) => step < 365.2425),
+    );
+
+    expect(daySteps.size).toBeGreaterThan(0);
+    expect([...daySteps].every((step) => [1, 2, 7, 14, 30, 60, 90, 180].includes(step))).toBe(true);
+
+    for (const state of states.filter((state) => state.step < 1)) {
+      expect(state.wholeYear).toBe(TIMELINE_MIN_YEAR);
+      expect(state.yearFraction).toBeDefined();
+      expect((state.yearFraction ?? 0) * 365.2425).toBeCloseTo(
+        Math.round((state.yearFraction ?? 0) * 365.2425),
+        6,
+      );
+    }
   });
 });
