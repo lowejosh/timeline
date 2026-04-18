@@ -176,6 +176,7 @@ describe("root timeline display data", () => {
       "protestant-reformation",
       "american-independence-declared",
       "french-revolution",
+      "berlin-conference-opens",
       "titanic-sinks",
       "world-war-i",
       "russian-revolution",

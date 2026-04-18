@@ -156,9 +156,7 @@ describe("timeline tick generation", () => {
         BCE_YEARS_AGO_HANDOFF_YEAR - 1.8,
         BCE_YEARS_AGO_HANDOFF_YEAR + 0.05,
       ),
-    ).toBe(
-      "elapsed",
-    );
+    ).toBe("elapsed");
     expect(
       getDominantTimelineDateReference(
         BCE_YEARS_AGO_HANDOFF_YEAR - 0.4,

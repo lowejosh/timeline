@@ -200,7 +200,11 @@ export function TimelineSidebar({
                               </span>
                               <OverlayGroupIconSvg
                                 className="timeline-sidebar__item-icon"
-                                groupId={section.id === "overlays" ? entry.id : undefined}
+                                groupId={
+                                  section.id === "overlays"
+                                    ? entry.id
+                                    : undefined
+                                }
                               />
                             </span>
                           </span>

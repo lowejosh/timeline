@@ -7,15 +7,11 @@ import {
 describe("overlay group icons", () => {
   it("maps supported overlay groups to icon ids", () => {
     expect(resolveOverlayGroupIconId("cultures")).toBe("cultures");
-    expect(resolveOverlayGroupIconId("civilizations")).toBe(
-      "civilizations",
-    );
+    expect(resolveOverlayGroupIconId("civilizations")).toBe("civilizations");
     expect(resolveOverlayGroupIconId("human-evolution")).toBe(
       "human-evolution",
     );
-    expect(resolveOverlayGroupIconId("deep-time-life")).toBe(
-      "deep-time-life",
-    );
+    expect(resolveOverlayGroupIconId("deep-time-life")).toBe("deep-time-life");
     expect(resolveOverlayGroupIconId("human-history")).toBeNull();
   });
 

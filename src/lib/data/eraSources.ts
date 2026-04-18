@@ -1694,6 +1694,15 @@ export const ERA_SOURCES = {
     url: "https://www.history.com/articles/french-revolution",
     notes: "Used for the standard 1789 start of the French Revolution.",
   },
+  britannicaScrambleForAfrica: {
+    shortTitle: "Britannica: Scramble for Africa",
+    title: "Scramble for Africa",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Scramble for Africa."',
+    url: "https://www.britannica.com/event/Scramble-for-Africa",
+    notes:
+      "Used for the late-19th-century partition of Africa and for the Berlin Conference's November 15, 1884-February 26, 1885 role in formalizing and accelerating European colonial claims.",
+  },
   historyWorldWarOne: {
     shortTitle: "History: World War I",
     title: "World War I",

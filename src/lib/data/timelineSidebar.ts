@@ -191,7 +191,9 @@ export function resolveTimelineSidebarSections(
     }
 
     if (
-      OVERLAY_ENTRY_IDS_HIDDEN_WITHOUT_ZOOM_VISIBLE_HISTORY.has(definition.id) &&
+      OVERLAY_ENTRY_IDS_HIDDEN_WITHOUT_ZOOM_VISIBLE_HISTORY.has(
+        definition.id,
+      ) &&
       hasHumanHistoryContent &&
       !hasZoomVisibleHumanHistoryMarkers
     ) {

@@ -299,6 +299,23 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     ],
   },
   {
+    id: "berlin-conference-opens",
+    label: "Berlin Conference opens",
+    shortLabel: "Scramble for Africa",
+    description:
+      "European powers met in Berlin to reconcile rival claims in Africa and set rules that accelerated colonial partition across most of the continent.",
+    year: ce(1884),
+    regionalScopeLabel: "Africa",
+    minZoom: 18,
+    priority: 84,
+    sourceRefs: [
+      {
+        sourceId: "britannicaScrambleForAfrica",
+        note: "Britannica's Scramble for Africa article says Bismarck's proposal led to the Berlin Conference held from November 15, 1884, to February 26, 1885, and that the conference formalized claims and accelerated the pace of colonization; the app uses the conference opening in 1884 as a clean marker anchor.",
+      },
+    ],
+  },
+  {
     id: "titanic-sinks",
     label: "Titanic sinks in North Atlantic",
     shortLabel: "Titanic Sinks",

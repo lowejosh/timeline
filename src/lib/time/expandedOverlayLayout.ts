@@ -62,8 +62,7 @@ function overlapsVertically(
   laneGap: number,
 ) {
   return !(
-    top + height + laneGap <= obstacleTop ||
-    top >= obstacleBottom + laneGap
+    top + height + laneGap <= obstacleTop || top >= obstacleBottom + laneGap
   );
 }
 
@@ -95,7 +94,8 @@ function resolvePackedExpandedOverlayYById(
   for (const item of sortedItems) {
     const expansion = expansionsById.get(item.id);
     const currentPanelHeight = expansion
-      ? Math.max(expansion.panelHeight, 0) * clamp01(expansion.expansionProgress)
+      ? Math.max(expansion.panelHeight, 0) *
+        clamp01(expansion.expansionProgress)
       : 0;
     const obstacleHeight = resolveExpandedOverlayObstacleHeight(
       bandHeight,

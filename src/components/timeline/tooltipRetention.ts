@@ -11,9 +11,21 @@ export type TooltipRetentionAnchor = {
   placement: "above" | "below";
 };
 
+export type TooltipRetentionCandidate = {
+  tooltip: {
+    sources: readonly unknown[];
+  };
+};
+
 const STICKY_RECT_PADDING_X = 6;
 const STICKY_RECT_PADDING_TOP = 12;
 const STICKY_RECT_PADDING_BOTTOM = 4;
+
+export function shouldPrioritizeTooltipRetention(
+  tooltip: TooltipRetentionCandidate | null | undefined,
+) {
+  return (tooltip?.tooltip.sources.length ?? 0) > 0;
+}
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -106,9 +118,7 @@ export function shouldRetainTooltipAtPoint(
     localStickyRect.right - 8,
   );
   const edgeY =
-    anchor.placement === "below"
-      ? localStickyRect.top
-      : localStickyRect.bottom;
+    anchor.placement === "below" ? localStickyRect.top : localStickyRect.bottom;
 
   return isPointInTooltipBridgeTriangle(
     pointX,

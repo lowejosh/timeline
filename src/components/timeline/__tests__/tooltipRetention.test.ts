@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  shouldPrioritizeTooltipRetention,
   shouldRetainTooltipAtPoint,
   type TooltipRect,
   type TooltipRetentionAnchor,
@@ -26,6 +27,24 @@ const ABOVE_ANCHOR: TooltipRetentionAnchor = {
 };
 
 describe("tooltip retention", () => {
+  it("prioritizes tooltips with sources for bridge retention", () => {
+    expect(
+      shouldPrioritizeTooltipRetention({
+        tooltip: {
+          sources: [{ id: "britannicaCarthage" }],
+        },
+      }),
+    ).toBe(true);
+
+    expect(
+      shouldPrioritizeTooltipRetention({
+        tooltip: {
+          sources: [],
+        },
+      }),
+    ).toBe(false);
+  });
+
   it("does not retain the tooltip from the non-interactive header area", () => {
     expect(
       shouldRetainTooltipAtPoint(
