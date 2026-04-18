@@ -6,6 +6,7 @@ import {
 } from "./viewport";
 import {
   getPreciseTimelineYearDelta,
+  getTimelineYearFromYearsAgo,
   getYearsAfterBigBang,
   getYearsAgoFromPresent,
   TIMELINE_MAX_YEAR,
@@ -45,9 +46,9 @@ export type TimelineTicks = {
 
 const numberFormatter = new Intl.NumberFormat("en-US");
 const AVERAGE_DAYS_PER_YEAR = 365.2425;
-export const BCE_YEARS_AGO_HANDOFF_YEAR = -10_000;
-export const YEARS_AGO_CUTOFF = getYearsAgoFromPresent(
-  BCE_YEARS_AGO_HANDOFF_YEAR,
+export const YEARS_AGO_CUTOFF = 15_000;
+export const BCE_YEARS_AGO_HANDOFF_YEAR = getTimelineYearFromYearsAgo(
+  YEARS_AGO_CUTOFF,
 );
 export const TIMELINE_DATE_REFERENCE_DOMINANCE_THRESHOLD = 0.85;
 const ELAPSED_ZERO_EPSILON = 1e-18;
@@ -228,13 +229,19 @@ function resolvePreciseTimelineYear(
   return typeof year === "number" ? splitTimelineYear(year) : year;
 }
 
+function isElapsedTimelineDateReferenceYear(
+  year: number | PreciseTimelineYear,
+) {
+  return (
+    toApproximateTimelineYear(resolvePreciseTimelineYear(year)) <=
+    BCE_YEARS_AGO_HANDOFF_YEAR
+  );
+}
+
 export function getTimelineDateReference(
   year: number | PreciseTimelineYear,
 ): TimelineDateReference {
-  return resolvePreciseTimelineYear(year).wholeYear <=
-    BCE_YEARS_AGO_HANDOFF_YEAR
-    ? "elapsed"
-    : "calendar";
+  return isElapsedTimelineDateReferenceYear(year) ? "elapsed" : "calendar";
 }
 
 export function getDominantTimelineDateReference(
@@ -258,7 +265,7 @@ export function getDominantTimelineDateReference(
   }
 
   const totalSpan = Math.max(orderedEnd - orderedStart, 1e-18);
-  const calendarStartYear = BCE_YEARS_AGO_HANDOFF_YEAR + 1;
+  const calendarStartYear = BCE_YEARS_AGO_HANDOFF_YEAR;
   const elapsedSpan = Math.max(
     0,
     Math.min(orderedEnd, calendarStartYear) - orderedStart,

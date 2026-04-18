@@ -12,13 +12,17 @@ import {
   getDominantTimelineDateReference,
   getTimelineYearFromUtcParts,
   getTimelineTicks,
+  YEARS_AGO_CUTOFF,
 } from "../bands";
 import {
   createExactCalendarTimestamp,
   getTimelineYearFromExactTimestamp,
 } from "../exactTimestamp";
 import { splitTimelineYear, TIMELINE_MIN_YEAR } from "../viewport";
-import { getYearsAgoFromPresent } from "../timelineYears";
+import {
+  getTimelineYearFromYearsAgo,
+  getYearsAgoFromPresent,
+} from "../timelineYears";
 
 const numberFormatter = new Intl.NumberFormat("en-US");
 
@@ -134,18 +138,33 @@ describe("timeline tick generation", () => {
     expect(formatTimelineYear(-3000)).toBe("3,000 BCE");
   });
 
-  it("hands off from BCE labels to years-ago labels at 10,000 BCE", () => {
+  it("hands off from BCE labels to years-ago labels at 15,000 years ago", () => {
+    const moreRecentThanCutoff = getTimelineYearFromYearsAgo(
+      YEARS_AGO_CUTOFF - 1,
+    );
+
+    expect(YEARS_AGO_CUTOFF).toBe(15_000);
     expect(formatTimelineYear(BCE_YEARS_AGO_HANDOFF_YEAR)).toContain(
       "years ago",
     );
-    expect(formatTimelineYear(-9_000)).toBe("9,000 BCE");
+    expect(formatTimelineYear(moreRecentThanCutoff)).toContain("BCE");
   });
 
   it("keeps the dominant date reference when only a tiny slice crosses the hand-off", () => {
-    expect(getDominantTimelineDateReference(-10_000.8, -9_998.95)).toBe(
+    expect(
+      getDominantTimelineDateReference(
+        BCE_YEARS_AGO_HANDOFF_YEAR - 1.8,
+        BCE_YEARS_AGO_HANDOFF_YEAR + 0.05,
+      ),
+    ).toBe(
       "elapsed",
     );
-    expect(getDominantTimelineDateReference(-9_999.4, -9_998.6)).toBeNull();
+    expect(
+      getDominantTimelineDateReference(
+        BCE_YEARS_AGO_HANDOFF_YEAR - 0.4,
+        BCE_YEARS_AGO_HANDOFF_YEAR + 0.4,
+      ),
+    ).toBeNull();
   });
 
   it("prefixes approximate labels with a tilde only once", () => {

@@ -5,36 +5,75 @@ const POST_CLASSICAL_MIN_ZOOM = 15;
 
 const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
   {
-    id: "sumerian-city-states",
-    label: "Sumerian city-states",
-    shortLabel: "Sumer",
+    id: "uruk-period",
+    label: "Uruk period",
+    shortLabel: "Uruk",
     description:
-      "Early civilization of southern Mesopotamia organized around independent city-states such as Uruk, Ur, and Lagash.",
-    startYear: bce(3_500),
-    endYear: bce(2_334),
+      "Southern Mesopotamian phase in which Uruk culture saw the appearance of cities and the state, with proto-cuneiform emerging late in the period.",
+    startYear: bce(4_000),
+    endYear: bce(3_100),
     regionalScopeLabel: "Southern Mesopotamia",
     approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(214, 166, 112)",
+    subGroup: "near-east",
+    sourceRefs: [
+      {
+        sourceId: "urukPeriodWikipedia",
+        note: "Uses the page's explicit Uruk period range of c. 4000–3100 BC and its direct framing of this phase as the period of the appearance of cities and the state in Mesopotamia.",
+      },
+      {
+        sourceId: "metUrukFirstCity",
+        note: "The Met says that by around 3200 B.C. Uruk was a true city, which anchors the later, clearly urban part of this broader Uruk-period band.",
+      },
+    ],
+  },
+  {
+    id: "jemdet-nasr-period",
+    label: "Jemdet Nasr",
+    shortLabel: "Jemdet Nasr",
+    description:
+      "Southern Mesopotamian phase developing out of the Uruk period and continuing into Early Dynastic I, with proto-cuneiform administration and distinctive painted pottery.",
+    startYear: bce(3_100),
+    endYear: bce(2_900),
+    regionalScopeLabel: "Southern Mesopotamia",
+    color: "rgb(208, 160, 108)",
+    subGroup: "near-east",
+    sourceRefs: [
+      {
+        sourceId: "jemdetNasrPeriodWikipedia",
+        note: "Uses the page's direct 3100–2900 BC dating and its statement that the Jemdet Nasr culture develops out of the Uruk period and continues into Early Dynastic I.",
+      },
+    ],
+  },
+  {
+    id: "sumerian-city-states",
+    label: "Early Dynastic Sumer",
+    shortLabel: "Early Dynastic",
+    description:
+      "Southern Mesopotamian period when city-states dominated Mesopotamia and city rulers grew in importance.",
+    startYear: bce(2_900),
+    endYear: bce(2_350),
+    regionalScopeLabel: "Southern Mesopotamia",
+    approximateStart: true,
+    approximateEnd: true,
     color: "rgb(202, 156, 105)",
     subGroup: "near-east",
     sourceRefs: [
       {
-        sourceId: "britannicaMesopotamia",
-        note: "Britannica treats the late 4th millennium BCE as Mesopotamia's early urban and writing threshold; the app uses that broader framing for a public-facing Sumerian city-state band.",
-      },
-      {
-        sourceId: "britannicaBabylonia",
-        note: "Britannica describes Sumer as the southeastern half of pre-Babylonian southern Mesopotamia before Babylon's rise to political prominence.",
+        sourceId: "metEarlyDynasticSculpture",
+        note: "The Met directly dates the Early Dynastic period in Mesopotamia to ca. 2900–2350 B.C. and says this was the phase when city life remained centered on the gods while city rulers grew in importance.",
       },
     ],
   },
   {
     id: "akkadian-empire",
-    label: "Akkadian Empire",
+    label: "Akkadian period",
     shortLabel: "Akkad",
     description:
-      "The first large Mesopotamian empire built by Sargon of Akkad and his successors.",
-    startYear: bce(2_334),
-    endYear: bce(2_154),
+      "Period named for Akkad, whose Semitic monarchs united the rival Sumerian cities by conquest.",
+    startYear: bce(2_350),
+    endYear: bce(2_150),
     regionalScopeLabel: "Mesopotamia",
     approximateStart: true,
     approximateEnd: true,
@@ -42,35 +81,41 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     subGroup: "near-east",
     sourceRefs: [
       {
-        sourceId: "britannicaAkkad",
-        note: "Britannica says Sargon founded Agade about 2300 BCE, united the city-states, and that his dynasty fell about 2150 BCE; the app uses the standard conventional span of c. 2334–2154 BCE for the Akkadian Empire.",
+        sourceId: "metAkkadianPeriod",
+        note: "The Met explicitly names the Akkadian period as ca. 2350–2150 B.C. and says Akkad's Semitic monarchs united the rival Sumerian cities by conquest.",
       },
     ],
   },
   {
     id: "ur-iii-empire",
-    label: "Ur III Empire",
+    label: "Ur III state",
     shortLabel: "Ur III",
     description:
-      "Neo-Sumerian kingdom centered on Ur, known for restoring centralized rule in southern Mesopotamia after the Akkadian collapse.",
+      "State founded by Ur-Nammu, who brought southern Mesopotamian cities under the control of Ur and sponsored major temple building.",
     startYear: bce(2_112),
     endYear: bce(2_004),
     regionalScopeLabel: "Southern Mesopotamia",
+    approximateStart: true,
+    approximateEnd: true,
     color: "rgb(182, 144, 101)",
     subGroup: "near-east",
     sourceRefs: [
       {
-        sourceId: "britannicaMesopotamia",
-        note: "Britannica highlights the 3rd dynasty of Ur as a major Mesopotamian phase whose administrative system and influence carried into the first quarter of the 2nd millennium BCE.",
+        sourceId: "metUrZiggurat",
+        note: "The Met says that around 2100 B.C. southern Mesopotamian cities came under the control of Ur-Nammu, ruler of Ur, who built major temples including the ziggurat at Ur.",
+      },
+      {
+        sourceId: "metIsinLarsaOldBabylonian",
+        note: "The Met explicitly dates the Ur III state to ca. 2112–2004 B.C., before its collapse and the rise of city-based dynasties in southern Mesopotamia.",
       },
     ],
   },
   {
     id: "old-babylonian-empire",
-    label: "Old Babylonian Empire",
-    shortLabel: "Babylon",
+    label: "Old Babylonian period",
+    shortLabel: "Old Babylonian",
     description:
-      "The Amorite-era Babylonian kingdom best known for Hammurabi's reign and laws.",
+      "Period when Hammurabi and his successors turned Babylon from a minor city into the political capital of Mesopotamia.",
     startYear: bce(1_894),
     endYear: bce(1_595),
     regionalScopeLabel: "Babylonia",
@@ -79,59 +124,47 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     subGroup: "near-east",
     sourceRefs: [
       {
-        sourceId: "britannicaBabylonia",
-        note: "Britannica says Babylon rose to political prominence around 1850 BCE under Amorite rule and that this phase lasted until 1600 BCE; the app uses the conventional Old Babylonian span of 1894–1595 BCE.",
-      },
-      {
-        sourceId: "britannicaHammurabi",
-        note: "Supports the public-facing association of this Babylonian phase with Hammurabi's reign and legal legacy.",
+        sourceId: "metIsinLarsaOldBabylonian",
+        note: "The Met explicitly dates the Old Babylonian period to ca. 1894–1595 B.C. and says Hammurabi transformed Babylon from a city of little importance into the political capital of Mesopotamia.",
       },
     ],
   },
   {
     id: "kassite-babylonia",
-    label: "Kassite Babylonia",
+    label: "Middle Babylonian / Kassite",
     shortLabel: "Kassites",
     description:
-      "The long-lasting Kassite dynasty that ruled Babylonia after the Old Babylonian collapse and anchored much of southern Mesopotamia in the later Bronze Age.",
+      "Long-lived Kassite rule in southern Mesopotamia, so enduring that it became virtually synonymous with the Middle Babylonian period.",
     startYear: bce(1_595),
     endYear: bce(1_155),
     regionalScopeLabel: "Babylonia",
+    approximateStart: true,
     approximateEnd: true,
     color: "rgb(154, 126, 96)",
     subGroup: "near-east",
     sourceRefs: [
       {
-        sourceId: "metBabylon",
-        note: "The Met says the Old Babylonian period ended in 1595 BCE and that a new Kassite dynasty then emerged in Babylonia; the app uses the conventional Kassite span through 1155 BCE.",
-      },
-      {
-        sourceId: "britannicaBabylonia",
-        note: "Britannica's broad Babylonia overview supports treating the Kassite centuries as a major intermediate Babylonian phase between Old and late Babylonian prominence.",
+        sourceId: "metMiddleBabylonianKassite",
+        note: "The Met titles this phase 'The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.)' and says Kassite rule was so long lasting that it was virtually synonymous with the Middle Babylonian period.",
       },
     ],
   },
   {
     id: "middle-assyrian-empire",
-    label: "Middle Assyrian Empire",
+    label: "Middle Assyrian period",
     shortLabel: "Mid Assyria",
     description:
-      "Assyrian kingdom and expanding empire of the late second millennium BCE, centered in northern Mesopotamia.",
+      "Assyrian revival from Ashur-uballit I through Tiglath-pileser I, conquering Mitanni and projecting power from the Euphrates to the Mediterranean.",
     startYear: bce(1_365),
-    endYear: bce(1_050),
+    endYear: bce(1_076),
     regionalScopeLabel: "Northern Mesopotamia",
     approximateStart: true,
-    approximateEnd: true,
     color: "rgb(141, 118, 138)",
     subGroup: "near-east",
     sourceRefs: [
       {
         sourceId: "metAssyria",
-        note: "The Met frames Assyria's revival from Ashur-uballit I in 1365 BCE, its expansion under Adad-nirari I and Tukulti-Ninurta I, and its territorial contraction by the end of the 2nd millennium BCE; the app uses a conventional c. 1365–1050 BCE span for this middle imperial phase.",
-      },
-      {
-        sourceId: "worldHistoryAssyria",
-        note: "World History Encyclopedia divides Assyria into older, middle, and neo-imperial phases and helps support a broad public-facing Middle Assyrian band before the Neo-Assyrian revival.",
+        note: "The Met says Assyria revived under Ashur-uballit I (1365–1330 B.C.), reached its greatest extent in the Middle Assyrian period under Tukulti-Ninurta I, and under Tiglath-pileser I (1114–1076 B.C.) campaigned as far as the Mediterranean.",
       },
     ],
   },
@@ -140,7 +173,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     label: "Neo-Assyrian Empire",
     shortLabel: "Assyria",
     description:
-      "The late expansionist Assyrian superpower centered on cities such as Nineveh and Ashur.",
+      "Final stage of Assyrian power, stretching across Mesopotamia, the Levant, Egypt, Anatolia, and into parts of Persia and Arabia.",
     startYear: bce(912),
     endYear: bce(612),
     regionalScopeLabel: "Northern Mesopotamia",
@@ -148,8 +181,8 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     subGroup: "near-east",
     sourceRefs: [
       {
-        sourceId: "worldHistoryAssyria",
-        note: "World History Encyclopedia identifies the Neo-Assyrian Empire as the late imperial phase from 912 to 612 BCE, the period most familiar in broad ancient-history surveys.",
+        sourceId: "worldHistoryNeoAssyrianEmpire",
+        note: "World History Encyclopedia explicitly dates the Neo-Assyrian Empire to 912–612 BCE and describes it as the final stage of Assyrian power, stretching across Mesopotamia, the Levant, Egypt, Anatolia, and parts of Persia and Arabia.",
       },
     ],
   },
@@ -158,16 +191,16 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     label: "Neo-Babylonian Empire",
     shortLabel: "Neo-Babylon",
     description:
-      "The final great independent Babylonian phase before the Persian conquest.",
-    startYear: bce(626),
+      "Babylonian revival under Nabopolassar and Nebuchadnezzar II, ruling most of the former Assyrian empire before Cyrus conquered the city.",
+    startYear: bce(625),
     endYear: bce(539),
     regionalScopeLabel: "Babylonia",
     color: "rgb(153, 114, 172)",
     subGroup: "near-east",
     sourceRefs: [
       {
-        sourceId: "britannicaBabylonia",
-        note: "Britannica describes the last and greatest period of Babylonian supremacy under Nabopolassar and Nebuchadnezzar II, ending when Cyrus captured Babylonia in 539 BCE; the app uses the conventional Neo-Babylonian span of 626–539 BCE.",
+        sourceId: "metBabylon",
+        note: "The Met gives Nabopolassar's reign as 625–605 B.C., describes him and Nebuchadnezzar II as ruling most of the former Assyrian empire, and dates Cyrus II's conquest of Babylon to 539 B.C.",
       },
     ],
   },
@@ -414,8 +447,8 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     id: "mesopotamia",
     label: "Mesopotamia",
     description:
-      "Ancient civilization of the Tigris-Euphrates river valley, home to some of the world's earliest cities, states, and writing systems.",
-    startYear: bce(3_500),
+      "Civilization of Mesopotamia shown here from early Sumer, the earliest known civilization in southern Mesopotamia, to the Persian conquest of Babylon.",
+    startYear: bce(4_000),
     endYear: bce(539),
     regionalScopeLabel: "Mesopotamia",
     approximateStart: true,
@@ -426,8 +459,12 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     children: MESOPOTAMIA_SUB_BANDS,
     sourceRefs: [
       {
-        sourceId: "britannicaMesopotamia",
-        note: "Broad app overlay spanning the rise of urban Mesopotamian civilization through the Achaemenid conquest of Babylon.",
+        sourceId: "britannicaSumer",
+        note: "Britannica directly calls Sumer the site of the earliest known civilization and says it was first settled between 4500 and 4000 BCE by the Ubaidians; the app uses 4000 BCE as the latest explicit opening date in that source for this parent Mesopotamian civilization band.",
+      },
+      {
+        sourceId: "metBabylon",
+        note: "The Met explicitly dates the Neo-Babylonian empire's end to 539 B.C., when Cyrus II of Persia conquered Babylon, which provides the parent band's endpoint here.",
       },
     ],
   },

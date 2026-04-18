@@ -150,7 +150,7 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     id: "ubaid-period",
     label: "Ubaid",
     description:
-      "Southern Mesopotamian village-and-temple world of irrigation, larger settlements, and the long pre-urban buildup before Uruk and Sumerian cities.",
+      "Southern Mesopotamian period of the earliest known settlements on the alluvial plain before the Uruk period.",
     startYear: bce(5_500),
     endYear: bce(3_800),
     regionalScopeLabel: "Southern Mesopotamia",
@@ -162,7 +162,7 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     sourceRefs: [
       {
         sourceId: "ubaidPeriodWikipedia",
-        note: "Uses a southern-Mesopotamian c. 5,500–3,800 BCE Ubaid framing for the irrigation-and-temple precursor world before Uruk urbanism.",
+        note: "Uses the page's explicit southern-Mesopotamian span of about 5500–3800 BC and its statement that the Ubaid is succeeded there by the Uruk period.",
       },
     ],
   },

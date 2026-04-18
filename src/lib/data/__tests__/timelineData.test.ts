@@ -221,14 +221,43 @@ describe("root timeline display data", () => {
     const hittites = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "hittite-empire",
     );
+    const uruk = mesopotamia?.children?.find(
+      (band) => band.id === "uruk-period",
+    );
+    const jemdetNasr = mesopotamia?.children?.find(
+      (band) => band.id === "jemdet-nasr-period",
+    );
+    const sumer = mesopotamia?.children?.find(
+      (band) => band.id === "sumerian-city-states",
+    );
     const akkad = mesopotamia?.children?.find(
       (band) => band.id === "akkadian-empire",
+    );
+    const urIII = mesopotamia?.children?.find(
+      (band) => band.id === "ur-iii-empire",
+    );
+    const oldBabylonian = mesopotamia?.children?.find(
+      (band) => band.id === "old-babylonian-empire",
+    );
+    const kassites = mesopotamia?.children?.find(
+      (band) => band.id === "kassite-babylonia",
+    );
+    const middleAssyrian = mesopotamia?.children?.find(
+      (band) => band.id === "middle-assyrian-empire",
+    );
+    const neoAssyrian = mesopotamia?.children?.find(
+      (band) => band.id === "neo-assyrian-empire",
+    );
+    const neoBabylonian = mesopotamia?.children?.find(
+      (band) => band.id === "neo-babylonian-empire",
     );
 
     expect(agriculture).toMatchObject({
       regionalScopeLabel: "Southwest Asia",
       approximate: true,
-      description: expect.stringContaining("10000–8000 BCE"),
+      description: expect.stringContaining(
+        "cultivation preceding the appearance of fully domesticated crops",
+      ),
     });
     expect(agriculture?.year).toBeLessThan(gobekliTepe?.year ?? Number.POSITIVE_INFINITY);
     expect(
@@ -250,7 +279,9 @@ describe("root timeline display data", () => {
       approximate: true,
       year: bce(6_000),
       label: "Canal irrigation appears at Choga Mami",
-      description: expect.stringContaining("Around 6000 BCE"),
+      description: expect.stringContaining(
+        "man-made channels watering fields in lowland Mesopotamia",
+      ),
     });
     expect(
       irrigation?.sourceRefs?.map((reference) => reference.sourceId),
@@ -265,7 +296,52 @@ describe("root timeline display data", () => {
     expect(mesopotamia).toMatchObject({
       regionalScopeLabel: "Mesopotamia",
       approximateStart: true,
+      startYear: bce(4_000),
+      endYear: bce(539),
+      description: expect.stringContaining(
+        "earliest known civilization in southern Mesopotamia",
+      ),
     });
+    expect(
+      mesopotamia?.sourceRefs?.map((reference) => reference.sourceId),
+    ).toEqual(["britannicaSumer", "metBabylon"]);
+    expect(uruk).toMatchObject({
+      label: "Uruk period",
+      startYear: bce(4_000),
+      endYear: bce(3_100),
+      regionalScopeLabel: "Southern Mesopotamia",
+      approximateStart: true,
+      approximateEnd: true,
+      description: expect.stringContaining("appearance of cities and the state"),
+    });
+    expect(uruk?.sourceRefs?.map((reference) => reference.sourceId)).toEqual([
+      "urukPeriodWikipedia",
+      "metUrukFirstCity",
+    ]);
+    expect(jemdetNasr).toMatchObject({
+      label: "Jemdet Nasr",
+      startYear: bce(3_100),
+      endYear: bce(2_900),
+      regionalScopeLabel: "Southern Mesopotamia",
+      description: expect.stringContaining(
+        "developing out of the Uruk period",
+      ),
+    });
+    expect(
+      jemdetNasr?.sourceRefs?.map((reference) => reference.sourceId),
+    ).toEqual(["jemdetNasrPeriodWikipedia"]);
+    expect(sumer).toMatchObject({
+      label: "Early Dynastic Sumer",
+      startYear: bce(2_900),
+      endYear: bce(2_350),
+      regionalScopeLabel: "Southern Mesopotamia",
+      approximateStart: true,
+      approximateEnd: true,
+      description: expect.stringContaining("city-states dominated Mesopotamia"),
+    });
+    expect(sumer?.sourceRefs?.map((reference) => reference.sourceId)).toEqual([
+      "metEarlyDynasticSculpture",
+    ]);
     expect(natufian).toMatchObject({
       regionalScopeLabel: "Levant",
       approximateStart: true,
@@ -277,10 +353,98 @@ describe("root timeline display data", () => {
       approximateEnd: true,
     });
     expect(akkad).toMatchObject({
+      label: "Akkadian period",
+      startYear: bce(2_350),
+      endYear: bce(2_150),
       regionalScopeLabel: "Mesopotamia",
       approximateStart: true,
       approximateEnd: true,
+      description: expect.stringContaining(
+        "Semitic monarchs united the rival Sumerian cities by conquest",
+      ),
     });
+    expect(akkad?.sourceRefs?.map((reference) => reference.sourceId)).toEqual([
+      "metAkkadianPeriod",
+    ]);
+    expect(urIII).toMatchObject({
+      label: "Ur III state",
+      startYear: bce(2_112),
+      endYear: bce(2_004),
+      regionalScopeLabel: "Southern Mesopotamia",
+      approximateStart: true,
+      approximateEnd: true,
+      description: expect.stringContaining(
+        "southern Mesopotamian cities under the control of Ur",
+      ),
+    });
+    expect(urIII?.sourceRefs?.map((reference) => reference.sourceId)).toEqual([
+      "metUrZiggurat",
+      "metIsinLarsaOldBabylonian",
+    ]);
+    expect(oldBabylonian).toMatchObject({
+      label: "Old Babylonian period",
+      startYear: bce(1_894),
+      endYear: bce(1_595),
+      regionalScopeLabel: "Babylonia",
+      approximateStart: true,
+      description: expect.stringContaining(
+        "political capital of Mesopotamia",
+      ),
+    });
+    expect(
+      oldBabylonian?.sourceRefs?.map((reference) => reference.sourceId),
+    ).toEqual(["metIsinLarsaOldBabylonian"]);
+    expect(kassites).toMatchObject({
+      label: "Middle Babylonian / Kassite",
+      startYear: bce(1_595),
+      endYear: bce(1_155),
+      regionalScopeLabel: "Babylonia",
+      approximateStart: true,
+      approximateEnd: true,
+      description: expect.stringContaining(
+        "virtually synonymous with the Middle Babylonian period",
+      ),
+    });
+    expect(kassites?.sourceRefs?.map((reference) => reference.sourceId)).toEqual([
+      "metMiddleBabylonianKassite",
+    ]);
+    expect(middleAssyrian).toMatchObject({
+      label: "Middle Assyrian period",
+      startYear: bce(1_365),
+      endYear: bce(1_076),
+      regionalScopeLabel: "Northern Mesopotamia",
+      approximateStart: true,
+      description: expect.stringContaining(
+        "projecting power from the Euphrates to the Mediterranean",
+      ),
+    });
+    expect(
+      middleAssyrian?.sourceRefs?.map((reference) => reference.sourceId),
+    ).toEqual(["metAssyria"]);
+    expect(neoAssyrian).toMatchObject({
+      label: "Neo-Assyrian Empire",
+      startYear: bce(912),
+      endYear: bce(612),
+      regionalScopeLabel: "Northern Mesopotamia",
+      description: expect.stringContaining(
+        "stretching across Mesopotamia, the Levant, Egypt, Anatolia",
+      ),
+    });
+    expect(
+      neoAssyrian?.sourceRefs?.map((reference) => reference.sourceId),
+    ).toEqual(["worldHistoryNeoAssyrianEmpire"]);
+    expect(neoBabylonian).toMatchObject({
+      label: "Neo-Babylonian Empire",
+      startYear: bce(625),
+      endYear: bce(539),
+      regionalScopeLabel: "Babylonia",
+      description: expect.stringContaining(
+        "Nabopolassar and Nebuchadnezzar II",
+      ),
+    });
+    expect(
+      neoBabylonian?.sourceRefs?.map((reference) => reference.sourceId),
+    ).toEqual(["metBabylon"]);
   });
 
   it("keeps deep-time crisis markers descriptive and source-backed", () => {
@@ -426,6 +590,8 @@ describe("root timeline display data", () => {
         .find((band) => band.id === "mesopotamia")
         ?.children?.map((band) => band.id),
     ).toEqual([
+      "uruk-period",
+      "jemdet-nasr-period",
       "sumerian-city-states",
       "akkadian-empire",
       "ur-iii-empire",
@@ -592,7 +758,13 @@ describe("root timeline display data", () => {
       endYear: bce(3_800),
       regionalScopeLabel: "Southern Mesopotamia",
       subGroup: "near-east",
+      description: expect.stringContaining(
+        "earliest known settlements on the alluvial plain",
+      ),
     });
+    expect(ubaid?.sourceRefs?.map((reference) => reference.sourceId)).toEqual([
+      "ubaidPeriodWikipedia",
+    ]);
 
     expect(
       chineseChildren?.every(

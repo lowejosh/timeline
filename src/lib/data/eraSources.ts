@@ -848,7 +848,7 @@ export const ERA_SOURCES = {
       'Wikipedia contributors, "Ubaid period." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Ubaid_period",
     notes:
-      "Used for the southern Mesopotamian Ubaid span of c. 5,500–3,800 BCE and for the specific late-Ubaid framing that links intensive irrigated hydraulic agriculture, larger settlements, and the movement toward urbanization during roughly 5,000–4,000 BCE.",
+      "Used for the page's explicit southern Mesopotamian Ubaid span of about 5500–3800 BC, its statement that this phase is succeeded by the Uruk period, and its framing of the south as the zone of the earliest known settlements on the alluvial plain.",
   },
   chogaMamiWikipedia: {
     shortTitle: "Wikipedia: Choga Mami",
@@ -1081,6 +1081,35 @@ export const ERA_SOURCES = {
     notes:
       "Used for Uruk / Erech as the key Mesopotamian city illustrating early urban life in the Erech–Jamdat Nasr period.",
   },
+  britannicaSumer: {
+    shortTitle: "Britannica: Sumer",
+    title: "Sumer",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Sumer."',
+    url: "https://www.britannica.com/place/Sumer",
+    notes:
+      "Used for Britannica's direct framing of Sumer as the site of the earliest known civilization in southern Mesopotamia and for the explicit statement that Sumer was first settled between 4500 and 4000 BCE by the Ubaidians.",
+  },
+  urukPeriodWikipedia: {
+    shortTitle: "Wikipedia: Uruk period",
+    title: "Uruk period",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Uruk period." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Uruk_period",
+    notes:
+      "Used for the page's explicit Uruk period range of c. 4000–3100 BC and for its public-facing framing of the Uruk period as the phase in Mesopotamia when cities, the state, and proto-cuneiform emerged.",
+  },
+  jemdetNasrPeriodWikipedia: {
+    shortTitle: "Wikipedia: Jemdet Nasr period",
+    title: "Jemdet Nasr period",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Jemdet Nasr period." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Jemdet_Nasr_period",
+    notes:
+      "Used for the page's direct 3100–2900 BC Jemdet Nasr dating and for its statement that this southern Mesopotamian phase develops out of the Uruk period and continues into Early Dynastic I.",
+  },
   metUrukFirstCity: {
     shortTitle: "Met: Uruk",
     title: "Uruk: The First City",
@@ -1089,7 +1118,37 @@ export const ERA_SOURCES = {
       'Department of Ancient Near Eastern Art. "Uruk: The First City." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
     url: "https://www.metmuseum.org/toah/hd/uruk/hd_uruk.htm",
     notes:
-      "Used for the direct museum framing of Uruk as the first city and for its threshold around 3200 B.C. as a true city in southern Mesopotamia.",
+      "Used for the direct museum framing of Uruk as the first city, for its threshold around 3200 B.C. as a true city in southern Mesopotamia, and for the statement that the following Early Dynastic period (2900–2350 B.C.) was the era when city-states dominated Mesopotamia.",
+  },
+  metEarlyDynasticSculpture: {
+    shortTitle: "Met: Early Dynastic",
+    title: "Early Dynastic Sculpture, 2900–2350 B.C.",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "Early Dynastic Sculpture, 2900–2350 B.C." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/edys/hd_edys.htm",
+    notes:
+      "Used for the Met's direct dating of the Early Dynastic period in Mesopotamia to ca. 2900–2350 B.C.",
+  },
+  metAkkadianPeriod: {
+    shortTitle: "Met: Akkadian period",
+    title: "The Akkadian Period (ca. 2350–2150 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "The Akkadian Period (ca. 2350–2150 B.C.)." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/essays/the-akkadian-period-ca-2350-2150-b-c",
+    notes:
+      "Used for the Met's explicit Akkadian-period title range of ca. 2350–2150 B.C. and for its statement that Akkad's Semitic monarchs united the rival Sumerian cities by conquest.",
+  },
+  metUrZiggurat: {
+    shortTitle: "Met: Ur ziggurat",
+    title: "Ur: The Ziggurat",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "Ur: The Ziggurat." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/essays/ur-the-ziggurat",
+    notes:
+      "Used for the statement that around 2100 B.C. southern Mesopotamian cities came under the control of Ur-Nammu, ruler of Ur, who built major temples including the ziggurat at Ur.",
   },
   britannicaWheel: {
     shortTitle: "Britannica: wheel",
@@ -1109,6 +1168,16 @@ export const ERA_SOURCES = {
     notes:
       "Used for Sargon of Akkad's rise around 2300 BCE and the broad Akkadian imperial phase that followed.",
   },
+  metIsinLarsaOldBabylonian: {
+    shortTitle: "Met: Isin-Larsa and Old Babylonian",
+    title: "The Isin-Larsa and Old Babylonian Periods (2004–1595 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Knott, Elizabeth. "The Isin-Larsa and Old Babylonian Periods (2004–1595 B.C.)." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/essays/the-isin-larsa-and-old-babylonian-periods-2004-1595-b-c",
+    notes:
+      "Used for the Met's explicit dates for the Ur III state (ca. 2112–2004 B.C.), the Isin-Larsa period (ca. 2004–1763 B.C.), and the Old Babylonian period (ca. 1894–1595 B.C.), plus its statement that Hammurabi turned Babylon into the political capital of Mesopotamia.",
+  },
   britannicaBabylonia: {
     shortTitle: "Britannica: Babylonia",
     title: "Babylonia",
@@ -1127,6 +1196,16 @@ export const ERA_SOURCES = {
     url: "https://www.metmuseum.org/toah/hd/babl/hd_babl.htm",
     notes:
       "Used for public-facing Babylonian periodization, including the Old Babylonian end in 1595 BCE, Kassite rule afterward, and the broader Babylonian sequence into the first millennium BCE.",
+  },
+  metMiddleBabylonianKassite: {
+    shortTitle: "Met: Kassite period",
+    title: "The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.) in Mesopotamia",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Knott, Elizabeth. "The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.) in Mesopotamia." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/essays/the-middle-babylonian-kassite-period-ca-1595-1155-b-c-in-mesopotamia",
+    notes:
+      "Used for the Met's explicit Middle Babylonian / Kassite period range of ca. 1595–1155 B.C. and for its statement that Kassite rule was so long lasting that it was virtually synonymous with the Middle Babylonian period.",
   },
   britannicaHammurabi: {
     shortTitle: "Britannica: Hammurabi",
@@ -1192,6 +1271,16 @@ export const ERA_SOURCES = {
     url: "https://www.worldhistory.org/assyria/",
     notes:
       "Used for the Neo-Assyrian Empire's conventional 912–612 BCE span and public-facing chronology.",
+  },
+  worldHistoryNeoAssyrianEmpire: {
+    shortTitle: "WHE: Neo-Assyrian Empire",
+    title: "Neo-Assyrian Empire",
+    organization: "World History Encyclopedia",
+    citation:
+      'Mark, Joshua J. "Neo-Assyrian Empire." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Neo-Assyrian_Empire/",
+    notes:
+      "Used for World History Encyclopedia's explicit 912–612 BCE Neo-Assyrian span and its public-facing summary of the empire's extent across Mesopotamia, the Levant, Egypt, Anatolia, and parts of Persia and Arabia.",
   },
   metAssyria: {
     shortTitle: "Met: Assyria",

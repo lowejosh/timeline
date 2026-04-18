@@ -3,7 +3,7 @@ import {
   createExactCalendarTimestamp,
   getTimelineYearFromExactTimestamp,
 } from "../../time/exactTimestamp";
-import { bce, ce, yearsAgo } from "../timelineDateBuilders";
+import { bce, ce } from "../timelineDateBuilders";
 
 const TITANIC_SINKS_AT = createExactCalendarTimestamp({
   era: "ce",
@@ -37,7 +37,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     label: "Agriculture emerges in Southwest Asia",
     shortLabel: "Early Agriculture",
     description:
-      "By about 10000 BCE, Southwest Asian communities had entered the long agricultural transition that ran across 10000–8000 BCE, with cultivation preceding the appearance of fully domesticated crops.",
+      "Southwest Asian communities had entered a long agricultural transition, with cultivation preceding the appearance of fully domesticated crops.",
     year: bce(10_000),
     regionalScopeLabel: "Southwest Asia",
     approximate: true,

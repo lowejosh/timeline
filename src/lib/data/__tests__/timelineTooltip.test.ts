@@ -5,7 +5,7 @@ import {
   getOverlayTooltipContent,
 } from "../timelineTooltip";
 import { createExactCalendarTimestamp } from "../../time/exactTimestamp";
-import { bce } from "../timelineDateBuilders";
+import { yearsAgo } from "../timelineDateBuilders";
 import type {
   Era,
   TimelineMarker,
@@ -202,11 +202,11 @@ describe("timeline tooltip content", () => {
     });
   });
 
-  it("switches tooltip point labels to years ago at the 10,000 BCE handoff", () => {
+  it("switches tooltip point labels to years ago at the 15,000-years-ago handoff", () => {
     const marker: TimelineMarker = {
       id: "ubirr",
       label: "Ubirr rock art in Kakadu",
-      year: bce(10_000),
+      year: yearsAgo(15_000),
       approximate: true,
       sourceRefs: [{ sourceId: "kakaduUbirr" }],
     };
@@ -218,7 +218,7 @@ describe("timeline tooltip content", () => {
     const overlay: TimelineOverlayBand = {
       id: "mesopotamia",
       label: "Mesopotamia",
-      startYear: -3500,
+      startYear: -4000,
       endYear: -539,
       color: "rgba(0, 0, 0, 0.1)",
       regionalScopeLabel: "Mesopotamia",
@@ -227,7 +227,7 @@ describe("timeline tooltip content", () => {
     };
 
     expect(getOverlayTooltipContent(overlay)).toMatchObject({
-      timeLabel: "~3,500 BCE — 539 BCE",
+      timeLabel: "~4,000 BCE — 539 BCE",
       regionalScopeLabel: "Mesopotamia",
     });
   });

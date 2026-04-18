@@ -7,7 +7,7 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
     label: "Canal irrigation appears at Choga Mami",
     shortLabel: "Irrigation",
     description:
-      "Around 6000 BCE, Choga Mami shows canal irrigation already in operation, with man-made channels watering fields in lowland Mesopotamia.",
+      "Choga Mami shows canal irrigation already in operation, with man-made channels watering fields in lowland Mesopotamia.",
     year: bce(6_000),
     regionalScopeLabel: "Mesopotamia",
     approximate: true,
