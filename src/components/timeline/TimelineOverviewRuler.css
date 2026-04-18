@@ -1,0 +1,68 @@
+.timeline-overview-ruler {
+  position: relative;
+  width: 100%;
+  background: transparent;
+}
+
+.timeline-overview-ruler__surface {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.timeline-overview-ruler__surface[data-dragging="true"] {
+  cursor: grabbing;
+}
+
+.timeline-overview-ruler__surface:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--focus);
+}
+
+.timeline-overview-ruler__strip {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #f7f0e2 0%, #efe5d4 100%);
+}
+
+.timeline-overview-ruler__band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  opacity: 0.3;
+}
+
+.timeline-overview-ruler__shade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(28, 20, 14, 0.42);
+  pointer-events: none;
+}
+
+.timeline-overview-ruler__window {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.timeline-overview-ruler__surface[data-following="true"] .timeline-overview-ruler__shade,
+.timeline-overview-ruler__surface[data-following="true"] .timeline-overview-ruler__window {
+  transition:
+    left 110ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 110ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.timeline-overview-ruler__surface[data-settling="true"] .timeline-overview-ruler__shade,
+.timeline-overview-ruler__surface[data-settling="true"] .timeline-overview-ruler__window {
+  transition:
+    left 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}

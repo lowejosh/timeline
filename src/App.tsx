@@ -4,6 +4,7 @@ import {
   TIMELINE_CANVAS_PAD,
 } from "./components/timeline/TimelineCanvas";
 import { TimelineSidebar } from "./components/chrome/TimelineSidebar";
+import { TimelineOverviewRulerStack } from "./components/timeline/TimelineOverviewRulerStack";
 import { useAnimatedViewport } from "./hooks/useAnimatedViewport";
 import { useElementSize } from "./hooks/useElementSize";
 import {
@@ -34,9 +35,14 @@ type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
 const HUMAN_EVOLUTION_GROUP_ID =
   TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
 const CIVILIZATIONS_GROUP_ID = TIMELINE_DECORATION_CATEGORY_IDS.civilizations;
+const OVERVIEW_RULER_TIER_HEIGHT = 18;
+const OVERVIEW_RULER_ADD_TIER_THRESHOLD_PX = 8;
+const OVERVIEW_RULER_MAX_TIERS = 3;
+const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
 
 function App() {
   const [stageRef, stageSize] = useElementSize<HTMLDivElement>();
+  const [timelineRef, timelineSize] = useElementSize<HTMLDivElement>();
   const innerWidth = Math.max(stageSize.width, 1);
   const animated = useAnimatedViewport(getHomeViewport(1440), innerWidth);
   const [activeEraId, setActiveEraId] = useState(ROOT_ERA.id);
@@ -280,6 +286,11 @@ function App() {
     },
     [],
   );
+  const isOverviewVisible = stageSize.height >= MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER;
+  const mainCanvasHeight = Math.max(
+    timelineSize.height > 0 ? timelineSize.height : stageSize.height,
+    1,
+  );
 
   return (
     <main
@@ -314,27 +325,51 @@ function App() {
       </div>
       <section className="app-stage" ref={stageRef}>
         {stageSize.width > 0 && stageSize.height > 0 ? (
-          <TimelineCanvas
-            height={stageSize.height}
-            viewport={animated.viewport}
-            width={stageSize.width}
-            activeEra={activeEra}
-            activeChain={chain}
-            siblingEras={siblingEras}
-            markers={TIMELINE_DISPLAY.markers}
-            overlayBands={TIMELINE_DISPLAY.overlays}
-            enabledGroupIds={renderEnabledGroupIds}
-            overlayVisibilityTransitionKey={overlayVisibilityTransitionKey}
-            parentEra={parentEra}
-            isAnimating={animated.isAnimating}
-            onViewportChange={handleViewportChange}
-            onAnimateZoom={handleZoom}
-            onAnimateToRange={animated.animateToRange}
-            onDrillIntoEra={handleDrillIntoEra}
-            onNavigateUp={handleNavigateUp}
-            onRecordDragSample={animated.recordDragSample}
-            onReleaseMomentum={animated.releaseMomentum}
-          />
+          <div className="app-stage__stack">
+            <div className="app-stage__timeline" ref={timelineRef}>
+              <TimelineCanvas
+                height={mainCanvasHeight}
+                viewport={animated.viewport}
+                width={stageSize.width}
+                activeEra={activeEra}
+                activeChain={chain}
+                siblingEras={siblingEras}
+                markers={TIMELINE_DISPLAY.markers}
+                overlayBands={TIMELINE_DISPLAY.overlays}
+                enabledGroupIds={renderEnabledGroupIds}
+                overlayVisibilityTransitionKey={overlayVisibilityTransitionKey}
+                parentEra={parentEra}
+                isAnimating={animated.isAnimating}
+                onViewportChange={handleViewportChange}
+                onAnimateZoom={handleZoom}
+                onAnimateToRange={animated.animateToRange}
+                onDrillIntoEra={handleDrillIntoEra}
+                onNavigateUp={handleNavigateUp}
+                onRecordDragSample={animated.recordDragSample}
+                onReleaseMomentum={animated.releaseMomentum}
+              />
+            </div>
+            {isOverviewVisible ? (
+              <div className="app-stage__overview">
+                <TimelineOverviewRulerStack
+                  eras={ROOT_ERA.children ?? []}
+                  mainInnerWidth={Math.max(
+                    stageSize.width - TIMELINE_CANVAS_PAD * 2,
+                    1,
+                  )}
+                  onViewportChange={handleViewportChange}
+                  pad={TIMELINE_CANVAS_PAD}
+                  tierHeight={OVERVIEW_RULER_TIER_HEIGHT}
+                  tierOptions={{
+                    addTierThresholdPx: OVERVIEW_RULER_ADD_TIER_THRESHOLD_PX,
+                    maxTiers: OVERVIEW_RULER_MAX_TIERS,
+                  }}
+                  viewport={animated.viewport}
+                  width={stageSize.width}
+                />
+              </div>
+            ) : null}
+          </div>
         ) : null}
       </section>
     </main>
