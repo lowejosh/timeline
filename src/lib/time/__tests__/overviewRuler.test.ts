@@ -67,12 +67,14 @@ describe("overview ruler geometry", () => {
     const subDomain = { startYear: 1000, endYear: 2000 };
     const bounds = getOverviewRulerBounds(width, pad);
 
-    expect(
-      mapOverviewRulerYearToX(1500, subDomain, width, pad),
-    ).toBeCloseTo(bounds.left + bounds.innerWidth / 2, 6);
-    expect(
-      mapOverviewRulerYearToX(2000, subDomain, width, pad),
-    ).toBeCloseTo(bounds.right, 6);
+    expect(mapOverviewRulerYearToX(1500, subDomain, width, pad)).toBeCloseTo(
+      bounds.left + bounds.innerWidth / 2,
+      6,
+    );
+    expect(mapOverviewRulerYearToX(2000, subDomain, width, pad)).toBeCloseTo(
+      bounds.right,
+      6,
+    );
   });
 
   it("enforces a one-pixel minimum spotlight display width for deep zoom", () => {
@@ -160,8 +162,7 @@ describe("overview ruler tier chain", () => {
     expect(firstTier.isFinalTier).toBe(false);
     expect(firstTier.domain).toEqual(FULL_DOMAIN);
 
-    const fullDomainSpan =
-      FULL_DOMAIN.endYear - FULL_DOMAIN.startYear;
+    const fullDomainSpan = FULL_DOMAIN.endYear - FULL_DOMAIN.startYear;
     const expectedFrozenSpan = (10 / innerWidth) * fullDomainSpan;
     const frozenSpan =
       firstTier.spotlightEndYear - firstTier.spotlightStartYear;
@@ -191,10 +192,7 @@ describe("overview ruler tier chain", () => {
         previous.spotlightStartYear,
         6,
       );
-      expect(current.domain.endYear).toBeCloseTo(
-        previous.spotlightEndYear,
-        6,
-      );
+      expect(current.domain.endYear).toBeCloseTo(previous.spotlightEndYear, 6);
     }
   });
 

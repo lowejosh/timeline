@@ -222,9 +222,10 @@ describe("era data", () => {
     const rootChildIds = ROOT_ERA.children?.map((era) => era.id) ?? [];
 
     expect(rootChildIds).not.toContain("cosmic-history");
-    expect(rootChildIds).toContain("primordial-universe");
-    expect(rootChildIds).toContain("cosmic-dawn");
-    expect(rootChildIds).toContain("galaxies-take-shape");
+    expect(rootChildIds).toContain("early-universe");
+    expect(rootChildIds).toContain("dark-ages");
+    expect(rootChildIds).toContain("first-stars-and-reionization");
+    expect(rootChildIds).toContain("galaxy-assembly");
   });
 
   it("keeps prehistoric and historical eras directly under the root timeline", () => {

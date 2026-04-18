@@ -26,9 +26,9 @@ import {
   type TimelineTooltipContent,
 } from "../../lib/data/timelineTooltip";
 import {
-  PRIMORDIAL_UNIVERSE_END_YEAR,
-  PRIMORDIAL_UNIVERSE_ID,
-  PRIMORDIAL_UNIVERSE_START_YEAR,
+  EARLY_UNIVERSE_END_YEAR,
+  EARLY_UNIVERSE_ID,
+  EARLY_UNIVERSE_START_YEAR,
 } from "../../lib/data/eraTrees/cosmic";
 import {
   comparePreciseTimelineYears,
@@ -519,13 +519,9 @@ function roundMetric(value: number) {
   return Number(value.toFixed(2));
 }
 
-function areStringArraysEqual(
-  left: readonly string[],
-  right: readonly string[],
-) {
+function areStringArraysEqual(left: readonly string[], right: readonly string[]) {
   return (
-    left.length === right.length &&
-    left.every((value, index) => value === right[index])
+    left.length === right.length && left.every((value, index) => value === right[index])
   );
 }
 
@@ -1712,7 +1708,8 @@ function resolveOverlayBandLabelInsets({
   hasDisclosure?: boolean;
 }) {
   return {
-    left: OVERLAY_BAND_SIDE_PADDING + Math.max(iconReservedWidth, 0),
+    left:
+      OVERLAY_BAND_SIDE_PADDING + Math.max(iconReservedWidth, 0),
     right:
       OVERLAY_BAND_SIDE_PADDING +
       (hasDisclosure ? OVERLAY_BAND_DISCLOSURE_RESERVED_WIDTH : 0),
@@ -2038,16 +2035,14 @@ export function TimelineCanvas({
         }
       }
 
-      const visibleExpandedOverlayIds =
-        renderedExpandedOverlayIdsRef.current.filter(
-          (expandedOverlayId, index, allIds) =>
-            allIds.indexOf(expandedOverlayId) === index &&
-            sceneResolvedOverlayBands.some(
-              ({ band }) =>
-                band.id === expandedOverlayId &&
-                (band.children?.length ?? 0) > 0,
-            ),
-        );
+      const visibleExpandedOverlayIds = renderedExpandedOverlayIdsRef.current.filter(
+        (expandedOverlayId, index, allIds) =>
+          allIds.indexOf(expandedOverlayId) === index &&
+          sceneResolvedOverlayBands.some(
+            ({ band }) =>
+              band.id === expandedOverlayId && (band.children?.length ?? 0) > 0,
+          ),
+      );
       const expandedOverlayDetails = resolveExpandedOverlayDetails(
         visibleExpandedOverlayIds,
         sceneResolvedOverlayBands,
@@ -2059,8 +2054,7 @@ export function TimelineCanvas({
         (detail) => {
           const fullHeight = getExpandedOverlayPanelHeight(detail);
           const progress =
-            expandedOverlayProgressByIdRef.current.get(detail.parent.band.id) ??
-            0;
+            expandedOverlayProgressByIdRef.current.get(detail.parent.band.id) ?? 0;
 
           return {
             detail,
@@ -2132,13 +2126,11 @@ export function TimelineCanvas({
           renderWidth: overlay.renderWidth,
           baseY: getOverlayLaneY(layout, overlay.laneIndex),
         })),
-        expandedOverlayExpansionStates.map(
-          ({ detail, fullHeight, progress }) => ({
-            parentId: detail.parent.band.id,
-            panelHeight: fullHeight,
-            expansionProgress: progress,
-          }),
-        ),
+        expandedOverlayExpansionStates.map(({ detail, fullHeight, progress }) => ({
+          parentId: detail.parent.band.id,
+          panelHeight: fullHeight,
+          expansionProgress: progress,
+        })),
         overlayBottomY,
         OVERLAY_LANE_HEIGHT,
         OVERLAY_LANE_GAP,
@@ -2493,8 +2485,7 @@ export function TimelineCanvas({
               context,
               layout: iconLayout,
               strokeStyle: overlayLabelPaint.fillStyle,
-              alpha:
-                OVERLAY_GROUP_ICON_PARENT_ALPHA * overlayState.currentOpacity,
+              alpha: OVERLAY_GROUP_ICON_PARENT_ALPHA * overlayState.currentOpacity,
             });
           }
 
@@ -2524,8 +2515,7 @@ export function TimelineCanvas({
               const indicatorCenterX = overlay.renderX + bandWidth - 10;
               const indicatorCenterY = y + OVERLAY_LANE_HEIGHT / 2;
               const indicatorProgress =
-                expandedOverlayProgressByIdRef.current.get(overlay.band.id) ??
-                0;
+                expandedOverlayProgressByIdRef.current.get(overlay.band.id) ?? 0;
 
               drawAnimatedOverlayDisclosureIndicator({
                 centerX: indicatorCenterX,
@@ -2856,17 +2846,17 @@ export function TimelineCanvas({
         ),
         1e-18,
       );
-      const primordialOverlapStart = Math.max(
+      const earlyUniverseOverlapStart = Math.max(
         edgeLeftYear,
-        PRIMORDIAL_UNIVERSE_START_YEAR,
+        EARLY_UNIVERSE_START_YEAR,
       );
-      const primordialOverlapEnd = Math.min(
+      const earlyUniverseOverlapEnd = Math.min(
         edgeRightYear,
-        PRIMORDIAL_UNIVERSE_END_YEAR,
+        EARLY_UNIVERSE_END_YEAR,
       );
-      const primordialOverlap = Math.max(
+      const earlyUniverseOverlap = Math.max(
         0,
-        primordialOverlapEnd - primordialOverlapStart,
+        earlyUniverseOverlapEnd - earlyUniverseOverlapStart,
       );
       const startsAtBigBang =
         comparePreciseTimelineYears(
@@ -2877,9 +2867,9 @@ export function TimelineCanvas({
         sceneViewport.zoom <= getMinZoomForWidth(innerWidth) + 0.001;
       const useBigBangElapsedLabels =
         !isFullyZoomedOut &&
-        (sceneActiveEra.id === PRIMORDIAL_UNIVERSE_ID ||
+        (sceneActiveEra.id === EARLY_UNIVERSE_ID ||
           startsAtBigBang ||
-          primordialOverlap / visibleSpan >= 0.75);
+          earlyUniverseOverlap / visibleSpan >= 0.75);
       const useSubYearAxis = fineGrainedAxisMode !== null;
       const useCalendarSubYearAxis = fineGrainedAxisMode === "calendar";
       const useElapsedSubYearAxis = fineGrainedAxisMode === "elapsed";
@@ -4163,17 +4153,17 @@ export function TimelineCanvas({
       ),
       1e-18,
     );
-    const primordialOverlapStart = Math.max(
+    const earlyUniverseOverlapStart = Math.max(
       tickStart,
-      PRIMORDIAL_UNIVERSE_START_YEAR,
+      EARLY_UNIVERSE_START_YEAR,
     );
-    const primordialOverlapEnd = Math.min(
+    const earlyUniverseOverlapEnd = Math.min(
       tickEnd,
-      PRIMORDIAL_UNIVERSE_END_YEAR,
+      EARLY_UNIVERSE_END_YEAR,
     );
-    const primordialOverlap = Math.max(
+    const earlyUniverseOverlap = Math.max(
       0,
-      primordialOverlapEnd - primordialOverlapStart,
+      earlyUniverseOverlapEnd - earlyUniverseOverlapStart,
     );
     const startsAtBigBang =
       comparePreciseTimelineYears(
@@ -4185,9 +4175,9 @@ export function TimelineCanvas({
       getMinZoomForWidth(innerWidth, viewport.scaleMode ?? "linear") + 0.001;
     const isPrimordialFocused =
       !isFullyZoomedOut &&
-      (activeEra.id === PRIMORDIAL_UNIVERSE_ID ||
+      (activeEra.id === EARLY_UNIVERSE_ID ||
         startsAtBigBang ||
-        primordialOverlap / visibleSpan >= 0.75);
+        earlyUniverseOverlap / visibleSpan >= 0.75);
 
     return resolveAxisTickRenderStates(tickStart, tickEnd, innerWidth, {
       elapsedReference: isPrimordialFocused ? "after-big-bang" : "ago",
@@ -4560,10 +4550,7 @@ export function TimelineCanvas({
   useEffect(() => {
     if (expandedOverlayIds.length > 0) {
       renderedExpandedOverlayIdsRef.current = [
-        ...new Set([
-          ...renderedExpandedOverlayIdsRef.current,
-          ...expandedOverlayIds,
-        ]),
+        ...new Set([...renderedExpandedOverlayIdsRef.current, ...expandedOverlayIds]),
       ];
     }
 
@@ -5309,21 +5296,21 @@ export function TimelineCanvas({
           })()
         : null;
     const visibleSpan = Math.max(edgeRightYear - edgeLeftYear, 1e-9);
-    const primordialOverlapStart = Math.max(
+    const earlyUniverseOverlapStart = Math.max(
       edgeLeftYear,
-      PRIMORDIAL_UNIVERSE_START_YEAR,
+      EARLY_UNIVERSE_START_YEAR,
     );
-    const primordialOverlapEnd = Math.min(
+    const earlyUniverseOverlapEnd = Math.min(
       edgeRightYear,
-      PRIMORDIAL_UNIVERSE_END_YEAR,
+      EARLY_UNIVERSE_END_YEAR,
     );
-    const primordialOverlap = Math.max(
+    const earlyUniverseOverlap = Math.max(
       0,
-      primordialOverlapEnd - primordialOverlapStart,
+      earlyUniverseOverlapEnd - earlyUniverseOverlapStart,
     );
     const useBigBangElapsedLabels =
-      activeEra.id === PRIMORDIAL_UNIVERSE_ID ||
-      primordialOverlap / visibleSpan >= 0.75;
+      activeEra.id === EARLY_UNIVERSE_ID ||
+      earlyUniverseOverlap / visibleSpan >= 0.75;
     const useSubYearAxis = fineGrainedAxisMode !== null;
     const useCalendarSubYearAxis = fineGrainedAxisMode === "calendar";
     const useElapsedSubYearAxis = fineGrainedAxisMode === "elapsed";
@@ -6456,17 +6443,13 @@ export function TimelineCanvas({
           setExpandedOverlayIds((current) => {
             const parentId = clickedRegion.parentId ?? clickedRegion.id;
 
-            return current.includes(parentId)
-              ? current
-              : [...current, parentId];
+            return current.includes(parentId) ? current : [...current, parentId];
           });
         } else if (clickedRegion?.role === "panel") {
           setExpandedOverlayIds((current) => {
             const parentId = clickedRegion.parentId ?? clickedRegion.id;
 
-            return current.includes(parentId)
-              ? current
-              : [...current, parentId];
+            return current.includes(parentId) ? current : [...current, parentId];
           });
         } else {
           setExpandedOverlayIds([]);

@@ -1,13 +1,78 @@
 import type { TimelineMarker } from "../timelineTypes";
-import { yearsAgo } from "../timelineDateBuilders";
+import { afterBigBang, yearsAgo } from "../timelineDateBuilders";
 
 export const CORE_TIMELINE_MARKERS: TimelineMarker[] = [
+  {
+    id: "cosmic-microwave-background-released",
+    label: "Cosmic microwave background released",
+    shortLabel: "CMB Released",
+    year: afterBigBang(380_000),
+    approximate: true,
+    description:
+      "About 380,000 years after the Big Bang, the first atoms formed and the cosmic fog cleared, releasing the oldest light we can still observe today.",
+    minZoom: 0,
+    priority: 92,
+    sourceRefs: [
+      {
+        sourceId: "nasaUniverseOverview",
+        note: "NASA says recombination happened around 380,000 years after the Big Bang and produced the cosmic microwave background, the oldest light we can observe.",
+      },
+      {
+        sourceId: "nasaLambdaCosmology",
+        note: "NASA LAMBDA uses recombination as the transition when the plasma became neutral and the early density pattern was frozen into the CMB.",
+      },
+    ],
+  },
+  {
+    id: "first-stars-ignite",
+    label: "First stars ignite",
+    shortLabel: "First Stars",
+    year: afterBigBang(200_000_000),
+    approximate: true,
+    description:
+      "The first stars ended the fully dark universe, flooding space with new light and helping seed the earliest galaxies.",
+    minZoom: 0,
+    priority: 91,
+    sourceRefs: [
+      {
+        sourceId: "nasaUniverseOverview",
+        note: "NASA says the universe remained dark for the next 200 million years after recombination, after which the first stars formed.",
+      },
+      {
+        sourceId: "nasaLambdaCosmology",
+        note: "NASA LAMBDA describes cosmic dawn as beginning with the first radiation sources such as stars.",
+      },
+    ],
+  },
+  {
+    id: "reionization-largely-complete",
+    label: "Reionization largely complete",
+    shortLabel: "Reionization",
+    year: afterBigBang(1_000_000_000),
+    approximate: true,
+    description:
+      "By roughly 1 billion years after the Big Bang, starlight and young galaxies had reionized nearly all intergalactic gas, leaving the universe broadly transparent to light again.",
+    minZoom: 0,
+    priority: 90,
+    sourceRefs: [
+      {
+        sourceId: "nasaUniverseOverview",
+        note: "NASA says that by the time the universe was 1 billion years old, stars and galaxies had transformed nearly all the gas, making the universe transparent to light as we see it today.",
+      },
+      {
+        sourceId: "nasaLambdaCosmology",
+        note: "NASA LAMBDA describes the first stars as reionizing the intergalactic medium and then gives way to later structure growth under gravity.",
+      },
+    ],
+  },
   {
     id: "solar-system-formation",
     label: "Solar System forms",
     shortLabel: "Solar System",
     year: yearsAgo(4_567_000_000),
     approximate: true,
+    description:
+      "A collapsing cloud of gas and dust forms the Sun, a spinning solar nebula, and the raw material of the planets.",
     minZoom: 0,
     priority: 90,
     sourceRefs: [
@@ -23,6 +88,8 @@ export const CORE_TIMELINE_MARKERS: TimelineMarker[] = [
     shortLabel: "Earth",
     year: yearsAgo(4_540_000_000),
     approximate: true,
+    description:
+      "One rocky world in the young solar disk grows by accretion into the planet that will become Earth.",
     minZoom: 0,
     priority: 100,
     sourceRefs: [

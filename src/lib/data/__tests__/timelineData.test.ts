@@ -107,6 +107,9 @@ describe("root timeline display data", () => {
 
   it("keeps core markers ordered chronologically with valid sources", () => {
     expect(TIMELINE_DISPLAY.markers.map((marker) => marker.id)).toEqual([
+      "cosmic-microwave-background-released",
+      "first-stars-ignite",
+      "reionization-largely-complete",
       "solar-system-formation",
       "earth-formation",
       "moon-forms",
@@ -882,9 +885,10 @@ describe("root timeline display data", () => {
       ROOT_ERA.children?.map((child) => child.id),
     );
     expect(ROOT_TIMELINE.rootEra.children?.map((child) => child.id)).toEqual([
-      "primordial-universe",
-      "cosmic-dawn",
-      "galaxies-take-shape",
+      "early-universe",
+      "dark-ages",
+      "first-stars-and-reionization",
+      "galaxy-assembly",
       "hadean",
       "archean",
       "siderian",

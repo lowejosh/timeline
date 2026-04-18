@@ -42,8 +42,7 @@ const overviewRulerIntegerFormatter = new Intl.NumberFormat("en-US", {
 });
 
 function formatOverviewRulerScaledValue(value: number) {
-  const maximumFractionDigits =
-    value >= 100 ? 0 : value >= 10 ? 1 : 2;
+  const maximumFractionDigits = value >= 100 ? 0 : value >= 10 ? 1 : 2;
 
   return new Intl.NumberFormat("en-US", {
     maximumFractionDigits,
@@ -179,7 +178,10 @@ export function resolveOverviewRulerTiers(
     options.addTierThresholdPx ?? OVERVIEW_RULER_DEFAULT_TIER_THRESHOLD_PX,
     1,
   );
-  const maxTiers = Math.max(options.maxTiers ?? OVERVIEW_RULER_DEFAULT_MAX_TIERS, 1);
+  const maxTiers = Math.max(
+    options.maxTiers ?? OVERVIEW_RULER_DEFAULT_MAX_TIERS,
+    1,
+  );
   const bounds = getOverviewRulerBounds(width, pad);
   const orderedVisibleStart = Math.min(visibleStartYear, visibleEndYear);
   const orderedVisibleEnd = Math.max(visibleStartYear, visibleEndYear);
@@ -190,7 +192,8 @@ export function resolveOverviewRulerTiers(
   for (let index = 0; index < maxTiers; index += 1) {
     const domainSpan = getDomainSpan(domain);
     const yearsPerPx = domainSpan / bounds.innerWidth;
-    const actualPx = yearsPerPx > 0 ? visibleSpan / yearsPerPx : bounds.innerWidth;
+    const actualPx =
+      yearsPerPx > 0 ? visibleSpan / yearsPerPx : bounds.innerWidth;
     const isLastSlot = index === maxTiers - 1;
     const visibleFitsInThisTier = actualPx >= addTierThresholdPx;
 
@@ -212,7 +215,10 @@ export function resolveOverviewRulerTiers(
       break;
     }
 
-    const frozenYearSpan = Math.min(addTierThresholdPx * yearsPerPx, domainSpan);
+    const frozenYearSpan = Math.min(
+      addTierThresholdPx * yearsPerPx,
+      domainSpan,
+    );
     const visibleCenter = (orderedVisibleStart + orderedVisibleEnd) / 2;
     let spotStart = visibleCenter - frozenYearSpan / 2;
     let spotEnd = spotStart + frozenYearSpan;

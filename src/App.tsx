@@ -286,7 +286,8 @@ function App() {
     },
     [],
   );
-  const isOverviewVisible = stageSize.height >= MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER;
+  const isOverviewVisible =
+    stageSize.height >= MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER;
   const mainCanvasHeight = Math.max(
     timelineSize.height > 0 ? timelineSize.height : stageSize.height,
     1,

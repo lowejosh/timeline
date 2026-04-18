@@ -17,6 +17,16 @@ export const ERA_SOURCES = {
     notes:
       "Used for the age of the universe and the app's broad cosmic-history framing.",
   },
+  nasaLambdaCosmology: {
+    shortTitle: "NASA LAMBDA: Cosmology timeline",
+    title: "ΛCDM Model of Cosmology",
+    organization: "NASA Goddard Space Flight Center",
+    citation:
+      'NASA LAMBDA Archive / WMAP Science Team, "ΛCDM Model of Cosmology."',
+    url: "https://lambda.gsfc.nasa.gov/education/graphic_history/univ_evol.html",
+    notes:
+      "Used as the primary simplified stage scaffold for pre-Earth cosmic history: inflation, recombination, dark ages, first light sources, reionization, and later large-scale structure growth.",
+  },
   nasaStarBasics: {
     shortTitle: "NASA: Star Basics",
     title: "Star Basics",
