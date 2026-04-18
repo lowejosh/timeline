@@ -12,10 +12,9 @@ import {
   POST_CLASSICAL_MARKERS,
 } from "./markers";
 import {
-  ANCIENT_CIVILIZATION_OVERLAYS,
+  CIVILIZATION_OVERLAYS,
   DEEP_TIME_LIFE_OVERLAYS,
   HUMAN_EVOLUTION_OVERLAYS,
-  POST_CLASSICAL_EARLY_MODERN_OVERLAYS,
 } from "./overlays";
 import type {
   TimelineDecorationCategory,
@@ -143,11 +142,7 @@ const TIMELINE_OVERLAY_COLLECTIONS: TimelineOverlayCollection[] = [
   { groupId: HUMAN_EVOLUTION_GROUP_ID, items: HUMAN_EVOLUTION_OVERLAYS },
   {
     groupId: CIVILIZATIONS_GROUP_ID,
-    items: ANCIENT_CIVILIZATION_OVERLAYS,
-  },
-  {
-    groupId: CIVILIZATIONS_GROUP_ID,
-    items: POST_CLASSICAL_EARLY_MODERN_OVERLAYS,
+    items: CIVILIZATION_OVERLAYS,
   },
 ];
 

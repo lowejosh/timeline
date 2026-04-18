@@ -329,20 +329,22 @@ describe("root timeline display data", () => {
       "mesopotamia",
       "indus-valley-civilization",
       "ancient-egypt",
+      "maya-civilization",
       "hittite-empire",
       "mycenaean-greece",
+      "chinese-civilization",
       "ancient-greece",
       "achaemenid-persia",
       "roman-republic",
       "hellenistic-world",
-      "han-china",
       "roman-empire",
+      "sasanian-empire",
       "byzantine-empire",
       "abbasid-caliphate",
-      "song-china",
+      "holy-roman-empire",
       "mongol-empire",
+      "mali-empire",
       "ottoman-empire",
-      "ming-dynasty",
       "aztec-empire",
       "inca-empire",
     ]);
@@ -385,12 +387,85 @@ describe("root timeline display data", () => {
       "neo-babylonian-empire",
     ]);
 
+    expect(
+      TIMELINE_DISPLAY.overlays
+        .find((band) => band.id === "chinese-civilization")
+        ?.children?.map((band) => band.id),
+    ).toEqual([
+      "shang-china",
+      "zhou-china",
+      "qin-dynasty",
+      "han-china",
+      "tang-dynasty",
+      "song-china",
+      "yuan-dynasty",
+      "ming-dynasty",
+      "qing-dynasty",
+    ]);
+
+    expect(
+      TIMELINE_DISPLAY.overlays
+        .find((band) => band.id === "maya-civilization")
+        ?.children?.map((band) => band.id),
+    ).toEqual(["preclassic-maya", "classic-maya", "postclassic-maya"]);
+
     const mesopotamiaChildren = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "mesopotamia",
     )?.children;
 
+    const maya = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "maya-civilization",
+    );
+
+    const holyRomanEmpire = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "holy-roman-empire",
+    );
+
+    const chineseCivilization = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "chinese-civilization",
+    );
+
+    const chineseChildren = chineseCivilization?.children;
+    const mayaChildren = maya?.children;
+
     expect(
       mesopotamiaChildren?.every(
+        (band, index, bands) =>
+          index === 0 || bands[index - 1].startYear <= band.startYear,
+      ),
+    ).toBe(true);
+
+    expect(chineseCivilization).toMatchObject({
+      label: "China",
+      regionalScopeLabel: "China",
+      approximateStart: true,
+      subGroup: "east-asia",
+    });
+
+    expect(maya).toMatchObject({
+      label: "Maya",
+      regionalScopeLabel: "Mesoamerica",
+      approximateStart: true,
+      subGroup: "mesoamerica",
+    });
+
+    expect(holyRomanEmpire).toMatchObject({
+      label: "Holy Roman Empire",
+      startYear: 962,
+      endYear: 1806,
+      regionalScopeLabel: "Central Europe",
+      subGroup: "central-europe",
+    });
+
+    expect(
+      chineseChildren?.every(
+        (band, index, bands) =>
+          index === 0 || bands[index - 1].startYear <= band.startYear,
+      ),
+    ).toBe(true);
+
+    expect(
+      mayaChildren?.every(
         (band, index, bands) =>
           index === 0 || bands[index - 1].startYear <= band.startYear,
       ),
@@ -401,6 +476,12 @@ describe("root timeline display data", () => {
         .find((band) => band.id === "age-of-dinosaurs")
         ?.children?.map((band) => band.id),
     ).toBeUndefined();
+
+    expect(
+      TIMELINE_DISPLAY.overlays
+        .filter((band) => band.groupId === "civilizations")
+        .every((band) => band.regionalScopeLabel && band.subGroup),
+    ).toBe(true);
   });
 
   it("keeps deep-time overlays descriptive and source-backed", () => {

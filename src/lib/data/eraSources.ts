@@ -1102,6 +1102,46 @@ export const ERA_SOURCES = {
     notes:
       "Used for the late Shang capital at Yin around 1300 BCE and for oracle bones as the earliest known mature Chinese writing.",
   },
+  historyOfChinaWikipedia: {
+    shortTitle: "Wikipedia: History of China",
+    title: "History of China",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "History of China." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/History_of_China",
+    notes:
+      "Used for a broad parent-level framing of Chinese civilization from the Shang era through the fall of the Qing dynasty.",
+  },
+  shangDynastyWikipedia: {
+    shortTitle: "Wikipedia: Shang dynasty",
+    title: "Shang dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Shang dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Shang_dynasty",
+    notes:
+      "Used for the conventional c. 1600 to 1046 BCE span of the Shang dynasty and for public-facing context on oracle-bone writing and bronze-age state culture.",
+  },
+  zhouDynastyWikipedia: {
+    shortTitle: "Wikipedia: Zhou dynasty",
+    title: "Zhou dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Zhou dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Zhou_dynasty",
+    notes:
+      "Used for the conventional c. 1046 to 256 BCE span of the Zhou dynasty and for its public-facing association with the Mandate of Heaven and major Chinese philosophical traditions.",
+  },
+  qinDynastyWikipedia: {
+    shortTitle: "Wikipedia: Qin dynasty",
+    title: "Qin dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Qin dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Qin_dynasty",
+    notes:
+      "Used for the Qin dynasty's 221 to 206 BCE span and for its public-facing role as the first imperial unification of China.",
+  },
   britannicaAncientGreece: {
     shortTitle: "Britannica: ancient Greece",
     title: "ancient Greek civilization",
@@ -1155,6 +1195,16 @@ export const ERA_SOURCES = {
     url: "https://www.britannica.com/topic/Han-dynasty",
     notes:
       "Used for the Han dynasty's standard 206 BCE to 220 CE span in Chinese history surveys.",
+  },
+  tangDynastyWikipedia: {
+    shortTitle: "Wikipedia: Tang dynasty",
+    title: "Tang dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Tang dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Tang_dynasty",
+    notes:
+      "Used for the Tang dynasty's 618 to 907 span and for broad public-facing context on its cosmopolitan culture, poetry, and imperial administration.",
   },
   britannicaMongolEmpire: {
     shortTitle: "Britannica: Mongol empire",
@@ -1210,6 +1260,16 @@ export const ERA_SOURCES = {
     notes:
       "Used for Charlemagne's reign and especially for his imperial coronation on December 25, 800.",
   },
+  holyRomanEmpireWikipedia: {
+    shortTitle: "Wikipedia: Holy Roman Empire",
+    title: "Holy Roman Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Holy Roman Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Holy_Roman_Empire",
+    notes:
+      "Used for the conventional public-facing Holy Roman Empire span from Otto I's imperial coronation in 962 to the empire's dissolution in 1806.",
+  },
   historyCrusades: {
     shortTitle: "History: Crusades",
     title: "Crusades",
@@ -1255,6 +1315,16 @@ export const ERA_SOURCES = {
     notes:
       "Used for the standard Song dynasty span of 960–1279 and for concise context on Song-era prosperity, trade, and innovation.",
   },
+  yuanDynastyWikipedia: {
+    shortTitle: "Wikipedia: Yuan dynasty",
+    title: "Yuan dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Yuan dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Yuan_dynasty",
+    notes:
+      "Used for the Yuan dynasty's 1271 to 1368 span and for public-facing context on Mongol rule over all China proper and its Eurasian connections.",
+  },
   historyOttomanEmpire: {
     shortTitle: "History: Ottoman Empire",
     title: "Ottoman Empire",
@@ -1272,6 +1342,66 @@ export const ERA_SOURCES = {
     url: "https://www.history.com/topics/china/ming-dynasty",
     notes:
       "Used for the conventional Ming dynasty span from 1368 to 1644 in broad public-history surveys.",
+  },
+  qingDynastyWikipedia: {
+    shortTitle: "Wikipedia: Qing dynasty",
+    title: "Qing dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Qing dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Qing_dynasty",
+    notes:
+      "Used for the Qing dynasty's 1644 to 1912 span and for public-facing context on the last imperial dynasty ruling China at its greatest territorial extent.",
+  },
+  historyOfMayaCivilizationWikipedia: {
+    shortTitle: "Wikipedia: History of the Maya civilization",
+    title: "History of the Maya civilization",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "History of the Maya civilization." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/History_of_the_Maya_civilization",
+    notes:
+      "Used for broad Maya periodization, including the Classic, Postclassic, and Contact-era framing that extends to the fall of the last independent Maya city in 1697.",
+  },
+  mayaCivilizationWikipedia: {
+    shortTitle: "Wikipedia: Maya civilization",
+    title: "Maya civilization",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Maya civilization." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Maya_civilization",
+    notes:
+      "Used for the broad Maya civilization span from around 2000 BCE to 1697 CE and for public-facing context on Maya writing, astronomy, mathematics, and city-state traditions.",
+  },
+  preclassicMayaWikipedia: {
+    shortTitle: "Wikipedia: Preclassic Maya",
+    title: "Preclassic Maya",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Preclassic Maya." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Preclassic_Maya",
+    notes:
+      "Used for the Preclassic Maya span through 250 CE and for public-facing context on the rise of settled villages, early cities, and emerging kingship and writing.",
+  },
+  maliEmpireWikipedia: {
+    shortTitle: "Wikipedia: Mali Empire",
+    title: "Mali Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Mali Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Mali_Empire",
+    notes:
+      "Used for the broad Mali Empire span from the rise associated with Sundiata in the 13th century to the empire's decline in the early 17th century.",
+  },
+  sasanianEmpireWikipedia: {
+    shortTitle: "Wikipedia: Sasanian Empire",
+    title: "Sasanian Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Sasanian Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Sasanian_Empire",
+    notes:
+      "Used for the Sasanian Empire span from 224 to 651 CE and for public-facing context on its rivalry with Rome and Byzantium and its continuation of Persian imperial traditions.",
   },
   historyAztecs: {
     shortTitle: "History: Aztecs",

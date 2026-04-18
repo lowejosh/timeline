@@ -34,24 +34,24 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
       },
     ],
   },
-  {
-    id: "uruk-becomes-the-first-city",
-    label: "Uruk becomes the first city",
-    shortLabel: "Uruk",
-    year: bce(3_200),
-    regionalScopeLabel: "Southern Mesopotamia",
-    approximate: true,
-    minZoom: 19,
-    priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "metUrukFirstCity",
-        note: "The Met's Uruk essay says that by around 3200 B.C. Uruk was the largest settlement in southern Mesopotamia, if not the world, and a true city; the app uses c. 3200 BCE as its urban threshold marker.",
-      },
-      {
-        sourceId: "britannicaErech",
-        note: "Britannica says urban life in the Erech–Jamdat Nasr period (c. 3500–2900 BCE) is more fully illustrated at Uruk than at any other Mesopotamian city, supporting this marker's Uruk-centered urbanization framing.",
-      },
-    ],
-  },
+  // {
+  //   id: "uruk-becomes-the-first-city",
+  //   label: "Uruk becomes the first city",
+  //   shortLabel: "Uruk",
+  //   year: bce(3_200),
+  //   regionalScopeLabel: "Southern Mesopotamia",
+  //   approximate: true,
+  //   minZoom: 19,
+  //   priority: 82,
+  //   sourceRefs: [
+  //     {
+  //       sourceId: "metUrukFirstCity",
+  //       note: "The Met's Uruk essay says that by around 3200 B.C. Uruk was the largest settlement in southern Mesopotamia, if not the world, and a true city; the app uses c. 3200 BCE as its urban threshold marker.",
+  //     },
+  //     {
+  //       sourceId: "britannicaErech",
+  //       note: "Britannica says urban life in the Erech–Jamdat Nasr period (c. 3500–2900 BCE) is more fully illustrated at Uruk than at any other Mesopotamian city, supporting this marker's Uruk-centered urbanization framing.",
+  //     },
+  //   ],
+  // },
 ];

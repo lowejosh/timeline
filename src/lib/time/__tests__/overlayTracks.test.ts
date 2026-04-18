@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { ANCIENT_CIVILIZATION_OVERLAYS } from "../../data/overlays/ancientCivilizations";
-import { POST_CLASSICAL_EARLY_MODERN_OVERLAYS } from "../../data/overlays/postClassicalEarlyModern";
+import {
+  ANCIENT_CIVILIZATION_OVERLAYS,
+  CIVILIZATION_OVERLAYS,
+  POST_CLASSICAL_EARLY_MODERN_OVERLAYS,
+} from "../../data/overlays/civilizations";
 import type {
   TimelineMarker,
   TimelineOverlayBand,
@@ -435,17 +438,27 @@ describe("timeline overlay tracks", () => {
       "mesopotamia",
       "indus-valley-civilization",
       "ancient-egypt",
+      "maya-civilization",
+      "chinese-civilization",
       "hittite-empire",
       "mycenaean-greece",
       "ancient-greece",
       "achaemenid-persia",
       "roman-republic",
       "hellenistic-world",
-      "han-china",
       "roman-empire",
     ]);
-    expect(new Set(resolved.map((band) => band.laneIndex)).size).toBe(5);
-    expect(resolved.every((band) => band.laneCount === 5)).toBe(true);
+    expect(new Set(resolved.map((band) => band.laneIndex)).size).toBe(7);
+    expect(resolved.every((band) => band.laneCount === 7)).toBe(true);
+
+    const china = resolved.find(
+      (band) => band.band.id === "chinese-civilization",
+    );
+    const mycenaeanGreece = resolved.find(
+      (band) => band.band.id === "mycenaean-greece",
+    );
+
+    expect(china?.laneIndex).toBeLessThan(mycenaeanGreece?.laneIndex ?? 0);
   });
 
   it("keeps post-classical overlays in stable lanes around 1100 CE", () => {
@@ -466,13 +479,13 @@ describe("timeline overlay tracks", () => {
     expect(resolved.map((band) => band.band.id)).toEqual([
       "byzantine-empire",
       "abbasid-caliphate",
-      "song-china",
+      "holy-roman-empire",
       "mongol-empire",
+      "mali-empire",
       "ottoman-empire",
-      "ming-dynasty",
     ]);
-    expect(resolved.map((band) => band.laneIndex)).toEqual([0, 1, 2, 3, 1, 2]);
-    expect(resolved.every((band) => band.laneCount === 5)).toBe(true);
+    expect(resolved.map((band) => band.laneIndex)).toEqual([1, 0, 2, 3, 4, 0]);
+    expect(resolved.every((band) => band.laneCount === 6)).toBe(true);
   });
 
   it("keeps post-classical overlays visible below the old zoom-18 cutoff", () => {
@@ -492,12 +505,54 @@ describe("timeline overlay tracks", () => {
     );
 
     expect(resolved.map((band) => band.band.id)).toEqual([
+      "sasanian-empire",
       "byzantine-empire",
       "abbasid-caliphate",
-      "song-china",
+      "holy-roman-empire",
+      "mali-empire",
       "ottoman-empire",
-      "ming-dynasty",
     ]);
+  });
+
+  it("includes maya, mali, and sasanian in the merged civilization overlays", () => {
+    const flattened = CIVILIZATION_OVERLAYS.flatMap((band) => [
+      band,
+      ...(band.children ?? []),
+    ]);
+
+    const mayaBand = flattened.find((band) => band.id === "maya-civilization");
+    const maliBand = flattened.find((band) => band.id === "mali-empire");
+    const sasanianBand = flattened.find(
+      (band) => band.id === "sasanian-empire",
+    );
+
+    expect(mayaBand).toMatchObject({
+      startYear: -2000,
+      endYear: 1697,
+      regionalScopeLabel: "Mesoamerica",
+      subGroup: "mesoamerica",
+    });
+    expect(maliBand).toMatchObject({
+      startYear: 1235,
+      endYear: 1610,
+      regionalScopeLabel: "West Africa",
+      subGroup: "west-africa",
+    });
+    expect(sasanianBand).toMatchObject({
+      startYear: 224,
+      endYear: 651,
+      regionalScopeLabel: "Iranian world",
+      subGroup: "iranian-world",
+    });
+
+    expect(
+      flattened.find((band) => band.id === "holy-roman-empire"),
+    ).toMatchObject({
+      startYear: 962,
+      endYear: 1806,
+      regionalScopeLabel: "Central Europe",
+      subGroup: "central-europe",
+    });
   });
 
   it("shows the Mongol Empire band in the post-classical stack once it starts", () => {
@@ -518,10 +573,83 @@ describe("timeline overlay tracks", () => {
     expect(resolved.map((band) => band.band.id)).toEqual([
       "byzantine-empire",
       "abbasid-caliphate",
-      "song-china",
+      "holy-roman-empire",
       "mongol-empire",
+      "mali-empire",
     ]);
-    expect(resolved.map((band) => band.laneIndex)).toEqual([0, 1, 2, 3]);
-    expect(resolved.every((band) => band.laneCount === 5)).toBe(true);
+    expect(resolved.map((band) => band.laneIndex)).toEqual([1, 0, 2, 3, 4]);
+    expect(resolved.every((band) => band.laneCount === 6)).toBe(true);
+  });
+
+  it("keeps lane assignments static even when off-screen overlaps would otherwise reshuffle visible bands", () => {
+    const width = 1000;
+    const pad = 100;
+    const overlays: TimelineOverlayBand[] = [
+      {
+        id: "off-screen-early",
+        label: "Off-screen early",
+        startYear: 200,
+        endYear: 650,
+        color: "rgba(0, 0, 0, 0.1)",
+      },
+      {
+        id: "larger-visible",
+        label: "Larger visible",
+        startYear: 300,
+        endYear: 1450,
+        color: "rgba(0, 0, 0, 0.1)",
+      },
+      {
+        id: "smaller-visible",
+        label: "Smaller visible",
+        startYear: 750,
+        endYear: 1250,
+        color: "rgba(0, 0, 0, 0.1)",
+      },
+    ];
+
+    const viewport = {
+      centerYear: 1100,
+      zoom: 26,
+    };
+
+    const resolved = resolveTimelineOverlayTracks(
+      overlays,
+      viewport,
+      width,
+      pad,
+    );
+
+    expect(resolved.map((band) => band.band.id)).toEqual([
+      "larger-visible",
+      "smaller-visible",
+    ]);
+    expect(resolved.map((band) => band.laneIndex)).toEqual([1, 0]);
+    expect(resolved.every((band) => band.laneCount === 2)).toBe(true);
+  });
+
+  it("keeps China a little lower than the late shorter civ bands in the static stack", () => {
+    const width = 1000;
+    const pad = 100;
+    const viewport = {
+      centerYear: 1500,
+      zoom: 26,
+    };
+
+    const resolved = resolveTimelineOverlayTracks(
+      CIVILIZATION_OVERLAYS,
+      viewport,
+      width,
+      pad,
+    );
+
+    const china = resolved.find(
+      (band) => band.band.id === "chinese-civilization",
+    );
+    const inca = resolved.find((band) => band.band.id === "inca-empire");
+
+    expect(china).toBeDefined();
+    expect(inca).toBeDefined();
+    expect(china?.laneIndex).toBeLessThan(inca?.laneIndex ?? 0);
   });
 });

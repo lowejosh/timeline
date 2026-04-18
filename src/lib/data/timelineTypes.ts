@@ -79,6 +79,7 @@ type TimelineDecorationBase = TimelineZoomVisibility &
     description?: string;
     priority?: number;
     groupId?: string;
+    subGroup?: string;
     sourceRefs?: TimelineSourceRef[];
   };
 

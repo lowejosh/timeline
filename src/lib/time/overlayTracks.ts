@@ -39,6 +39,7 @@ const OVERLAY_MIN_VISIBLE_WIDTH_DEVICE_PX = 0.5;
 const PRIORITY_ZOOM_GRACE_START = 75;
 const PRIORITY_ZOOM_GRACE_STEP = 5;
 const PRIORITY_ZOOM_GRACE_MAX = 5;
+const CHINA_OVERLAY_LANE_START_BIAS_YEARS = -250;
 const overlayLaneAssignmentCache = new WeakMap<
   TimelineOverlayBand[],
   CachedOverlayLaneAssignment
@@ -161,10 +162,33 @@ function compareDecorations(
   );
 }
 
+function compareOverlayBandsForLaneAssignment(
+  left: TimelineOverlayBand,
+  right: TimelineOverlayBand,
+) {
+  const leftBiasedStartYear =
+    left.startYear +
+    (left.id === "chinese-civilization"
+      ? CHINA_OVERLAY_LANE_START_BIAS_YEARS
+      : 0);
+  const rightBiasedStartYear =
+    right.startYear +
+    (right.id === "chinese-civilization"
+      ? CHINA_OVERLAY_LANE_START_BIAS_YEARS
+      : 0);
+
+  return (
+    leftBiasedStartYear - rightBiasedStartYear ||
+    right.endYear - left.endYear ||
+    (right.priority ?? 0) - (left.priority ?? 0) ||
+    left.id.localeCompare(right.id)
+  );
+}
+
 function assignOverlayLanes(overlays: TimelineOverlayBand[]) {
   const laneEndYears: number[] = [];
   const assigned = [...overlays]
-    .sort(compareDecorations)
+    .sort(compareOverlayBandsForLaneAssignment)
     .map<AssignedTimelineOverlayBand>((band) => {
       let laneIndex = laneEndYears.findIndex(
         (laneEndYear) => band.startYear >= laneEndYear,
