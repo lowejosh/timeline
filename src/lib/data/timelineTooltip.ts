@@ -28,6 +28,7 @@ export type TimelineTooltipContent = {
   kindLabel: string;
   title: string;
   timeLabel: string;
+  iconGroupId?: string;
   regionalScopeLabel?: string;
   description?: string;
   sources: TimelineTooltipSource[];
@@ -85,6 +86,7 @@ export function getOverlayTooltipContent(
     kind: "overlay",
     kindLabel: "Band",
     title: overlay.label,
+    iconGroupId: overlay.groupId,
     timeLabel:
       overlay.exactStartTime && overlay.exactEndTime
         ? formatTimelineExactRange(overlay.exactStartTime, overlay.exactEndTime)

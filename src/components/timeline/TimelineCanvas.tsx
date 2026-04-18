@@ -94,6 +94,11 @@ import {
   syncAnimatedContextBandLabelState,
   type AnimatedContextBandLabelState,
 } from "./bandRendering";
+import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
+import {
+  drawOverlayGroupIcon,
+  resolveOverlayGroupIconLayout,
+} from "./overlayGroupIcons";
 
 type TimelineCanvasProps = {
   width: number;
@@ -407,6 +412,10 @@ const SUBYEAR_PRIMARY_FONT = "11px var(--font-sans)";
 const SUBYEAR_SECONDARY_FONT = "10px var(--font-sans)";
 const ERA_BAND_ALPHA = 0.3;
 const OVERLAY_BAND_ALPHA = 1;
+const OVERLAY_BAND_SIDE_PADDING = 5;
+const OVERLAY_BAND_DISCLOSURE_RESERVED_WIDTH = 18;
+const OVERLAY_GROUP_ICON_PARENT_ALPHA = 0.44;
+const OVERLAY_GROUP_ICON_CHILD_ALPHA = 0.4;
 const EXPANDED_OVERLAY_CONNECTOR_ALPHA = 1;
 const EXPANDED_OVERLAY_CONNECTOR_LINE_WIDTH = 1;
 const EXPANDED_OVERLAY_CHILD_BORDER_ALPHA = 1;
@@ -1668,6 +1677,22 @@ function drawPaperOverlayBand({
   context.restore();
 }
 
+function resolveOverlayBandLabelInsets({
+  iconReservedWidth = 0,
+  hasDisclosure = false,
+}: {
+  iconReservedWidth?: number;
+  hasDisclosure?: boolean;
+}) {
+  return {
+    left:
+      OVERLAY_BAND_SIDE_PADDING + Math.max(iconReservedWidth, 0),
+    right:
+      OVERLAY_BAND_SIDE_PADDING +
+      (hasDisclosure ? OVERLAY_BAND_DISCLOSURE_RESERVED_WIDTH : 0),
+  };
+}
+
 export function TimelineCanvas({
   width,
   height,
@@ -2207,6 +2232,8 @@ export function TimelineCanvas({
         shortLabel,
         renderX,
         renderWidth,
+        labelLeftInset = 0,
+        labelRightInset = 0,
         y,
         fillStyle,
         alpha,
@@ -2218,12 +2245,18 @@ export function TimelineCanvas({
         shortLabel: string;
         renderX: number;
         renderWidth: number;
+        labelLeftInset?: number;
+        labelRightInset?: number;
         y: number;
         fillStyle: string;
         alpha: number;
         hoverId?: string;
         tooltip?: TimelineTooltipContent;
       }) => {
+        const contentLeft = renderX + labelLeftInset;
+        const contentRight = renderX + renderWidth - labelRightInset;
+        const contentWidth = Math.max(contentRight - contentLeft, 0);
+
         context.font = "11px var(--font-sans)";
         const fullLabelWidth = context.measureText(fullLabel).width;
         const hasDistinctShortLabel = shortLabel !== fullLabel;
@@ -2236,7 +2269,7 @@ export function TimelineCanvas({
           : undefined;
         const currentVariant = steppedExistingState?.toVariant ?? "hidden";
         const nextVariant = resolveContextBandLabelVariant({
-          availableWidth: renderWidth,
+          availableWidth: contentWidth,
           fullLabelWidth,
           shortLabelWidth,
           currentVariant,
@@ -2277,10 +2310,10 @@ export function TimelineCanvas({
 
         if (dominantLayer && hoverId && tooltip) {
           const hoverBounds = resolveOverlayLabelHoverBounds({
-            centerX: renderX + renderWidth / 2,
+            centerX: contentLeft + contentWidth / 2,
             labelWidth: dominantLayer.width,
-            bandLeft: renderX,
-            bandRight: renderX + renderWidth,
+            bandLeft: contentLeft,
+            bandRight: contentRight,
             bandTop: y,
             bandBottom: y + OVERLAY_LANE_HEIGHT,
           });
@@ -2291,7 +2324,7 @@ export function TimelineCanvas({
             right: hoverBounds.right,
             top: hoverBounds.top,
             bottom: hoverBounds.bottom,
-            anchorX: renderX + renderWidth / 2,
+            anchorX: contentLeft + contentWidth / 2,
             anchorY: y + 2,
             anchorMode: "follow-x",
             placement: "above",
@@ -2307,7 +2340,7 @@ export function TimelineCanvas({
           context.textBaseline = "middle";
           context.fillText(
             layer.text,
-            renderX + renderWidth / 2,
+            contentLeft + contentWidth / 2,
             y + OVERLAY_LANE_HEIGHT / 2,
           );
           context.restore();
@@ -2405,6 +2438,27 @@ export function TimelineCanvas({
             drawBorder: !overlay.isHairline,
           });
 
+          const iconLayout = resolveOverlayGroupIconLayout({
+            groupId: overlay.band.groupId,
+            bandLeft: overlay.renderX,
+            bandTop: y,
+            bandWidth,
+            bandHeight: OVERLAY_LANE_HEIGHT,
+          });
+          const labelInsets = resolveOverlayBandLabelInsets({
+            iconReservedWidth: iconLayout?.reservedWidth ?? 0,
+            hasDisclosure: isVisibleOverlay && canExpandParent,
+          });
+
+          if (iconLayout) {
+            drawOverlayGroupIcon({
+              context,
+              layout: iconLayout,
+              strokeStyle: overlayLabelPaint.fillStyle,
+              alpha: OVERLAY_GROUP_ICON_PARENT_ALPHA * overlayState.currentOpacity,
+            });
+          }
+
           const fullLabel = overlay.band.label;
           const shortLabel = overlay.band.shortLabel ?? fullLabel;
           drawAnimatedOverlayLabel({
@@ -2413,6 +2467,8 @@ export function TimelineCanvas({
             shortLabel,
             renderX: overlay.renderX,
             renderWidth: bandWidth,
+            labelLeftInset: labelInsets.left,
+            labelRightInset: labelInsets.right,
             y,
             fillStyle: overlayLabelPaint.fillStyle,
             alpha: 0.82 * overlayState.currentOpacity,
@@ -2616,6 +2672,26 @@ export function TimelineCanvas({
             drawBorder: true,
           });
 
+          const childIconLayout = resolveOverlayGroupIconLayout({
+            groupId: child.band.groupId,
+            bandLeft: renderX,
+            bandTop: childRenderY,
+            bandWidth: renderWidth,
+            bandHeight: OVERLAY_LANE_HEIGHT,
+          });
+          const childLabelInsets = resolveOverlayBandLabelInsets({
+            iconReservedWidth: childIconLayout?.reservedWidth ?? 0,
+          });
+
+          if (childIconLayout) {
+            drawOverlayGroupIcon({
+              context,
+              layout: childIconLayout,
+              strokeStyle: childLabelPaint.fillStyle,
+              alpha: OVERLAY_GROUP_ICON_CHILD_ALPHA * childReveal,
+            });
+          }
+
           const fullLabel = child.band.label;
           const shortLabel = child.band.shortLabel ?? fullLabel;
 
@@ -2626,6 +2702,8 @@ export function TimelineCanvas({
               shortLabel,
               renderX,
               renderWidth,
+              labelLeftInset: childLabelInsets.left,
+              labelRightInset: childLabelInsets.right,
               y: childRenderY,
               fillStyle: childLabelPaint.fillStyle,
               alpha: 0.8 * childReveal * childLabelReveal,
@@ -4733,15 +4811,39 @@ export function TimelineCanvas({
           drawBorder: !overlay.isHairline,
         });
 
+        const iconLayout = resolveOverlayGroupIconLayout({
+          groupId: overlay.band.groupId,
+          bandLeft: overlay.renderX,
+          bandTop: y,
+          bandWidth,
+          bandHeight: OVERLAY_LANE_HEIGHT,
+        });
+        const labelInsets = resolveOverlayBandLabelInsets({
+          iconReservedWidth: iconLayout?.reservedWidth ?? 0,
+          hasDisclosure: canExpandParent,
+        });
+        const labelLeft = overlay.renderX + labelInsets.left;
+        const labelRight = overlay.renderX + bandWidth - labelInsets.right;
+        const labelWidth = Math.max(labelRight - labelLeft, 0);
+
+        if (iconLayout) {
+          drawOverlayGroupIcon({
+            context,
+            layout: iconLayout,
+            strokeStyle: overlayLabelPaint.fillStyle,
+            alpha: OVERLAY_GROUP_ICON_PARENT_ALPHA,
+          });
+        }
+
         const fullLabel = overlay.band.label;
         const shortLabel = overlay.band.shortLabel ?? fullLabel;
         context.font = "11px var(--font-sans)";
         const fullLabelWidth = context.measureText(fullLabel).width;
         const shortLabelWidth = context.measureText(shortLabel).width;
         const chosenLabel =
-          fullLabelWidth <= Math.max(bandWidth - 10, 0)
+          fullLabelWidth <= Math.max(labelWidth - 10, 0)
             ? fullLabel
-            : shortLabelWidth <= Math.max(bandWidth - 10, 0)
+            : shortLabelWidth <= Math.max(labelWidth - 10, 0)
               ? shortLabel
               : "";
         const chosenLabelWidth =
@@ -4752,7 +4854,7 @@ export function TimelineCanvas({
               : 0;
         const labelOpacity =
           chosenLabelWidth > 0
-            ? clamp01((bandWidth - (chosenLabelWidth + 8)) / 20)
+            ? clamp01((labelWidth - (chosenLabelWidth + 8)) / 20)
             : 0;
 
         if (chosenLabel && labelOpacity > 0.01) {
@@ -4762,7 +4864,7 @@ export function TimelineCanvas({
           context.textBaseline = "middle";
           context.fillText(
             chosenLabel,
-            overlay.renderX + bandWidth / 2,
+            labelLeft + labelWidth / 2,
             y + OVERLAY_LANE_HEIGHT / 2,
           );
         }
@@ -4962,6 +5064,29 @@ export function TimelineCanvas({
           drawBorder: true,
         });
 
+        const childIconLayout = resolveOverlayGroupIconLayout({
+          groupId: child.band.groupId,
+          bandLeft: renderX,
+          bandTop: childRenderY,
+          bandWidth: renderWidth,
+          bandHeight: OVERLAY_LANE_HEIGHT,
+        });
+        const childLabelInsets = resolveOverlayBandLabelInsets({
+          iconReservedWidth: childIconLayout?.reservedWidth ?? 0,
+        });
+        const childLabelLeft = renderX + childLabelInsets.left;
+        const childLabelRight = renderX + renderWidth - childLabelInsets.right;
+        const childLabelWidth = Math.max(childLabelRight - childLabelLeft, 0);
+
+        if (childIconLayout) {
+          drawOverlayGroupIcon({
+            context,
+            layout: childIconLayout,
+            strokeStyle: childLabelPaint.fillStyle,
+            alpha: OVERLAY_GROUP_ICON_CHILD_ALPHA * childReveal,
+          });
+        }
+
         const fullLabel = child.band.label;
         const shortLabel = child.band.shortLabel ?? fullLabel;
         context.font = "11px var(--font-sans)";
@@ -4971,9 +5096,9 @@ export function TimelineCanvas({
             ? fullLabelWidth
             : context.measureText(shortLabel).width;
         const chosenLabel =
-          fullLabelWidth <= Math.max(renderWidth - 10, 0)
+          fullLabelWidth <= Math.max(childLabelWidth - 10, 0)
             ? fullLabel
-            : shortLabelWidth <= Math.max(renderWidth - 10, 0)
+            : shortLabelWidth <= Math.max(childLabelWidth - 10, 0)
               ? shortLabel
               : "";
         const chosenLabelWidth =
@@ -4984,17 +5109,17 @@ export function TimelineCanvas({
               : 0;
         const labelOpacity =
           chosenLabelWidth > 0
-            ? clamp01((renderWidth - (chosenLabelWidth + 8)) / 20)
+            ? clamp01((childLabelWidth - (chosenLabelWidth + 8)) / 20)
             : 0;
 
         const animatedLabelOpacity = labelOpacity * childReveal * childLabelReveal;
 
         if (chosenLabel && animatedLabelOpacity > 0.01) {
           const hoverBounds = resolveOverlayLabelHoverBounds({
-            centerX: renderX + renderWidth / 2,
+            centerX: childLabelLeft + childLabelWidth / 2,
             labelWidth: chosenLabelWidth,
-            bandLeft: renderX,
-            bandRight: renderX + renderWidth,
+            bandLeft: childLabelLeft,
+            bandRight: childLabelRight,
             bandTop: childRenderY,
             bandBottom: childRenderY + OVERLAY_LANE_HEIGHT,
           });
@@ -5005,7 +5130,7 @@ export function TimelineCanvas({
             right: hoverBounds.right,
             top: hoverBounds.top,
             bottom: hoverBounds.bottom,
-            anchorX: renderX + renderWidth / 2,
+            anchorX: childLabelLeft + childLabelWidth / 2,
             anchorY: childRenderY + 2,
             anchorMode: "follow-x",
             placement: "above",
@@ -5018,7 +5143,7 @@ export function TimelineCanvas({
           context.textBaseline = "middle";
           context.fillText(
             chosenLabel,
-            renderX + renderWidth / 2,
+            childLabelLeft + childLabelWidth / 2,
             childRenderY + OVERLAY_LANE_HEIGHT / 2,
           );
         }
@@ -6457,8 +6582,14 @@ export function TimelineCanvas({
           data-phase={renderedTooltip.phase}
           style={tooltipStyle}
         >
-          <div className="timeline-tooltip__title">
-            {renderedTooltip.tooltipState.tooltip.title}
+          <div className="timeline-tooltip__header">
+            <OverlayGroupIconSvg
+              className="timeline-tooltip__icon"
+              groupId={renderedTooltip.tooltipState.tooltip.iconGroupId}
+            />
+            <div className="timeline-tooltip__title">
+              {renderedTooltip.tooltipState.tooltip.title}
+            </div>
           </div>
           {renderedTooltip.tooltipState.tooltip.regionalScopeLabel ? (
             <div className="timeline-tooltip__subtitle">

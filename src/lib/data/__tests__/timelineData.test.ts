@@ -109,6 +109,9 @@ describe("root timeline display data", () => {
     expect(TIMELINE_DISPLAY.markers.map((marker) => marker.id)).toEqual([
       "solar-system-formation",
       "earth-formation",
+      "moon-forms",
+      "oldest-known-zircons-form",
+      "early-oceans-and-hydrosphere",
       "earliest-evidence-of-life",
       "great-oxidation-event",
       "first-eukaryotic-cells",

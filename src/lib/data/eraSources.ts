@@ -51,6 +51,35 @@ export const ERA_SOURCES = {
     url: "https://www.usgs.gov/faqs/how-old-earth",
     notes: "Used for the Earth's formation at about 4.54 billion years ago.",
   },
+  nasaMoonFormation: {
+    shortTitle: "NASA: Moon Formation",
+    title: "Moon Formation",
+    organization: "NASA",
+    citation: 'NASA, "Moon Formation," Science Mission Directorate.',
+    url: "https://science.nasa.gov/moon/formation/",
+    notes:
+      "Used for the public-facing statement that the Moon formed about 4.5 billion years ago when a Mars-sized object or similar impactor struck the young Earth and lofted debris into space.",
+  },
+  amnhZirconsEarlyEarth: {
+    shortTitle: "AMNH: Early Earth zircons",
+    title: "Zircons: Time Capsules from the Early Earth",
+    organization: "American Museum of Natural History",
+    citation:
+      'American Museum of Natural History, "Zircons: Time Capsules from the Early Earth."',
+    url: "https://www.amnh.org/explore/videos/earth-and-climate/zircons",
+    notes:
+      "Used for the oldest Jack Hills zircons at roughly 4.375 billion years old and for the public-facing argument that zircon evidence points to a comparatively cool early Earth with continents, oceans, and liquid water by about 4.4 billion years ago.",
+  },
+  uwMadisonCoolEarlyEarth: {
+    shortTitle: "UW–Madison: cool early Earth",
+    title: "Oldest bit of crust firms up idea of a cool early Earth",
+    organization: "University of Wisconsin–Madison",
+    citation:
+      'University of Wisconsin–Madison, "Oldest bit of crust firms up idea of a cool early Earth."',
+    url: "https://news.wisc.edu/oldest-bit-of-crust-firms-up-idea-of-a-cool-early-earth/",
+    notes:
+      "Used for the 4.4-billion-year-old Jack Hills zircon as the oldest known material formed on Earth and for the claim that Earth had liquid water, oceans, and a hydrosphere before about 4.3 billion years ago.",
+  },
   icsChart2024: {
     shortTitle: "ICS Chart v2024/12",
     title: "International Chronostratigraphic Chart v2024/12",

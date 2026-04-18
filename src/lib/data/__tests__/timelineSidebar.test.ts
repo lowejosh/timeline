@@ -197,6 +197,43 @@ describe("timeline sidebar selectors", () => {
     expect(sections).toEqual([]);
   });
 
+  it("hides cultures when human-history markers are no longer zoom-visible", () => {
+    const display: TimelineDisplayConfig = {
+      markers: [
+        {
+          id: "late-history-marker",
+          label: "Late history marker",
+          year: 1200,
+          minZoom: 20,
+          groupId: "human-history",
+        },
+      ],
+      overlays: [
+        {
+          id: "natufian-culture",
+          label: "Natufian",
+          startYear: -12_500,
+          endYear: -9_500,
+          color: "rgba(0, 0, 0, 0.1)",
+          groupId: "cultures",
+        },
+      ],
+    };
+
+    const sections = resolveTimelineSidebarSections(
+      display,
+      {
+        centerYear: -11_000,
+        zoom: 10,
+      },
+      1000,
+      120,
+      new Set(["human-history", "cultures"]),
+    );
+
+    expect(sections).toEqual([]);
+  });
+
   it("surfaces the human evolution layer in overlays and counts both markers and overlays", () => {
     const display: TimelineDisplayConfig = {
       markers: [

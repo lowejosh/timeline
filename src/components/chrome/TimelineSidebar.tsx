@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { TimelineSidebarSectionState } from "../../lib/data/timelineSidebar";
+import { OverlayGroupIconSvg } from "../timeline/OverlayGroupIconSvg";
 
 type RenderedTimelineSidebarSection = TimelineSidebarSectionState & {
   phase: "entering" | "present" | "exiting";
@@ -193,8 +194,14 @@ export function TimelineSidebar({
                             aria-hidden="true"
                           />
                           <span className="timeline-sidebar__toggle-copy">
-                            <span className="timeline-sidebar__item-title">
-                              {entry.label}
+                            <span className="timeline-sidebar__item-header">
+                              <span className="timeline-sidebar__item-title">
+                                {entry.label}
+                              </span>
+                              <OverlayGroupIconSvg
+                                className="timeline-sidebar__item-icon"
+                                groupId={section.id === "overlays" ? entry.id : undefined}
+                              />
                             </span>
                           </span>
                         </label>

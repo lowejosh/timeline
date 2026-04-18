@@ -9,7 +9,7 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     approximate: true,
     year: yearsAgo(2_400_000_000),
     description:
-      "As cyanobacteria oxygenated sea and sky, oxygen likely poisoned much of Earth's anaerobic life—though the size of that die-off remains hard to pin down from the fossil record.",
+      "As cyanobacteria oxygenated sea and sky, oxygen likely poisoned much of Earth's anaerobic life. The precise size of that die-off remains hard to pin down from the fossil record.",
     minZoom: 0,
     priority: 96,
     sourceRefs: [

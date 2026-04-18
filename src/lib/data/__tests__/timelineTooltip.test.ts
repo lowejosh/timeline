@@ -100,11 +100,15 @@ describe("timeline tooltip content", () => {
       label: "Roman Empire",
       startYear: -27,
       endYear: 476,
+      groupId: "civilizations",
       color: "rgba(0, 0, 0, 0.1)",
       sourceRefs: [{ sourceId: "historyAncientRome" }],
     };
 
-    expect(getOverlayTooltipContent(overlay).timeLabel).toBe("27 BCE — 476 CE");
+    expect(getOverlayTooltipContent(overlay)).toMatchObject({
+      timeLabel: "27 BCE — 476 CE",
+      iconGroupId: "civilizations",
+    });
   });
 
   it("surfaces region scope and approximate labels for era tooltips", () => {

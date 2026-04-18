@@ -89,11 +89,10 @@ const HUMAN_HISTORY_GROUP_IDS = new Set(
   )?.groupIds ?? [],
 );
 
-const CIVILIZATION_GROUP_IDS = new Set(
-  SIDEBAR_ENTRY_DEFINITIONS.find(
-    (definition) => definition.id === "civilizations",
-  )?.groupIds ?? [],
-);
+const OVERLAY_ENTRY_IDS_HIDDEN_WITHOUT_ZOOM_VISIBLE_HISTORY = new Set([
+  "civilizations",
+  "cultures",
+]);
 
 export function resolveTimelineSidebarSections(
   display: TimelineDisplayConfig,
@@ -192,10 +191,9 @@ export function resolveTimelineSidebarSections(
     }
 
     if (
-      definition.id === "civilizations" &&
+      OVERLAY_ENTRY_IDS_HIDDEN_WITHOUT_ZOOM_VISIBLE_HISTORY.has(definition.id) &&
       hasHumanHistoryContent &&
-      !hasZoomVisibleHumanHistoryMarkers &&
-      definition.groupIds.some((groupId) => CIVILIZATION_GROUP_IDS.has(groupId))
+      !hasZoomVisibleHumanHistoryMarkers
     ) {
       return accumulator;
     }
