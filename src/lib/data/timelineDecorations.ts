@@ -66,8 +66,9 @@ export const TIMELINE_DECORATION_CATEGORIES: TimelineDecorationCategory[] = [
   },
   {
     id: CULTURES_CATEGORY_ID,
-    label: "Cultures",
-    description: "Toggleable prehistoric and non-state cultural overlays.",
+    label: "Pre-Civilization Cultures",
+    description:
+      "Toggleable archaeological cultures and village worlds before early states and cities.",
     order: 3,
   },
   {
@@ -107,9 +108,9 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
   {
     id: CULTURES_GROUP_ID,
     categoryId: CULTURES_CATEGORY_ID,
-    label: "Cultures",
+    label: "Pre-Civilization Cultures",
     description:
-      "Prehistoric and non-state cultural overlays before or alongside early states.",
+      "Archaeological cultures and village worlds before or alongside the rise of early states and cities.",
     contentType: "overlays",
     order: 0,
   },

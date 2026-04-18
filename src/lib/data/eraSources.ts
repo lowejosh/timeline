@@ -748,7 +748,47 @@ export const ERA_SOURCES = {
       'Wikipedia contributors, "Natufian culture." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Natufian_culture",
     notes:
-      "Used for the broad Natufian span of roughly 12,500–9,500 BCE and for public-facing context on semi-sedentary villages, wild-cereal harvesting, and the threshold to agriculture in the Levant.",
+      "Used for the page's primary Natufian span of roughly 15,000–11,500 BP and for public-facing context on semi-sedentary villages, wild-cereal harvesting, and the threshold to agriculture in the Levant.",
+  },
+  khiamianCultureWikipedia: {
+    shortTitle: "Wikipedia: Khiamian culture",
+    title: "Khiamian culture",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Khiamian culture." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Khiamian_culture",
+    notes:
+      "Used for the Khiamian's explicit c. 9700–8650 BC span and for public-facing context on El Khiam points, early ground-level houses, and the still-experimental agricultural world immediately after the Natufian.",
+  },
+  mureybetWikipedia: {
+    shortTitle: "Wikipedia: Mureybet",
+    title: "Mureybet",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Mureybet." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Mureybet",
+    notes:
+      "Used for the Mureybetian's explicit 9300–8600 BC span and for public-facing context on Middle Euphrates settlement, rectangular storage buildings, cereal cultivation, and communal architecture.",
+  },
+  cayonuWikipedia: {
+    shortTitle: "Wikipedia: Çayönü",
+    title: "Çayönü",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Çayönü." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/%C3%87ay%C3%B6n%C3%BC",
+    notes:
+      "Used for Çayönü Tepesi's explicit c. 8630–6800 BC span and for public-facing context on Upper Tigris architectural phases, early cereal cultivation, and possible early pig domestication in a classic PPNB settlement.",
+  },
+  nevaliCoriWikipedia: {
+    shortTitle: "Wikipedia: Nevalı Çori",
+    title: "Nevalı Çori",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Nevalı Çori." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Neval%C4%B1_%C3%87ori",
+    notes:
+      "Used for Nevalı Çori's explicit 8400–8100 BC PPNB span and for public-facing context on its channeled houses, cult building with monolithic pillars, and early monumental sculpture on the middle Euphrates.",
   },
   prePotteryNeolithicAWikipedia: {
     shortTitle: "Wikipedia: Pre-Pottery Neolithic A",
@@ -758,7 +798,17 @@ export const ERA_SOURCES = {
       'Wikipedia contributors, "Pre-Pottery Neolithic A." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Pre-Pottery_Neolithic_A",
     notes:
-      "Used for the broad PPNA span of c. 10,000–8,800 BCE and for public-facing context on round mud-brick settlements, granaries, early cultivation, and communal architecture in the Levant and Upper Mesopotamia.",
+      "Used for the page's primary PPNA span of c. 12,000–10,800 years ago and for public-facing context on round mud-brick settlements, granaries, early cultivation, and communal architecture in the Levant and Upper Mesopotamia.",
+  },
+  originsOfAgricultureInWestAsiaWikipedia: {
+    shortTitle: "Wikipedia: West Asian agriculture origins",
+    title: "Origins of agriculture in West Asia",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Origins of agriculture in West Asia." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Origins_of_agriculture_in_West_Asia",
+    notes:
+      "Used for Southwest Asia's early agricultural timeline: the page explicitly traces agriculture to 10,000–8,000 BCE, with pre-domestic cultivation emphasized for about 9,500–8,500 BCE before domesticated forms become clear around 8,500–8,000 BCE.",
   },
   prePotteryNeolithicBWikipedia: {
     shortTitle: "Wikipedia: Pre-Pottery Neolithic B",
@@ -768,7 +818,7 @@ export const ERA_SOURCES = {
       'Wikipedia contributors, "Pre-Pottery Neolithic B." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Pre-Pottery_Neolithic_B",
     notes:
-      "Used for the broad PPNB span of c. 8,800–6,500 BCE and for public-facing context on larger farming villages, rectilinear architecture, plastered floors, herding, and early ritual traditions in the Levant and Upper Mesopotamia.",
+      "Used for the page's primary PPNB span of c. 10,800–8,500 years ago and for public-facing context on larger farming villages, rectilinear architecture, plastered floors, herding, and early ritual traditions in the Levant and Upper Mesopotamia.",
   },
   halafCultureWikipedia: {
     shortTitle: "Wikipedia: Halaf culture",
@@ -780,6 +830,16 @@ export const ERA_SOURCES = {
     notes:
       "Used for the broad Halaf span of c. 6,100–5,100 BCE and for public-facing context on northern Mesopotamian village life, painted pottery, and the northern traditions that transition toward the Ubaid horizon.",
   },
+  samarraCultureWikipedia: {
+    shortTitle: "Wikipedia: Samarra culture",
+    title: "Samarra culture",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Samarra culture." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Samarra_culture",
+    notes:
+      "Used for the Samarra culture's explicit c. 5500–4800 BCE span and for public-facing context on fine painted pottery, irrigation at Tell es-Sawwan, and the culture's role as a precursor to the Ubaid world.",
+  },
   ubaidPeriodWikipedia: {
     shortTitle: "Wikipedia: Ubaid period",
     title: "Ubaid period",
@@ -788,7 +848,17 @@ export const ERA_SOURCES = {
       'Wikipedia contributors, "Ubaid period." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Ubaid_period",
     notes:
-      "Used for the southern Mesopotamian Ubaid span of c. 5,500–3,800 BCE and for public-facing context on irrigation, larger settlements, temples, and the long pre-urban lead-in to Uruk.",
+      "Used for the southern Mesopotamian Ubaid span of c. 5,500–3,800 BCE and for the specific late-Ubaid framing that links intensive irrigated hydraulic agriculture, larger settlements, and the movement toward urbanization during roughly 5,000–4,000 BCE.",
+  },
+  chogaMamiWikipedia: {
+    shortTitle: "Wikipedia: Choga Mami",
+    title: "Choga Mami",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Choga Mami." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Choga_Mami",
+    notes:
+      "Used for the specific irrigation evidence in Mesopotamia: Choga Mami is described as showing the first canal irrigation in operation around 6000 BCE, with man-made channels and irrigated plots in the Samarran world.",
   },
   metChauvet: {
     shortTitle: "Met: Chauvet Cave",

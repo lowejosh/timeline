@@ -1,5 +1,5 @@
 import type { TimelineOverlayBand } from "../timelineTypes";
-import { bce } from "../timelineDateBuilders";
+import { bce, yearsAgo } from "../timelineDateBuilders";
 
 export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
   {
@@ -7,8 +7,8 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     label: "Natufian",
     description:
       "Semi-sedentary Levantine foragers with stone-built hamlets, food storage, wild-cereal harvesting, and some of the clearest steps toward farming.",
-    startYear: bce(12_500),
-    endYear: bce(9_500),
+    startYear: yearsAgo(15_000),
+    endYear: yearsAgo(11_500),
     regionalScopeLabel: "Levant",
     approximateStart: true,
     approximateEnd: true,
@@ -18,7 +18,7 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     sourceRefs: [
       {
         sourceId: "natufianCultureWikipedia",
-        note: "Uses the page's conventional 12,500–9,500 BCE range for a broad public-facing Natufian band.",
+        note: "Uses the page's primary 15,000–11,500 BP framing for a broad public-facing Natufian band, so this overlay is expressed with yearsAgo(...) rather than BCE dates.",
       },
       {
         sourceId: "metPrehistoricArt",
@@ -27,13 +27,13 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     ],
   },
   {
-    id: "pre-pottery-neolithic-a",
-    label: "PPNA",
+    id: "khiamian-culture",
+    label: "Khiamian",
     description:
-      "Early Near Eastern village horizon of round houses, granaries, cultivation experiments, and communal building before pottery.",
-    startYear: bce(10_000),
-    endYear: bce(8_800),
-    regionalScopeLabel: "Levant and Upper Mesopotamia",
+      "Earliest named village culture after the Natufian, marked by El Khiam points, ground-level houses, and some of the first cultivation experiments in Southwest Asia.",
+    startYear: bce(9_700),
+    endYear: bce(8_650),
+    regionalScopeLabel: "Levant and Middle Euphrates",
     approximateStart: true,
     approximateEnd: true,
     color: "rgb(162, 130, 92)",
@@ -41,19 +41,19 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     subGroup: "near-east",
     sourceRefs: [
       {
-        sourceId: "prePotteryNeolithicAWikipedia",
-        note: "Uses the conventional c. 10,000–8,800 BCE span for PPNA and its association with early granaries, small mud-brick settlements, and pre-domestication cultivation.",
+        sourceId: "khiamianCultureWikipedia",
+        note: "Uses the page's explicit c. 9700–8650 BC Khiamian span and its emphasis on El Khiam points, early ground-level houses, and experimental cultivation before fully established farming villages.",
       },
     ],
   },
   {
-    id: "pre-pottery-neolithic-b",
-    label: "PPNB",
+    id: "mureybetian-culture",
+    label: "Mureybetian",
     description:
-      "Larger farming communities of the Fertile Crescent with rectilinear houses, plastered floors, herding, and ancestor-focused ritual practices.",
-    startYear: bce(8_800),
-    endYear: bce(6_500),
-    regionalScopeLabel: "Levant and Upper Mesopotamia",
+      "Middle Euphrates village tradition of round and rectangular buildings, storage rooms, cereal cultivation, and communal architecture pushing the Neolithic deeper toward northern Mesopotamia.",
+    startYear: bce(9_300),
+    endYear: bce(8_600),
+    regionalScopeLabel: "Middle Euphrates",
     approximateStart: true,
     approximateEnd: true,
     color: "rgb(149, 123, 96)",
@@ -61,8 +61,48 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     subGroup: "near-east",
     sourceRefs: [
       {
-        sourceId: "prePotteryNeolithicBWikipedia",
-        note: "Uses the conventional c. 8,800–6,500 BCE span for PPNB and its stronger evidence for herding, rectilinear architecture, plastered floors, and settled farming life.",
+        sourceId: "mureybetWikipedia",
+        note: "Uses the page's explicit 9300–8600 BC Mureybetian span and its description of rectangular buildings, storage spaces, cereal cultivation, and communal structures in the Middle Euphrates.",
+      },
+    ],
+  },
+  {
+    id: "cayonu-tepesi",
+    label: "Çayönü",
+    description:
+      "Upper Tigris PPNB settlement with changing house plans, early cereal farming, and some of the clearest evidence for pig domestication in northern Mesopotamia.",
+    startYear: bce(8_630),
+    endYear: bce(6_800),
+    regionalScopeLabel: "Upper Tigris",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(145, 117, 91)",
+    priority: 75,
+    subGroup: "near-east",
+    sourceRefs: [
+      {
+        sourceId: "cayonuWikipedia",
+        note: "Uses the page's explicit c. 8630–6800 BC range for Çayönü Tepesi and its public-facing emphasis on Upper Mesopotamian architecture, cereal cultivation, and early pig domestication.",
+      },
+    ],
+  },
+  {
+    id: "nevali-cori",
+    label: "Nevalı Çori",
+    description:
+      "Middle Euphrates PPNB site of channeled houses, a cult building with monolithic pillars, and some of the earliest large-scale sculpture in the Neolithic world.",
+    startYear: bce(8_400),
+    endYear: bce(8_100),
+    regionalScopeLabel: "Middle Euphrates",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(143, 116, 94)",
+    priority: 75,
+    subGroup: "near-east",
+    sourceRefs: [
+      {
+        sourceId: "nevaliCoriWikipedia",
+        note: "Uses the page's explicit 8400–8100 BC Nevalı Çori range and its description of channeled-house architecture, cult buildings with monolithic pillars, and very early monumental sculpture.",
       },
     ],
   },
@@ -83,6 +123,26 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
       {
         sourceId: "halafCultureWikipedia",
         note: "Uses the conventional c. 6,100–5,100 BCE Halaf range and its role as a northern village tradition that transitions into Ubaid-linked material culture.",
+      },
+    ],
+  },
+  {
+    id: "samarra-culture",
+    label: "Samarra",
+    description:
+      "Late Neolithic middle-Tigris culture known for fine painted pottery, irrigation at Tell es-Sawwan, and increasingly organized settled life before full Ubaid dominance.",
+    startYear: bce(5_500),
+    endYear: bce(4_800),
+    regionalScopeLabel: "Northern Mesopotamia",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(136, 118, 90)",
+    priority: 75,
+    subGroup: "near-east",
+    sourceRefs: [
+      {
+        sourceId: "samarraCultureWikipedia",
+        note: "Uses the page's explicit c. 5500–4800 BCE Samarra range and its emphasis on fine painted pottery, irrigation at Tell es-Sawwan, and Samarran culture as a precursor to Ubaid Mesopotamia.",
       },
     ],
   },

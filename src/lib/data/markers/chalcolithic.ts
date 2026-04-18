@@ -3,18 +3,24 @@ import { bce } from "../timelineDateBuilders";
 
 export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
   {
-    id: "irrigation-reshapes-southern-mesopotamia",
-    label: "Irrigation reshapes southern Mesopotamia",
+    id: "canal-irrigation-appears-at-choga-mami",
+    label: "Canal irrigation appears at Choga Mami",
     shortLabel: "Irrigation",
-    year: bce(4_000),
-    regionalScopeLabel: "Southern Mesopotamia",
+    description:
+      "Around 6000 BCE, Choga Mami shows canal irrigation already in operation, with man-made channels watering fields in lowland Mesopotamia.",
+    year: bce(6_000),
+    regionalScopeLabel: "Mesopotamia",
     approximate: true,
     minZoom: 19,
     priority: 70,
     sourceRefs: [
       {
-        sourceId: "britannicaMesopotamia",
-        note: "Britannica says agriculture in Mesopotamia itself developed only after artificial irrigation was invented and that the south overtook the north by about 4000 BCE; the app uses c. 4000 BCE as a concise threshold for canal-based transformation in southern Mesopotamia.",
+        sourceId: "chogaMamiWikipedia",
+        note: "The page explicitly says Choga Mami shows the first canal irrigation in operation around 6000 BCE; the marker now uses that source-stated date and site rather than a later inferred threshold.",
+      },
+      {
+        sourceId: "originsOfAgricultureInWestAsiaWikipedia",
+        note: "The page says irrigation is only attested with certainty at the end of the Neolithic in central Mesopotamia at Choga Mami, c. 5900 BC, and that it spread in the 6th millennium BC on a modest scale.",
       },
     ],
   },

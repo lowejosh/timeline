@@ -141,14 +141,14 @@ describe("root timeline display data", () => {
       "last-neanderthals-disappear",
       "chauvet-cave-figurative-art",
       "venus-of-dolni-vestonice",
-      "gobekli-tepe-monuments",
       "agriculture-emerges-in-southwest-asia",
+      "gobekli-tepe-monuments",
       "natufian-settled-hunter-gatherers-at-eynan",
       "mehrgarh-early-farming-community",
       "catalhoyuk-settled-farming-community",
       "jericho-ritual-community",
       "jiahu-bone-flutes-and-village-life",
-      "irrigation-reshapes-southern-mesopotamia",
+      "canal-irrigation-appears-at-choga-mami",
       "wheeled-transport-appears-in-sumer",
       "cuneiform-writing-emerges",
       "stonehenge-begins",
@@ -203,6 +203,12 @@ describe("root timeline display data", () => {
     const cuneiform = TIMELINE_DISPLAY.markers.find(
       (marker) => marker.id === "cuneiform-writing-emerges",
     );
+    const irrigation = TIMELINE_DISPLAY.markers.find(
+      (marker) => marker.id === "canal-irrigation-appears-at-choga-mami",
+    );
+    const gobekliTepe = TIMELINE_DISPLAY.markers.find(
+      (marker) => marker.id === "gobekli-tepe-monuments",
+    );
     const homoSapiens = TIMELINE_DISPLAY.markers.find(
       (marker) => marker.id === "homo-sapiens-evolves-in-africa",
     );
@@ -222,7 +228,15 @@ describe("root timeline display data", () => {
     expect(agriculture).toMatchObject({
       regionalScopeLabel: "Southwest Asia",
       approximate: true,
+      description: expect.stringContaining("10000–8000 BCE"),
     });
+    expect(agriculture?.year).toBeLessThan(gobekliTepe?.year ?? Number.POSITIVE_INFINITY);
+    expect(
+      agriculture?.sourceRefs?.map((reference) => reference.sourceId),
+    ).toEqual([
+      "originsOfAgricultureInWestAsiaWikipedia",
+      "prePotteryNeolithicAWikipedia",
+    ]);
     expect(collapse).toMatchObject({
       regionalScopeLabel: "Eastern Mediterranean",
       approximate: true,
@@ -231,6 +245,19 @@ describe("root timeline display data", () => {
       regionalScopeLabel: "Mesopotamia",
       approximate: true,
     });
+    expect(irrigation).toMatchObject({
+      regionalScopeLabel: "Mesopotamia",
+      approximate: true,
+      year: bce(6_000),
+      label: "Canal irrigation appears at Choga Mami",
+      description: expect.stringContaining("Around 6000 BCE"),
+    });
+    expect(
+      irrigation?.sourceRefs?.map((reference) => reference.sourceId),
+    ).toEqual([
+      "chogaMamiWikipedia",
+      "originsOfAgricultureInWestAsiaWikipedia",
+    ]);
     expect(homoSapiens).toMatchObject({
       regionalScopeLabel: "Africa",
       approximate: true,
@@ -341,9 +368,12 @@ describe("root timeline display data", () => {
       "homo-sapiens",
       "homo-floresiensis",
       "natufian-culture",
-      "pre-pottery-neolithic-a",
-      "pre-pottery-neolithic-b",
+      "khiamian-culture",
+      "mureybetian-culture",
+      "cayonu-tepesi",
+      "nevali-cori",
       "halaf-culture",
+      "samarra-culture",
       "ubaid-period",
       "mesopotamia",
       "indus-valley-civilization",
@@ -439,11 +469,29 @@ describe("root timeline display data", () => {
     const holyRomanEmpire = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "holy-roman-empire",
     );
-    const ppna = TIMELINE_DISPLAY.overlays.find(
-      (band) => band.id === "pre-pottery-neolithic-a",
+    const natufian = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "natufian-culture",
+    );
+    const khiamian = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "khiamian-culture",
+    );
+    const mureybetian = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "mureybetian-culture",
+    );
+    const cayonu = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "cayonu-tepesi",
+    );
+    const nevaliCori = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "nevali-cori",
     );
     const halaf = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "halaf-culture",
+    );
+    const samarra = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "samarra-culture",
+    );
+    const ubaid = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "ubaid-period",
     );
 
     const chineseCivilization = TIMELINE_DISPLAY.overlays.find(
@@ -482,15 +530,67 @@ describe("root timeline display data", () => {
       subGroup: "central-europe",
     });
 
-    expect(ppna).toMatchObject({
-      label: "PPNA",
-      regionalScopeLabel: "Levant and Upper Mesopotamia",
+    expect(natufian).toMatchObject({
+      label: "Natufian",
+      startYear: yearsAgo(15_000),
+      endYear: yearsAgo(11_500),
+      regionalScopeLabel: "Levant",
+      subGroup: "near-east",
+    });
+
+    expect(khiamian).toMatchObject({
+      label: "Khiamian",
+      startYear: bce(9_700),
+      endYear: bce(8_650),
+      regionalScopeLabel: "Levant and Middle Euphrates",
+      subGroup: "near-east",
+    });
+
+    expect(mureybetian).toMatchObject({
+      label: "Mureybetian",
+      startYear: bce(9_300),
+      endYear: bce(8_600),
+      regionalScopeLabel: "Middle Euphrates",
+      subGroup: "near-east",
+    });
+
+    expect(cayonu).toMatchObject({
+      label: "Çayönü",
+      startYear: bce(8_630),
+      endYear: bce(6_800),
+      regionalScopeLabel: "Upper Tigris",
+      subGroup: "near-east",
+    });
+
+    expect(nevaliCori).toMatchObject({
+      label: "Nevalı Çori",
+      startYear: bce(8_400),
+      endYear: bce(8_100),
+      regionalScopeLabel: "Middle Euphrates",
       subGroup: "near-east",
     });
 
     expect(halaf).toMatchObject({
       label: "Halaf",
+      startYear: bce(6_100),
+      endYear: bce(5_100),
       regionalScopeLabel: "Upper Mesopotamia",
+      subGroup: "near-east",
+    });
+
+    expect(samarra).toMatchObject({
+      label: "Samarra",
+      startYear: bce(5_500),
+      endYear: bce(4_800),
+      regionalScopeLabel: "Northern Mesopotamia",
+      subGroup: "near-east",
+    });
+
+    expect(ubaid).toMatchObject({
+      label: "Ubaid",
+      startYear: bce(5_500),
+      endYear: bce(3_800),
+      regionalScopeLabel: "Southern Mesopotamia",
       subGroup: "near-east",
     });
 

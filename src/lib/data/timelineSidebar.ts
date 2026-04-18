@@ -48,7 +48,7 @@ const SIDEBAR_ENTRY_DEFINITIONS = [
   },
   {
     id: "cultures",
-    label: "Cultures",
+    label: "Pre-Civilization Cultures",
     sectionId: "overlays",
     groupIds: TIMELINE_DECORATION_GROUPS.filter(
       (group) =>

@@ -122,7 +122,7 @@ describe("timeline sidebar selectors", () => {
     expect(sections.map((section) => section.label)).toEqual(["Overlays"]);
     expect(sections[0].entries[0]).toMatchObject({
       id: "cultures",
-      label: "Cultures",
+      label: "Pre-Civilization Cultures",
       enabled: false,
       mixed: false,
       overlayCount: 1,

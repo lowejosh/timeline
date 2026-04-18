@@ -3,7 +3,7 @@ import {
   createExactCalendarTimestamp,
   getTimelineYearFromExactTimestamp,
 } from "../../time/exactTimestamp";
-import { bce, ce } from "../timelineDateBuilders";
+import { bce, ce, yearsAgo } from "../timelineDateBuilders";
 
 const TITANIC_SINKS_AT = createExactCalendarTimestamp({
   era: "ce",
@@ -36,19 +36,21 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "agriculture-emerges-in-southwest-asia",
     label: "Agriculture emerges in Southwest Asia",
     shortLabel: "Early Agriculture",
-    year: bce(9_500),
+    description:
+      "By about 10000 BCE, Southwest Asian communities had entered the long agricultural transition that ran across 10000–8000 BCE, with cultivation preceding the appearance of fully domesticated crops.",
+    year: bce(10_000),
     regionalScopeLabel: "Southwest Asia",
     approximate: true,
     minZoom: 19,
     priority: 81,
     sourceRefs: [
       {
-        sourceId: "britannicaOriginAgriculture",
-        note: "Britannica places the beginnings of agriculture broadly between 15,000 and 10,000 years before present and emphasizes regional independence; the app uses c. 9500 BCE as a cautious Southwest Asia anchor rather than a universal global start date.",
+        sourceId: "originsOfAgricultureInWestAsiaWikipedia",
+        note: "The page explicitly says agriculture in West Asia can be traced back to between 10,000 and 8,000 BC; the marker now uses the opening date named by the source instead of an inferred midpoint.",
       },
       {
-        sourceId: "khanNeolithicRevolution",
-        note: "Khan Academy frames the Neolithic Revolution at roughly 11,500–5,000 years ago, supporting a mid-10th-millennium BCE marker for early Southwest Asian farming.",
+        sourceId: "prePotteryNeolithicAWikipedia",
+        note: "PPNA is dated to c. 10,000–8,800 BCE in the Levant and Upper Mesopotamia and is explicitly characterized by crop cultivation and granaries, reinforcing 10,000 BCE as an early public-facing anchor for this marker.",
       },
     ],
   },
