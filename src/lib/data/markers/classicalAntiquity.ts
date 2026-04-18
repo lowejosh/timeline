@@ -21,6 +21,23 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     ],
   },
   {
+    id: "rome-destroys-carthage",
+    label: "Rome destroys Carthage",
+    shortLabel: "Carthage Falls",
+    description:
+      "Rome destroyed Carthage in 146 BCE, ending the city's long rivalry with Rome as an independent power.",
+    year: bce(146),
+    regionalScopeLabel: "North Africa",
+    minZoom: 18,
+    priority: 75,
+    sourceRefs: [
+      {
+        sourceId: "britannicaCarthage",
+        note: "Britannica says Carthage finally fell in 146 BCE, when the site was plundered and burned after the Punic Wars; the app uses that year as a clear marker for Rome's final defeat of Carthage.",
+      },
+    ],
+  },
+  {
     id: "caesar-crosses-the-rubicon",
     label: "Caesar crosses the Rubicon",
     shortLabel: "Rubicon",

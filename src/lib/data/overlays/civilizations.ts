@@ -597,6 +597,27 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     ],
   },
   {
+    id: "carthage",
+    label: "Carthage",
+    shortLabel: "Carthage",
+    description:
+      "Phoenician-founded city-state on the North African coast that grew into a major Mediterranean power and rival to Rome.",
+    startYear: bce(814),
+    endYear: bce(146),
+    regionalScopeLabel: "North Africa",
+    approximateStart: true,
+    color: "rgb(126, 104, 148)",
+    minZoom: 0,
+    priority: 87,
+    subGroup: "mediterranean",
+    sourceRefs: [
+      {
+        sourceId: "britannicaCarthage",
+        note: "Uses Britannica's traditional 814 BCE foundation date for Carthage and its explicit 146 BCE destruction by Rome, along with the page's framing of Carthage as a thriving port and trading centre that became a major Mediterranean power and rival to Rome.",
+      },
+    ],
+  },
+  {
     id: "achaemenid-persia",
     label: "Achaemenid Persia",
     shortLabel: "Achaemenids",
@@ -636,26 +657,6 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
       {
         sourceId: "khanRomanRepublic",
         note: "Supports the conventional 509 BCE republican starting point used in world-history surveys.",
-      },
-    ],
-  },
-  {
-    id: "hellenistic-world",
-    label: "Hellenistic World",
-    shortLabel: "Hellenistic",
-    description:
-      "Age after Alexander when Greek culture mingled with Egyptian, Persian, and Asian traditions across a network of kingdoms.",
-    startYear: bce(323),
-    endYear: bce(30),
-    regionalScopeLabel: "Eastern Mediterranean and Southwest Asia",
-    color: "rgb(87, 142, 166)",
-    minZoom: 0,
-    priority: 82,
-    subGroup: "mediterranean",
-    sourceRefs: [
-      {
-        sourceId: "britannicaHellenisticAge",
-        note: "Uses Britannica's 323 BCE to 30 BCE span from Alexander's death to Rome's conquest of Egypt.",
       },
     ],
   },

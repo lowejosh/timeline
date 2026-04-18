@@ -516,6 +516,12 @@ function roundMetric(value: number) {
   return Number(value.toFixed(2));
 }
 
+function areStringArraysEqual(left: readonly string[], right: readonly string[]) {
+  return (
+    left.length === right.length && left.every((value, index) => value === right[index])
+  );
+}
+
 function pushRecentMarkerChange(
   stats: TimelineVerboseStats,
   change: TimelineVerboseStats["recentMarkerChanges"][number],
@@ -1468,6 +1474,26 @@ function resolveExpandedOverlayDetail(
   };
 }
 
+function resolveExpandedOverlayDetails(
+  expandedOverlayIds: readonly string[],
+  resolvedOverlayBands: ResolvedTimelineOverlayBand[],
+  viewport: TimelineViewport,
+  width: number,
+  pad: number,
+) {
+  return expandedOverlayIds
+    .map((expandedOverlayId) =>
+      resolveExpandedOverlayDetail(
+        expandedOverlayId,
+        resolvedOverlayBands,
+        viewport,
+        width,
+        pad,
+      ),
+    )
+    .filter((detail): detail is ExpandedOverlayDetail => detail !== null);
+}
+
 function resolveExpandedOverlayConnectorGeometry(
   children: ExpandedOverlayChild[],
   panelLeft: number,
@@ -1776,8 +1802,8 @@ export function TimelineCanvas({
   );
   const expandedOverlayAnimationFrameRef = useRef(0);
   const expandedOverlayAnimationLastTimeRef = useRef(0);
-  const expandedOverlayProgressRef = useRef(0);
-  const renderedExpandedOverlayIdRef = useRef<string | null>(null);
+  const expandedOverlayProgressByIdRef = useRef<Map<string, number>>(new Map());
+  const renderedExpandedOverlayIdsRef = useRef<string[]>([]);
   const wheelFrameRef = useRef(0);
   const pendingWheelPanRef = useRef(0);
   const pendingWheelZoomRef = useRef(0);
@@ -1786,9 +1812,7 @@ export function TimelineCanvas({
     useState<HoveredTooltipState | null>(null);
   const [renderedTooltip, setRenderedTooltip] =
     useState<RenderedTooltipState | null>(null);
-  const [expandedOverlayId, setExpandedOverlayId] = useState<string | null>(
-    null,
-  );
+  const [expandedOverlayIds, setExpandedOverlayIds] = useState<string[]>([]);
   const [isViewportInteractionActive, setIsViewportInteractionActive] =
     useState(false);
   useEffect(() => {
@@ -2014,28 +2038,35 @@ export function TimelineCanvas({
         }
       }
 
-      const visibleExpandedOverlayId =
-        renderedExpandedOverlayIdRef.current &&
-        sceneResolvedOverlayBands.some(
-          ({ band }) =>
-            band.id === renderedExpandedOverlayIdRef.current &&
-            (band.children?.length ?? 0) > 0,
-        )
-          ? renderedExpandedOverlayIdRef.current
-          : null;
-      const expandedOverlayDetail = resolveExpandedOverlayDetail(
-        visibleExpandedOverlayId,
+      const visibleExpandedOverlayIds = renderedExpandedOverlayIdsRef.current.filter(
+        (expandedOverlayId, index, allIds) =>
+          allIds.indexOf(expandedOverlayId) === index &&
+          sceneResolvedOverlayBands.some(
+            ({ band }) =>
+              band.id === expandedOverlayId && (band.children?.length ?? 0) > 0,
+          ),
+      );
+      const expandedOverlayDetails = resolveExpandedOverlayDetails(
+        visibleExpandedOverlayIds,
         sceneResolvedOverlayBands,
         sceneViewport,
         sceneWidth,
         PAD,
       );
-      const expandedOverlayFullHeight = getExpandedOverlayPanelHeight(
-        expandedOverlayDetail,
+      const expandedOverlayExpansionStates = expandedOverlayDetails.map(
+        (detail) => {
+          const fullHeight = getExpandedOverlayPanelHeight(detail);
+          const progress =
+            expandedOverlayProgressByIdRef.current.get(detail.parent.band.id) ?? 0;
+
+          return {
+            detail,
+            fullHeight,
+            progress,
+            animatedHeight: fullHeight * progress,
+          };
+        },
       );
-      const expandedOverlayProgress = expandedOverlayProgressRef.current;
-      const expandedOverlayAnimatedHeight =
-        expandedOverlayFullHeight * expandedOverlayProgress;
       const paper = themeRef.current.paper;
       const paperDeep = themeRef.current.paperDeep;
       const line = themeRef.current.line;
@@ -2098,9 +2129,11 @@ export function TimelineCanvas({
           renderWidth: overlay.renderWidth,
           baseY: getOverlayLaneY(layout, overlay.laneIndex),
         })),
-        visibleExpandedOverlayId,
-        expandedOverlayFullHeight,
-        expandedOverlayProgressRef.current,
+        expandedOverlayExpansionStates.map(({ detail, fullHeight, progress }) => ({
+          parentId: detail.parent.band.id,
+          panelHeight: fullHeight,
+          expansionProgress: progress,
+        })),
         overlayBottomY,
         OVERLAY_LANE_HEIGHT,
         OVERLAY_LANE_GAP,
@@ -2485,9 +2518,7 @@ export function TimelineCanvas({
               const indicatorCenterX = overlay.renderX + bandWidth - 10;
               const indicatorCenterY = y + OVERLAY_LANE_HEIGHT / 2;
               const indicatorProgress =
-                visibleExpandedOverlayId === overlay.band.id
-                  ? expandedOverlayProgress
-                  : 0;
+                expandedOverlayProgressByIdRef.current.get(overlay.band.id) ?? 0;
 
               drawAnimatedOverlayDisclosureIndicator({
                 centerX: indicatorCenterX,
@@ -2503,7 +2534,15 @@ export function TimelineCanvas({
         }
       }
 
-      if (expandedOverlayDetail && expandedOverlayAnimatedHeight > 0.5) {
+      for (const {
+        detail: expandedOverlayDetail,
+        progress: expandedOverlayProgress,
+        animatedHeight: expandedOverlayAnimatedHeight,
+      } of expandedOverlayExpansionStates) {
+        if (expandedOverlayAnimatedHeight <= 0.5) {
+          continue;
+        }
+
         const panelHeight = expandedOverlayAnimatedHeight;
         const parentY =
           resolvedOverlayLayout.yById.get(
@@ -4494,29 +4533,29 @@ export function TimelineCanvas({
   }, [axisTickTargets, invalidateCanvas, isViewportInteractionActive]);
 
   useEffect(() => {
-    if (!expandedOverlayId) {
-      return;
-    }
+    setExpandedOverlayIds((current) => {
+      const next = current.filter((expandedOverlayId) => {
+        const expandedParent = resolvedOverlayBands.find(
+          ({ band }) =>
+            band.id === expandedOverlayId && (band.children?.length ?? 0) > 0,
+        );
 
-    const expandedParent = resolvedOverlayBands.find(
-      ({ band }) =>
-        band.id === expandedOverlayId && (band.children?.length ?? 0) > 0,
-    );
+        return (
+          !!expandedParent &&
+          expandedParent.renderWidth >= MIN_EXPANDED_OVERLAY_PARENT_WIDTH
+        );
+      });
 
-    if (
-      !expandedParent ||
-      expandedParent.renderWidth < MIN_EXPANDED_OVERLAY_PARENT_WIDTH
-    ) {
-      setExpandedOverlayId(null);
-    }
-  }, [expandedOverlayId, resolvedOverlayBands]);
+      return areStringArraysEqual(current, next) ? current : next;
+    });
+  }, [resolvedOverlayBands]);
 
   useEffect(() => {
-    if (expandedOverlayId) {
-      renderedExpandedOverlayIdRef.current = expandedOverlayId;
+    if (expandedOverlayIds.length > 0) {
+      renderedExpandedOverlayIdsRef.current = [
+        ...new Set([...renderedExpandedOverlayIdsRef.current, ...expandedOverlayIds]),
+      ];
     }
-
-    const target = expandedOverlayId ? 1 : 0;
 
     const stepAnimation = (now: number) => {
       const lastTime = expandedOverlayAnimationLastTimeRef.current || now;
@@ -4524,25 +4563,45 @@ export function TimelineCanvas({
       expandedOverlayAnimationLastTimeRef.current = now;
       const factor =
         1 - Math.exp(-dt / EXPANDED_OVERLAY_ANIMATION_SMOOTHING_MS);
-      const current = expandedOverlayProgressRef.current;
-      let next = current + (target - current) * factor;
+      const progressById = expandedOverlayProgressByIdRef.current;
+      const orderedIds = [
+        ...new Set([
+          ...renderedExpandedOverlayIdsRef.current,
+          ...expandedOverlayIds,
+          ...progressById.keys(),
+        ]),
+      ];
+      let hasActiveAnimation = false;
 
-      if (Math.abs(target - next) <= 0.002) {
-        next = target;
-      }
+      for (const expandedOverlayId of orderedIds) {
+        const target = expandedOverlayIds.includes(expandedOverlayId) ? 1 : 0;
+        const current = progressById.get(expandedOverlayId) ?? 0;
+        let next = current + (target - current) * factor;
 
-      expandedOverlayProgressRef.current = next;
-      invalidateCanvas("expanded-overlay-animation");
+        if (Math.abs(target - next) <= 0.002) {
+          next = target;
+        }
 
-      if (!expandedOverlayId && next <= 0.003) {
-        expandedOverlayProgressRef.current = 0;
+        if (target > 0.001 || next > 0.003) {
+          progressById.set(expandedOverlayId, next);
+        } else {
+          progressById.delete(expandedOverlayId);
+        }
 
-        if (renderedExpandedOverlayIdRef.current !== null) {
-          renderedExpandedOverlayIdRef.current = null;
+        if (Math.abs(target - next) > 0.002) {
+          hasActiveAnimation = true;
         }
       }
 
-      if (Math.abs(target - next) > 0.002) {
+      renderedExpandedOverlayIdsRef.current = orderedIds.filter(
+        (expandedOverlayId) =>
+          expandedOverlayIds.includes(expandedOverlayId) ||
+          (progressById.get(expandedOverlayId) ?? 0) > 0.003,
+      );
+
+      invalidateCanvas("expanded-overlay-animation");
+
+      if (hasActiveAnimation) {
         expandedOverlayAnimationFrameRef.current =
           requestAnimationFrame(stepAnimation);
       } else {
@@ -4564,7 +4623,7 @@ export function TimelineCanvas({
         expandedOverlayAnimationFrameRef.current = 0;
       }
     };
-  }, [expandedOverlayId, invalidateCanvas]);
+  }, [expandedOverlayIds, invalidateCanvas]);
 
   useEffect(() => {
     return () => {
@@ -6378,15 +6437,25 @@ export function TimelineCanvas({
         );
 
         if (clickedRegion?.role === "parent") {
-          setExpandedOverlayId((current) =>
-            current === clickedRegion.id ? null : clickedRegion.id,
+          setExpandedOverlayIds((current) =>
+            current.includes(clickedRegion.id)
+              ? current.filter((id) => id !== clickedRegion.id)
+              : [...current, clickedRegion.id],
           );
         } else if (clickedRegion?.role === "child") {
-          setExpandedOverlayId(clickedRegion.parentId ?? clickedRegion.id);
+          setExpandedOverlayIds((current) => {
+            const parentId = clickedRegion.parentId ?? clickedRegion.id;
+
+            return current.includes(parentId) ? current : [...current, parentId];
+          });
         } else if (clickedRegion?.role === "panel") {
-          setExpandedOverlayId(clickedRegion.parentId ?? clickedRegion.id);
+          setExpandedOverlayIds((current) => {
+            const parentId = clickedRegion.parentId ?? clickedRegion.id;
+
+            return current.includes(parentId) ? current : [...current, parentId];
+          });
         } else {
-          setExpandedOverlayId(null);
+          setExpandedOverlayIds([]);
         }
       }
     }

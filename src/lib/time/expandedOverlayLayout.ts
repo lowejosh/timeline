@@ -13,6 +13,12 @@ export type ExpandedOverlayLayoutItem = {
   baseY: number;
 };
 
+export type ExpandedOverlayLayoutExpansion = {
+  parentId: string;
+  panelHeight: number;
+  expansionProgress: number;
+};
+
 export type ExpandedOverlayLayoutResult = {
   yById: Map<string, number>;
 };
@@ -39,6 +45,13 @@ function intervalsOverlap(
 
 function lerp(start: number, end: number, t: number) {
   return start + (end - start) * t;
+}
+
+function resolveExpandedOverlayObstacleHeight(
+  bandHeight: number,
+  panelHeight: number,
+) {
+  return bandHeight + Math.max(panelHeight, 0);
 }
 
 function overlapsVertically(
@@ -69,31 +82,28 @@ function compareExpandedOverlayLayoutItems(
 
 function resolvePackedExpandedOverlayYById(
   items: ExpandedOverlayLayoutItem[],
-  parent: ExpandedOverlayLayoutItem,
-  panelHeight: number,
+  expansionsById: Map<string, ExpandedOverlayLayoutExpansion>,
+  globalProgress: number,
   bottomY: number,
   bandHeight: number,
   laneGap: number,
 ) {
   const packedYById = new Map<string, number>();
-  const parentY = parent.baseY - panelHeight;
-
-  packedYById.set(parent.id, parentY);
-
-  const placedObstacles: ExpandedOverlayObstacle[] = [
-    {
-      left: parent.renderX,
-      right: parent.renderX + parent.renderWidth,
-      top: parentY,
-      bottom: parent.baseY + bandHeight,
-    },
-  ];
-  const sortedItems = items
-    .filter((item) => item.id !== parent.id)
-    .sort(compareExpandedOverlayLayoutItems);
+  const placedObstacles: ExpandedOverlayObstacle[] = [];
+  const sortedItems = [...items].sort(compareExpandedOverlayLayoutItems);
 
   for (const item of sortedItems) {
-    let resolvedY = bottomY;
+    const expansion = expansionsById.get(item.id);
+    const currentPanelHeight = expansion
+      ? Math.max(expansion.panelHeight, 0) * clamp01(expansion.expansionProgress)
+      : 0;
+    const obstacleHeight = resolveExpandedOverlayObstacleHeight(
+      bandHeight,
+      currentPanelHeight,
+    );
+    let resolvedY = expansion
+      ? item.baseY - currentPanelHeight
+      : lerp(item.baseY, bottomY, globalProgress);
 
     for (const obstacle of [...placedObstacles].sort(
       (left, right) => right.top - left.top || left.left - right.left,
@@ -112,7 +122,7 @@ function resolvePackedExpandedOverlayYById(
       if (
         !overlapsVertically(
           resolvedY,
-          bandHeight,
+          obstacleHeight,
           obstacle.top,
           obstacle.bottom,
           laneGap,
@@ -121,7 +131,7 @@ function resolvePackedExpandedOverlayYById(
         continue;
       }
 
-      resolvedY = obstacle.top - bandHeight - laneGap;
+      resolvedY = obstacle.top - obstacleHeight - laneGap;
     }
 
     packedYById.set(item.id, resolvedY);
@@ -129,7 +139,7 @@ function resolvePackedExpandedOverlayYById(
       left: item.renderX,
       right: item.renderX + item.renderWidth,
       top: resolvedY,
-      bottom: resolvedY + bandHeight,
+      bottom: resolvedY + obstacleHeight,
     });
   }
 
@@ -138,9 +148,7 @@ function resolvePackedExpandedOverlayYById(
 
 export function resolveExpandedOverlayLayout(
   items: ExpandedOverlayLayoutItem[],
-  expandedParentId: string | null,
-  panelHeight: number,
-  expansionProgress: number,
+  expansions: ExpandedOverlayLayoutExpansion[],
   bottomY: number,
   bandHeight: number,
   laneGap: number,
@@ -151,29 +159,37 @@ export function resolveExpandedOverlayLayout(
     yById.set(item.id, item.baseY);
   }
 
-  if (!expandedParentId || panelHeight <= 0.01) {
+  const expansionsById = new Map(
+    expansions
+      .filter(
+        (expansion) =>
+          expansion.parentId &&
+          expansion.panelHeight > 0.01 &&
+          expansion.expansionProgress > 0.001,
+      )
+      .map((expansion) => [expansion.parentId, expansion] as const),
+  );
+
+  if (expansionsById.size === 0) {
     return { yById };
   }
 
-  const parent = items.find((item) => item.id === expandedParentId);
-
-  if (!parent) {
-    return { yById };
-  }
-
-  const clampedProgress = clamp01(expansionProgress);
+  const globalProgress = Math.max(
+    ...[...expansionsById.values()].map((expansion) =>
+      clamp01(expansion.expansionProgress),
+    ),
+  );
   const packedExpandedYById = resolvePackedExpandedOverlayYById(
     items,
-    parent,
-    panelHeight,
+    expansionsById,
+    globalProgress,
     bottomY,
     bandHeight,
     laneGap,
   );
 
   for (const item of items) {
-    const packedY = packedExpandedYById.get(item.id) ?? item.baseY;
-    yById.set(item.id, lerp(item.baseY, packedY, clampedProgress));
+    yById.set(item.id, packedExpandedYById.get(item.id) ?? item.baseY);
   }
 
   return { yById };

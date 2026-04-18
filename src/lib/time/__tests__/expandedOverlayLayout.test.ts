@@ -44,9 +44,13 @@ describe("expanded overlay layout", () => {
           baseY: 104,
         },
       ],
-      "parent",
-      40,
-      1,
+      [
+        {
+          parentId: "parent",
+          panelHeight: 40,
+          expansionProgress: 1,
+        },
+      ],
       200,
       16,
       8,
@@ -98,9 +102,13 @@ describe("expanded overlay layout", () => {
           baseY: 104,
         },
       ],
-      "parent",
-      40,
-      0.5,
+      [
+        {
+          parentId: "parent",
+          panelHeight: 40,
+          expansionProgress: 0.5,
+        },
+      ],
       200,
       16,
       8,
@@ -138,9 +146,13 @@ describe("expanded overlay layout", () => {
           baseY: 152,
         },
       ],
-      "parent",
-      40,
-      0,
+      [
+        {
+          parentId: "parent",
+          panelHeight: 40,
+          expansionProgress: 0,
+        },
+      ],
       200,
       16,
       8,
@@ -192,9 +204,13 @@ describe("expanded overlay layout", () => {
           baseY: 128,
         },
       ],
-      "parent",
-      40,
-      1,
+      [
+        {
+          parentId: "parent",
+          panelHeight: 40,
+          expansionProgress: 1,
+        },
+      ],
       200,
       16,
       8,
@@ -204,5 +220,68 @@ describe("expanded overlay layout", () => {
     expect(yById.get("parent")).toBe(136);
     expect(yById.get("overlap-upper")).toBe(112);
     expect(yById.get("non-overlap-upper")).toBe(200);
+  });
+
+  it("supports two expanded parents at once", () => {
+    const { yById } = resolveExpandedOverlayLayout(
+      [
+        {
+          id: "below",
+          laneIndex: 0,
+          renderX: 0,
+          renderWidth: 80,
+          baseY: 200,
+        },
+        {
+          id: "parent-a",
+          laneIndex: 1,
+          renderX: 0,
+          renderWidth: 80,
+          baseY: 176,
+        },
+        {
+          id: "between",
+          laneIndex: 2,
+          renderX: 0,
+          renderWidth: 80,
+          baseY: 152,
+        },
+        {
+          id: "parent-b",
+          laneIndex: 3,
+          renderX: 0,
+          renderWidth: 80,
+          baseY: 128,
+        },
+        {
+          id: "upper",
+          laneIndex: 4,
+          renderX: 0,
+          renderWidth: 80,
+          baseY: 104,
+        },
+      ],
+      [
+        {
+          parentId: "parent-a",
+          panelHeight: 40,
+          expansionProgress: 1,
+        },
+        {
+          parentId: "parent-b",
+          panelHeight: 40,
+          expansionProgress: 1,
+        },
+      ],
+      200,
+      16,
+      8,
+    );
+
+    expect(yById.get("below")).toBe(200);
+    expect(yById.get("parent-a")).toBe(136);
+    expect(yById.get("between")).toBe(112);
+    expect(yById.get("parent-b")).toBe(48);
+    expect(yById.get("upper")).toBe(24);
   });
 });

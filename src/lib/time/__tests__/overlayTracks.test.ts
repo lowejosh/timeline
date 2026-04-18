@@ -443,9 +443,9 @@ describe("timeline overlay tracks", () => {
       "hittite-empire",
       "mycenaean-greece",
       "ancient-greece",
+      "carthage",
       "achaemenid-persia",
       "roman-republic",
-      "hellenistic-world",
       "roman-empire",
     ]);
     expect(new Set(resolved.map((band) => band.laneIndex)).size).toBe(7);

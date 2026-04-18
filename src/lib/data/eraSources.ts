@@ -1389,6 +1389,15 @@ export const ERA_SOURCES = {
     notes:
       "Used for the broad ancient Greek civilization span from about 1200 BCE to the death of Alexander in 323 BCE.",
   },
+  britannicaCarthage: {
+    shortTitle: "Britannica: Carthage",
+    title: "Carthage",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Carthage."',
+    url: "https://www.britannica.com/place/Carthage-ancient-city-Tunisia",
+    notes:
+      "Used for Carthage's traditional 814 BCE foundation by Phoenicians of Tyre, its rise from a thriving port and trading centre into a major Mediterranean power and rival to Rome, and its destruction in 146 BCE.",
+  },
   britannicaHellenisticAge: {
     shortTitle: "Britannica: Hellenistic age",
     title: "Hellenistic age",
