@@ -89,7 +89,7 @@ export const CORE_TIMELINE_MARKERS: TimelineMarker[] = [
     year: yearsAgo(4_540_000_000),
     approximate: true,
     description:
-      "One rocky world in the young solar disk grows by accretion into the planet that will become Earth.",
+      "Dust and rock clump together in the young solar system, building the planet Earth.",
     minZoom: 0,
     priority: 100,
     sourceRefs: [
