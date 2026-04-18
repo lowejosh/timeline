@@ -37,6 +37,20 @@ export type OverviewRulerTier = {
   isFinalTier: boolean;
 };
 
+const overviewRulerIntegerFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+});
+
+function formatOverviewRulerScaledValue(value: number) {
+  const maximumFractionDigits =
+    value >= 100 ? 0 : value >= 10 ? 1 : 2;
+
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits,
+    minimumFractionDigits: 0,
+  }).format(value);
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -260,4 +274,26 @@ export function resolveAnchoredOverviewRulerTiers(
   );
 
   return [...prefix, ...anchoredSuffix];
+}
+
+export function formatOverviewRulerSpanLabel(spanYears: number) {
+  const safeSpanYears = Math.max(Math.abs(spanYears), 1e-18);
+
+  if (safeSpanYears >= 1_000_000_000) {
+    return `${formatOverviewRulerScaledValue(safeSpanYears / 1_000_000_000)}B years`;
+  }
+
+  if (safeSpanYears >= 1_000_000) {
+    return `${formatOverviewRulerScaledValue(safeSpanYears / 1_000_000)}M years`;
+  }
+
+  if (safeSpanYears >= 1_000) {
+    return `${formatOverviewRulerScaledValue(safeSpanYears / 1_000)}k years`;
+  }
+
+  if (safeSpanYears >= 1) {
+    return `${overviewRulerIntegerFormatter.format(Math.round(safeSpanYears))} years`;
+  }
+
+  return "<1 years";
 }

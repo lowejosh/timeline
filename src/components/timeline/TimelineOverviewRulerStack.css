@@ -17,6 +17,35 @@
   transition: top 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.timeline-overview-ruler-stack__tier-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.22rem;
+  padding: 0 0.28rem 0 0.5rem;
+  color: rgba(54, 41, 30, 0.5);
+  font: 500 0.56rem/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  text-align: left;
+  pointer-events: none;
+  white-space: nowrap;
+  text-transform: lowercase;
+}
+
+.timeline-overview-ruler-stack__tier-label-prefix {
+  color: rgba(77, 61, 47, 0.36);
+}
+
+.timeline-overview-ruler-stack__tier-label-value {
+  color: rgba(54, 41, 30, 0.54);
+  font-weight: 600;
+}
+
 .timeline-overview-ruler-stack__tier[data-root="true"] {
   animation: none;
 }

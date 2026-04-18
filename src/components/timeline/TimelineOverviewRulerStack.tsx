@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type Era } from "../../lib/data/eras";
 import {
+  formatOverviewRulerSpanLabel,
   OVERVIEW_RULER_FULL_TIMELINE_DOMAIN,
   resolveAnchoredOverviewRulerTiers,
   resolveOverviewRulerTiers,
@@ -97,6 +98,9 @@ export function TimelineOverviewRulerStack({
         const isRoot = index === 0;
         // Root tier stays visually on top; deeper tiers stack beneath it.
         const top = index * tierHeight;
+        const tierSpanLabel = formatOverviewRulerSpanLabel(
+          tier.spotlightEndYear - tier.spotlightStartYear,
+        );
 
         return (
           <div
@@ -112,7 +116,9 @@ export function TimelineOverviewRulerStack({
               domain={tier.domain}
               eras={eras}
               height={tierHeight}
-              isFollowingDrag={dragAnchor !== null && index > dragAnchor.tierIndex}
+              isFollowingDrag={
+                dragAnchor !== null && index > dragAnchor.tierIndex
+              }
               isSettling={isSettling}
               mainInnerWidth={mainInnerWidth}
               onDragEnd={() => {
@@ -148,6 +154,15 @@ export function TimelineOverviewRulerStack({
               viewport={viewport}
               width={width}
             />
+            <div
+              aria-hidden="true"
+              className="timeline-overview-ruler-stack__tier-label"
+              style={{ width: pad }}
+            >
+              <span className="timeline-overview-ruler-stack__tier-label-value">
+                {tierSpanLabel}
+              </span>
+            </div>
           </div>
         );
       })}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatOverviewRulerSpanLabel,
   OVERVIEW_RULER_FULL_TIMELINE_DOMAIN,
   OVERVIEW_RULER_MIN_SPOTLIGHT_WIDTH,
   getOverviewRulerBounds,
@@ -15,6 +16,11 @@ import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "../timelineYears";
 const FULL_DOMAIN = OVERVIEW_RULER_FULL_TIMELINE_DOMAIN;
 
 describe("overview ruler geometry", () => {
+  it("formats overview span labels compactly across scales", () => {
+    expect(formatOverviewRulerSpanLabel(575)).toBe("575 years");
+    expect(formatOverviewRulerSpanLabel(2_580_000)).toBe("2.58M years");
+  });
+
   it("maps the full timeline range onto the padded strip", () => {
     const width = 1200;
     const pad = 120;
