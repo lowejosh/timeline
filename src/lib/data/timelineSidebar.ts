@@ -47,6 +47,16 @@ const SIDEBAR_ENTRY_DEFINITIONS = [
     ).map((group) => group.id),
   },
   {
+    id: "cultures",
+    label: "Cultures",
+    sectionId: "overlays",
+    groupIds: TIMELINE_DECORATION_GROUPS.filter(
+      (group) =>
+        group.categoryId === TIMELINE_DECORATION_CATEGORY_IDS.cultures &&
+        group.contentType === "overlays",
+    ).map((group) => group.id),
+  },
+  {
     id: "civilizations",
     label: "Civilizations",
     sectionId: "overlays",

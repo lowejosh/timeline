@@ -740,6 +740,56 @@ export const ERA_SOURCES = {
     notes:
       "Used for direct public-facing statements on early ocher markings in African rock art and on Natufian occupation at Eynan/Ain Mallaha around 10,000–8000 B.C.",
   },
+  natufianCultureWikipedia: {
+    shortTitle: "Wikipedia: Natufian culture",
+    title: "Natufian culture",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Natufian culture." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Natufian_culture",
+    notes:
+      "Used for the broad Natufian span of roughly 12,500–9,500 BCE and for public-facing context on semi-sedentary villages, wild-cereal harvesting, and the threshold to agriculture in the Levant.",
+  },
+  prePotteryNeolithicAWikipedia: {
+    shortTitle: "Wikipedia: Pre-Pottery Neolithic A",
+    title: "Pre-Pottery Neolithic A",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Pre-Pottery Neolithic A." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Pre-Pottery_Neolithic_A",
+    notes:
+      "Used for the broad PPNA span of c. 10,000–8,800 BCE and for public-facing context on round mud-brick settlements, granaries, early cultivation, and communal architecture in the Levant and Upper Mesopotamia.",
+  },
+  prePotteryNeolithicBWikipedia: {
+    shortTitle: "Wikipedia: Pre-Pottery Neolithic B",
+    title: "Pre-Pottery Neolithic B",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Pre-Pottery Neolithic B." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Pre-Pottery_Neolithic_B",
+    notes:
+      "Used for the broad PPNB span of c. 8,800–6,500 BCE and for public-facing context on larger farming villages, rectilinear architecture, plastered floors, herding, and early ritual traditions in the Levant and Upper Mesopotamia.",
+  },
+  halafCultureWikipedia: {
+    shortTitle: "Wikipedia: Halaf culture",
+    title: "Halaf culture",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Halaf culture." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Halaf_culture",
+    notes:
+      "Used for the broad Halaf span of c. 6,100–5,100 BCE and for public-facing context on northern Mesopotamian village life, painted pottery, and the northern traditions that transition toward the Ubaid horizon.",
+  },
+  ubaidPeriodWikipedia: {
+    shortTitle: "Wikipedia: Ubaid period",
+    title: "Ubaid period",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Ubaid period." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Ubaid_period",
+    notes:
+      "Used for the southern Mesopotamian Ubaid span of c. 5,500–3,800 BCE and for public-facing context on irrigation, larger settlements, temples, and the long pre-urban lead-in to Uruk.",
+  },
   metChauvet: {
     shortTitle: "Met: Chauvet Cave",
     title: "Chauvet Cave (ca. 30,000 B.C.)",

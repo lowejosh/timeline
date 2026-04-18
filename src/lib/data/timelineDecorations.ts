@@ -13,6 +13,7 @@ import {
 } from "./markers";
 import {
   CIVILIZATION_OVERLAYS,
+  CULTURE_OVERLAYS,
   DEEP_TIME_LIFE_OVERLAYS,
   HUMAN_EVOLUTION_OVERLAYS,
 } from "./overlays";
@@ -27,18 +28,21 @@ import type {
 const HUMAN_HISTORY_CATEGORY_ID = "human-history";
 const DEEP_TIME_LIFE_CATEGORY_ID = "deep-time-life";
 const HUMAN_EVOLUTION_CATEGORY_ID = "human-evolution";
+const CULTURES_CATEGORY_ID = "cultures";
 const CIVILIZATIONS_CATEGORY_ID = "civilizations";
 
 export const TIMELINE_DECORATION_CATEGORY_IDS = {
   deepTimeLife: DEEP_TIME_LIFE_CATEGORY_ID,
   humanHistory: HUMAN_HISTORY_CATEGORY_ID,
   humanEvolution: HUMAN_EVOLUTION_CATEGORY_ID,
+  cultures: CULTURES_CATEGORY_ID,
   civilizations: CIVILIZATIONS_CATEGORY_ID,
 } as const;
 
 const HUMAN_HISTORY_GROUP_ID = HUMAN_HISTORY_CATEGORY_ID;
 const DEEP_TIME_LIFE_GROUP_ID = DEEP_TIME_LIFE_CATEGORY_ID;
 const HUMAN_EVOLUTION_GROUP_ID = HUMAN_EVOLUTION_CATEGORY_ID;
+const CULTURES_GROUP_ID = CULTURES_CATEGORY_ID;
 const CIVILIZATIONS_GROUP_ID = CIVILIZATIONS_CATEGORY_ID;
 
 export const TIMELINE_DECORATION_CATEGORIES: TimelineDecorationCategory[] = [
@@ -61,10 +65,16 @@ export const TIMELINE_DECORATION_CATEGORIES: TimelineDecorationCategory[] = [
     order: 2,
   },
   {
+    id: CULTURES_CATEGORY_ID,
+    label: "Cultures",
+    description: "Toggleable prehistoric and non-state cultural overlays.",
+    order: 3,
+  },
+  {
     id: CIVILIZATIONS_CATEGORY_ID,
     label: "Civilizations",
     description: "All toggleable civilization overlay bands.",
-    order: 3,
+    order: 4,
   },
 ];
 
@@ -92,6 +102,15 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     label: "Human Evolution",
     description: "Branching hominin overlays and major evolutionary markers.",
     contentType: "mixed",
+    order: 0,
+  },
+  {
+    id: CULTURES_GROUP_ID,
+    categoryId: CULTURES_CATEGORY_ID,
+    label: "Cultures",
+    description:
+      "Prehistoric and non-state cultural overlays before or alongside early states.",
+    contentType: "overlays",
     order: 0,
   },
   {
@@ -140,6 +159,7 @@ const TIMELINE_MARKER_COLLECTIONS: TimelineMarkerCollection[] = [
 const TIMELINE_OVERLAY_COLLECTIONS: TimelineOverlayCollection[] = [
   { groupId: DEEP_TIME_LIFE_GROUP_ID, items: DEEP_TIME_LIFE_OVERLAYS },
   { groupId: HUMAN_EVOLUTION_GROUP_ID, items: HUMAN_EVOLUTION_OVERLAYS },
+  { groupId: CULTURES_GROUP_ID, items: CULTURE_OVERLAYS },
   {
     groupId: CIVILIZATIONS_GROUP_ID,
     items: CIVILIZATION_OVERLAYS,

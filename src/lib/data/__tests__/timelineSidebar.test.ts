@@ -93,6 +93,43 @@ describe("timeline sidebar selectors", () => {
     });
   });
 
+  it("aggregates culture overlays into the overlay section", () => {
+    const display: TimelineDisplayConfig = {
+      markers: [],
+      overlays: [
+        {
+          id: "natufian-culture",
+          label: "Natufian",
+          startYear: -12500,
+          endYear: -9500,
+          color: "rgba(0, 0, 0, 0.1)",
+          groupId: "cultures",
+        },
+      ],
+    };
+
+    const sections = resolveTimelineSidebarSections(
+      display,
+      {
+        centerYear: -11000,
+        zoom: 24,
+      },
+      1000,
+      120,
+      new Set(),
+    );
+
+    expect(sections.map((section) => section.label)).toEqual(["Overlays"]);
+    expect(sections[0].entries[0]).toMatchObject({
+      id: "cultures",
+      label: "Cultures",
+      enabled: false,
+      mixed: false,
+      overlayCount: 1,
+      relevantItemCount: 1,
+    });
+  });
+
   it("hides suppressed civilization entries from the sidebar", () => {
     const display: TimelineDisplayConfig = {
       markers: [],

@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import { ERA_SOURCES } from "../eraSources";
 import { ROOT_ERA, ROOT_TIMELINE, TIMELINE_DISPLAY } from "../eras";
 import {
+  CIVILIZATION_OVERLAYS,
+  CULTURE_OVERLAYS,
+} from "../overlays";
+import {
   TIMELINE_DECORATION_CATEGORIES,
   TIMELINE_DECORATION_GROUPS,
 } from "../timelineDecorations";
@@ -56,9 +60,19 @@ describe("root timeline display data", () => {
     ).toBe(true);
 
     expect(
-      TIMELINE_DISPLAY.overlays
-        .filter((band) => band.startYear >= bce(3_500))
-        .every((band) => band.groupId === "civilizations"),
+      CULTURE_OVERLAYS.every(
+        (overlay) =>
+          TIMELINE_DISPLAY.overlays.find((band) => band.id === overlay.id)
+            ?.groupId === "cultures",
+      ),
+    ).toBe(true);
+
+    expect(
+      CIVILIZATION_OVERLAYS.every(
+        (overlay) =>
+          TIMELINE_DISPLAY.overlays.find((band) => band.id === overlay.id)
+            ?.groupId === "civilizations",
+      ),
     ).toBe(true);
 
     expect(
@@ -136,7 +150,6 @@ describe("root timeline display data", () => {
       "jiahu-bone-flutes-and-village-life",
       "irrigation-reshapes-southern-mesopotamia",
       "wheeled-transport-appears-in-sumer",
-      "uruk-becomes-the-first-city",
       "cuneiform-writing-emerges",
       "stonehenge-begins",
       "great-pyramid-of-giza-completed",
@@ -193,11 +206,11 @@ describe("root timeline display data", () => {
     const homoSapiens = TIMELINE_DISPLAY.markers.find(
       (marker) => marker.id === "homo-sapiens-evolves-in-africa",
     );
-    const uruk = TIMELINE_DISPLAY.markers.find(
-      (marker) => marker.id === "uruk-becomes-the-first-city",
-    );
     const mesopotamia = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "mesopotamia",
+    );
+    const natufian = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "natufian-culture",
     );
     const hittites = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "hittite-empire",
@@ -222,13 +235,14 @@ describe("root timeline display data", () => {
       regionalScopeLabel: "Africa",
       approximate: true,
     });
-    expect(uruk).toMatchObject({
-      regionalScopeLabel: "Southern Mesopotamia",
-      approximate: true,
-    });
     expect(mesopotamia).toMatchObject({
       regionalScopeLabel: "Mesopotamia",
       approximateStart: true,
+    });
+    expect(natufian).toMatchObject({
+      regionalScopeLabel: "Levant",
+      approximateStart: true,
+      approximateEnd: true,
     });
     expect(hittites).toMatchObject({
       regionalScopeLabel: "Anatolia and northern Syria",
@@ -326,6 +340,11 @@ describe("root timeline display data", () => {
       "homo-naledi",
       "homo-sapiens",
       "homo-floresiensis",
+      "natufian-culture",
+      "pre-pottery-neolithic-a",
+      "pre-pottery-neolithic-b",
+      "halaf-culture",
+      "ubaid-period",
       "mesopotamia",
       "indus-valley-civilization",
       "ancient-egypt",
@@ -420,6 +439,12 @@ describe("root timeline display data", () => {
     const holyRomanEmpire = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "holy-roman-empire",
     );
+    const ppna = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "pre-pottery-neolithic-a",
+    );
+    const halaf = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "halaf-culture",
+    );
 
     const chineseCivilization = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "chinese-civilization",
@@ -457,6 +482,18 @@ describe("root timeline display data", () => {
       subGroup: "central-europe",
     });
 
+    expect(ppna).toMatchObject({
+      label: "PPNA",
+      regionalScopeLabel: "Levant and Upper Mesopotamia",
+      subGroup: "near-east",
+    });
+
+    expect(halaf).toMatchObject({
+      label: "Halaf",
+      regionalScopeLabel: "Upper Mesopotamia",
+      subGroup: "near-east",
+    });
+
     expect(
       chineseChildren?.every(
         (band, index, bands) =>
@@ -480,6 +517,12 @@ describe("root timeline display data", () => {
     expect(
       TIMELINE_DISPLAY.overlays
         .filter((band) => band.groupId === "civilizations")
+        .every((band) => band.regionalScopeLabel && band.subGroup),
+    ).toBe(true);
+
+    expect(
+      TIMELINE_DISPLAY.overlays
+        .filter((band) => band.groupId === "cultures")
         .every((band) => band.regionalScopeLabel && band.subGroup),
     ).toBe(true);
   });
