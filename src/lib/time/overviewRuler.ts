@@ -1,7 +1,7 @@
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "./timelineYears";
 
 export const OVERVIEW_RULER_MIN_SPOTLIGHT_WIDTH = 1;
-export const OVERVIEW_RULER_DEFAULT_TIER_THRESHOLD_PX = 10;
+export const OVERVIEW_RULER_DEFAULT_TIER_THRESHOLD_PX = 4;
 export const OVERVIEW_RULER_DEFAULT_MAX_TIERS = 4;
 
 export type OverviewRulerDomain = {
@@ -18,6 +18,11 @@ export type OverviewRulerBounds = {
   left: number;
   right: number;
   innerWidth: number;
+};
+
+export type OverviewRulerBandRect = {
+  left: number;
+  width: number;
 };
 
 export type OverviewRulerSpotlight = {
@@ -113,6 +118,39 @@ export function mapOverviewRulerXToYear(
   const progress = (clampedX - bounds.left) / bounds.innerWidth;
 
   return domain.startYear + progress * span;
+}
+
+export function resolveOverviewRulerBandRect(
+  startYear: number,
+  endYear: number,
+  domain: OverviewRulerDomain,
+  width: number,
+  pad: number,
+  minRenderableWidth = 0.5,
+): OverviewRulerBandRect | null {
+  const bounds = getOverviewRulerBounds(width, pad);
+  const left = mapOverviewRulerYearToX(startYear, domain, width, pad);
+  const right = mapOverviewRulerYearToX(endYear, domain, width, pad);
+  const bandStart = Math.min(left, right);
+  const bandEnd = Math.max(left, right);
+  const clampedStart = Math.min(
+    Math.max(bandStart, bounds.left),
+    bounds.right,
+  );
+  const clampedEnd = Math.min(
+    Math.max(bandEnd, bounds.left),
+    bounds.right,
+  );
+  const visibleWidth = Math.max(clampedEnd - clampedStart, 0);
+
+  if (visibleWidth < minRenderableWidth) {
+    return null;
+  }
+
+  return {
+    left: clampedStart,
+    width: visibleWidth,
+  };
 }
 
 export function resolveOverviewRulerSpotlight(
@@ -292,10 +330,52 @@ export function formatOverviewRulerSpanLabel(spanYears: number) {
   }
 
   if (safeSpanYears >= 1) {
-    return `${overviewRulerIntegerFormatter.format(Math.round(safeSpanYears))} years`;
+    const rounded = Math.round(safeSpanYears);
+    return `${overviewRulerIntegerFormatter.format(rounded)} ${rounded === 1 ? "year" : "years"}`;
   }
 
-  return "<1 years";
+  const AVERAGE_DAYS_PER_YEAR = 365.2425;
+  const days = safeSpanYears * AVERAGE_DAYS_PER_YEAR;
+
+  if (days >= 1) {
+    const rounded = Math.round(days);
+    return `${rounded} ${rounded === 1 ? "day" : "days"}`;
+  }
+
+  const hours = days * 24;
+
+  if (hours >= 1) {
+    const formatted = formatOverviewRulerScaledValue(hours);
+    return `${formatted} ${formatted === "1" ? "hour" : "hours"}`;
+  }
+
+  const minutes = hours * 60;
+
+  if (minutes >= 1) {
+    const formatted = formatOverviewRulerScaledValue(minutes);
+    return `${formatted} ${formatted === "1" ? "minute" : "minutes"}`;
+  }
+
+  const seconds = minutes * 60;
+
+  if (seconds >= 1) {
+    const formatted = formatOverviewRulerScaledValue(seconds);
+    return `${formatted} ${formatted === "1" ? "second" : "seconds"}`;
+  }
+
+  const milliseconds = seconds * 1_000;
+
+  if (milliseconds >= 1) {
+    return `${formatOverviewRulerScaledValue(milliseconds)} ms`;
+  }
+
+  const microseconds = milliseconds * 1_000;
+
+  if (microseconds >= 0.01) {
+    return `${formatOverviewRulerScaledValue(microseconds)} µs`;
+  }
+
+  return "<1 µs";
 }
 
 export function formatOverviewRulerPercentageLabel(

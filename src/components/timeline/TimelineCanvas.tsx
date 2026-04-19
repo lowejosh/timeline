@@ -28,12 +28,14 @@ import {
 } from "../../lib/data/timelineTooltip";
 import {
   EARLY_UNIVERSE_END_YEAR,
-  EARLY_UNIVERSE_ID,
+  EARLY_UNIVERSE_CHILD_ERA_ORDER,
   EARLY_UNIVERSE_START_YEAR,
 } from "../../lib/data/eraTrees/cosmic";
+import { getPreciseTimelineYearFromExactTimestamp } from "../../lib/time/exactTimestamp";
 import {
   comparePreciseTimelineYears,
   getMinZoomForWidth,
+  getMaxZoomForTimelineViewport,
   getViewportCenterYear,
   getZoomAnchorForCanvasX,
   getVisibleRange,
@@ -58,6 +60,7 @@ import {
   getPreviewFocusChain,
   resolveTimelineEraLayersFromOpacityMap,
   shouldHideOverlappedEraLabel,
+  type ResolvedTimelineEraLayer,
 } from "../../lib/time/childLayers";
 import {
   getVisibleTimelineMarkers,
@@ -133,9 +136,9 @@ type TimelineCanvasProps = {
 
 type DragState = {
   pointerId: number;
-  lastX: number;
   startX: number;
   startY: number;
+  lastX: number;
   moved: boolean;
 };
 
@@ -250,6 +253,231 @@ type TimelineCanvasTheme = {
   lineSoft: string;
   labelColor: string;
 };
+
+type EraScreenSpan = {
+  x0: number;
+  x1: number;
+  usesVisualExpansion: boolean;
+};
+
+type PrimordialDetailStripSegment = {
+  era: Era;
+  x0: number;
+  x1: number;
+};
+
+const EARLY_UNIVERSE_MIN_EPOCH_WIDTH_PX = 16;
+const EARLY_UNIVERSE_NATURAL_SPAN_MIN_WIDTH_PX = 6;
+const EARLY_UNIVERSE_DETAIL_STRIP_EPOCH_WIDTH_PX =
+  EARLY_UNIVERSE_MIN_EPOCH_WIDTH_PX + 28;
+const EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX = 10;
+const EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_RESERVED_HEIGHT_PX = 58;
+const EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_MIN_CANVAS_HEIGHT_PX = 480;
+const PRIMORDIAL_DETAIL_STRIP_FOCUS_ERA_ID = "quark-epoch";
+const PRIMORDIAL_DETAIL_STRIP_FADE_DURATION_MS = 140;
+const EARLY_UNIVERSE_EXPANDED_LABEL_MIN_WIDTH_PX = 22;
+const EARLY_UNIVERSE_EXPANDED_LABEL_FADE_WIDTH_PX = 42;
+const EARLY_UNIVERSE_COMPACT_LABEL_MIN_WIDTH_PX = 18;
+const EARLY_UNIVERSE_COMPACT_LABEL_FADE_WIDTH_PX = 32;
+const FORCED_PRIMORDIAL_LABEL_IDS = new Set(["quark-epoch", "hadron-epoch"]);
+const PRIMORDIAL_SYNTHETIC_DETAIL_MAX_ZOOM_WINDOW = 0.001;
+const EARLY_UNIVERSE_INLINE_LABELS: Readonly<Record<string, string>> = {
+  "planck-epoch": "Planck",
+  "grand-unification-epoch": "GUT",
+  "inflationary-epoch": "Inflation",
+  "electroweak-epoch": "EW",
+  "quark-epoch": "Quark",
+  "hadron-epoch": "Hadron",
+  "lepton-epoch": "Lepton",
+  "big-bang-nucleosynthesis": "BBN",
+  "photon-epoch": "Photon",
+  recombination: "Recomb.",
+};
+const EARLY_UNIVERSE_DETAIL_STRIP_LABELS: Readonly<Record<string, string>> = {
+  "planck-epoch": "Planck",
+  "grand-unification-epoch": "GUT",
+  "inflationary-epoch": "Infl.",
+  "electroweak-epoch": "EW",
+  "quark-epoch": "Quark",
+  "hadron-epoch": "Hadron",
+  "lepton-epoch": "Lepton",
+  "big-bang-nucleosynthesis": "BBN",
+  "photon-epoch": "Photon",
+  recombination: "Recomb.",
+};
+const EARLY_UNIVERSE_BAND_EXPANSION_IDS = new Set<string>(
+  EARLY_UNIVERSE_CHILD_ERA_ORDER,
+);
+
+function getEraBoundaryPreciseYear(era: Era, edge: "start" | "end") {
+  const exactTime = edge === "start" ? era.exactStartTime : era.exactEndTime;
+
+  if (exactTime) {
+    return getPreciseTimelineYearFromExactTimestamp(exactTime);
+  }
+
+  return splitTimelineYear(edge === "start" ? era.startYear : era.endYear);
+}
+
+function getActualEraScreenSpan(
+  era: Era,
+  viewport: TimelineViewport,
+  innerWidth: number,
+  pad: number,
+): EraScreenSpan {
+  return {
+    x0: pad + worldPreciseToScreen(getEraBoundaryPreciseYear(era, "start"), viewport, innerWidth),
+    x1: pad + worldPreciseToScreen(getEraBoundaryPreciseYear(era, "end"), viewport, innerWidth),
+    usesVisualExpansion: false,
+  };
+}
+
+function isPreciseRangeInsideEarlyUniverse(
+  visibleStart: PreciseTimelineYear,
+  visibleEnd: PreciseTimelineYear,
+) {
+  return (
+    visibleStart.wholeYear >= Math.floor(EARLY_UNIVERSE_START_YEAR) &&
+    visibleEnd.wholeYear <= Math.ceil(EARLY_UNIVERSE_END_YEAR)
+  );
+}
+
+function resolveEraScreenSpanMap(
+  layers: ResolvedTimelineEraLayer[],
+  viewport: TimelineViewport,
+  width: number,
+  pad: number,
+  allowPrimordialSyntheticExpansion: boolean,
+) {
+  const innerWidth = Math.max(width - pad * 2, 1);
+  const spans = new Map<string, EraScreenSpan>();
+
+  for (const layer of layers) {
+    spans.set(layer.era.id, getActualEraScreenSpan(layer.era, viewport, innerWidth, pad));
+  }
+
+  if (!allowPrimordialSyntheticExpansion) {
+    return spans;
+  }
+
+  const [visibleStart, visibleEnd] = getVisibleRangePrecise(viewport, innerWidth);
+  const visibleSpan = Math.max(
+    Math.abs(subtractPreciseTimelineYears(visibleEnd, visibleStart)),
+    1e-18,
+  );
+  const earlyUniverseOverlapStart = Math.max(
+    toApproximateTimelineYear(visibleStart),
+    EARLY_UNIVERSE_START_YEAR,
+  );
+  const earlyUniverseOverlapEnd = Math.min(
+    toApproximateTimelineYear(visibleEnd),
+    EARLY_UNIVERSE_END_YEAR,
+  );
+  const floatOverlapRatio =
+    Math.max(0, earlyUniverseOverlapEnd - earlyUniverseOverlapStart) /
+    visibleSpan;
+  const viewportInsideEarlyUniverse = isPreciseRangeInsideEarlyUniverse(
+    visibleStart,
+    visibleEnd,
+  );
+  const shouldExpandEarlyUniverseChildren =
+    floatOverlapRatio >= 0.75 || viewportInsideEarlyUniverse;
+
+  if (!shouldExpandEarlyUniverseChildren) {
+    return spans;
+  }
+
+  return spans;
+}
+
+function resolvePrimordialDetailStripSegments(
+  layers: ResolvedTimelineEraLayer[],
+  spans: ReadonlyMap<string, EraScreenSpan>,
+  viewport: TimelineViewport,
+  width: number,
+  pad: number,
+) {
+  const innerWidth = Math.max(width - pad * 2, 1);
+  const [visibleStart, visibleEnd] = getVisibleRangePrecise(viewport, innerWidth);
+
+  const visibleSpan = Math.max(
+    Math.abs(subtractPreciseTimelineYears(visibleEnd, visibleStart)),
+    1e-18,
+  );
+  const earlyUniverseOverlapStart = Math.max(
+    toApproximateTimelineYear(visibleStart),
+    EARLY_UNIVERSE_START_YEAR,
+  );
+  const earlyUniverseOverlapEnd = Math.min(
+    toApproximateTimelineYear(visibleEnd),
+    EARLY_UNIVERSE_END_YEAR,
+  );
+  const startsAtBigBang =
+    comparePreciseTimelineYears(
+      visibleStart,
+      splitTimelineYear(TIMELINE_MIN_YEAR),
+    ) === 0;
+  const shouldShowDetailStrip =
+    startsAtBigBang ||
+    isPreciseRangeInsideEarlyUniverse(visibleStart, visibleEnd) ||
+    Math.max(0, earlyUniverseOverlapEnd - earlyUniverseOverlapStart) /
+      visibleSpan >=
+      0.75;
+
+  if (!shouldShowDetailStrip) {
+    return [] as PrimordialDetailStripSegment[];
+  }
+
+  const orderedLayers = EARLY_UNIVERSE_CHILD_ERA_ORDER.map((id) =>
+    layers.find((layer) => layer.era.id === id),
+  ).filter((layer): layer is ResolvedTimelineEraLayer => layer !== undefined);
+
+  if (orderedLayers.length === 0) {
+    return [] as PrimordialDetailStripSegment[];
+  }
+
+  const viewportLeft = pad;
+  const viewportRight = pad + innerWidth;
+  const firstNaturallyVisibleIndex = orderedLayers.findIndex((layer) => {
+    const actualSpan = spans.get(layer.era.id);
+
+    if (!actualSpan) {
+      return false;
+    }
+
+    const visibleWidth =
+      Math.min(actualSpan.x1, viewportRight) - Math.max(actualSpan.x0, viewportLeft);
+
+    return visibleWidth >= EARLY_UNIVERSE_NATURAL_SPAN_MIN_WIDTH_PX;
+  });
+  const firstNaturallyVisibleLayer =
+    firstNaturallyVisibleIndex === -1
+      ? null
+      : orderedLayers[firstNaturallyVisibleIndex];
+
+  if (firstNaturallyVisibleLayer?.era.id !== PRIMORDIAL_DETAIL_STRIP_FOCUS_ERA_ID) {
+    return [] as PrimordialDetailStripSegment[];
+  }
+
+  const syntheticLayers =
+    firstNaturallyVisibleIndex === -1
+      ? orderedLayers
+      : orderedLayers.slice(0, firstNaturallyVisibleIndex);
+
+  if (syntheticLayers.length === 0) {
+    return [] as PrimordialDetailStripSegment[];
+  }
+
+  return syntheticLayers.map((layer, index) => {
+    const x0 = pad + index * EARLY_UNIVERSE_DETAIL_STRIP_EPOCH_WIDTH_PX;
+
+    return {
+      era: layer.era,
+      x0,
+      x1: x0 + EARLY_UNIVERSE_DETAIL_STRIP_EPOCH_WIDTH_PX,
+    };
+  });
+}
 
 type TimelinePerfBreakdown = {
   setupMs: number;
@@ -1816,6 +2044,18 @@ export function TimelineCanvas({
   const previousOverlayVisibilityTransitionKeyRef = useRef(
     overlayVisibilityTransitionKey,
   );
+  const primordialDebugSignatureRef = useRef<string | null>(null);
+  const primordialDetailStripAnimationRef = useRef<{
+    opacity: number;
+    target: number;
+    lastTime: number;
+    segments: PrimordialDetailStripSegment[];
+  }>({
+    opacity: 0,
+    target: 0,
+    lastTime: 0,
+    segments: [],
+  });
   const expandedOverlayAnimationFrameRef = useRef(0);
   const expandedOverlayAnimationLastTimeRef = useRef(0);
   const expandedOverlayProgressByIdRef = useRef<Map<string, number>>(new Map());
@@ -2172,6 +2412,78 @@ export function TimelineCanvas({
         .sort(
           (left, right) => left.step - right.step || left.year - right.year,
         );
+      const sceneMaxZoom = getMaxZoomForTimelineViewport(
+        sceneViewport,
+        innerWidth,
+      );
+      const allowPrimordialSyntheticDetail =
+        sceneViewport.zoom >=
+        sceneMaxZoom - PRIMORDIAL_SYNTHETIC_DETAIL_MAX_ZOOM_WINDOW;
+      const eraScreenSpanById = resolveEraScreenSpanMap(
+        visibleEraLayers,
+        sceneViewport,
+        sceneWidth,
+        pad,
+        allowPrimordialSyntheticDetail,
+      );
+      const primordialDetailStripSegments = resolvePrimordialDetailStripSegments(
+        visibleEraLayers,
+        eraScreenSpanById,
+        sceneViewport,
+        sceneWidth,
+        pad,
+      );
+      const primordialDetailStripAnimation =
+        primordialDetailStripAnimationRef.current;
+      const hasPrimordialDetailStripTarget =
+        primordialDetailStripSegments.length > 0;
+
+      primordialDetailStripAnimation.target = hasPrimordialDetailStripTarget ? 1 : 0;
+
+      if (hasPrimordialDetailStripTarget) {
+        primordialDetailStripAnimation.segments = primordialDetailStripSegments;
+      }
+
+      const primordialDetailStripDt = primordialDetailStripAnimation.lastTime
+        ? Math.max(drawNow - primordialDetailStripAnimation.lastTime, 0)
+        : 16;
+      primordialDetailStripAnimation.lastTime = drawNow;
+      const primordialDetailStripFactor =
+        1 -
+        Math.exp(
+          -primordialDetailStripDt / PRIMORDIAL_DETAIL_STRIP_FADE_DURATION_MS,
+        );
+      primordialDetailStripAnimation.opacity +=
+        (primordialDetailStripAnimation.target -
+          primordialDetailStripAnimation.opacity) *
+        primordialDetailStripFactor;
+
+      let hasActivePrimordialDetailStripAnimation = false;
+
+      if (
+        Math.abs(
+          primordialDetailStripAnimation.target -
+            primordialDetailStripAnimation.opacity,
+        ) <= 0.01
+      ) {
+        primordialDetailStripAnimation.opacity =
+          primordialDetailStripAnimation.target;
+      } else {
+        hasActivePrimordialDetailStripAnimation = true;
+      }
+
+      if (
+        primordialDetailStripAnimation.target <= 0 &&
+        primordialDetailStripAnimation.opacity <= 0.01
+      ) {
+        primordialDetailStripAnimation.segments = [];
+      }
+
+      const renderedPrimordialDetailStripSegments =
+        primordialDetailStripAnimation.target > 0
+          ? primordialDetailStripSegments
+          : primordialDetailStripAnimation.segments;
+      const primordialDetailStripOpacity = primordialDetailStripAnimation.opacity;
 
       const toX = (year: number) =>
         pad + worldToScreen(year, sceneViewport, innerWidth);
@@ -2200,8 +2512,9 @@ export function TimelineCanvas({
 
         if (opacity < 0.01) return;
 
-        const x0 = toX(era.startYear);
-        const x1 = toX(era.endYear);
+        const screenSpan = eraScreenSpanById.get(era.id);
+        const x0 = screenSpan?.x0 ?? toX(era.startYear);
+        const x1 = screenSpan?.x1 ?? toX(era.endYear);
         const eraWidth = x1 - x0;
         const renderState = resolveContextBandRenderState({
           x0,
@@ -2226,18 +2539,65 @@ export function TimelineCanvas({
         context.restore();
 
         const shouldHideInlineLabel = breadcrumbChainIds.has(era.id);
+        const isPrimordialEra = EARLY_UNIVERSE_BAND_EXPANSION_IDS.has(era.id);
+        const visibleEraWidth = Math.max(
+          Math.min(x1, sceneWidth - pad) - Math.max(x0, pad),
+          0,
+        );
+        const allowsNormalPrimordialLabelBypass =
+          FORCED_PRIMORDIAL_LABEL_IDS.has(era.id) && visibleEraWidth >= 44;
+        const usesForcedPrimordialLabel =
+          allowPrimordialSyntheticDetail &&
+          FORCED_PRIMORDIAL_LABEL_IDS.has(era.id) &&
+          visibleEraWidth < 44;
+        const usesExpandedPrimordialLabel =
+          allowPrimordialSyntheticDetail && screenSpan?.usesVisualExpansion === true;
+        const usesCompactPrimordialLabel =
+          allowPrimordialSyntheticDetail &&
+          isPrimordialEra &&
+          !usesExpandedPrimordialLabel &&
+          eraWidth < 60;
+        const labelText =
+          usesExpandedPrimordialLabel || usesCompactPrimordialLabel
+            ? (EARLY_UNIVERSE_INLINE_LABELS[era.id] ?? era.name)
+            : era.name;
+        const labelMinWidth = usesForcedPrimordialLabel
+          ? 8
+          : usesExpandedPrimordialLabel
+            ? EARLY_UNIVERSE_EXPANDED_LABEL_MIN_WIDTH_PX
+            : usesCompactPrimordialLabel
+              ? EARLY_UNIVERSE_COMPACT_LABEL_MIN_WIDTH_PX
+              : 60;
+        const labelFadeWidth = usesForcedPrimordialLabel
+          ? 18
+          : usesExpandedPrimordialLabel
+            ? EARLY_UNIVERSE_EXPANDED_LABEL_FADE_WIDTH_PX
+            : usesCompactPrimordialLabel
+              ? EARLY_UNIVERSE_COMPACT_LABEL_FADE_WIDTH_PX
+              : 120;
+        const labelFont =
+          usesForcedPrimordialLabel
+            ? "9px var(--font-sans)"
+            : usesExpandedPrimordialLabel || usesCompactPrimordialLabel
+              ? "10px var(--font-sans)"
+              : "11px var(--font-sans)";
 
-        if (eraWidth > 60 && !shouldHideInlineLabel) {
+        if (
+          visibleEraWidth > labelMinWidth &&
+          (!shouldHideInlineLabel || allowsNormalPrimordialLabelBypass)
+        ) {
           const labelX =
             Math.max(x0, pad) / 2 + Math.min(x1, sceneWidth - pad) / 2;
           const labelBaselineY = axisY - 44;
           const labelAlpha =
-            Math.min((eraWidth - 60) / 120, 1) *
-            (0.28 + Math.min(opacity, 1) * 0.22);
+            Math.min((visibleEraWidth - labelMinWidth) / labelFadeWidth, 1) *
+            (usesForcedPrimordialLabel
+              ? 0.68
+              : 0.28 + Math.min(opacity, 1) * 0.22);
 
           context.save();
-          context.font = "11px var(--font-sans)";
-          const labelMetrics = context.measureText(era.name);
+          context.font = labelFont;
+          const labelMetrics = context.measureText(labelText);
           context.restore();
 
           const shouldHideForPriorityOverlap = shouldHideOverlappedEraLabel(
@@ -2249,17 +2609,23 @@ export function TimelineCanvas({
             labelMetrics.width,
           );
 
-          if (shouldHideForPriorityOverlap) {
+          if (
+            shouldHideForPriorityOverlap &&
+            !screenSpan?.usesVisualExpansion &&
+            !usesCompactPrimordialLabel &&
+            !usesForcedPrimordialLabel &&
+            !allowsNormalPrimordialLabelBypass
+          ) {
             return;
           }
 
           context.save();
           context.globalAlpha = labelAlpha;
-          context.font = "11px var(--font-sans)";
+          context.font = labelFont;
           context.fillStyle = labelColor;
           context.textAlign = "center";
           context.textBaseline = "bottom";
-          context.fillText(era.name, labelX, labelBaselineY);
+          context.fillText(labelText, labelX, labelBaselineY);
           context.restore();
 
           if (labelAlpha > 0.01) {
@@ -2448,6 +2814,95 @@ export function TimelineCanvas({
 
       for (const layer of visibleEraLayers) {
         renderEra(layer);
+      }
+
+      if (
+        renderedPrimordialDetailStripSegments.length > 0 &&
+        primordialDetailStripOpacity > 0.01
+      ) {
+        const stripPanelPaddingTop = 14;
+        const stripPanelPaddingBottom = 6;
+        const overviewReservedHeight =
+          sceneHeight >=
+          EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_MIN_CANVAS_HEIGHT_PX
+            ? EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_RESERVED_HEIGHT_PX
+            : 0;
+        const stripPanelTop =
+          sceneHeight -
+          overviewReservedHeight -
+          (EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX +
+            stripPanelPaddingTop +
+            stripPanelPaddingBottom);
+        const stripPanelHeight =
+          EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX +
+          stripPanelPaddingTop +
+          stripPanelPaddingBottom;
+        const stripBottomY =
+          stripPanelTop + stripPanelHeight - stripPanelPaddingBottom;
+        const stripTopY = stripBottomY - EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX;
+        const stripLabelBaselineY = stripTopY - 3;
+
+        for (const segment of renderedPrimordialDetailStripSegments) {
+          const segmentWidth = segment.x1 - segment.x0;
+          const labelText =
+            EARLY_UNIVERSE_DETAIL_STRIP_LABELS[segment.era.id] ??
+            EARLY_UNIVERSE_INLINE_LABELS[segment.era.id] ??
+            segment.era.name;
+
+          context.save();
+          context.globalAlpha = 0.92 * primordialDetailStripOpacity;
+          context.fillStyle = segment.era.color;
+          context.fillRect(
+            segment.x0,
+            stripTopY,
+            segmentWidth,
+            EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX,
+          );
+          context.strokeStyle = lineSoft;
+          context.globalAlpha = 0.55 * primordialDetailStripOpacity;
+          context.strokeRect(
+            segment.x0 + 0.5,
+            stripTopY + 0.5,
+            Math.max(segmentWidth - 1, 0),
+            Math.max(EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX - 1, 0),
+          );
+          context.restore();
+
+          context.save();
+          context.font = "8px var(--font-sans)";
+          const labelWidth = context.measureText(labelText).width;
+          context.restore();
+
+          if (labelWidth + 6 <= segmentWidth) {
+            context.save();
+            context.globalAlpha = 0.82 * primordialDetailStripOpacity;
+            context.font = "8px var(--font-sans)";
+            context.fillStyle = labelColor;
+            context.textAlign = "center";
+            context.textBaseline = "bottom";
+            context.fillText(
+              labelText,
+              segment.x0 + segmentWidth / 2,
+              stripLabelBaselineY,
+            );
+            context.restore();
+          }
+
+          if (primordialDetailStripOpacity >= 0.35) {
+            hoverRegions.push({
+              id: `era:detail-strip:${segment.era.id}`,
+              left: segment.x0,
+              right: segment.x1,
+              top: stripPanelTop,
+              bottom: stripBottomY + 4,
+              anchorX: segment.x0 + segmentWidth / 2,
+              anchorY: stripTopY - 2,
+              anchorMode: "fixed",
+              placement: "above",
+              tooltip: getEraTooltipContent(segment.era),
+            });
+          }
+        }
       }
       markPerf("eraMs");
 
@@ -2901,13 +3356,104 @@ export function TimelineCanvas({
           edgeLeftPreciseYear,
           splitTimelineYear(TIMELINE_MIN_YEAR),
         ) === 0;
+      const viewportFullyInEarlyUniverse =
+        edgeLeftPreciseYear.wholeYear >= Math.floor(EARLY_UNIVERSE_START_YEAR) &&
+        edgeRightPreciseYear.wholeYear <= Math.ceil(EARLY_UNIVERSE_END_YEAR);
       const isFullyZoomedOut =
         sceneViewport.zoom <= getMinZoomForWidth(innerWidth) + 0.001;
       const useBigBangElapsedLabels =
         !isFullyZoomedOut &&
-        (sceneActiveEra.id === EARLY_UNIVERSE_ID ||
-          startsAtBigBang ||
+        (startsAtBigBang ||
+          viewportFullyInEarlyUniverse ||
           earlyUniverseOverlap / visibleSpan >= 0.75);
+      const [debugVisibleStart, debugVisibleEnd] = getVisibleRangePrecise(
+        sceneViewport,
+        innerWidth,
+      );
+      const debugEarlyUniverseOverlapStart = Math.max(
+        toApproximateTimelineYear(debugVisibleStart),
+        EARLY_UNIVERSE_START_YEAR,
+      );
+      const debugEarlyUniverseOverlapEnd = Math.min(
+        toApproximateTimelineYear(debugVisibleEnd),
+        EARLY_UNIVERSE_END_YEAR,
+      );
+      const debugFloatOverlapRatio =
+        Math.max(
+          0,
+          debugEarlyUniverseOverlapEnd - debugEarlyUniverseOverlapStart,
+        ) / visibleSpan;
+      const visiblePrimordialLayerIds = visibleEraLayers
+        .filter((layer) => EARLY_UNIVERSE_BAND_EXPANSION_IDS.has(layer.era.id))
+        .map((layer) => layer.era.id);
+      const primordialSpanDebug = EARLY_UNIVERSE_CHILD_ERA_ORDER.map((eraId) => {
+        const span = eraScreenSpanById.get(eraId);
+
+        return {
+          id: eraId,
+          width: span ? Number((span.x1 - span.x0).toFixed(2)) : null,
+          expanded: span?.usesVisualExpansion === true,
+        };
+      });
+      const primordialDetailStripDebug = primordialDetailStripSegments.map(
+        (segment) => ({
+          id: segment.era.id,
+          width: Number((segment.x1 - segment.x0).toFixed(2)),
+        }),
+      );
+      const renderedPrimordialDetailStripDebug =
+        renderedPrimordialDetailStripSegments.map((segment) => ({
+          id: segment.era.id,
+          width: Number((segment.x1 - segment.x0).toFixed(2)),
+        }));
+      const primordialDebugActive =
+        allowPrimordialSyntheticDetail ||
+        viewportFullyInEarlyUniverse ||
+        sceneViewport.zoom >= sceneMaxZoom - 0.01;
+
+      if (primordialDebugActive) {
+        const debugSnapshot = {
+          activeEraId: sceneActiveEra.id,
+          breadcrumbIds: breadcrumbChain.map((era) => era.id),
+          zoom: Number(sceneViewport.zoom.toFixed(6)),
+          sceneMaxZoom: Number(sceneMaxZoom.toFixed(6)),
+          zoomDeltaToMax: Number((sceneMaxZoom - sceneViewport.zoom).toFixed(6)),
+          allowPrimordialSyntheticDetail,
+          startsAtBigBang,
+          viewportFullyInEarlyUniverse,
+          useBigBangElapsedLabels,
+          edgeLabelStep,
+          fineGrainedAxisMode,
+          visibleSpanYears: Number(visibleSpan.toExponential(6)),
+          floatOverlapRatio: Number(debugFloatOverlapRatio.toFixed(6)),
+          visibleStart: {
+            wholeYear: debugVisibleStart.wholeYear,
+            fraction: Number(debugVisibleStart.fraction.toFixed(12)),
+          },
+          visibleEnd: {
+            wholeYear: debugVisibleEnd.wholeYear,
+            fraction: Number(debugVisibleEnd.fraction.toFixed(12)),
+          },
+          visiblePrimordialLayerIds,
+          primordialSpanDebug,
+          primordialDetailStripDebug,
+          renderedPrimordialDetailStripDebug,
+          primordialDetailStripOpacity: Number(
+            primordialDetailStripOpacity.toFixed(3),
+          ),
+          axisTickSteps: [...new Set(resolvedAxisTickStates.map((tick) => tick.step))]
+            .slice(0, 8)
+            .map((step) => Number(step.toExponential(6))),
+        };
+        const nextSignature = JSON.stringify(debugSnapshot);
+
+        if (primordialDebugSignatureRef.current !== nextSignature) {
+          primordialDebugSignatureRef.current = nextSignature;
+          console.info("[timeline primordial debug]", debugSnapshot);
+        }
+      } else if (primordialDebugSignatureRef.current !== null) {
+        primordialDebugSignatureRef.current = null;
+      }
       const useSubYearAxis = fineGrainedAxisMode !== null;
       const useCalendarSubYearAxis = fineGrainedAxisMode === "calendar";
       const useElapsedSubYearAxis = fineGrainedAxisMode === "elapsed";
@@ -3692,7 +4238,10 @@ export function TimelineCanvas({
         }
       }
 
-      if (hasActiveOverlayLabelAnimation && !drawFrameRef.current) {
+      if (
+        (hasActiveOverlayLabelAnimation || hasActivePrimordialDetailStripAnimation) &&
+        !drawFrameRef.current
+      ) {
         drawFrameRef.current = requestAnimationFrame(() => {
           drawFrameRef.current = 0;
           drawCanvasRef.current?.(["overlay-label-animation"]);
@@ -4207,9 +4756,7 @@ export function TimelineCanvas({
       getMinZoomForWidth(innerWidth, viewport.scaleMode ?? "linear") + 0.001;
     const isPrimordialFocused =
       !isFullyZoomedOut &&
-      (activeEra.id === EARLY_UNIVERSE_ID ||
-        startsAtBigBang ||
-        earlyUniverseOverlap / visibleSpan >= 0.75);
+      (startsAtBigBang || earlyUniverseOverlap / visibleSpan >= 0.75);
 
     return resolveAxisTickRenderStates(tickStart, tickEnd, innerWidth, {
       elapsedReference: isPrimordialFocused ? "after-big-bang" : "ago",
@@ -4219,7 +4766,7 @@ export function TimelineCanvas({
       preciseAnchorYear: getViewportCenterYear(viewport),
       scaleMode: "logarithmic",
     });
-  }, [activeEra.id, viewport, width]);
+  }, [viewport, width]);
 
   useEffect(() => {
     const animationStates = eraChildAnimationRef.current;
@@ -5341,7 +5888,6 @@ export function TimelineCanvas({
       earlyUniverseOverlapEnd - earlyUniverseOverlapStart,
     );
     const useBigBangElapsedLabels =
-      activeEra.id === EARLY_UNIVERSE_ID ||
       earlyUniverseOverlap / visibleSpan >= 0.75;
     const useSubYearAxis = fineGrainedAxisMode !== null;
     const useCalendarSubYearAxis = fineGrainedAxisMode === "calendar";
@@ -5808,7 +6354,7 @@ export function TimelineCanvas({
         x: pad,
         ...(() => {
           if (useCalendarSubYearAxis) {
-            return getCalendarAxisLabelText(edgeLeftYear, edgeLabelStep);
+            return getCalendarEdgeAxisLabelText(edgeLeftYear, edgeLabelStep);
           }
 
           if (useElapsedSubYearAxis) {
@@ -5831,7 +6377,7 @@ export function TimelineCanvas({
         x: width - pad,
         ...(() => {
           if (useCalendarSubYearAxis) {
-            return getCalendarAxisLabelText(edgeRightYear, edgeLabelStep);
+            return getCalendarEdgeAxisLabelText(edgeRightYear, edgeLabelStep);
           }
 
           if (useElapsedSubYearAxis) {

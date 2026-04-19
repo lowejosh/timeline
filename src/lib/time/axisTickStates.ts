@@ -54,7 +54,7 @@ type AxisStepDefinition =
     }
   | {
       kind: "calendar";
-      unit: "month" | "day" | "hour" | "minute";
+      unit: "month" | "day" | "hour" | "minute" | "second" | "millisecond" | "microsecond";
       count: number;
       step: number;
     }
@@ -110,14 +110,21 @@ const LABEL_FULL_SPACING_PX = 120;
 const MIN_USEFUL_TICKS_PER_LAYER = 0.9;
 const MAX_FINER_VISIBLE_LAYERS = 2;
 const MAX_COARSER_CONTEXT_LAYERS = 2;
+const MAX_TICKS_PER_STEP = 10_000;
 const EPSILON = 1e-18;
 const DAY_IN_MS = 86_400_000;
 const AVERAGE_DAYS_PER_YEAR = 365.2425;
 const HOURS_PER_DAY = 24;
 const MINUTES_PER_HOUR = 60;
+const SECONDS_PER_MINUTE = 60;
+const MILLISECONDS_PER_SECOND = 1_000;
+const MICROSECONDS_PER_MILLISECOND = 1_000;
 const YEARS_PER_DAY = 1 / AVERAGE_DAYS_PER_YEAR;
 const YEARS_PER_HOUR = YEARS_PER_DAY / HOURS_PER_DAY;
 const YEARS_PER_MINUTE = YEARS_PER_HOUR / MINUTES_PER_HOUR;
+const YEARS_PER_SECOND = YEARS_PER_MINUTE / SECONDS_PER_MINUTE;
+const YEARS_PER_MILLISECOND = YEARS_PER_SECOND / MILLISECONDS_PER_SECOND;
+const YEARS_PER_MICROSECOND = YEARS_PER_MILLISECOND / MICROSECONDS_PER_MILLISECOND;
 const LOGARITHMIC_GENERATION_REVEAL_START_PX = 200;
 const LOGARITHMIC_GENERATION_REVEAL_END_PX = 230;
 const CALENDAR_STEP_DEFINITIONS: readonly AxisStepDefinition[] = [
@@ -151,6 +158,29 @@ const CALENDAR_STEP_DEFINITIONS: readonly AxisStepDefinition[] = [
     step: 5 * YEARS_PER_MINUTE,
   },
   { kind: "calendar", unit: "minute", count: 1, step: YEARS_PER_MINUTE },
+  { kind: "calendar", unit: "second", count: 30, step: 30 * YEARS_PER_SECOND },
+  { kind: "calendar", unit: "second", count: 15, step: 15 * YEARS_PER_SECOND },
+  { kind: "calendar", unit: "second", count: 10, step: 10 * YEARS_PER_SECOND },
+  { kind: "calendar", unit: "second", count: 5, step: 5 * YEARS_PER_SECOND },
+  { kind: "calendar", unit: "second", count: 1, step: YEARS_PER_SECOND },
+  { kind: "calendar", unit: "millisecond", count: 500, step: 500 * YEARS_PER_MILLISECOND },
+  { kind: "calendar", unit: "millisecond", count: 200, step: 200 * YEARS_PER_MILLISECOND },
+  { kind: "calendar", unit: "millisecond", count: 100, step: 100 * YEARS_PER_MILLISECOND },
+  { kind: "calendar", unit: "millisecond", count: 50, step: 50 * YEARS_PER_MILLISECOND },
+  { kind: "calendar", unit: "millisecond", count: 20, step: 20 * YEARS_PER_MILLISECOND },
+  { kind: "calendar", unit: "millisecond", count: 10, step: 10 * YEARS_PER_MILLISECOND },
+  { kind: "calendar", unit: "millisecond", count: 5, step: 5 * YEARS_PER_MILLISECOND },
+  { kind: "calendar", unit: "millisecond", count: 2, step: 2 * YEARS_PER_MILLISECOND },
+  { kind: "calendar", unit: "millisecond", count: 1, step: YEARS_PER_MILLISECOND },
+  { kind: "calendar", unit: "microsecond", count: 500, step: 500 * YEARS_PER_MICROSECOND },
+  { kind: "calendar", unit: "microsecond", count: 200, step: 200 * YEARS_PER_MICROSECOND },
+  { kind: "calendar", unit: "microsecond", count: 100, step: 100 * YEARS_PER_MICROSECOND },
+  { kind: "calendar", unit: "microsecond", count: 50, step: 50 * YEARS_PER_MICROSECOND },
+  { kind: "calendar", unit: "microsecond", count: 20, step: 20 * YEARS_PER_MICROSECOND },
+  { kind: "calendar", unit: "microsecond", count: 10, step: 10 * YEARS_PER_MICROSECOND },
+  { kind: "calendar", unit: "microsecond", count: 5, step: 5 * YEARS_PER_MICROSECOND },
+  { kind: "calendar", unit: "microsecond", count: 2, step: 2 * YEARS_PER_MICROSECOND },
+  { kind: "calendar", unit: "microsecond", count: 1, step: YEARS_PER_MICROSECOND },
 ] as const;
 const ELAPSED_DAY_STEP_DEFINITIONS: readonly AxisStepDefinition[] = [
   { kind: "elapsed-day", count: 180, step: 180 * YEARS_PER_DAY },
@@ -161,6 +191,37 @@ const ELAPSED_DAY_STEP_DEFINITIONS: readonly AxisStepDefinition[] = [
   { kind: "elapsed-day", count: 7, step: 7 * YEARS_PER_DAY },
   { kind: "elapsed-day", count: 2, step: 2 * YEARS_PER_DAY },
   { kind: "elapsed-day", count: 1, step: YEARS_PER_DAY },
+  { kind: "elapsed-day", count: 0.5, step: 12 * YEARS_PER_HOUR },
+  { kind: "elapsed-day", count: 0.25, step: 6 * YEARS_PER_HOUR },
+  { kind: "elapsed-day", count: 3 / 24, step: 3 * YEARS_PER_HOUR },
+  { kind: "elapsed-day", count: 1 / 24, step: YEARS_PER_HOUR },
+  { kind: "elapsed-day", count: 30 / 1440, step: 30 * YEARS_PER_MINUTE },
+  { kind: "elapsed-day", count: 15 / 1440, step: 15 * YEARS_PER_MINUTE },
+  { kind: "elapsed-day", count: 5 / 1440, step: 5 * YEARS_PER_MINUTE },
+  { kind: "elapsed-day", count: 1 / 1440, step: YEARS_PER_MINUTE },
+  { kind: "elapsed-day", count: 30 / 86400, step: 30 * YEARS_PER_SECOND },
+  { kind: "elapsed-day", count: 15 / 86400, step: 15 * YEARS_PER_SECOND },
+  { kind: "elapsed-day", count: 10 / 86400, step: 10 * YEARS_PER_SECOND },
+  { kind: "elapsed-day", count: 5 / 86400, step: 5 * YEARS_PER_SECOND },
+  { kind: "elapsed-day", count: 1 / 86400, step: YEARS_PER_SECOND },
+  { kind: "elapsed-day", count: 500e-3 / 86400, step: 500 * YEARS_PER_MILLISECOND },
+  { kind: "elapsed-day", count: 200e-3 / 86400, step: 200 * YEARS_PER_MILLISECOND },
+  { kind: "elapsed-day", count: 100e-3 / 86400, step: 100 * YEARS_PER_MILLISECOND },
+  { kind: "elapsed-day", count: 50e-3 / 86400, step: 50 * YEARS_PER_MILLISECOND },
+  { kind: "elapsed-day", count: 20e-3 / 86400, step: 20 * YEARS_PER_MILLISECOND },
+  { kind: "elapsed-day", count: 10e-3 / 86400, step: 10 * YEARS_PER_MILLISECOND },
+  { kind: "elapsed-day", count: 5e-3 / 86400, step: 5 * YEARS_PER_MILLISECOND },
+  { kind: "elapsed-day", count: 2e-3 / 86400, step: 2 * YEARS_PER_MILLISECOND },
+  { kind: "elapsed-day", count: 1e-3 / 86400, step: YEARS_PER_MILLISECOND },
+  { kind: "elapsed-day", count: 500e-6 / 86400, step: 500 * YEARS_PER_MICROSECOND },
+  { kind: "elapsed-day", count: 200e-6 / 86400, step: 200 * YEARS_PER_MICROSECOND },
+  { kind: "elapsed-day", count: 100e-6 / 86400, step: 100 * YEARS_PER_MICROSECOND },
+  { kind: "elapsed-day", count: 50e-6 / 86400, step: 50 * YEARS_PER_MICROSECOND },
+  { kind: "elapsed-day", count: 20e-6 / 86400, step: 20 * YEARS_PER_MICROSECOND },
+  { kind: "elapsed-day", count: 10e-6 / 86400, step: 10 * YEARS_PER_MICROSECOND },
+  { kind: "elapsed-day", count: 5e-6 / 86400, step: 5 * YEARS_PER_MICROSECOND },
+  { kind: "elapsed-day", count: 2e-6 / 86400, step: 2 * YEARS_PER_MICROSECOND },
+  { kind: "elapsed-day", count: 1e-6 / 86400, step: YEARS_PER_MICROSECOND },
 ] as const;
 
 function clamp01(value: number) {
@@ -267,6 +328,8 @@ function getCalendarTicksForStep(
   startYear: number,
   endYear: number,
   stepDefinition: Extract<AxisStepDefinition, { kind: "calendar" }>,
+  preciseStartYear?: PreciseTimelineYear,
+  preciseEndYear?: PreciseTimelineYear,
 ): ExplicitTick[] {
   const clampedStart = Math.max(
     Math.min(startYear, endYear),
@@ -309,13 +372,57 @@ function getCalendarTicksForStep(
     return ticks;
   }
 
+  if (stepDefinition.unit === "microsecond") {
+    const precStart =
+      preciseStartYear && preciseEndYear
+        ? comparePreciseTimelineYears(preciseStartYear, preciseEndYear) <= 0
+          ? preciseStartYear
+          : preciseEndYear
+        : splitTimelineYear(clampedStart);
+    const precEnd =
+      preciseStartYear && preciseEndYear
+        ? comparePreciseTimelineYears(preciseStartYear, preciseEndYear) <= 0
+          ? preciseEndYear
+          : preciseStartYear
+        : splitTimelineYear(clampedEnd);
+    const localSpan = Math.abs(
+      subtractPreciseTimelineYears(precEnd, precStart),
+    );
+    const maxIterations = Math.min(
+      Math.ceil(localSpan / stepDefinition.step) + 2,
+      MAX_TICKS_PER_STEP,
+    );
+
+    for (let i = 0; i < maxIterations; i++) {
+      const offset = i * stepDefinition.step;
+
+      if (offset > localSpan + EPSILON) break;
+
+      const preciseYear = addPreciseTimelineYears(precStart, offset);
+      const tickYear = toApproximateTimelineYear(preciseYear);
+
+      if (
+        tickYear >= clampedStart - EPSILON &&
+        tickYear <= clampedEnd + EPSILON
+      ) {
+        ticks.push({ year: tickYear, preciseYear });
+      }
+    }
+
+    return ticks;
+  }
+
   const epoch = createTimelineUtcDate(1970, 0, 1);
   const unitMilliseconds =
     stepDefinition.unit === "day"
       ? DAY_IN_MS
       : stepDefinition.unit === "hour"
         ? DAY_IN_MS / HOURS_PER_DAY
-        : DAY_IN_MS / HOURS_PER_DAY / MINUTES_PER_HOUR;
+        : stepDefinition.unit === "minute"
+          ? DAY_IN_MS / HOURS_PER_DAY / MINUTES_PER_HOUR
+          : stepDefinition.unit === "second"
+            ? MILLISECONDS_PER_SECOND
+            : 1;
   const startOfUnit =
     stepDefinition.unit === "day"
       ? createTimelineUtcDate(
@@ -330,13 +437,32 @@ function getCalendarTicksForStep(
             startDate.getUTCDate(),
             startDate.getUTCHours(),
           )
-        : createTimelineUtcDate(
-            startDate.getUTCFullYear(),
-            startDate.getUTCMonth(),
-            startDate.getUTCDate(),
-            startDate.getUTCHours(),
-            startDate.getUTCMinutes(),
-          );
+        : stepDefinition.unit === "minute"
+          ? createTimelineUtcDate(
+              startDate.getUTCFullYear(),
+              startDate.getUTCMonth(),
+              startDate.getUTCDate(),
+              startDate.getUTCHours(),
+              startDate.getUTCMinutes(),
+            )
+          : stepDefinition.unit === "second"
+            ? createTimelineUtcDate(
+                startDate.getUTCFullYear(),
+                startDate.getUTCMonth(),
+                startDate.getUTCDate(),
+                startDate.getUTCHours(),
+                startDate.getUTCMinutes(),
+                startDate.getUTCSeconds(),
+              )
+            : createTimelineUtcDate(
+                startDate.getUTCFullYear(),
+                startDate.getUTCMonth(),
+                startDate.getUTCDate(),
+                startDate.getUTCHours(),
+                startDate.getUTCMinutes(),
+                startDate.getUTCSeconds(),
+                startDate.getUTCMilliseconds(),
+              );
   const startUnitOffset = Math.floor(
     (startOfUnit.getTime() - epoch.getTime()) / unitMilliseconds,
   );
@@ -399,6 +525,10 @@ function getElapsedDayTicksForStep(
         : preciseStartYear
       : splitTimelineYear(clampedEnd);
 
+  const localSpan = Math.abs(
+    subtractPreciseTimelineYears(orderedPreciseEnd, orderedPreciseStart),
+  );
+
   if (isAfterBigBangRange) {
     const referenceYear = splitTimelineYear(TIMELINE_MIN_YEAR);
     const minElapsed = Math.max(
@@ -409,6 +539,29 @@ function getElapsedDayTicksForStep(
       0,
       subtractPreciseTimelineYears(orderedPreciseEnd, referenceYear),
     );
+
+    if (step < maxElapsed * Number.EPSILON * 64) {
+      const maxTicks = Math.min(Math.ceil(localSpan / step) + 2, MAX_TICKS_PER_STEP);
+
+      for (let i = 0; i < maxTicks; i++) {
+        const offset = i * step;
+
+        if (offset > localSpan + EPSILON) break;
+
+        const preciseYear = addPreciseTimelineYears(
+          orderedPreciseStart,
+          offset,
+        );
+
+        ticks.push({
+          year: toApproximateTimelineYear(preciseYear),
+          preciseYear,
+        });
+      }
+
+      return ticks;
+    }
+
     const firstElapsed = Math.ceil((minElapsed - EPSILON) / step) * step;
 
     for (
@@ -422,6 +575,8 @@ function getElapsedDayTicksForStep(
         year: toApproximateTimelineYear(preciseYear),
         preciseYear,
       });
+
+      if (ticks.length >= MAX_TICKS_PER_STEP) break;
     }
 
     return ticks;
@@ -436,6 +591,29 @@ function getElapsedDayTicksForStep(
     0,
     subtractPreciseTimelineYears(referenceYear, orderedPreciseStart),
   );
+
+  if (step < maxElapsed * Number.EPSILON * 64) {
+    const maxTicks = Math.min(Math.ceil(localSpan / step) + 2, MAX_TICKS_PER_STEP);
+
+    for (let i = 0; i < maxTicks; i++) {
+      const offset = i * step;
+
+      if (offset > localSpan + EPSILON) break;
+
+      const preciseYear = addPreciseTimelineYears(
+        orderedPreciseStart,
+        offset,
+      );
+
+      ticks.push({
+        year: toApproximateTimelineYear(preciseYear),
+        preciseYear,
+      });
+    }
+
+    return ticks;
+  }
+
   const firstElapsed = Math.ceil((minElapsed - EPSILON) / step) * step;
 
   for (
@@ -449,6 +627,8 @@ function getElapsedDayTicksForStep(
       year: toApproximateTimelineYear(preciseYear),
       preciseYear,
     });
+
+    if (ticks.length >= MAX_TICKS_PER_STEP) break;
   }
 
   return ticks;
@@ -510,6 +690,8 @@ function getElapsedTicksForStep(
       year: approximateYear,
       preciseYear,
     });
+
+    if (ticks.length >= MAX_TICKS_PER_STEP) break;
   }
 
   return ticks;
@@ -583,7 +765,13 @@ function getExplicitTicksForStep(
   }
 
   if (stepDefinition.kind === "calendar") {
-    return getCalendarTicksForStep(startYear, endYear, stepDefinition);
+    return getCalendarTicksForStep(
+      startYear,
+      endYear,
+      stepDefinition,
+      options.preciseStartYear,
+      options.preciseEndYear,
+    );
   }
 
   if (stepDefinition.kind === "elapsed-day") {

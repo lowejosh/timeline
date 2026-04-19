@@ -217,7 +217,16 @@ describe("era data", () => {
       findEraById(ROOT_ERA, "cosmic-history")?.children?.map((era) => era.id) ?? [];
 
     expect(cosmicChildIds).toEqual([
-      "early-universe",
+      "planck-epoch",
+      "grand-unification-epoch",
+      "inflationary-epoch",
+      "electroweak-epoch",
+      "quark-epoch",
+      "hadron-epoch",
+      "lepton-epoch",
+      "big-bang-nucleosynthesis",
+      "photon-epoch",
+      "recombination",
       "dark-ages",
       "first-stars-and-reionization",
       "galaxy-assembly",
@@ -271,7 +280,8 @@ describe("era data", () => {
 
     expect(rootDisplayIds).toEqual(
       expect.arrayContaining([
-        "early-universe",
+        "planck-epoch",
+        "recombination",
         "hadean",
         "quaternary",
         "paleolithic",

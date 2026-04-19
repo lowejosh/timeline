@@ -487,24 +487,30 @@ describe("axis tick render states", () => {
         .filter((step) => step < 365.2425),
     );
 
+    const validDaySteps = new Set(
+      [
+        180, 90, 60, 30, 14, 7, 2, 1,
+        12 / 24, 6 / 24, 3 / 24, 1 / 24,
+        30 / 1440, 15 / 1440, 5 / 1440, 1 / 1440,
+        30 / 86400, 15 / 86400, 10 / 86400, 5 / 86400, 1 / 86400,
+      ].map((v) => Number(v.toFixed(6))),
+    );
+
     expect(daySteps.size).toBeGreaterThan(0);
     expect(
-      [...daySteps].every((step) =>
-        [1, 2, 7, 14, 30, 60, 90, 180].includes(step),
-      ),
+      [...daySteps].every((step) => validDaySteps.has(step)),
     ).toBe(true);
 
     for (const state of states.filter((state) => state.step < 1)) {
       expect(state.wholeYear).toBe(preciseStart.wholeYear);
       expect(state.yearFraction).toBeDefined();
-      expect(
-        ((state.yearFraction ?? 0) - preciseStart.fraction) * 365.2425,
-      ).toBeCloseTo(
-        Math.round(
-          ((state.yearFraction ?? 0) - preciseStart.fraction) * 365.2425,
-        ),
-        6,
-      );
+
+      const offsetDays =
+        ((state.yearFraction ?? 0) - preciseStart.fraction) * 365.2425;
+      const stepDays = state.step * 365.2425;
+      const stepMultiple = offsetDays / stepDays;
+
+      expect(stepMultiple).toBeCloseTo(Math.round(stepMultiple), 4);
     }
   });
 });

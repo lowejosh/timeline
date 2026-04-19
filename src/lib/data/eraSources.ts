@@ -2022,6 +2022,16 @@ export const ERA_SOURCES = {
     notes:
       "Supports contemporary history as c. 1945–present in English-language historiography.",
   },
+  physicsOfUniverseBigBangTimeline: {
+    shortTitle: "Physics of the Universe: Big Bang Timeline",
+    title: "Timeline of the Big Bang",
+    organization: "The Physics of the Universe",
+    citation:
+      '"Timeline of the Big Bang," The Physics of the Universe.',
+    url: "https://www.physicsoftheuniverse.com/topics_bigbang_timeline.html",
+    notes:
+      "Used for the sequence and approximate timescales of cosmological epochs from the Planck era through recombination.",
+  },
 } as const satisfies Record<string, EraSource>;
 
 export type EraSourceId = keyof typeof ERA_SOURCES;

@@ -9,6 +9,7 @@ import {
   mapOverviewRulerXToYear,
   mapOverviewRulerYearToX,
   resolveAnchoredOverviewRulerTiers,
+  resolveOverviewRulerBandRect,
   resolveOverviewRulerSpotlight,
   resolveOverviewRulerTiers,
 } from "../overviewRuler";
@@ -20,6 +21,16 @@ describe("overview ruler geometry", () => {
   it("formats overview span labels compactly across scales", () => {
     expect(formatOverviewRulerSpanLabel(575)).toBe("575 years");
     expect(formatOverviewRulerSpanLabel(2_580_000)).toBe("2.58M years");
+    expect(formatOverviewRulerSpanLabel(0.5)).toBe("183 days");
+    expect(formatOverviewRulerSpanLabel(1 / 365.2425)).toBe("1 day");
+    expect(formatOverviewRulerSpanLabel(1 / 365.2425 / 2)).toBe("12 hours");
+    expect(formatOverviewRulerSpanLabel(1 / 365.2425 / 24)).toBe("1 hour");
+    expect(formatOverviewRulerSpanLabel(1 / 365.2425 / 24 / 2)).toBe("30 minutes");
+    expect(formatOverviewRulerSpanLabel(1 / 365.2425 / 24 / 60)).toBe("1 minute");
+    expect(formatOverviewRulerSpanLabel(1 / 365.2425 / 24 / 60 / 2)).toBe("30 seconds");
+    expect(formatOverviewRulerSpanLabel(1 / 365.2425 / 24 / 3600)).toBe("1 second");
+    expect(formatOverviewRulerSpanLabel(1 / 365.2425 / 24 / 3600 / 2)).toBe("500 ms");
+    expect(formatOverviewRulerSpanLabel(1 / 365.2425 / 24 / 3600 / 2000)).toBe("500 µs");
   });
 
   it("formats overview percentage labels compactly across scales", () => {
@@ -107,6 +118,21 @@ describe("overview ruler geometry", () => {
     );
   });
 
+  it("respects a larger custom spotlight minimum width when provided", () => {
+    const width = 1200;
+    const pad = 120;
+    const spotlight = resolveOverviewRulerSpotlight(
+      1900,
+      1900.0001,
+      FULL_DOMAIN,
+      width,
+      pad,
+      4,
+    );
+
+    expect(spotlight.displayWidth).toBeGreaterThanOrEqual(4);
+  });
+
   it("clamps spotlight display bounds at the timeline start edge", () => {
     const width = 1200;
     const pad = 120;
@@ -135,6 +161,36 @@ describe("overview ruler geometry", () => {
     );
 
     expect(spotlight.displayRight).toBeCloseTo(width - pad, 6);
+  });
+
+  it("does not inflate microscopic overview bands into visible one-pixel slivers", () => {
+    const width = 1200;
+    const pad = 120;
+
+    expect(
+      resolveOverviewRulerBandRect(
+        TIMELINE_MIN_YEAR,
+        TIMELINE_MIN_YEAR + 1_000,
+        FULL_DOMAIN,
+        width,
+        pad,
+      ),
+    ).toBeNull();
+  });
+
+  it("keeps genuinely visible overview bands at their natural width", () => {
+    const width = 1200;
+    const pad = 120;
+    const rect = resolveOverviewRulerBandRect(
+      -13_800_000_000,
+      -13_000_000_000,
+      FULL_DOMAIN,
+      width,
+      pad,
+    );
+
+    expect(rect).not.toBeNull();
+    expect(rect?.width).toBeGreaterThan(1);
   });
 });
 

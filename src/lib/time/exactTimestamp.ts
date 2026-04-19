@@ -3,6 +3,11 @@ import {
   getTimelineYearFromYearsAfterBigBang,
   getTimelineYearFromYearsAgo,
 } from "./timelineYears";
+import {
+  normalizePreciseTimelineYear,
+  splitTimelineYear,
+  type PreciseTimelineYear,
+} from "./viewport";
 
 export type TimelineElapsedReference = "ago" | "after-big-bang";
 export type TimelineTimestampPrecision =
@@ -457,12 +462,59 @@ export function getTimelineYearFromElapsedTimestamp(
     : getTimelineYearFromYearsAgo(totalYears);
 }
 
+export function getPreciseTimelineYearFromElapsedTimestamp(
+  timestamp: TimelineElapsedTimestamp,
+): PreciseTimelineYear {
+  const normalized = normalizeElapsedTimestamp(timestamp);
+  const anchor = splitTimelineYear(
+    normalized.reference === "after-big-bang"
+      ? getTimelineYearFromYearsAfterBigBang(0)
+      : getTimelineYearFromYearsAgo(0),
+  );
+  const wholeYears = Number(normalized.years);
+  const fractionalYears =
+    Number(normalized.days) / AVERAGE_DAYS_PER_YEAR +
+    Number(normalized.hours) / 24 / AVERAGE_DAYS_PER_YEAR +
+    Number(normalized.minutes) / 60 / 24 / AVERAGE_DAYS_PER_YEAR +
+    Number(normalized.seconds) / 60 / 60 / 24 / AVERAGE_DAYS_PER_YEAR +
+    Number(normalized.milliseconds) /
+      1_000 /
+      60 /
+      60 /
+      24 /
+      AVERAGE_DAYS_PER_YEAR +
+    Number(normalized.microseconds) /
+      1_000_000 /
+      60 /
+      60 /
+      24 /
+      AVERAGE_DAYS_PER_YEAR;
+
+  return normalized.reference === "after-big-bang"
+    ? normalizePreciseTimelineYear(
+        anchor.wholeYear + wholeYears,
+        anchor.fraction + fractionalYears,
+      )
+    : normalizePreciseTimelineYear(
+        anchor.wholeYear - wholeYears,
+        anchor.fraction - fractionalYears,
+      );
+}
+
 export function getTimelineYearFromExactTimestamp(
   timestamp: TimelineExactTimestamp,
 ) {
   return timestamp.kind === "calendar"
     ? getTimelineYearFromCalendarTimestamp(timestamp)
     : getTimelineYearFromElapsedTimestamp(timestamp);
+}
+
+export function getPreciseTimelineYearFromExactTimestamp(
+  timestamp: TimelineExactTimestamp,
+): PreciseTimelineYear {
+  return timestamp.kind === "calendar"
+    ? splitTimelineYear(getTimelineYearFromCalendarTimestamp(timestamp))
+    : getPreciseTimelineYearFromElapsedTimestamp(timestamp);
 }
 
 export function formatTimelineExactTimestamp(

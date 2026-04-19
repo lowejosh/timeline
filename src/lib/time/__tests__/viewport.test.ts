@@ -7,9 +7,15 @@ import {
   getPrecisionLimitedYearsPerPixel,
   getViewportPrecisionLimitedYearsPerPixel,
   getVisibleRange,
+  getMinVisibleRangeHoursForWidth,
   getMinVisibleRangeDaysForWidth,
+  getMinVisibleRangeMicrosecondsForWidth,
+  MIN_VISIBLE_RANGE_HOURS,
   MIN_VISIBLE_RANGE_DAYS,
+  MIN_VISIBLE_RANGE_MICROSECONDS,
+  MAX_ZOOM_HOUR_TICK_SPACING_PX,
   MAX_ZOOM_DAY_TICK_SPACING_PX,
+  MAX_ZOOM_MICROSECOND_TICK_SPACING_PX,
   getViewportForRange,
   normalizeViewport,
   panByPixels,
@@ -158,7 +164,7 @@ describe("timeline viewport math", () => {
     expect(rightAfter).toBeCloseTo(rightBefore, 3);
   });
 
-  it("uses a width-aware day-scale visible-range floor at maximum zoom", () => {
+  it("uses a width-aware sub-day visible-range floor at maximum zoom", () => {
     const width = 1200;
     const viewport = normalizeViewport(
       {
@@ -171,21 +177,42 @@ describe("timeline viewport math", () => {
     const visibleDays = (visibleEnd - visibleStart) * 365.2425;
     const precisionLimitedDays =
       getViewportPrecisionLimitedYearsPerPixel(viewport) * width * 365.2425;
+    const effectiveVisibleRangeMicroseconds =
+      getMinVisibleRangeMicrosecondsForWidth(width);
+    const effectiveVisibleRangeHours = getMinVisibleRangeHoursForWidth(width);
     const effectiveVisibleRangeDays = getMinVisibleRangeDaysForWidth(width);
 
-    expect(viewport.zoom).toBeCloseTo(getMaxZoomForWidth(width), 6);
+    expect(viewport.zoom).toBeLessThanOrEqual(getMaxZoomForWidth(width));
+    expect(effectiveVisibleRangeMicroseconds).toBeGreaterThanOrEqual(
+      MIN_VISIBLE_RANGE_MICROSECONDS,
+    );
+    expect(effectiveVisibleRangeMicroseconds).toBe(
+      Math.max(
+        MIN_VISIBLE_RANGE_MICROSECONDS,
+        width / MAX_ZOOM_MICROSECOND_TICK_SPACING_PX,
+      ),
+    );
+    expect(effectiveVisibleRangeHours).toBeGreaterThanOrEqual(
+      MIN_VISIBLE_RANGE_HOURS,
+    );
+    expect(effectiveVisibleRangeHours).toBeCloseTo(
+      effectiveVisibleRangeMicroseconds / (3600 * 1_000_000),
+      20,
+    );
     expect(effectiveVisibleRangeDays).toBeGreaterThanOrEqual(
       MIN_VISIBLE_RANGE_DAYS,
     );
     expect(effectiveVisibleRangeDays).toBeCloseTo(
-      width / MAX_ZOOM_DAY_TICK_SPACING_PX,
-      6,
+      effectiveVisibleRangeHours / 24,
+      20,
     );
-    expect(visibleDays).toBeGreaterThanOrEqual(
-      effectiveVisibleRangeDays * 0.99,
+    expect(MAX_ZOOM_DAY_TICK_SPACING_PX).toBe(
+      MAX_ZOOM_HOUR_TICK_SPACING_PX * 24,
     );
-    expect(visibleDays).toBeLessThanOrEqual(effectiveVisibleRangeDays * 1.01);
-    expect(precisionLimitedDays).toBeLessThan(effectiveVisibleRangeDays);
+    expect(visibleDays).toBeGreaterThan(effectiveVisibleRangeDays);
+    expect(precisionLimitedDays).toBeGreaterThan(effectiveVisibleRangeDays);
+    expect(visibleDays).toBeGreaterThan(precisionLimitedDays * 0.8);
+    expect(visibleDays).toBeLessThan(precisionLimitedDays * 1.05);
   });
 
   it("reduces allowed zoom further for very large-magnitude center years", () => {

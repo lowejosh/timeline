@@ -8,7 +8,7 @@ export type LogarithmicAxisGeometry = {
 };
 
 export const LOGARITHMIC_AXIS_FOCUS_RADIUS_PX = 96;
-export const LOGARITHMIC_AXIS_EPSILON_YEARS = 1e-9;
+export const LOGARITHMIC_AXIS_EPSILON_YEARS = 1e-18;
 
 function clampToSafePositive(value: number) {
   if (!Number.isFinite(value) || value <= 0) {

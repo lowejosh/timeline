@@ -40,7 +40,6 @@ const HUMAN_EVOLUTION_GROUP_ID =
   TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
 const CIVILIZATIONS_GROUP_ID = TIMELINE_DECORATION_CATEGORY_IDS.civilizations;
 const OVERVIEW_RULER_TIER_HEIGHT = 18;
-const OVERVIEW_RULER_ADD_TIER_THRESHOLD_PX = 8;
 const OVERVIEW_RULER_MAX_TIERS = 3;
 const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
 
@@ -381,7 +380,6 @@ function App() {
                   pad={TIMELINE_CANVAS_PAD}
                   tierHeight={OVERVIEW_RULER_TIER_HEIGHT}
                   tierOptions={{
-                    addTierThresholdPx: OVERVIEW_RULER_ADD_TIER_THRESHOLD_PX,
                     maxTiers: OVERVIEW_RULER_MAX_TIERS,
                   }}
                   viewport={animated.viewport}

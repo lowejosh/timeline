@@ -1,36 +1,285 @@
 import type { EraDefinition } from "../timelineTypes";
 import { afterBigBang, yearsAgo } from "../timelineDateBuilders";
+import { createExactElapsedTimestamp } from "../../time/exactTimestamp";
 
 export const EARLY_UNIVERSE_ID = "early-universe";
 export const EARLY_UNIVERSE_START_YEAR = afterBigBang(0);
-export const EARLY_UNIVERSE_END_YEAR = afterBigBang(380_000);
+const RECOMBINATION_END = afterBigBang(300_000);
+export const EARLY_UNIVERSE_END_YEAR = RECOMBINATION_END;
 export const DARK_AGES_END_YEAR = afterBigBang(200_000_000);
 export const REIONIZATION_END_YEAR = afterBigBang(1_000_000_000);
+export const EARLY_UNIVERSE_CHILD_ERA_ORDER = [
+  "planck-epoch",
+  "grand-unification-epoch",
+  "inflationary-epoch",
+  "electroweak-epoch",
+  "quark-epoch",
+  "hadron-epoch",
+  "lepton-epoch",
+  "big-bang-nucleosynthesis",
+  "photon-epoch",
+  "recombination",
+] as const;
 
-export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
+// Sub-year epoch boundary computation.
+// At ~13.8 billion years, float64 can only distinguish offsets > ~3.8e-6 years (~2 minutes).
+// Earlier boundaries collapse to EARLY_UNIVERSE_START_YEAR, but the data is recorded
+// with timeLabel strings carrying the true scientific-notation timescales.
+const SECONDS_PER_YEAR = 365.25 * 24 * 3600;
+const secondsAfterBB = (s: number) =>
+  EARLY_UNIVERSE_START_YEAR + s / SECONDS_PER_YEAR;
+const minutesAfterBB = (m: number) =>
+  EARLY_UNIVERSE_START_YEAR + (m * 60) / SECONDS_PER_YEAR;
+
+const BB = EARLY_UNIVERSE_START_YEAR;
+const PLANCK_END = secondsAfterBB(1e-43);
+const GUT_END = secondsAfterBB(1e-36);
+const INFLATION_END = secondsAfterBB(1e-32);
+const ELECTROWEAK_END = secondsAfterBB(1e-12);
+const QUARK_END = secondsAfterBB(1e-6);
+const HADRON_END = secondsAfterBB(1);
+const LEPTON_END = minutesAfterBB(3);
+const BBN_END = minutesAfterBB(20);
+const PHOTON_END = afterBigBang(240_000);
+
+const bigBangTimelineSource = {
+  sourceId: "physicsOfUniverseBigBangTimeline" as const,
+};
+
+const afterBigBangExact = (
+  timestamp: Omit<
+    Parameters<typeof createExactElapsedTimestamp>[0],
+    "kind" | "reference"
+  >,
+) =>
+  createExactElapsedTimestamp({
+    reference: "after-big-bang",
+    ...timestamp,
+  });
+
+const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
   {
-    id: EARLY_UNIVERSE_ID,
-    name: "Early Universe",
-    startYear: EARLY_UNIVERSE_START_YEAR,
-    endYear: EARLY_UNIVERSE_END_YEAR,
+    id: "planck-epoch",
+    name: "Planck Epoch",
+    startYear: BB,
+    endYear: PLANCK_END,
+    color: "rgb(74, 46, 132)",
+    timeLabel: "0 to 10⁻⁴³ s after the Big Bang",
     description:
-      "Inflation, primordial particles, and the first atoms emerge as the universe cools from a hot dense beginning.",
+      "All four fundamental forces are unified. The observable universe spans one Planck length at over 10³² °C — the hottest moment in existence.",
     scheme: "cosmic",
     sourceRefs: [
       {
-        sourceId: "nasaLambdaCosmology",
-        note: "NASA LAMBDA uses inflation and recombination as foundational early-universe transitions; this band covers the hot early cosmos through recombination, when neutral atoms form and the cosmic microwave background is released.",
-      },
-      {
-        sourceId: "nasaUniverseOverview",
-        note: "NASA's Cosmic History page explicitly names cosmic inflation, big bang nucleosynthesis, and recombination, placing recombination at about 380,000 years after the Big Bang.",
+        ...bigBangTimelineSource,
+        note: "Planck Epoch from zero to approximately 10⁻⁴³ seconds; four forces unified, universe spans 10⁻³⁵ meters at Planck Temperature.",
       },
     ],
   },
   {
+    id: "grand-unification-epoch",
+    name: "Grand Unification Epoch",
+    startYear: PLANCK_END,
+    endYear: GUT_END,
+    color: "rgb(56, 92, 196)",
+    timeLabel: "10⁻⁴³ to 10⁻³⁶ s after the Big Bang",
+    description:
+      "Gravity separates first. The earliest elementary particles and antiparticles begin to appear.",
+    scheme: "cosmic",
+    sourceRefs: [
+      {
+        ...bigBangTimelineSource,
+        note: "Grand Unification Epoch from 10⁻⁴³ to 10⁻³⁶ seconds; gravity separates, elementary particles created.",
+      },
+    ],
+  },
+  {
+    id: "inflationary-epoch",
+    name: "Inflationary Epoch",
+    startYear: GUT_END,
+    endYear: INFLATION_END,
+    color: "rgb(58, 150, 228)",
+    timeLabel: "10⁻³⁶ to 10⁻³² s after the Big Bang",
+    description:
+      "Space itself expands by at least a factor of 10²⁶ in a fraction of a second, stretching the universe from subatomic to roughly grapefruit-sized.",
+    scheme: "cosmic",
+    sourceRefs: [
+      {
+        ...bigBangTimelineSource,
+        note: "Inflationary Epoch from 10⁻³⁶ to 10⁻³² seconds; triggered by separation of strong nuclear force, universe expands by factor of 10²⁶.",
+      },
+    ],
+  },
+  {
+    id: "electroweak-epoch",
+    name: "Electroweak Epoch",
+    startYear: INFLATION_END,
+    endYear: ELECTROWEAK_END,
+    color: "rgb(70, 182, 136)",
+    timeLabel: "10⁻³² to 10⁻¹² s after the Big Bang",
+    description:
+      "With the strong force now separate, particle interactions create W and Z bosons and the Higgs boson, slowing particles down and giving them mass.",
+    scheme: "cosmic",
+    sourceRefs: [
+      {
+        ...bigBangTimelineSource,
+        note: "Electroweak Epoch from 10⁻³⁶ to 10⁻¹² seconds; strong nuclear force separates, Higgs field gives particles mass. Sequenced here after inflation for non-overlapping display.",
+      },
+    ],
+  },
+  {
+    id: "quark-epoch",
+    name: "Quark Epoch",
+    startYear: ELECTROWEAK_END,
+    endYear: QUARK_END,
+    exactEndTime: afterBigBangExact({
+      microseconds: 1n,
+      precision: "microsecond",
+    }),
+    color: "rgb(182, 82, 208)",
+    timeLabel: "10⁻¹² to 10⁻⁶ s after the Big Bang",
+    description:
+      "Quarks, electrons, and neutrinos fill the cooling universe below 10 quadrillion degrees. A tiny surplus of quarks over antiquarks survives — the seed of all future matter.",
+    scheme: "cosmic",
+    sourceRefs: [
+      {
+        ...bigBangTimelineSource,
+        note: "Quark Epoch from 10⁻¹² to 10⁻⁶ seconds; quarks and antiquarks annihilate, a surplus of about one quark per billion pairs persists (baryogenesis).",
+      },
+    ],
+  },
+  {
+    id: "hadron-epoch",
+    name: "Hadron Epoch",
+    startYear: QUARK_END,
+    endYear: HADRON_END,
+    exactStartTime: afterBigBangExact({
+      microseconds: 1n,
+      precision: "microsecond",
+    }),
+    exactEndTime: afterBigBangExact({
+      seconds: 1n,
+      precision: "second",
+    }),
+    color: "rgb(230, 122, 72)",
+    timeLabel: "10⁻⁶ s to 1 s after the Big Bang",
+    description:
+      "Quarks bind into protons and neutrons at roughly a trillion degrees. Neutrinos decouple and begin streaming freely through space.",
+    scheme: "cosmic",
+    sourceRefs: [
+      {
+        ...bigBangTimelineSource,
+        note: "Hadron Epoch from 10⁻⁶ to 1 second; quarks combine into hadrons (protons and neutrons), neutrinos decouple.",
+      },
+    ],
+  },
+  {
+    id: "lepton-epoch",
+    name: "Lepton Epoch",
+    startYear: HADRON_END,
+    endYear: LEPTON_END,
+    exactStartTime: afterBigBangExact({
+      seconds: 1n,
+      precision: "second",
+    }),
+    exactEndTime: afterBigBangExact({
+      minutes: 3n,
+      precision: "minute",
+    }),
+    color: "rgb(220, 92, 138)",
+    timeLabel: "1 s to 3 min after the Big Bang",
+    description:
+      "Electrons and positrons dominate, annihilating in pairs and releasing bursts of photons. A small excess of electrons survives.",
+    scheme: "cosmic",
+    sourceRefs: [
+      {
+        ...bigBangTimelineSource,
+        note: "Lepton Epoch from 1 second to 3 minutes; leptons and antileptons dominate, most annihilate into photons.",
+      },
+    ],
+  },
+  {
+    id: "big-bang-nucleosynthesis",
+    name: "Big Bang Nucleosynthesis",
+    startYear: LEPTON_END,
+    endYear: BBN_END,
+    exactStartTime: afterBigBangExact({
+      minutes: 3n,
+      precision: "minute",
+    }),
+    exactEndTime: afterBigBangExact({
+      minutes: 20n,
+      precision: "minute",
+    }),
+    color: "rgb(240, 176, 64)",
+    timeLabel: "3 to 20 min after the Big Bang",
+    description:
+      "Protons and neutrons fuse into hydrogen, helium, and traces of lithium — the first bout of nuclear fusion, before the universe cools too far for it to continue.",
+    scheme: "cosmic",
+    sourceRefs: [
+      {
+        ...bigBangTimelineSource,
+        note: "Nucleosynthesis from 3 to 20 minutes; protons and neutrons fuse into hydrogen, helium, and lithium nuclei.",
+      },
+    ],
+  },
+  {
+    id: "photon-epoch",
+    name: "Photon Epoch",
+    startYear: BBN_END,
+    endYear: PHOTON_END,
+    exactStartTime: afterBigBangExact({
+      minutes: 20n,
+      precision: "minute",
+    }),
+    exactEndTime: afterBigBangExact({
+      years: 240_000n,
+      precision: "year",
+    }),
+    color: "rgb(192, 198, 74)",
+    timeLabel: "20 min to 240,000 yr after the Big Bang",
+    description:
+      "A hot, opaque plasma of atomic nuclei and electrons fills the expanding universe, with photons scattering endlessly off charged particles.",
+    scheme: "cosmic",
+    sourceRefs: [
+      {
+        ...bigBangTimelineSource,
+        note: "Photon Epoch (Radiation Domination) from 3 minutes to 240,000 years; universe filled with hot opaque plasma, photon energy dominates. Displayed here from 20 minutes onward (after nucleosynthesis) for non-overlapping layout.",
+      },
+    ],
+  },
+  {
+    id: "recombination",
+    name: "Recombination",
+    startYear: PHOTON_END,
+    endYear: RECOMBINATION_END,
+    exactStartTime: afterBigBangExact({
+      years: 240_000n,
+      precision: "year",
+    }),
+    exactEndTime: afterBigBangExact({
+      years: 300_000n,
+      precision: "year",
+    }),
+    color: "rgb(88, 194, 228)",
+    timeLabel: "240,000 to 300,000 yr after the Big Bang",
+    description:
+      "Electrons settle into the first neutral atoms. The universe turns transparent, releasing the light we detect today as the cosmic microwave background.",
+    scheme: "cosmic",
+    sourceRefs: [
+      {
+        ...bigBangTimelineSource,
+        note: "Recombination/Decoupling from 240,000 to 300,000 years; hydrogen and helium atoms capture electrons, universe becomes transparent, CMB photons released.",
+      },
+    ],
+  },
+];
+
+export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
+  ...EARLY_UNIVERSE_CHILDREN,
+  {
     id: "dark-ages",
     name: "Dark Ages",
-    startYear: EARLY_UNIVERSE_END_YEAR,
+    startYear: RECOMBINATION_END,
     endYear: DARK_AGES_END_YEAR,
     description:
       "Neutral hydrogen fills a starless universe after recombination, before the first stars light up space.",

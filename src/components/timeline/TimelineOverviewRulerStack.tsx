@@ -3,7 +3,9 @@ import { type Era } from "../../lib/data/eras";
 import {
   formatOverviewRulerPercentageLabel,
   formatOverviewRulerSpanLabel,
+  OVERVIEW_RULER_DEFAULT_TIER_THRESHOLD_PX,
   OVERVIEW_RULER_FULL_TIMELINE_DOMAIN,
+  OVERVIEW_RULER_MIN_SPOTLIGHT_WIDTH,
   resolveAnchoredOverviewRulerTiers,
   resolveOverviewRulerTiers,
   type OverviewRulerDomain,
@@ -12,6 +14,8 @@ import {
 } from "../../lib/time/overviewRuler";
 import {
   getVisibleRange,
+  getVisibleRangePrecise,
+  subtractPreciseTimelineYears,
   type TimelineViewport,
 } from "../../lib/time/viewport";
 import { TimelineOverviewRuler } from "./TimelineOverviewRuler";
@@ -60,6 +64,14 @@ export function TimelineOverviewRulerStack({
     () => getVisibleRange(viewport, mainInnerWidth),
     [mainInnerWidth, viewport],
   );
+  const preciseVisibleSpan = useMemo(() => {
+    const [precStart, precEnd] = getVisibleRangePrecise(viewport, mainInnerWidth);
+    return Math.abs(subtractPreciseTimelineYears(precEnd, precStart));
+  }, [mainInnerWidth, viewport]);
+  const addTierThresholdPx = Math.max(
+    tierOptions?.addTierThresholdPx ?? OVERVIEW_RULER_DEFAULT_TIER_THRESHOLD_PX,
+    1,
+  );
   const baseTiers = useMemo(
     () =>
       resolveOverviewRulerTiers(
@@ -100,11 +112,12 @@ export function TimelineOverviewRulerStack({
         const isRoot = index === 0;
         // Root tier stays visually on top; deeper tiers stack beneath it.
         const top = index * tierHeight;
-        const tierSpanLabel = formatOverviewRulerSpanLabel(
-          tier.spotlightEndYear - tier.spotlightStartYear,
-        );
+        const tierSpanYears = tier.isFinalTier
+          ? preciseVisibleSpan
+          : tier.spotlightEndYear - tier.spotlightStartYear;
+        const tierSpanLabel = formatOverviewRulerSpanLabel(tierSpanYears);
         const tierPercentageLabel = formatOverviewRulerPercentageLabel(
-          tier.spotlightEndYear - tier.spotlightStartYear,
+          tierSpanYears,
           totalSpanYears,
         );
 
@@ -165,6 +178,11 @@ export function TimelineOverviewRulerStack({
               onViewportChange={onViewportChange}
               pad={pad}
               spotlightEndYear={tier.spotlightEndYear}
+              spotlightMinDisplayWidth={
+                tier.isFinalTier
+                  ? OVERVIEW_RULER_MIN_SPOTLIGHT_WIDTH
+                  : addTierThresholdPx
+              }
               spotlightStartYear={tier.spotlightStartYear}
               viewport={viewport}
               width={width}

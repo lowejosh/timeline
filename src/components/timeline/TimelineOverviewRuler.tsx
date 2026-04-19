@@ -7,10 +7,9 @@ import {
 } from "react";
 import { type Era } from "../../lib/data/eras";
 import {
-  getOverviewRulerBounds,
   getOverviewRulerYearsPerPixel,
   mapOverviewRulerXToYear,
-  mapOverviewRulerYearToX,
+  resolveOverviewRulerBandRect,
   resolveOverviewRulerSpotlight,
   type OverviewRulerDomain,
 } from "../../lib/time/overviewRuler";
@@ -32,6 +31,7 @@ type TimelineOverviewRulerProps = {
   domain: OverviewRulerDomain;
   spotlightStartYear: number;
   spotlightEndYear: number;
+  spotlightMinDisplayWidth?: number;
   viewport: TimelineViewport;
   mainInnerWidth: number;
   isFollowingDrag?: boolean;
@@ -52,6 +52,7 @@ type DragState = {
 
 const KEYBOARD_PAN_PIXELS = 120;
 const MIN_RENDERABLE_BAND_WIDTH = 0.5;
+const SPOTLIGHT_SHADE_EDGE_OVERLAP = 0.5;
 
 function withViewportCenterYear(
   viewport: TimelineViewport,
@@ -79,6 +80,7 @@ export function TimelineOverviewRuler({
   domain,
   spotlightStartYear,
   spotlightEndYear,
+  spotlightMinDisplayWidth,
   viewport,
   mainInnerWidth,
   isFollowingDrag = false,
@@ -98,12 +100,9 @@ export function TimelineOverviewRuler({
         domain,
         width,
         pad,
+        spotlightMinDisplayWidth,
       ),
-    [domain, pad, spotlightEndYear, spotlightStartYear, width],
-  );
-  const bounds = useMemo(
-    () => getOverviewRulerBounds(width, pad),
-    [pad, width],
+    [domain, pad, spotlightEndYear, spotlightMinDisplayWidth, spotlightStartYear, width],
   );
   const yearsPerPixel = useMemo(
     () => getOverviewRulerYearsPerPixel(domain, width, pad),
@@ -111,34 +110,18 @@ export function TimelineOverviewRuler({
   );
   const bandRects = useMemo(
     () =>
-      eras.map((era) => {
-        const left = mapOverviewRulerYearToX(era.startYear, domain, width, pad);
-        const right = mapOverviewRulerYearToX(era.endYear, domain, width, pad);
-        const bandStart = Math.min(left, right);
-        const bandEnd = Math.max(left, right);
-        const clampedStart = Math.min(
-          Math.max(bandStart, bounds.left),
-          bounds.right,
-        );
-        const clampedEnd = Math.min(
-          Math.max(bandEnd, bounds.left),
-          bounds.right,
-        );
-        const availableWidth = Math.max(bounds.right - clampedStart, 0);
-        const bandWidth =
-          availableWidth <= 0
-            ? 0
-            : Math.min(Math.max(clampedEnd - clampedStart, 1), availableWidth);
-        const visibleBandWidth =
-          bandWidth >= MIN_RENDERABLE_BAND_WIDTH ? bandWidth : 0;
-
-        return {
-          era,
-          left: clampedStart,
-          width: visibleBandWidth,
-        };
-      }),
-    [bounds.left, bounds.right, domain, eras, pad, width],
+      eras.map((era) => ({
+        era,
+        rect: resolveOverviewRulerBandRect(
+          era.startYear,
+          era.endYear,
+          domain,
+          width,
+          pad,
+          MIN_RENDERABLE_BAND_WIDTH,
+        ),
+      })),
+    [domain, eras, pad, width],
   );
 
   const recenterToYear = (targetYear: number) => {
@@ -240,9 +223,15 @@ export function TimelineOverviewRuler({
     }
   };
 
-  const leftShadeWidth = Math.max(spotlight.displayLeft - pad, 0);
-  const rightShadeLeft = spotlight.displayRight;
-  const rightShadeWidth = Math.max(width - pad - spotlight.displayRight, 0);
+  const leftShadeWidth = Math.max(
+    spotlight.displayLeft - pad - SPOTLIGHT_SHADE_EDGE_OVERLAP,
+    0,
+  );
+  const rightShadeLeft = Math.min(
+    Math.max(spotlight.displayRight + SPOTLIGHT_SHADE_EDGE_OVERLAP, pad),
+    width - pad,
+  );
+  const rightShadeWidth = Math.max(width - pad - rightShadeLeft, 0);
 
   return (
     <div className="timeline-overview-ruler" style={{ height }}>
@@ -264,15 +253,15 @@ export function TimelineOverviewRuler({
           className="timeline-overview-ruler__strip"
           style={{ left: pad, right: pad }}
         />
-        {bandRects.map(({ era, left, width: bandWidth }) => (
-          bandWidth > 0 ? (
+        {bandRects.map(({ era, rect }) => (
+          rect ? (
           <div
             className="timeline-overview-ruler__band"
             key={era.id}
             style={{
               backgroundColor: era.color,
-              left,
-              width: bandWidth,
+              left: rect.left,
+              width: rect.width,
             }}
           />
           ) : null

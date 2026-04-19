@@ -26,19 +26,39 @@ export const MAX_ZOOM = 80;
 export const BASE_YEARS_PER_PIXEL = 50_000_000;
 export const HOME_RANGE: [number, number] = [1500, TIMELINE_MAX_YEAR];
 const DAYS_PER_YEAR = 365.2425;
-export const MIN_VISIBLE_RANGE_DAYS = 2;
-export const MAX_ZOOM_DAY_TICK_SPACING_PX = 120;
+const HOURS_PER_DAY = 24;
+const SECONDS_PER_HOUR = 3600;
+const MICROSECONDS_PER_SECOND = 1_000_000;
+const MICROSECONDS_PER_HOUR = SECONDS_PER_HOUR * MICROSECONDS_PER_SECOND;
+export const MIN_VISIBLE_RANGE_MICROSECONDS = 1;
+export const MAX_ZOOM_MICROSECOND_TICK_SPACING_PX = 1200;
+export const MIN_VISIBLE_RANGE_HOURS =
+  MIN_VISIBLE_RANGE_MICROSECONDS / MICROSECONDS_PER_HOUR;
+export const MAX_ZOOM_HOUR_TICK_SPACING_PX =
+  MAX_ZOOM_MICROSECOND_TICK_SPACING_PX * MICROSECONDS_PER_HOUR;
+export const MIN_VISIBLE_RANGE_DAYS = MIN_VISIBLE_RANGE_HOURS / HOURS_PER_DAY;
+export const MAX_ZOOM_DAY_TICK_SPACING_PX =
+  MAX_ZOOM_HOUR_TICK_SPACING_PX * HOURS_PER_DAY;
 const PRECISION_YEARS_PER_PIXEL_FACTOR = 2;
+const PRIMORDIAL_PRECISION_YEARS_PER_PIXEL_FACTOR = 0.125;
 
 export { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "./timelineYears";
 
-export function getMinVisibleRangeDaysForWidth(width: number) {
+export function getMinVisibleRangeMicrosecondsForWidth(width: number) {
   const safeWidth = Math.max(width, 1);
 
   return Math.max(
-    MIN_VISIBLE_RANGE_DAYS,
-    safeWidth / MAX_ZOOM_DAY_TICK_SPACING_PX,
+    MIN_VISIBLE_RANGE_MICROSECONDS,
+    safeWidth / MAX_ZOOM_MICROSECOND_TICK_SPACING_PX,
   );
+}
+
+export function getMinVisibleRangeHoursForWidth(width: number) {
+  return getMinVisibleRangeMicrosecondsForWidth(width) / MICROSECONDS_PER_HOUR;
+}
+
+export function getMinVisibleRangeDaysForWidth(width: number) {
+  return getMinVisibleRangeHoursForWidth(width) / HOURS_PER_DAY;
 }
 
 function getMinVisibleRangeYearsForWidth(width: number) {
@@ -195,8 +215,12 @@ export function getViewportPrecisionLimitedYearsPerPixel(
 ) {
   const centerYear = getViewportCenterYear(viewport);
   const localMagnitude = Math.max(Math.abs(centerYear.fraction), 1);
+  const precisionFactor =
+    centerYear.wholeYear === Math.floor(TIMELINE_MIN_YEAR)
+      ? PRIMORDIAL_PRECISION_YEARS_PER_PIXEL_FACTOR
+      : PRECISION_YEARS_PER_PIXEL_FACTOR;
 
-  return localMagnitude * Number.EPSILON * PRECISION_YEARS_PER_PIXEL_FACTOR;
+  return localMagnitude * Number.EPSILON * precisionFactor;
 }
 
 export function getMaxZoomForViewport(
