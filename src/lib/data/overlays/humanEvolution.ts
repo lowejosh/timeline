@@ -110,7 +110,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Kenyanthropus platyops",
     shortLabel: "Kenyanthropus",
     description:
-      "A debated flat-faced 3.5 million-year-old Kenyan branch that may represent real diversity—or a distorted skull.",
+      "A debated flat-faced 3.5 million-year-old Kenyan branch that may represent real diversity, or a distorted skull.",
     startYear: yearsAgo(3_550_000),
     endYear: yearsAgo(3_450_000),
     approximateStart: true,

@@ -68,7 +68,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     color: "rgb(74, 46, 132)",
     timeLabel: "0 to 10⁻⁴³ s after the Big Bang",
     description:
-      "All four fundamental forces are unified. The observable universe spans one Planck length at over 10³² °C — the hottest moment in existence.",
+      "All four fundamental forces are unified. The observable universe spans one Planck length at over 10³² °C, the hottest moment in existence.",
     scheme: "cosmic",
     sourceRefs: [
       {
@@ -148,7 +148,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     color: "rgb(182, 82, 208)",
     timeLabel: "10⁻¹² to 10⁻⁶ s after the Big Bang",
     description:
-      "Quarks, electrons, and neutrinos fill the cooling universe below 10 quadrillion degrees. A tiny surplus of quarks over antiquarks survives — the seed of all future matter.",
+      "Quarks, electrons, and neutrinos fill the cooling universe below 10 quadrillion degrees. A tiny surplus of quarks over antiquarks survives, becoming the seed of all future matter.",
     scheme: "cosmic",
     sourceRefs: [
       {
@@ -229,7 +229,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     color: "rgb(240, 176, 64)",
     timeLabel: "3 to 20 min after the Big Bang",
     description:
-      "Protons and neutrons fuse into hydrogen, helium, and traces of lithium — the first bout of nuclear fusion, before the universe cools too far for it to continue.",
+      "Protons and neutrons fuse into hydrogen, helium, and traces of lithium in the first bout of nuclear fusion, before the universe cools too far for it to continue.",
     scheme: "cosmic",
     sourceRefs: [
       {
