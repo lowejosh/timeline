@@ -101,13 +101,11 @@ export function getAllowedAxisLabelSteps(
             entry.maxWidth + SUBYEAR_LABEL_MIN_CLEARANCE_PX,
       )
       .sort(
-        (left, right) =>
-          left.step - right.step || right.score - left.score,
+        (left, right) => left.step - right.step || right.score - left.score,
       );
     const preferredEntry = pickPreferredEntry(
       entries.sort(
-        (left, right) =>
-          right.score - left.score || right.step - left.step,
+        (left, right) => right.score - left.score || right.step - left.step,
       ),
       readableEntries,
     );
@@ -115,8 +113,7 @@ export function getAllowedAxisLabelSteps(
     allowedSteps.add(preferredEntry.step);
 
     const sortedReadableEntries = [...readableEntries].sort(
-      (left, right) =>
-        right.score - left.score || right.step - left.step,
+      (left, right) => right.score - left.score || right.step - left.step,
     );
 
     for (const entry of sortedReadableEntries) {

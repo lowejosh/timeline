@@ -911,6 +911,21 @@ function getCalendarAxisLabelText(
   };
 }
 
+function getCalendarEdgeAxisLabelText(
+  year: number | PreciseTimelineYear,
+  step: number,
+) {
+  const label = getCalendarAxisLabelText(year, step);
+
+  return {
+    text: label.text,
+    secondaryText:
+      step < CALENDAR_DAY_STEP
+        ? `${label.secondaryText ?? formatTimelineDateLabel(year, CALENDAR_DAY_STEP)} · ${formatTimelineYear(year, 1)}`
+        : formatTimelineYear(year, 1),
+  };
+}
+
 const TICK_SCALE_LOG_MIN = Math.log(3);
 const TICK_SCALE_LOG_RANGE = Math.log(8_000) - TICK_SCALE_LOG_MIN;
 
@@ -2903,10 +2918,6 @@ export function TimelineCanvas({
         useBigBangElapsedLabels
           ? formatTimelineElapsedAxisLabel(year, step, "after-big-bang")
           : formatTimelineYear(year, step, { mode: "axis" });
-      const formatAxisDate = (
-        year: number | PreciseTimelineYear,
-        step: number,
-      ) => formatTimelineDateLabel(year, step);
       const formatElapsedAxisLabel = (
         year: number | PreciseTimelineYear,
         step: number,
@@ -3021,16 +3032,14 @@ export function TimelineCanvas({
         context.textBaseline = "top";
 
         if (useCalendarSubYearAxis) {
+          const edgeLabel = getCalendarEdgeAxisLabelText(year, edgeLabelStep);
+
           context.globalAlpha = 0.9;
           context.font = SUBYEAR_PRIMARY_FONT;
-          context.fillText(
-            formatAxisDate(year, edgeLabelStep),
-            x,
-            layout.dateLabelY,
-          );
+          context.fillText(edgeLabel.text, x, layout.dateLabelY);
           context.globalAlpha = 0.72;
           context.font = SUBYEAR_SECONDARY_FONT;
-          context.fillText(formatTimelineYear(year, 1), x, layout.yearLabelY);
+          context.fillText(edgeLabel.secondaryText, x, layout.yearLabelY);
         } else if (useElapsedSubYearAxis) {
           const edgeLabel = formatElapsedAxisLabel(year, edgeLabelStep);
 
@@ -3169,7 +3178,7 @@ export function TimelineCanvas({
           x: pad,
           ...(() => {
             if (useCalendarSubYearAxis) {
-              return getCalendarAxisLabelText(
+              return getCalendarEdgeAxisLabelText(
                 edgeLeftPreciseYear,
                 edgeLabelStep,
               );
@@ -3198,7 +3207,7 @@ export function TimelineCanvas({
           x: sceneWidth - pad,
           ...(() => {
             if (useCalendarSubYearAxis) {
-              return getCalendarAxisLabelText(
+              return getCalendarEdgeAxisLabelText(
                 edgeRightPreciseYear,
                 edgeLabelStep,
               );

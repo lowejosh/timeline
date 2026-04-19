@@ -47,8 +47,9 @@ export type TimelineTicks = {
 const numberFormatter = new Intl.NumberFormat("en-US");
 const AVERAGE_DAYS_PER_YEAR = 365.2425;
 export const YEARS_AGO_CUTOFF = 15_000;
-export const BCE_YEARS_AGO_HANDOFF_YEAR =
-  getTimelineYearFromYearsAgo(YEARS_AGO_CUTOFF);
+export const BCE_YEARS_AGO_HANDOFF_YEAR = getTimelineYearFromYearsAgo(
+  YEARS_AGO_CUTOFF,
+);
 export const TIMELINE_DATE_REFERENCE_DOMINANCE_THRESHOLD = 0.85;
 const ELAPSED_ZERO_EPSILON = 1e-18;
 const HOURS_PER_DAY = 24;

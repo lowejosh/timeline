@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { getTimelineYearFromUtcParts } from "../bands";
 import { resolveAxisTickRenderStates } from "../axisTickStates";
 import {
   getTimelineYearFromYearsAgo,
@@ -28,6 +29,48 @@ function getTimelineDateFromYear(year: number) {
   const end = getTimelineYearStart(wholeYear + 1);
 
   return new Date(start + fraction * (end - start));
+}
+
+function getTickDate(state: {
+  year: number;
+  wholeYear?: number;
+  yearFraction?: number;
+}) {
+  return getTimelineDateFromYear(
+    state.wholeYear !== undefined && state.yearFraction !== undefined
+      ? state.wholeYear + state.yearFraction
+      : state.year,
+  );
+}
+
+function expectUtcTimeAlignedToStep(
+  state: {
+    step: number;
+    year: number;
+    wholeYear?: number;
+    yearFraction?: number;
+  },
+  minimumUnitMs: number,
+) {
+  const date = getTickDate(state);
+  const millisecondsSinceMidnight =
+    date.getUTCHours() * 60 * 60 * 1000 +
+    date.getUTCMinutes() * 60 * 1000 +
+    date.getUTCSeconds() * 1000 +
+    date.getUTCMilliseconds();
+  const stepMilliseconds = Math.max(
+    minimumUnitMs,
+    Math.round(state.step * 365.2425 * DAY_IN_MS),
+  );
+  const remainder =
+    ((millisecondsSinceMidnight % stepMilliseconds) + stepMilliseconds) %
+    stepMilliseconds;
+  const distanceToAlignment = Math.min(
+    remainder,
+    stepMilliseconds - remainder,
+  );
+
+  expect(distanceToAlignment).toBeLessThanOrEqual(1);
 }
 
 function getTickStatesAtYear(year: number, span: number, width = 1000) {
@@ -196,14 +239,35 @@ describe("axis tick render states", () => {
     }
   });
 
-  it("does not resolve sub-day steps for narrow calendar ranges", () => {
+  it("resolves calendar sub-day label steps at sufficiently narrow zoom", () => {
+    const start = getTimelineYearFromUtcParts(2015, 7, 20, 0, 0);
+    const end = getTimelineYearFromUtcParts(2015, 7, 28, 12, 0);
     const yearsPerDay = 1 / 365.2425;
-    const states = resolveAxisTickRenderStates(2025.57, 2025.58, 1_200);
-
-    expect(states.length).toBeGreaterThan(0);
-    expect(states.every((state) => state.step >= yearsPerDay - 1e-12)).toBe(
-      true,
+    const states = resolveAxisTickRenderStates(start, end, 1_800);
+    const labeledSubDayStates = states.filter(
+      (state) => state.labelOpacity > 0.01 && state.step < yearsPerDay - 1e-12,
     );
+
+    expect(labeledSubDayStates.length).toBeGreaterThan(0);
+
+    for (const state of labeledSubDayStates) {
+      expectUtcTimeAlignedToStep(state, 60 * 60 * 1000);
+    }
+  });
+
+  it("snaps calendar minute ticks to exact minute boundaries when deeply zoomed", () => {
+    const start = getTimelineYearFromUtcParts(2015, 7, 20, 0, 0);
+    const end = getTimelineYearFromUtcParts(2015, 7, 20, 3, 0);
+    const yearsPerHour = 1 / 365.2425 / 24;
+    const minuteStates = resolveAxisTickRenderStates(start, end, 1_800).filter(
+      (state) => state.step < yearsPerHour - 1e-12,
+    );
+
+    expect(minuteStates.length).toBeGreaterThan(0);
+
+    for (const state of minuteStates) {
+      expectUtcTimeAlignedToStep(state, 60 * 1000);
+    }
   });
 
   it("keeps discrete daily ticks across a deep Big Bang day span", () => {

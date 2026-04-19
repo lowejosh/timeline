@@ -54,7 +54,7 @@ type AxisStepDefinition =
     }
   | {
       kind: "calendar";
-      unit: "month" | "day";
+      unit: "month" | "day" | "hour" | "minute";
       count: number;
       step: number;
     }
@@ -113,7 +113,11 @@ const MAX_COARSER_CONTEXT_LAYERS = 2;
 const EPSILON = 1e-18;
 const DAY_IN_MS = 86_400_000;
 const AVERAGE_DAYS_PER_YEAR = 365.2425;
+const HOURS_PER_DAY = 24;
+const MINUTES_PER_HOUR = 60;
 const YEARS_PER_DAY = 1 / AVERAGE_DAYS_PER_YEAR;
+const YEARS_PER_HOUR = YEARS_PER_DAY / HOURS_PER_DAY;
+const YEARS_PER_MINUTE = YEARS_PER_HOUR / MINUTES_PER_HOUR;
 const LOGARITHMIC_GENERATION_REVEAL_START_PX = 200;
 const LOGARITHMIC_GENERATION_REVEAL_END_PX = 230;
 const CALENDAR_STEP_DEFINITIONS: readonly AxisStepDefinition[] = [
@@ -124,6 +128,29 @@ const CALENDAR_STEP_DEFINITIONS: readonly AxisStepDefinition[] = [
   { kind: "calendar", unit: "day", count: 7, step: 7 * YEARS_PER_DAY },
   { kind: "calendar", unit: "day", count: 2, step: 2 * YEARS_PER_DAY },
   { kind: "calendar", unit: "day", count: 1, step: YEARS_PER_DAY },
+  { kind: "calendar", unit: "hour", count: 12, step: 12 * YEARS_PER_HOUR },
+  { kind: "calendar", unit: "hour", count: 6, step: 6 * YEARS_PER_HOUR },
+  { kind: "calendar", unit: "hour", count: 3, step: 3 * YEARS_PER_HOUR },
+  { kind: "calendar", unit: "hour", count: 1, step: YEARS_PER_HOUR },
+  {
+    kind: "calendar",
+    unit: "minute",
+    count: 30,
+    step: 30 * YEARS_PER_MINUTE,
+  },
+  {
+    kind: "calendar",
+    unit: "minute",
+    count: 15,
+    step: 15 * YEARS_PER_MINUTE,
+  },
+  {
+    kind: "calendar",
+    unit: "minute",
+    count: 5,
+    step: 5 * YEARS_PER_MINUTE,
+  },
+  { kind: "calendar", unit: "minute", count: 1, step: YEARS_PER_MINUTE },
 ] as const;
 const ELAPSED_DAY_STEP_DEFINITIONS: readonly AxisStepDefinition[] = [
   { kind: "elapsed-day", count: 180, step: 180 * YEARS_PER_DAY },
@@ -225,13 +252,15 @@ function getTimelineDateFromYear(year: number) {
   return new Date(start + fraction * (end - start));
 }
 
-function getTimelineYearFromDate(date: Date) {
-  const year = date.getUTCFullYear();
-  const start = getTimelineYearStart(year);
-  const end = getTimelineYearStart(year + 1);
-  const timelineYear = getTimelineYearFromAstronomicalYear(year);
+function getPreciseTimelineYearFromDate(date: Date): PreciseTimelineYear {
+  const astronomicalYear = date.getUTCFullYear();
+  const start = getTimelineYearStart(astronomicalYear);
+  const end = getTimelineYearStart(astronomicalYear + 1);
 
-  return timelineYear + (date.getTime() - start) / (end - start);
+  return normalizePreciseTimelineYear(
+    getTimelineYearFromAstronomicalYear(astronomicalYear),
+    (date.getTime() - start) / (end - start),
+  );
 }
 
 function getCalendarTicksForStep(
@@ -263,13 +292,14 @@ function getCalendarTicksForStep(
     const current = createTimelineUtcDate(firstYear, firstMonth, 1);
 
     while (current.getTime() <= endDate.getTime() + DAY_IN_MS * 0.5) {
-      const tickYear = getTimelineYearFromDate(current);
+      const preciseYear = getPreciseTimelineYearFromDate(current);
+      const tickYear = toApproximateTimelineYear(preciseYear);
 
       if (
         tickYear >= clampedStart - EPSILON &&
         tickYear <= clampedEnd + EPSILON
       ) {
-        ticks.push({ year: tickYear });
+        ticks.push({ year: tickYear, preciseYear });
       }
 
       current.setUTCMonth(current.getUTCMonth() + stepDefinition.count, 1);
@@ -280,30 +310,54 @@ function getCalendarTicksForStep(
   }
 
   const epoch = createTimelineUtcDate(1970, 0, 1);
-  const startOfDay = createTimelineUtcDate(
-    startDate.getUTCFullYear(),
-    startDate.getUTCMonth(),
-    startDate.getUTCDate(),
-  );
-  const startDayOffset = Math.floor(
-    (startOfDay.getTime() - epoch.getTime()) / DAY_IN_MS,
+  const unitMilliseconds =
+    stepDefinition.unit === "day"
+      ? DAY_IN_MS
+      : stepDefinition.unit === "hour"
+        ? DAY_IN_MS / HOURS_PER_DAY
+        : DAY_IN_MS / HOURS_PER_DAY / MINUTES_PER_HOUR;
+  const startOfUnit =
+    stepDefinition.unit === "day"
+      ? createTimelineUtcDate(
+          startDate.getUTCFullYear(),
+          startDate.getUTCMonth(),
+          startDate.getUTCDate(),
+        )
+      : stepDefinition.unit === "hour"
+        ? createTimelineUtcDate(
+            startDate.getUTCFullYear(),
+            startDate.getUTCMonth(),
+            startDate.getUTCDate(),
+            startDate.getUTCHours(),
+          )
+        : createTimelineUtcDate(
+            startDate.getUTCFullYear(),
+            startDate.getUTCMonth(),
+            startDate.getUTCDate(),
+            startDate.getUTCHours(),
+            startDate.getUTCMinutes(),
+          );
+  const startUnitOffset = Math.floor(
+    (startOfUnit.getTime() - epoch.getTime()) / unitMilliseconds,
   );
   const firstAlignedOffset =
-    Math.ceil(startDayOffset / stepDefinition.count) * stepDefinition.count;
-  const current = new Date(epoch.getTime() + firstAlignedOffset * DAY_IN_MS);
+    Math.ceil(startUnitOffset / stepDefinition.count) * stepDefinition.count;
+  const current = new Date(
+    epoch.getTime() + firstAlignedOffset * unitMilliseconds,
+  );
 
-  while (current.getTime() <= endDate.getTime() + DAY_IN_MS * 0.5) {
-    const tickYear = getTimelineYearFromDate(current);
+  while (current.getTime() <= endDate.getTime() + unitMilliseconds * 0.5) {
+    const preciseYear = getPreciseTimelineYearFromDate(current);
+    const tickYear = toApproximateTimelineYear(preciseYear);
 
     if (
       tickYear >= clampedStart - EPSILON &&
       tickYear <= clampedEnd + EPSILON
     ) {
-      ticks.push({ year: tickYear });
+      ticks.push({ year: tickYear, preciseYear });
     }
 
-    current.setUTCDate(current.getUTCDate() + stepDefinition.count);
-    current.setUTCHours(0, 0, 0, 0);
+    current.setTime(current.getTime() + stepDefinition.count * unitMilliseconds);
   }
 
   return ticks;
