@@ -42,7 +42,8 @@ const overviewRulerIntegerFormatter = new Intl.NumberFormat("en-US", {
 });
 
 function formatOverviewRulerScaledValue(value: number) {
-  const maximumFractionDigits = value >= 100 ? 0 : value >= 10 ? 1 : 2;
+  const maximumFractionDigits =
+    value >= 100 ? 0 : value >= 10 ? 1 : 2;
 
   return new Intl.NumberFormat("en-US", {
     maximumFractionDigits,
@@ -178,10 +179,7 @@ export function resolveOverviewRulerTiers(
     options.addTierThresholdPx ?? OVERVIEW_RULER_DEFAULT_TIER_THRESHOLD_PX,
     1,
   );
-  const maxTiers = Math.max(
-    options.maxTiers ?? OVERVIEW_RULER_DEFAULT_MAX_TIERS,
-    1,
-  );
+  const maxTiers = Math.max(options.maxTiers ?? OVERVIEW_RULER_DEFAULT_MAX_TIERS, 1);
   const bounds = getOverviewRulerBounds(width, pad);
   const orderedVisibleStart = Math.min(visibleStartYear, visibleEndYear);
   const orderedVisibleEnd = Math.max(visibleStartYear, visibleEndYear);
@@ -192,8 +190,7 @@ export function resolveOverviewRulerTiers(
   for (let index = 0; index < maxTiers; index += 1) {
     const domainSpan = getDomainSpan(domain);
     const yearsPerPx = domainSpan / bounds.innerWidth;
-    const actualPx =
-      yearsPerPx > 0 ? visibleSpan / yearsPerPx : bounds.innerWidth;
+    const actualPx = yearsPerPx > 0 ? visibleSpan / yearsPerPx : bounds.innerWidth;
     const isLastSlot = index === maxTiers - 1;
     const visibleFitsInThisTier = actualPx >= addTierThresholdPx;
 
@@ -215,10 +212,7 @@ export function resolveOverviewRulerTiers(
       break;
     }
 
-    const frozenYearSpan = Math.min(
-      addTierThresholdPx * yearsPerPx,
-      domainSpan,
-    );
+    const frozenYearSpan = Math.min(addTierThresholdPx * yearsPerPx, domainSpan);
     const visibleCenter = (orderedVisibleStart + orderedVisibleEnd) / 2;
     let spotStart = visibleCenter - frozenYearSpan / 2;
     let spotEnd = spotStart + frozenYearSpan;
@@ -302,4 +296,38 @@ export function formatOverviewRulerSpanLabel(spanYears: number) {
   }
 
   return "<1 years";
+}
+
+export function formatOverviewRulerPercentageLabel(
+  highlightedSpanYears: number,
+  totalSpanYears: number,
+) {
+  const safeHighlightedSpanYears = Math.max(Math.abs(highlightedSpanYears), 1e-18);
+  const safeTotalSpanYears = Math.max(Math.abs(totalSpanYears), safeHighlightedSpanYears);
+  const percentage = (safeHighlightedSpanYears / safeTotalSpanYears) * 100;
+  const maximumFractionDigits =
+    percentage >= 10
+      ? 1
+      : percentage >= 0.1
+        ? 2
+        : percentage >= 0.01
+          ? 3
+          : percentage >= 0.001
+            ? 4
+            : percentage >= 0.0001
+              ? 6
+              : 8;
+  const minimumVisiblePercentage = 10 ** -maximumFractionDigits;
+
+  if (percentage > 0 && percentage < minimumVisiblePercentage) {
+    return `<${new Intl.NumberFormat("en-US", {
+      maximumFractionDigits,
+      minimumFractionDigits: 0,
+    }).format(minimumVisiblePercentage)}%`;
+  }
+
+  return `${new Intl.NumberFormat("en-US", {
+    maximumFractionDigits,
+    minimumFractionDigits: 0,
+  }).format(percentage)}%`;
 }

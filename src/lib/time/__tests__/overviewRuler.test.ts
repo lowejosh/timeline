@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatOverviewRulerPercentageLabel,
   formatOverviewRulerSpanLabel,
   OVERVIEW_RULER_FULL_TIMELINE_DOMAIN,
   OVERVIEW_RULER_MIN_SPOTLIGHT_WIDTH,
@@ -19,6 +20,21 @@ describe("overview ruler geometry", () => {
   it("formats overview span labels compactly across scales", () => {
     expect(formatOverviewRulerSpanLabel(575)).toBe("575 years");
     expect(formatOverviewRulerSpanLabel(2_580_000)).toBe("2.58M years");
+  });
+
+  it("formats overview percentage labels compactly across scales", () => {
+    expect(formatOverviewRulerPercentageLabel(92_500_000, 13_800_000_000)).toBe(
+      "0.67%",
+    );
+    expect(formatOverviewRulerPercentageLabel(620_000, 13_800_000_000)).toBe(
+      "0.0045%",
+    );
+    expect(formatOverviewRulerPercentageLabel(574, 13_800_000_000)).toBe(
+      "0.00000416%",
+    );
+    expect(formatOverviewRulerPercentageLabel(0.5, 13_800_000_000)).toBe(
+      "<0.00000001%",
+    );
   });
 
   it("maps the full timeline range onto the padded strip", () => {
@@ -67,14 +83,12 @@ describe("overview ruler geometry", () => {
     const subDomain = { startYear: 1000, endYear: 2000 };
     const bounds = getOverviewRulerBounds(width, pad);
 
-    expect(mapOverviewRulerYearToX(1500, subDomain, width, pad)).toBeCloseTo(
-      bounds.left + bounds.innerWidth / 2,
-      6,
-    );
-    expect(mapOverviewRulerYearToX(2000, subDomain, width, pad)).toBeCloseTo(
-      bounds.right,
-      6,
-    );
+    expect(
+      mapOverviewRulerYearToX(1500, subDomain, width, pad),
+    ).toBeCloseTo(bounds.left + bounds.innerWidth / 2, 6);
+    expect(
+      mapOverviewRulerYearToX(2000, subDomain, width, pad),
+    ).toBeCloseTo(bounds.right, 6);
   });
 
   it("enforces a one-pixel minimum spotlight display width for deep zoom", () => {
@@ -162,7 +176,8 @@ describe("overview ruler tier chain", () => {
     expect(firstTier.isFinalTier).toBe(false);
     expect(firstTier.domain).toEqual(FULL_DOMAIN);
 
-    const fullDomainSpan = FULL_DOMAIN.endYear - FULL_DOMAIN.startYear;
+    const fullDomainSpan =
+      FULL_DOMAIN.endYear - FULL_DOMAIN.startYear;
     const expectedFrozenSpan = (10 / innerWidth) * fullDomainSpan;
     const frozenSpan =
       firstTier.spotlightEndYear - firstTier.spotlightStartYear;
@@ -192,7 +207,10 @@ describe("overview ruler tier chain", () => {
         previous.spotlightStartYear,
         6,
       );
-      expect(current.domain.endYear).toBeCloseTo(previous.spotlightEndYear, 6);
+      expect(current.domain.endYear).toBeCloseTo(
+        previous.spotlightEndYear,
+        6,
+      );
     }
   });
 

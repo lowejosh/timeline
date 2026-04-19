@@ -232,6 +232,9 @@ describe("era data", () => {
     const rootChildIds = ROOT_ERA.children?.map((era) => era.id) ?? [];
     const bronzeAge = ROOT_ERA.children?.find((era) => era.id === "bronze-age");
     const ironAge = ROOT_ERA.children?.find((era) => era.id === "iron-age");
+    const contemporary = ROOT_ERA.children?.find(
+      (era) => era.id === "contemporary-history",
+    );
 
     expect(rootChildIds).toEqual(
       expect.arrayContaining([
@@ -260,6 +263,11 @@ describe("era data", () => {
       "early-iron-age",
       "middle-iron-age",
       "late-iron-age",
+    ]);
+    expect(contemporary?.children?.map((era) => era.id)).toEqual([
+      "postwar-order",
+      "cold-war-and-decolonization",
+      "digital-age",
     ]);
   });
 });

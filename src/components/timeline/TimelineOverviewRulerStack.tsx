@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type Era } from "../../lib/data/eras";
 import {
+  formatOverviewRulerPercentageLabel,
   formatOverviewRulerSpanLabel,
   OVERVIEW_RULER_FULL_TIMELINE_DOMAIN,
   resolveAnchoredOverviewRulerTiers,
@@ -88,6 +89,7 @@ export function TimelineOverviewRulerStack({
   }, [baseTiers, dragAnchor, pad, tierOptions, visibleRange, width]);
 
   const stackHeight = Math.max(tiers.length, 1) * tierHeight;
+  const totalSpanYears = fullDomain.endYear - fullDomain.startYear;
 
   return (
     <div
@@ -101,6 +103,10 @@ export function TimelineOverviewRulerStack({
         const tierSpanLabel = formatOverviewRulerSpanLabel(
           tier.spotlightEndYear - tier.spotlightStartYear,
         );
+        const tierPercentageLabel = formatOverviewRulerPercentageLabel(
+          tier.spotlightEndYear - tier.spotlightStartYear,
+          totalSpanYears,
+        );
 
         return (
           <div
@@ -112,6 +118,15 @@ export function TimelineOverviewRulerStack({
               top,
             }}
           >
+            <div
+              aria-hidden="true"
+              className="timeline-overview-ruler-stack__tier-mag"
+              style={{ width: pad }}
+            >
+              <span className="timeline-overview-ruler-stack__tier-mag-value">
+                {tierPercentageLabel}
+              </span>
+            </div>
             <TimelineOverviewRuler
               domain={tier.domain}
               eras={eras}

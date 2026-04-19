@@ -7,6 +7,7 @@ import {
 } from "react";
 import { type Era } from "../../lib/data/eras";
 import {
+  getOverviewRulerBounds,
   getOverviewRulerYearsPerPixel,
   mapOverviewRulerXToYear,
   mapOverviewRulerYearToX,
@@ -50,6 +51,7 @@ type DragState = {
 };
 
 const KEYBOARD_PAN_PIXELS = 120;
+const MIN_RENDERABLE_BAND_WIDTH = 0.5;
 
 function withViewportCenterYear(
   viewport: TimelineViewport,
@@ -99,6 +101,10 @@ export function TimelineOverviewRuler({
       ),
     [domain, pad, spotlightEndYear, spotlightStartYear, width],
   );
+  const bounds = useMemo(
+    () => getOverviewRulerBounds(width, pad),
+    [pad, width],
+  );
   const yearsPerPixel = useMemo(
     () => getOverviewRulerYearsPerPixel(domain, width, pad),
     [domain, pad, width],
@@ -108,14 +114,31 @@ export function TimelineOverviewRuler({
       eras.map((era) => {
         const left = mapOverviewRulerYearToX(era.startYear, domain, width, pad);
         const right = mapOverviewRulerYearToX(era.endYear, domain, width, pad);
+        const bandStart = Math.min(left, right);
+        const bandEnd = Math.max(left, right);
+        const clampedStart = Math.min(
+          Math.max(bandStart, bounds.left),
+          bounds.right,
+        );
+        const clampedEnd = Math.min(
+          Math.max(bandEnd, bounds.left),
+          bounds.right,
+        );
+        const availableWidth = Math.max(bounds.right - clampedStart, 0);
+        const bandWidth =
+          availableWidth <= 0
+            ? 0
+            : Math.min(Math.max(clampedEnd - clampedStart, 1), availableWidth);
+        const visibleBandWidth =
+          bandWidth >= MIN_RENDERABLE_BAND_WIDTH ? bandWidth : 0;
 
         return {
           era,
-          left,
-          width: Math.max(right - left, 1),
+          left: clampedStart,
+          width: visibleBandWidth,
         };
       }),
-    [domain, eras, pad, width],
+    [bounds.left, bounds.right, domain, eras, pad, width],
   );
 
   const recenterToYear = (targetYear: number) => {
@@ -242,6 +265,7 @@ export function TimelineOverviewRuler({
           style={{ left: pad, right: pad }}
         />
         {bandRects.map(({ era, left, width: bandWidth }) => (
+          bandWidth > 0 ? (
           <div
             className="timeline-overview-ruler__band"
             key={era.id}
@@ -251,6 +275,7 @@ export function TimelineOverviewRuler({
               width: bandWidth,
             }}
           />
+          ) : null
         ))}
         <div
           className="timeline-overview-ruler__shade timeline-overview-ruler__shade--left"

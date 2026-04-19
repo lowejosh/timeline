@@ -1784,6 +1784,51 @@ export const ERA_SOURCES = {
     notes:
       "Used for the post-1945 Cold War as a period of geopolitical tension, nuclear rivalry, and space-race competition between blocs led by the United States and Soviet Union.",
   },
+  britannicaColdWar: {
+    shortTitle: "Britannica: Cold War",
+    title: "Cold War",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Cold War."',
+    url: "https://www.britannica.com/event/Cold-War",
+    notes:
+      "Used for the Cold War's 1947-1991 span, its emergence from the postwar settlement, its long superpower rivalry, and its eventual end with the Soviet collapse.",
+  },
+  unHistoryUnitedNations: {
+    shortTitle: "UN: History of the UN",
+    title: "History of the United Nations",
+    organization: "United Nations",
+    citation: 'United Nations, "History of the United Nations."',
+    url: "https://www.un.org/en/about-us/history-of-the-un",
+    notes:
+      "Used for the 1945 San Francisco Conference, the drafting and signing of the UN Charter, and the United Nations' official beginning on 24 October 1945 as a defining postwar institutional threshold.",
+  },
+  unUniversalDeclarationHumanRights: {
+    shortTitle: "UN: UDHR",
+    title: "Universal Declaration of Human Rights",
+    organization: "United Nations",
+    citation: 'United Nations, "Universal Declaration of Human Rights."',
+    url: "https://www.un.org/en/about-us/universal-declaration-of-human-rights",
+    notes:
+      "Used for the Universal Declaration of Human Rights being proclaimed by the UN General Assembly in Paris on 10 December 1948 as a common standard of achievement for all peoples and all nations.",
+  },
+  natoFoundingTreaty: {
+    shortTitle: "NATO: Founding treaty",
+    title: "Founding treaty",
+    organization: "North Atlantic Treaty Organization",
+    citation: 'North Atlantic Treaty Organization, "Founding treaty."',
+    url: "https://www.nato.int/cps/en/natohq/topics_67656.htm",
+    notes:
+      "Used for the North Atlantic Treaty being signed in Washington, D.C., on 4 April 1949 by 12 founding members and for collective defence being at the heart of the Alliance.",
+  },
+  historyMarshallPlan: {
+    shortTitle: "History: Marshall Plan",
+    title: "Marshall Plan",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Marshall Plan."',
+    url: "https://www.history.com/articles/marshall-plan",
+    notes:
+      "Used for postwar European reconstruction from 1948, including the rebuilding of cities, industries, and infrastructure, and for the plan's role in hardening early Cold War divisions.",
+  },
   historyPrintingPress: {
     shortTitle: "History: Printing Press",
     title: "Printing Press",
@@ -1819,6 +1864,100 @@ export const ERA_SOURCES = {
     url: "https://www.un.org/en/global-issues/decolonization",
     notes:
       "Used for decolonization after 1945, including the UN-backed wave of independence and self-determination that reshaped the modern world.",
+  },
+  unAntiColonialismDay: {
+    shortTitle: "UN: Anti-Colonialism Day",
+    title: "International Day Against Colonialism in All Its Forms and Manifestations",
+    organization: "United Nations",
+    citation:
+      'United Nations, "International Day Against Colonialism in All Its Forms and Manifestations."',
+    url: "https://www.un.org/en/observances/anti-colonialism-day",
+    notes:
+      "Used for the exact 14 December anniversary of Resolution 1514 (XV), the Declaration on the Granting of Independence to Colonial Countries and Peoples.",
+  },
+  historyStateFallCommunism: {
+    shortTitle: "State Dept: fall of communism",
+    title: "Fall of Communism in Eastern Europe, 1989",
+    organization: "U.S. Department of State, Office of the Historian",
+    citation:
+      'U.S. Department of State, Office of the Historian, "Fall of Communism in Eastern Europe, 1989."',
+    url: "https://history.state.gov/milestones/1989-1992/fall-of-communism",
+    notes:
+      "Used for the fall of the Berlin Wall on November 9, 1989 and for the wider 1989-1990 collapse of communist regimes in Eastern Europe, which helps frame the end of the Cold War order.",
+  },
+  britannicaSovietCollapse: {
+    shortTitle: "Britannica: Soviet collapse",
+    title: "collapse of the Soviet Union",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "collapse of the Soviet Union."',
+    url: "https://www.britannica.com/event/the-collapse-of-the-Soviet-Union",
+    notes:
+      "Used for the Soviet Union's formal dissolution on December 31, 1991, a clean boundary for the end of the Cold War world order.",
+  },
+  cernBirthWeb: {
+    shortTitle: "CERN: birth of the Web",
+    title: "The birth of the Web",
+    organization: "CERN",
+    citation: 'CERN, "The birth of the Web."',
+    url: "https://home.cern/science/computing/birth-web",
+    notes:
+      "Used for Tim Berners-Lee's invention of the World Wide Web in 1989 and CERN's decision on April 30, 1993 to place the software in the public domain, allowing the web to spread globally.",
+  },
+  britannicaYuriGagarin: {
+    shortTitle: "Britannica: Yuri Gagarin",
+    title: "Yuri Gagarin",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Yuri Gagarin."',
+    url: "https://www.britannica.com/biography/Yuri-Gagarin",
+    notes:
+      "Used for Yuri Gagarin's Vostok 1 flight on 12 April 1961, when he became the first human to travel into space and orbit Earth.",
+  },
+  historyStateCubanMissileCrisis: {
+    shortTitle: "State Dept: Cuban Missile Crisis",
+    title: "The Cuban Missile Crisis, October 1962",
+    organization: "U.S. Department of State, Office of the Historian",
+    citation:
+      'U.S. Department of State, Office of the Historian, "The Cuban Missile Crisis, October 1962."',
+    url: "https://history.state.gov/milestones/1961-1968/cuban-missile-crisis",
+    notes:
+      "Used for the Cuban Missile Crisis as the moment when the United States and Soviet Union came closest to nuclear conflict, and for Khrushchev's 28 October 1962 public statement that Soviet missiles would be dismantled and removed from Cuba.",
+  },
+  historySeptember11Attacks: {
+    shortTitle: "History: September 11 Attacks",
+    title: "September 11 Attacks",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "September 11 Attacks."',
+    url: "https://www.history.com/articles/9-11-attacks",
+    notes:
+      "Used for the 11 September 2001 attacks, in which al Qaeda terrorists hijacked four commercial airliners and struck the World Trade Center, the Pentagon, and rural Pennsylvania.",
+  },
+  investopediaLehmanCollapse: {
+    shortTitle: "Investopedia: Lehman collapse",
+    title: "Lehman Brothers Collapse Explained: Causes and Legacy",
+    organization: "Investopedia",
+    citation: 'Liodis, Nick, "Lehman Brothers Collapse Explained: Causes and Legacy." Investopedia.',
+    url: "https://www.investopedia.com/articles/economics/09/lehman-brothers-collapse.asp",
+    notes:
+      "Used for Lehman Brothers filing for bankruptcy on 15 September 2008 and for the firm's heavy exposure to subprime mortgages and mortgage-backed securities as a pivotal moment in the financial crisis.",
+  },
+  unParisAgreement: {
+    shortTitle: "UN: Paris Agreement",
+    title: "The Paris Agreement",
+    organization: "United Nations",
+    citation: 'United Nations, "The Paris Agreement."',
+    url: "https://www.un.org/en/climatechange/paris-agreement",
+    notes:
+      "Used for world leaders reaching the Paris Agreement at COP21 on 12 December 2015 and for the accord's goals of keeping warming well below 2°C while pursuing 1.5°C.",
+  },
+  whoCovid19Pandemic: {
+    shortTitle: "WHO: COVID-19 pandemic",
+    title: "Coronavirus disease (COVID-19) pandemic",
+    organization: "World Health Organization",
+    citation:
+      'World Health Organization, "Coronavirus disease (COVID-19) pandemic."',
+    url: "https://www.who.int/europe/emergencies/situations/covid-19",
+    notes:
+      "Used for WHO's statement that it declared a Public Health Emergency of International Concern on 30 January 2020 and characterized the outbreak as a pandemic on 11 March 2020.",
   },
   britannicaHaitianRevolution: {
     shortTitle: "Britannica: Haitian Revolution",

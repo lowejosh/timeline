@@ -1,8 +1,22 @@
 import type { EraDefinition } from "../timelineTypes";
 import { TIMELINE_MAX_YEAR } from "../../time/timelineYears";
+import {
+  createExactCalendarTimestamp,
+  getTimelineYearFromExactTimestamp,
+} from "../../time/exactTimestamp";
 import { bce, ce, yearsAgo } from "../timelineDateBuilders";
 
 const CURRENT_YEAR = TIMELINE_MAX_YEAR;
+const COLD_WAR_DIGITAL_AGE_HANDOFF_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1991,
+  month: 12,
+  day: 31,
+  precision: "day",
+});
+const COLD_WAR_DIGITAL_AGE_HANDOFF_YEAR = getTimelineYearFromExactTimestamp(
+  COLD_WAR_DIGITAL_AGE_HANDOFF_AT,
+);
 
 export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
   id: "human-history",
@@ -334,12 +348,75 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       endYear: CURRENT_YEAR,
       color: "rgb(0, 120, 100)",
       description:
-        "Post-1945 world of decolonization, the Cold War, and accelerating globalization.",
+        "Post-1945 world of decolonization, superpower rivalry, and rapidly networked global life.",
       scheme: "world-history",
       sourceRefs: [
         { sourceId: "unDecolonization" },
-        { sourceId: "historyColdWar" },
+        { sourceId: "britannicaColdWar" },
         { sourceId: "natGeoGlobalization" },
+      ],
+      children: [
+        {
+          id: "postwar-order",
+          name: "Postwar Order",
+          startYear: ce(1945),
+          endYear: ce(1960),
+          description:
+            "Reconstruction, new international institutions, and nuclear superpowers define the early postwar world.",
+          scheme: "world-history",
+          sourceRefs: [
+            {
+              sourceId: "unHistoryUnitedNations",
+              note: "The UN's history page places the San Francisco Conference and UN Charter in 1945, with the organization officially beginning on 24 October 1945 as a clear postwar institutional threshold.",
+            },
+            {
+              sourceId: "historyMarshallPlan",
+              note: "HISTORY describes the Marshall Plan, enacted in 1948, as a program to rebuild Western European cities, industries, and infrastructure after World War II.",
+            },
+            {
+              sourceId: "britannicaColdWar",
+              note: "Britannica says the Cold War emerged after World War II and had solidified by 1947-48, fitting this early postwar era of bloc formation and nuclear superpowers.",
+            },
+          ],
+        },
+        {
+          id: "cold-war-and-decolonization",
+          name: "Cold War & Decolonization",
+          startYear: ce(1960),
+          endYear: COLD_WAR_DIGITAL_AGE_HANDOFF_YEAR,
+          description:
+            "Independence movements redraw the map while proxy wars, ideology, and nuclear rivalry shape a divided world.",
+          scheme: "world-history",
+          sourceRefs: [
+            {
+              sourceId: "unDecolonization",
+              note: "The UN identifies its 1960 Declaration on the Granting of Independence to Colonial Countries and Peoples as a landmark acceleration point in global decolonization.",
+            },
+            {
+              sourceId: "britannicaColdWar",
+              note: "Britannica gives the Cold War a 1947-1991 span and describes the later decades of proxy conflict, detente, renewed tension, and final breakdown through 1991.",
+            },
+          ],
+        },
+        {
+          id: "digital-age",
+          name: "Digital Age",
+          startYear: COLD_WAR_DIGITAL_AGE_HANDOFF_YEAR,
+          endYear: CURRENT_YEAR,
+          description:
+            "The web, personal computing, and mobile networks tighten global connections across culture, finance, and politics.",
+          scheme: "world-history",
+          sourceRefs: [
+            {
+              sourceId: "natGeoGlobalization",
+              note: "National Geographic says globalization went into overdrive with the Information Age, when computer and communications technology redefined what it meant to be connected.",
+            },
+            {
+              sourceId: "cernBirthWeb",
+              note: "CERN dates the Web's invention to 1989 and its public-domain release to 1993, making it a core threshold technology for the modern digital era.",
+            },
+          ],
+        },
       ],
     },
   ],

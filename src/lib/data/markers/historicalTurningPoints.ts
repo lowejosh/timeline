@@ -15,6 +15,110 @@ const TITANIC_SINKS_AT = createExactCalendarTimestamp({
   precision: "minute",
 });
 
+const UN_DECOLONIZATION_DECLARATION_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1960,
+  month: 12,
+  day: 14,
+  precision: "day",
+});
+
+const BERLIN_WALL_FALLS_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1989,
+  month: 11,
+  day: 9,
+  precision: "day",
+});
+
+const SOVIET_UNION_DISSOLVES_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1991,
+  month: 12,
+  day: 31,
+  precision: "day",
+});
+
+const WORLD_WIDE_WEB_OPENED_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1993,
+  month: 4,
+  day: 30,
+  precision: "day",
+});
+
+const COVID_19_PANDEMIC_DECLARED_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 2020,
+  month: 3,
+  day: 11,
+  precision: "day",
+});
+
+const UNITED_NATIONS_FOUNDED_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1945,
+  month: 10,
+  day: 24,
+  precision: "day",
+});
+
+const UDHR_PROCLAIMED_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1948,
+  month: 12,
+  day: 10,
+  precision: "day",
+});
+
+const NATO_FOUNDED_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1949,
+  month: 4,
+  day: 4,
+  precision: "day",
+});
+
+const FIRST_HUMAN_IN_SPACE_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1961,
+  month: 4,
+  day: 12,
+  precision: "day",
+});
+
+const CUBAN_MISSILE_CRISIS_RESOLVED_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1962,
+  month: 10,
+  day: 28,
+  precision: "day",
+});
+
+const SEPTEMBER_11_ATTACKS_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 2001,
+  month: 9,
+  day: 11,
+  precision: "day",
+});
+
+const LEHMAN_BROTHERS_BANKRUPTCY_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 2008,
+  month: 9,
+  day: 15,
+  precision: "day",
+});
+
+const PARIS_AGREEMENT_ADOPTED_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 2015,
+  month: 12,
+  day: 12,
+  precision: "day",
+});
+
 export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
   {
     id: "gobekli-tepe-monuments",
@@ -374,16 +478,254 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     ],
   },
   {
+    id: "united-nations-founded",
+    label: "United Nations founded",
+    shortLabel: "United Nations Founded",
+    description:
+      "The United Nations officially began after the UN Charter had been ratified by China, France, the Soviet Union, the United Kingdom, the United States, and a majority of other signatories.",
+    year: getTimelineYearFromExactTimestamp(UNITED_NATIONS_FOUNDED_AT),
+    exactTime: UNITED_NATIONS_FOUNDED_AT,
+    dateLabel: "Oct 24, 1945",
+    minZoom: 20,
+    priority: 83,
+    sourceRefs: [
+      {
+        sourceId: "unHistoryUnitedNations",
+        note: "The UN says it officially began on 24 October 1945, after the Charter had been ratified by the major powers and a majority of other signatories.",
+      },
+    ],
+  },
+  {
+    id: "udhr-proclaimed",
+    label: "Universal Declaration of Human Rights proclaimed",
+    shortLabel: "UDHR Proclaimed",
+    description:
+      "The UN General Assembly proclaimed the Universal Declaration of Human Rights as a common standard of achievement for all peoples and all nations.",
+    year: getTimelineYearFromExactTimestamp(UDHR_PROCLAIMED_AT),
+    exactTime: UDHR_PROCLAIMED_AT,
+    dateLabel: "Dec 10, 1948",
+    minZoom: 20,
+    priority: 78,
+    sourceRefs: [
+      {
+        sourceId: "unUniversalDeclarationHumanRights",
+        note: "The UN says the General Assembly proclaimed the UDHR in Paris on 10 December 1948 as a common standard of achievement for all peoples and all nations.",
+      },
+    ],
+  },
+  {
+    id: "nato-founded",
+    label: "NATO founded",
+    shortLabel: "NATO",
+    description:
+      "Twelve countries signed the North Atlantic Treaty in Washington, D.C., establishing the alliance with collective defence at its heart.",
+    year: getTimelineYearFromExactTimestamp(NATO_FOUNDED_AT),
+    exactTime: NATO_FOUNDED_AT,
+    dateLabel: "Apr 4, 1949",
+    minZoom: 20,
+    priority: 80,
+    sourceRefs: [
+      {
+        sourceId: "natoFoundingTreaty",
+        note: "NATO says 12 countries signed the North Atlantic Treaty in Washington, D.C., on 4 April 1949 and that collective defence is at the heart of the Treaty.",
+      },
+    ],
+  },
+  {
+    id: "un-decolonization-declaration",
+    label: "UN decolonization declaration adopted",
+    shortLabel: "UN Decolonization Declaration",
+    description:
+      "The General Assembly adopted its landmark declaration affirming self-determination and calling for colonialism to be brought to a speedy and unconditional end.",
+    year: getTimelineYearFromExactTimestamp(UN_DECOLONIZATION_DECLARATION_AT),
+    exactTime: UN_DECOLONIZATION_DECLARATION_AT,
+    dateLabel: "Dec 14, 1960",
+    minZoom: 20,
+    priority: 79,
+    sourceRefs: [
+      {
+        sourceId: "unAntiColonialismDay",
+        note: "The UN's anti-colonialism observance page identifies 14 December as the anniversary of Resolution 1514 (XV), the Declaration on the Granting of Independence to Colonial Countries and Peoples.",
+      },
+      {
+        sourceId: "unDecolonization",
+        note: "The UN calls the 1960 declaration a landmark in the decolonization process and links it to the acceleration of independence movements.",
+      },
+    ],
+  },
+  {
+    id: "first-human-in-space",
+    label: "First human orbits Earth",
+    shortLabel: "First Human in Space",
+    description:
+      "Yuri Gagarin became the first human to travel into space and orbit Earth aboard Vostok 1.",
+    year: getTimelineYearFromExactTimestamp(FIRST_HUMAN_IN_SPACE_AT),
+    exactTime: FIRST_HUMAN_IN_SPACE_AT,
+    dateLabel: "Apr 12, 1961",
+    minZoom: 20,
+    priority: 81,
+    sourceRefs: [
+      {
+        sourceId: "britannicaYuriGagarin",
+        note: "Britannica says Gagarin's Vostok 1 spacecraft was launched on April 12, 1961, when he became the first man to travel into space and orbit Earth.",
+      },
+    ],
+  },
+  {
+    id: "cuban-missile-crisis-resolved",
+    label: "Cuban Missile Crisis de-escalates",
+    shortLabel: "Cuban Missile Crisis",
+    description:
+      "Khrushchev publicly stated that Soviet missiles would be dismantled and removed from Cuba, ending the most dangerous U.S.-Soviet confrontation of the Cold War.",
+    year: getTimelineYearFromExactTimestamp(CUBAN_MISSILE_CRISIS_RESOLVED_AT),
+    exactTime: CUBAN_MISSILE_CRISIS_RESOLVED_AT,
+    dateLabel: "Oct 28, 1962",
+    minZoom: 20,
+    priority: 82,
+    sourceRefs: [
+      {
+        sourceId: "historyStateCubanMissileCrisis",
+        note: "The State Department says Khrushchev issued a public statement on October 28, 1962, that Soviet missiles would be dismantled and removed from Cuba.",
+      },
+    ],
+  },
+  {
     id: "apollo-11-moon-landing",
     label: "Apollo 11 Moon landing",
     shortLabel: "Moon Landing",
     year: ce(1969),
     minZoom: 20,
-    priority: 79,
+    priority: 83,
     sourceRefs: [
       {
         sourceId: "historyMoonLanding",
         note: "HISTORY dates the Apollo 11 moon landing to July 20, 1969, when Armstrong and Aldrin became the first humans to land on the Moon.",
+      },
+    ],
+  },
+  {
+    id: "berlin-wall-falls",
+    label: "Berlin Wall falls",
+    shortLabel: "Berlin Wall Falls",
+    description:
+      "The East German government announced the opening of all East German borders, and the Wall's fall came to represent the end of the Cold War.",
+    year: getTimelineYearFromExactTimestamp(BERLIN_WALL_FALLS_AT),
+    exactTime: BERLIN_WALL_FALLS_AT,
+    dateLabel: "Nov 9, 1989",
+    minZoom: 20,
+    priority: 83,
+    sourceRefs: [
+      {
+        sourceId: "historyStateFallCommunism",
+        note: "The State Department dates the fall of the Berlin Wall to November 9, 1989 and frames it as the most visible symbol of the Cold War's collapse.",
+      },
+    ],
+  },
+  {
+    id: "soviet-union-dissolves",
+    label: "Soviet Union dissolves",
+    shortLabel: "Soviet Union Dissolves",
+    description:
+      "The Soviet Union dissolved and was replaced by 15 independent countries.",
+    year: getTimelineYearFromExactTimestamp(SOVIET_UNION_DISSOLVES_AT),
+    exactTime: SOVIET_UNION_DISSOLVES_AT,
+    dateLabel: "Dec 31, 1991",
+    minZoom: 20,
+    priority: 85,
+    sourceRefs: [
+      {
+        sourceId: "britannicaSovietCollapse",
+        note: "Britannica states that the Soviet Union dissolved on December 31, 1991, making it a clean endpoint for the Cold War world order.",
+      },
+    ],
+  },
+  {
+    id: "world-wide-web-opened",
+    label: "World Wide Web opened to the public",
+    shortLabel: "Web Opens",
+    description:
+      "CERN put the World Wide Web software in the public domain, a move that allowed the web to flourish.",
+    year: getTimelineYearFromExactTimestamp(WORLD_WIDE_WEB_OPENED_AT),
+    exactTime: WORLD_WIDE_WEB_OPENED_AT,
+    dateLabel: "Apr 30, 1993",
+    minZoom: 20,
+    priority: 81,
+    sourceRefs: [
+      {
+        sourceId: "cernBirthWeb",
+        note: "CERN says that on April 30, 1993 it placed the World Wide Web software in the public domain, allowing the web to spread globally.",
+      },
+    ],
+  },
+  {
+    id: "september-11-attacks",
+    label: "September 11 attacks",
+    shortLabel: "9/11 Attacks",
+    description:
+      "Al Qaeda terrorists hijacked four commercial passenger airplanes and carried out attacks on the World Trade Center, the Pentagon, and rural Pennsylvania.",
+    year: getTimelineYearFromExactTimestamp(SEPTEMBER_11_ATTACKS_AT),
+    exactTime: SEPTEMBER_11_ATTACKS_AT,
+    dateLabel: "Sep 11, 2001",
+    minZoom: 20,
+    priority: 86,
+    sourceRefs: [
+      {
+        sourceId: "historySeptember11Attacks",
+        note: "HISTORY says the September 11 attacks occurred on September 11, 2001, when al Qaeda-linked hijackers seized four airliners and attacked targets in the United States.",
+      },
+    ],
+  },
+  {
+    id: "lehman-brothers-bankruptcy",
+    label: "2008 financial crisis",
+    shortLabel: "2008 Financial Crisis",
+    description:
+      "Lehman Brothers filed for bankruptcy after heavy exposure to subprime mortgages and mortgage-backed securities, sending shock waves through global markets.",
+    year: getTimelineYearFromExactTimestamp(LEHMAN_BROTHERS_BANKRUPTCY_AT),
+    exactTime: LEHMAN_BROTHERS_BANKRUPTCY_AT,
+    dateLabel: "Sep 15, 2008",
+    minZoom: 20,
+    priority: 83,
+    sourceRefs: [
+      {
+        sourceId: "investopediaLehmanCollapse",
+        note: "Investopedia dates Lehman's bankruptcy filing to September 15, 2008 and describes it as a pivotal moment in the financial crisis driven by heavy exposure to subprime mortgages and complex securities.",
+      },
+    ],
+  },
+  {
+    id: "paris-agreement-adopted",
+    label: "Paris Agreement adopted",
+    shortLabel: "Paris Agreement",
+    description:
+      "World leaders reached the Paris Agreement, a breakthrough climate accord aimed at keeping warming well below 2°C while pursuing 1.5°C.",
+    year: getTimelineYearFromExactTimestamp(PARIS_AGREEMENT_ADOPTED_AT),
+    exactTime: PARIS_AGREEMENT_ADOPTED_AT,
+    dateLabel: "Dec 12, 2015",
+    minZoom: 20,
+    priority: 80,
+    sourceRefs: [
+      {
+        sourceId: "unParisAgreement",
+        note: "The UN says world leaders reached the Paris Agreement on 12 December 2015 at COP21 in Paris.",
+      },
+    ],
+  },
+  {
+    id: "covid-19-pandemic-declared",
+    label: "WHO declares COVID-19 pandemic",
+    shortLabel: "COVID-19 Pandemic",
+    description:
+      "WHO characterized the COVID-19 outbreak as a pandemic after cases spread rapidly to countries across the world.",
+    year: getTimelineYearFromExactTimestamp(COVID_19_PANDEMIC_DECLARED_AT),
+    exactTime: COVID_19_PANDEMIC_DECLARED_AT,
+    dateLabel: "Mar 11, 2020",
+    minZoom: 20,
+    priority: 84,
+    sourceRefs: [
+      {
+        sourceId: "whoCovid19Pandemic",
+        note: "WHO says it characterized the COVID-19 outbreak as a pandemic on March 11, 2020.",
       },
     ],
   },

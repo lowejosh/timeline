@@ -186,7 +186,20 @@ describe("root timeline display data", () => {
       "world-war-i",
       "russian-revolution",
       "world-war-ii",
+      "united-nations-founded",
+      "udhr-proclaimed",
+      "nato-founded",
+      "un-decolonization-declaration",
+      "first-human-in-space",
+      "cuban-missile-crisis-resolved",
       "apollo-11-moon-landing",
+      "berlin-wall-falls",
+      "soviet-union-dissolves",
+      "world-wide-web-opened",
+      "september-11-attacks",
+      "lehman-brothers-bankruptcy",
+      "paris-agreement-adopted",
+      "covid-19-pandemic-declared",
     ]);
 
     for (const marker of TIMELINE_DISPLAY.markers) {
