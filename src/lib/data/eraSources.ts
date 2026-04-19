@@ -2030,7 +2030,7 @@ export const ERA_SOURCES = {
       '"Timeline of the Big Bang," The Physics of the Universe.',
     url: "https://www.physicsoftheuniverse.com/topics_bigbang_timeline.html",
     notes:
-      "Used for the sequence and approximate timescales of cosmological epochs from the Planck era through recombination.",
+      "Used for the sequence and approximate timescales of the very early cosmological epochs from the Planck era through the photon epoch; recombination/CMB timing in the app now follows NASA's around-380,000-year framing instead of this older 240,000-300,000 summary.",
   },
 } as const satisfies Record<string, EraSource>;
 

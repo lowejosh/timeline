@@ -35,6 +35,10 @@ export type TimelineElapsedLabel = {
   secondaryText?: string;
 };
 
+export type TimelineElapsedAxisLabelFormatOptions = {
+  snapToReferenceStartWithinYears?: number;
+};
+
 export type TimelineElapsedReference = "ago" | "after-big-bang";
 export type TimelineDateReference = "calendar" | "elapsed";
 
@@ -496,6 +500,10 @@ function formatPreciseElapsedAxisLabel(
     .filter((part): part is string => part !== null);
 
   if (includedParts.length === 0) {
+    if (reference === "after-big-bang") {
+      return { primaryText: "Big Bang" };
+    }
+
     return {
       primaryText: `${step >= YEARS_PER_MILLISECOND ? "0ms" : "0µs"} ${suffix}`,
     };
@@ -724,7 +732,28 @@ export function formatTimelineElapsedAxisLabelLines(
   year: number | PreciseTimelineYear,
   step: number,
   reference: TimelineElapsedReference,
+  options: TimelineElapsedAxisLabelFormatOptions = {},
 ) {
+  const snapToReferenceStartWithinYears = Math.max(
+    options.snapToReferenceStartWithinYears ?? 0,
+    0,
+  );
+
+  if (reference === "after-big-bang" && snapToReferenceStartWithinYears > 0) {
+    const elapsed = getPreciseTimelineYearDelta(year, TIMELINE_MIN_YEAR);
+
+    if (
+      elapsed.wholeYears < 0 ||
+      (elapsed.wholeYears === 0 &&
+        elapsed.fractionalYears <=
+          snapToReferenceStartWithinYears + ELAPSED_ZERO_EPSILON)
+    ) {
+      return {
+        primaryText: "Big Bang",
+      };
+    }
+  }
+
   if (step >= 1) {
     return {
       primaryText: formatTimelineElapsedAxisLabel(year, step, reference),

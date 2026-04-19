@@ -639,6 +639,7 @@ const EXPANDED_OVERLAY_LABEL_REVEAL_DELAY = 0.18;
 const EXPANDED_OVERLAY_LABEL_REVEAL_DURATION = 0.28;
 const EXPANDED_OVERLAY_INTERACTION_REVEAL_THRESHOLD = 0.35;
 const AXIS_LABEL_SECONDARY_STEP_RATIO = 0.82;
+const EDGE_AXIS_LABEL_SNAP_TOLERANCE_PX = 2;
 const SUBYEAR_EDGE_LABEL_MIN_SPACING_PX = 72;
 const SUBYEAR_LABEL_MIN_CLEARANCE_PX = 12;
 const SUBYEAR_PRIMARY_FONT = "11px var(--font-sans)";
@@ -3291,6 +3292,15 @@ export function TimelineCanvas({
       const edgeRightPreciseYear = fromX(sceneWidth - pad);
       const edgeLeftYear = toApproximateTimelineYear(edgeLeftPreciseYear);
       const edgeRightYear = toApproximateTimelineYear(edgeRightPreciseYear);
+      const edgeLeftSnapToleranceYears = Math.max(
+        Math.abs(
+          subtractPreciseTimelineYears(
+            fromX(pad + EDGE_AXIS_LABEL_SNAP_TOLERANCE_PX),
+            edgeLeftPreciseYear,
+          ),
+        ),
+        1e-18,
+      );
       const edgeLeftX = pad;
       const edgeRightX = sceneWidth - pad;
       const edgeLabelStep = (() => {
@@ -3467,11 +3477,15 @@ export function TimelineCanvas({
       const formatElapsedAxisLabel = (
         year: number | PreciseTimelineYear,
         step: number,
+        options?: {
+          snapToReferenceStartWithinYears?: number;
+        },
       ) =>
         formatTimelineElapsedAxisLabelLines(
           year,
           step,
           useBigBangElapsedLabels ? "after-big-bang" : "ago",
+          options,
         );
 
       if (resolvedAxisTickStates.length > 0) {
@@ -3587,7 +3601,15 @@ export function TimelineCanvas({
           context.font = SUBYEAR_SECONDARY_FONT;
           context.fillText(edgeLabel.secondaryText, x, layout.yearLabelY);
         } else if (useElapsedSubYearAxis) {
-          const edgeLabel = formatElapsedAxisLabel(year, edgeLabelStep);
+          const edgeLabel = formatElapsedAxisLabel(
+            year,
+            edgeLabelStep,
+            x === pad
+              ? {
+                  snapToReferenceStartWithinYears: edgeLeftSnapToleranceYears,
+                }
+              : undefined,
+          );
 
           if (!edgeLabel) {
             context.restore();
@@ -3734,6 +3756,9 @@ export function TimelineCanvas({
               const edgeLabel = formatElapsedAxisLabel(
                 edgeLeftPreciseYear,
                 edgeLabelStep,
+                {
+                  snapToReferenceStartWithinYears: edgeLeftSnapToleranceYears,
+                },
               );
 
               return {

@@ -34,6 +34,8 @@ export type TimelineTooltipContent = {
   sources: TimelineTooltipSource[];
 };
 
+const EXPLICIT_RANGE_SEPARATORS = [" — ", " to "] as const;
+
 function resolveTooltipSources(sourceRefs?: TimelineSourceRef[]) {
   const seen = new Set<string>();
 
@@ -55,6 +57,31 @@ function resolveTooltipSources(sourceRefs?: TimelineSourceRef[]) {
       },
     ];
   });
+}
+
+function formatExplicitApproximateRangeLabel(
+  label: string,
+  approximateStart?: boolean,
+  approximateEnd?: boolean,
+) {
+  if (!approximateStart && !approximateEnd) {
+    return label;
+  }
+
+  for (const separator of EXPLICIT_RANGE_SEPARATORS) {
+    const separatorIndex = label.indexOf(separator);
+
+    if (separatorIndex === -1) {
+      continue;
+    }
+
+    const startLabel = label.slice(0, separatorIndex);
+    const endLabel = label.slice(separatorIndex + separator.length);
+
+    return `${formatApproximateLabel(startLabel, approximateStart)}${separator}${formatApproximateLabel(endLabel, approximateEnd)}`;
+  }
+
+  return formatApproximateLabel(label, approximateStart || approximateEnd);
 }
 
 export function getMarkerTooltipContent(
@@ -106,13 +133,18 @@ export function getEraTooltipContent(era: Era): TimelineTooltipContent {
     kindLabel: "Era",
     title: era.name,
     timeLabel:
-      era.timeLabel ??
-      (era.exactStartTime && era.exactEndTime
-        ? formatTimelineExactRange(era.exactStartTime, era.exactEndTime)
-        : formatTimelineRange(era.startYear, era.endYear, {
-            approximateStart: era.approximateStart,
-            approximateEnd: era.approximateEnd,
-          })),
+      era.timeLabel
+        ? formatExplicitApproximateRangeLabel(
+            era.timeLabel,
+            era.approximateStart,
+            era.approximateEnd,
+          )
+        : era.exactStartTime && era.exactEndTime
+          ? formatTimelineExactRange(era.exactStartTime, era.exactEndTime)
+          : formatTimelineRange(era.startYear, era.endYear, {
+              approximateStart: era.approximateStart,
+              approximateEnd: era.approximateEnd,
+            }),
     regionalScopeLabel: era.regionalScopeLabel,
     description: era.description,
     sources: resolveTooltipSources(era.sourceRefs),

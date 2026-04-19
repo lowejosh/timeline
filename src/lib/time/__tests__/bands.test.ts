@@ -156,7 +156,9 @@ describe("timeline tick generation", () => {
         BCE_YEARS_AGO_HANDOFF_YEAR - 1.8,
         BCE_YEARS_AGO_HANDOFF_YEAR + 0.05,
       ),
-    ).toBe("elapsed");
+    ).toBe(
+      "elapsed",
+    );
     expect(
       getDominantTimelineDateReference(
         BCE_YEARS_AGO_HANDOFF_YEAR - 0.4,
@@ -295,6 +297,45 @@ describe("timeline tick generation", () => {
     ).toEqual({
       primaryText: "64µs",
       secondaryText: "after the Big Bang",
+    });
+  });
+
+  it("keeps the Big Bang label pinned when a left-edge elapsed label rounds below the current unit", () => {
+    const yearsPerMillisecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000;
+    const bigBangYear = splitTimelineYear(TIMELINE_MIN_YEAR);
+
+    expect(
+      formatTimelineElapsedAxisLabelLines(
+        {
+          wholeYear: bigBangYear.wholeYear,
+          fraction: bigBangYear.fraction + yearsPerMillisecond / 4,
+        },
+        yearsPerMillisecond,
+        "after-big-bang",
+      ),
+    ).toEqual({
+      primaryText: "Big Bang",
+    });
+  });
+
+  it("can snap a near-origin Big Bang edge label to Big Bang within a supplied tolerance", () => {
+    const yearsPerMicrosecond = 1 / 365.2425 / 24 / 60 / 60 / 1_000_000;
+    const bigBangYear = splitTimelineYear(TIMELINE_MIN_YEAR);
+
+    expect(
+      formatTimelineElapsedAxisLabelLines(
+        {
+          wholeYear: bigBangYear.wholeYear,
+          fraction: bigBangYear.fraction + yearsPerMicrosecond * 6,
+        },
+        yearsPerMicrosecond,
+        "after-big-bang",
+        {
+          snapToReferenceStartWithinYears: yearsPerMicrosecond * 8,
+        },
+      ),
+    ).toEqual({
+      primaryText: "Big Bang",
     });
   });
 

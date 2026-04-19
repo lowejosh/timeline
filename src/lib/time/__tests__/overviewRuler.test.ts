@@ -44,7 +44,7 @@ describe("overview ruler geometry", () => {
       "0.00000416%",
     );
     expect(formatOverviewRulerPercentageLabel(0.5, 13_800_000_000)).toBe(
-      "<0.00000001%",
+      "3.62×10⁻⁹%",
     );
   });
 

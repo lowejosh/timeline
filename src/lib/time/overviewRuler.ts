@@ -45,6 +45,19 @@ export type OverviewRulerTier = {
 const overviewRulerIntegerFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
+const OVERVIEW_RULER_SUPERSCRIPT_DIGITS: Record<string, string> = {
+  "-": "⁻",
+  "0": "⁰",
+  "1": "¹",
+  "2": "²",
+  "3": "³",
+  "4": "⁴",
+  "5": "⁵",
+  "6": "⁶",
+  "7": "⁷",
+  "8": "⁸",
+  "9": "⁹",
+};
 
 function formatOverviewRulerScaledValue(value: number) {
   const maximumFractionDigits =
@@ -54,6 +67,19 @@ function formatOverviewRulerScaledValue(value: number) {
     maximumFractionDigits,
     minimumFractionDigits: 0,
   }).format(value);
+}
+
+function formatOverviewRulerScientificValue(value: number, fractionDigits = 2) {
+  const scientific = value.toExponential(fractionDigits);
+  const [mantissa, exponent] = scientific.split("e");
+  const trimmedMantissa = mantissa.includes(".")
+    ? mantissa.replace(/\.0+$|(?<=\.[0-9]*[1-9])0+$/u, "")
+    : mantissa;
+  const exponentLabel = [...String(Number(exponent))]
+    .map((character) => OVERVIEW_RULER_SUPERSCRIPT_DIGITS[character] ?? character)
+    .join("");
+
+  return `${trimmedMantissa}×10${exponentLabel}`;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -400,10 +426,7 @@ export function formatOverviewRulerPercentageLabel(
   const minimumVisiblePercentage = 10 ** -maximumFractionDigits;
 
   if (percentage > 0 && percentage < minimumVisiblePercentage) {
-    return `<${new Intl.NumberFormat("en-US", {
-      maximumFractionDigits,
-      minimumFractionDigits: 0,
-    }).format(minimumVisiblePercentage)}%`;
+    return `${formatOverviewRulerScientificValue(percentage)}%`;
   }
 
   return `${new Intl.NumberFormat("en-US", {

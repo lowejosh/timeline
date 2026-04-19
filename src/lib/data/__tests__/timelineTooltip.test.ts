@@ -166,6 +166,24 @@ describe("timeline tooltip content", () => {
     });
   });
 
+  it("shows approximation on explicit era time labels when flagged", () => {
+    const era: Era = {
+      id: "recombination",
+      name: "Recombination",
+      startYear: 240_000,
+      endYear: 380_000,
+      timeLabel: "240,000 to 380,000 yr after the Big Bang",
+      approximateStart: true,
+      approximateEnd: true,
+      color: "rgba(0, 0, 0, 0.1)",
+      sourceRefs: [{ sourceId: "nasaUniverseOverview" }],
+    };
+
+    expect(getEraTooltipContent(era)).toMatchObject({
+      timeLabel: "~240,000 to ~380,000 yr after the Big Bang",
+    });
+  });
+
   it("prefers explicit marker date/time labels when provided", () => {
     const marker: TimelineMarker = {
       id: "titanic-sinks",
