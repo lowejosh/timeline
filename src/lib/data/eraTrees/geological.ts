@@ -25,12 +25,6 @@ function icsHex(hex: string): string {
   );
 }
 
-const QUATERNARY_TRUNCATION_NOTE =
-  "The formal Quaternary continues to the present; the rendered band is clipped where the app hands off to the visible human-history eras.";
-
-const PLEISTOCENE_TRUNCATION_NOTE =
-  "The formal Pleistocene continues to 11.7 ka; the rendered child is clipped where the app hands off to the visible human-history eras.";
-
 const CAMBRIAN_SERIES: EraDefinition[] = [
   {
     id: "terreneuvian",
@@ -393,10 +387,19 @@ const QUATERNARY_SERIES: EraDefinition[] = [
     id: "pleistocene",
     name: "Pleistocene",
     startYear: yearsAgo(2_580_000),
-    endYear: yearsAgo(300_000),
+    endYear: yearsAgo(11_700),
     color: icsHex("#FFEFAF"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(PLEISTOCENE_TRUNCATION_NOTE),
+    sourceRefs: chartRef(),
+  },
+  {
+    id: "holocene",
+    name: "Holocene",
+    startYear: yearsAgo(11_700),
+    endYear: yearsAgo(0),
+    color: icsHex("#FFF2AE"),
+    scheme: "chronostratigraphic",
+    sourceRefs: chartRef(),
   },
 ];
 
@@ -614,11 +617,10 @@ const CENOZOIC_PERIODS: EraDefinition[] = [
     id: "quaternary",
     name: "Quaternary",
     startYear: yearsAgo(2_580_000),
-    endYear: yearsAgo(300_000),
-    timeLabel: "2.58M years ago — present",
+    endYear: yearsAgo(0),
     color: icsColor(249, 249, 127),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(QUATERNARY_TRUNCATION_NOTE),
+    sourceRefs: chartRef(),
     children: QUATERNARY_SERIES,
   },
 ];

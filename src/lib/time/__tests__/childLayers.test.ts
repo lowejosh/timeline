@@ -7,6 +7,7 @@ import {
   getVisibleEraFillRatio,
   resolveTimelineEraLayers,
   resolveTimelineEraLayersFromOpacityMap,
+  shouldHideOverlappedEraLabel,
 } from "../childLayers";
 import { getViewportForRange } from "../viewport";
 
@@ -204,5 +205,175 @@ describe("timeline child layers", () => {
         (era) => era.id,
       ),
     ).toEqual(["human-history", "bronze-age"]);
+  });
+
+  it("hides a lower-priority label when a higher-priority era overlaps its label center", () => {
+    const width = 1000;
+    const pad = 100;
+    const innerWidth = width - pad * 2;
+    const viewport = getViewportForRange(-100, 100, innerWidth, 0);
+    const background = {
+      ...makeEra("background", -100, 100),
+      priority: 100,
+    };
+    const foreground = {
+      ...makeEra("foreground", -20, 20),
+      priority: 300,
+    };
+
+    const layers = resolveTimelineEraLayers(
+      [background, foreground],
+      "none",
+      viewport,
+      width,
+      pad,
+      false,
+    ).filter((layer) => layer.opacity > 0.01);
+
+    const backgroundLayer = layers.find((layer) => layer.era.id === "background");
+    const foregroundLayer = layers.find((layer) => layer.era.id === "foreground");
+
+    expect(backgroundLayer).toBeDefined();
+    expect(foregroundLayer).toBeDefined();
+    expect(
+      shouldHideOverlappedEraLabel(
+        backgroundLayer!,
+        layers,
+        viewport,
+        width,
+        pad,
+        80,
+      ),
+    ).toBe(true);
+    expect(
+      shouldHideOverlappedEraLabel(
+        foregroundLayer!,
+        layers,
+        viewport,
+        width,
+        pad,
+        80,
+      ),
+    ).toBe(false);
+  });
+
+  it("does not hide a label for overlap from a different depth", () => {
+    const width = 1000;
+    const pad = 100;
+    const innerWidth = width - pad * 2;
+    const viewport = getViewportForRange(-100, 100, innerWidth, 0);
+    const parent = {
+      ...makeEra("parent", -100, 100),
+      priority: 100,
+    };
+    const child = {
+      ...makeEra("child", -20, 20),
+      priority: 300,
+    };
+    parent.children = [child];
+
+    const layers = resolveTimelineEraLayersFromOpacityMap(
+      [parent],
+      "none",
+      viewport,
+      width,
+      pad,
+      new Map([["parent", 1]]),
+    ).filter((layer) => layer.opacity > 0.01);
+
+    const parentLayer = layers.find((layer) => layer.era.id === "parent");
+
+    expect(parentLayer).toBeDefined();
+    expect(
+      shouldHideOverlappedEraLabel(
+        parentLayer!,
+        layers,
+        viewport,
+        width,
+        pad,
+        80,
+      ),
+    ).toBe(false);
+  });
+
+  it("hides a deeper lower-priority label when a shallower higher-priority era overlaps it", () => {
+    const width = 1000;
+    const pad = 100;
+    const innerWidth = width - pad * 2;
+    const viewport = getViewportForRange(-100, 100, innerWidth, 0);
+    const background = {
+      ...makeEra("background", -100, 100),
+      priority: 300,
+    };
+    const child = {
+      ...makeEra("child", -100, 100),
+      priority: 100,
+    };
+    background.children = [child];
+
+    const layers = resolveTimelineEraLayersFromOpacityMap(
+      [background],
+      "none",
+      viewport,
+      width,
+      pad,
+      new Map([["background", 1]]),
+    ).filter((layer) => layer.opacity > 0.01);
+
+    const childLayer = layers.find((layer) => layer.era.id === "child");
+
+    expect(childLayer).toBeDefined();
+    expect(
+      shouldHideOverlappedEraLabel(
+        childLayer!,
+        layers,
+        viewport,
+        width,
+        pad,
+        120,
+      ),
+    ).toBe(true);
+  });
+
+  it("hides a lower-priority label when adjacent higher-priority eras split across its label box", () => {
+    const width = 1000;
+    const pad = 100;
+    const innerWidth = width - pad * 2;
+    const viewport = getViewportForRange(-100, 100, innerWidth, 0);
+    const background = {
+      ...makeEra("background", -100, 100),
+      priority: 100,
+    };
+    const leftForeground = {
+      ...makeEra("left-foreground", -100, 0),
+      priority: 300,
+    };
+    const rightForeground = {
+      ...makeEra("right-foreground", 0, 100),
+      priority: 300,
+    };
+
+    const layers = resolveTimelineEraLayers(
+      [background, leftForeground, rightForeground],
+      "none",
+      viewport,
+      width,
+      pad,
+      false,
+    ).filter((layer) => layer.opacity > 0.01);
+
+    const backgroundLayer = layers.find((layer) => layer.era.id === "background");
+
+    expect(backgroundLayer).toBeDefined();
+    expect(
+      shouldHideOverlappedEraLabel(
+        backgroundLayer!,
+        layers,
+        viewport,
+        width,
+        pad,
+        120,
+      ),
+    ).toBe(true);
   });
 });

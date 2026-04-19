@@ -12,6 +12,10 @@ import {
   TIMELINE_DISPLAY,
   findEraById,
   getAncestorChain,
+  getEraDisplayChain,
+  getNavigableAncestor,
+  getRootDisplayEras,
+  isEraFamilyRoot,
   type Era,
 } from "./lib/data/eras";
 import {
@@ -152,20 +156,36 @@ function App() {
     return next;
   }, [enabledGroupIds, isCivilizationsAutoHidden]);
 
+  const rootDisplayEras = useMemo(() => getRootDisplayEras(ROOT_ERA), []);
+
   const activeEra = findEraById(ROOT_ERA, activeEraId) ?? ROOT_ERA;
-  const chain = getAncestorChain(ROOT_ERA, activeEraId);
-  const parentEra = chain.length > 1 ? chain[chain.length - 2] : null;
-  // Sibling eras: the children of the parent (or root's children if at root)
-  const siblingEras = parentEra
-    ? (parentEra.children ?? [])
-    : (activeEra.children ?? []);
+  const rawChain = getAncestorChain(ROOT_ERA, activeEraId);
+  const chain = getEraDisplayChain(ROOT_ERA, activeEraId);
+  const rawParentEra = rawChain.length > 1 ? rawChain[rawChain.length - 2] : null;
+  const parentEra =
+    rawParentEra && !isEraFamilyRoot(rawParentEra) ? rawParentEra : null;
+  const isTopLevelDisplayEra =
+    rawParentEra !== null && isEraFamilyRoot(rawParentEra);
+  const siblingEras =
+    activeEra.id === ROOT_ERA.id || isTopLevelDisplayEra
+      ? rootDisplayEras
+      : rawParentEra
+        ? (rawParentEra.children ?? [])
+        : (activeEra.children ?? []);
 
   // Check if we should auto-collapse when zoomed out
   const checkAutoTransition = useCallback(() => {
     setActiveEraId((currentId) => {
       const era = findEraById(ROOT_ERA, currentId) ?? ROOT_ERA;
-      const ch = getAncestorChain(ROOT_ERA, currentId);
-      if (ch.length <= 1 || currentId === ROOT_ERA.id) return currentId;
+      const navigableAncestor = getNavigableAncestor(ROOT_ERA, currentId);
+
+      if (
+        currentId === ROOT_ERA.id ||
+        isEraFamilyRoot(era) ||
+        !navigableAncestor
+      ) {
+        return currentId;
+      }
 
       const eraPixelWidth = Math.abs(
         worldToScreen(era.endYear, viewportRef.current, innerWidthRef.current) -
@@ -179,7 +199,7 @@ function App() {
 
       // Auto-collapse: if drilled in and era is too small, go back to parent
       if (fillRatio < 0.45) {
-        return ch[ch.length - 2].id;
+        return navigableAncestor.id;
       }
 
       return currentId;
@@ -235,14 +255,14 @@ function App() {
   );
 
   const handleNavigateUp = useCallback(() => {
-    const chain = getAncestorChain(ROOT_ERA, activeEraId);
-    if (chain.length > 1) {
-      // Go up one level
-      const parent = chain[chain.length - 2];
+    const parent = getNavigableAncestor(ROOT_ERA, activeEraId);
+
+    if (parent && parent.id !== ROOT_ERA.id) {
       setActiveEraId(parent.id);
       animated.animateToRange(parent.startYear, parent.endYear);
     } else {
       // Already at root — go home
+      setActiveEraId(ROOT_ERA.id);
       animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1]);
     }
   }, [activeEraId, animated]);
@@ -286,8 +306,7 @@ function App() {
     },
     [],
   );
-  const isOverviewVisible =
-    stageSize.height >= MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER;
+  const isOverviewVisible = stageSize.height >= MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER;
   const mainCanvasHeight = Math.max(
     timelineSize.height > 0 ? timelineSize.height : stageSize.height,
     1,
@@ -353,7 +372,7 @@ function App() {
             {isOverviewVisible ? (
               <div className="app-stage__overview">
                 <TimelineOverviewRulerStack
-                  eras={ROOT_ERA.children ?? []}
+                  eras={rootDisplayEras}
                   mainInnerWidth={Math.max(
                     stageSize.width - TIMELINE_CANVAS_PAD * 2,
                     1,

@@ -6,16 +6,20 @@ import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "../time/timelineYears";
 import type {
   Era,
   EraDefinition,
+  EraFamilyId,
   RootTimelineData,
+  TimelineEraFamilyConfig,
   TimelineSourceRef,
 } from "./timelineTypes";
 
 export type {
   Era,
   EraDefinition,
+  EraFamilyId,
   EraScheme,
   RootTimelineData,
   TimelineDisplayConfig,
+  TimelineEraFamilyConfig,
   TimelineMarker,
   TimelineOverlayBand,
 } from "./timelineTypes";
@@ -43,9 +47,98 @@ export function getAncestorChain(root: Era, targetId: string): Era[] {
   return [];
 }
 
+export function isEraFamilyRoot(era: Era): boolean {
+  return era.isFamilyRoot === true;
+}
+
+export function compareEraPriorityAscending(left: Era, right: Era) {
+  return (
+    (left.priority ?? 0) - (right.priority ?? 0) ||
+    left.startYear - right.startYear ||
+    right.endYear - left.endYear ||
+    left.id.localeCompare(right.id)
+  );
+}
+
+export function compareEraPriorityDescending(left: Era, right: Era) {
+  return (
+    (right.priority ?? 0) - (left.priority ?? 0) ||
+    left.startYear - right.startYear ||
+    right.endYear - left.endYear ||
+    left.id.localeCompare(right.id)
+  );
+}
+
+export function getEraFamilyRoots(root: Era): Era[] {
+  return (root.children ?? []).filter(isEraFamilyRoot);
+}
+
+export function getRootDisplayEras(root: Era): Era[] {
+  return (root.children ?? []).flatMap((child) =>
+    isEraFamilyRoot(child) ? (child.children ?? []) : [child],
+  );
+}
+
+export function getEraDisplayChain(root: Era, targetId: string): Era[] {
+  return getAncestorChain(root, targetId).filter(
+    (era) => era.id === root.id || !isEraFamilyRoot(era),
+  );
+}
+
+export function getNavigableAncestor(root: Era, targetId: string): Era | null {
+  const chain = getAncestorChain(root, targetId);
+
+  for (let index = chain.length - 2; index >= 0; index -= 1) {
+    const candidate = chain[index];
+
+    if (candidate.id === root.id || !isEraFamilyRoot(candidate)) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
+export function getEraFamilyId(root: Era, targetId: string): EraFamilyId | null {
+  return (
+    getAncestorChain(root, targetId).find(
+      (era) => era.id !== root.id && isEraFamilyRoot(era),
+    )?.familyId ?? null
+  );
+}
+
 const CURRENT_YEAR = TIMELINE_MAX_YEAR;
-const HUMAN_HISTORY_VISIBLE_CHILDREN =
-  HUMAN_HISTORY_ERA_DEFINITION.children ?? [];
+
+export const TIMELINE_ERA_FAMILIES: TimelineEraFamilyConfig[] = [
+  {
+    id: "cosmic",
+    label: "Cosmic History",
+    description: "Universe-scale eras before Earth forms.",
+    order: 0,
+    priority: 100,
+    defaultEnabled: true,
+  },
+  {
+    id: "geological",
+    label: "Geological History",
+    description: "Earth-system and chronostratigraphic eras.",
+    order: 1,
+    priority: 200,
+    defaultEnabled: true,
+  },
+  {
+    id: "human-history",
+    label: "Human History",
+    description: "Archaeological and world-history eras.",
+    order: 2,
+    priority: 300,
+    defaultEnabled: true,
+  },
+];
+
+const ERA_FAMILY_CONFIG_BY_ID = new Map(
+  TIMELINE_ERA_FAMILIES.map((family) => [family.id, family]),
+);
 
 function hashString(value: string): number {
   let hash = 2166136261;
@@ -104,13 +197,66 @@ export function getSeededEraColor(seed: string): string {
   return hslToRgb(hue, saturation, lightness);
 }
 
-function materializeEra(definition: EraDefinition): Era {
+function materializeEra(
+  definition: EraDefinition,
+  inheritedFamilyId?: EraFamilyId,
+  inheritedPriority?: number,
+): Era {
+  const familyId = definition.familyId ?? inheritedFamilyId;
+  const familyPriority =
+    familyId !== undefined
+      ? ERA_FAMILY_CONFIG_BY_ID.get(familyId)?.priority
+      : undefined;
+  const priority = definition.priority ?? inheritedPriority ?? familyPriority;
+
   return {
     ...definition,
+    familyId,
+    priority,
     color: definition.color ?? getSeededEraColor(definition.id),
-    children: definition.children?.map(materializeEra),
+    children: definition.children?.map((child) =>
+      materializeEra(child, familyId, priority),
+    ),
   };
 }
+
+const COSMIC_FAMILY_ROOT_DEFINITION: EraDefinition = {
+  id: "cosmic-history",
+  name: "Cosmic History",
+  startYear: COSMIC_ERA_DEFINITIONS[0]?.startYear ?? TIMELINE_MIN_YEAR,
+  endYear:
+    COSMIC_ERA_DEFINITIONS[COSMIC_ERA_DEFINITIONS.length - 1]?.endYear ??
+    CURRENT_YEAR,
+  color: "rgba(0, 0, 0, 0)",
+  scheme: "cosmic",
+  familyId: "cosmic",
+  priority: ERA_FAMILY_CONFIG_BY_ID.get("cosmic")?.priority,
+  isFamilyRoot: true,
+  children: COSMIC_ERA_DEFINITIONS,
+};
+
+const GEOLOGICAL_FAMILY_ROOT_DEFINITION: EraDefinition = {
+  id: "geological-history",
+  name: "Geological History",
+  startYear: GEOLOGICAL_ERA_DEFINITIONS[0]?.startYear ?? TIMELINE_MIN_YEAR,
+  endYear:
+    GEOLOGICAL_ERA_DEFINITIONS[GEOLOGICAL_ERA_DEFINITIONS.length - 1]?.endYear ??
+    CURRENT_YEAR,
+  color: "rgba(0, 0, 0, 0)",
+  scheme: "chronostratigraphic",
+  familyId: "geological",
+  priority: ERA_FAMILY_CONFIG_BY_ID.get("geological")?.priority,
+  isFamilyRoot: true,
+  children: GEOLOGICAL_ERA_DEFINITIONS,
+};
+
+const HUMAN_HISTORY_FAMILY_ROOT_DEFINITION: EraDefinition = {
+  ...HUMAN_HISTORY_ERA_DEFINITION,
+  color: HUMAN_HISTORY_ERA_DEFINITION.color ?? "rgba(0, 0, 0, 0)",
+  familyId: "human-history",
+  priority: ERA_FAMILY_CONFIG_BY_ID.get("human-history")?.priority,
+  isFamilyRoot: true,
+};
 
 export const ROOT_ERA: Era = materializeEra({
   id: "universe",
@@ -126,9 +272,9 @@ export const ROOT_ERA: Era = materializeEra({
     },
   ],
   children: [
-    ...COSMIC_ERA_DEFINITIONS,
-    ...GEOLOGICAL_ERA_DEFINITIONS,
-    ...HUMAN_HISTORY_VISIBLE_CHILDREN,
+    COSMIC_FAMILY_ROOT_DEFINITION,
+    GEOLOGICAL_FAMILY_ROOT_DEFINITION,
+    HUMAN_HISTORY_FAMILY_ROOT_DEFINITION,
   ],
 });
 

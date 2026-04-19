@@ -15,6 +15,7 @@ import {
   formatTimelineYear,
 } from "../../lib/time/bands";
 import {
+  compareEraPriorityDescending,
   type Era,
   type TimelineMarker,
   type TimelineOverlayBand,
@@ -56,6 +57,7 @@ import {
   getInteractiveDescendantEras,
   getPreviewFocusChain,
   resolveTimelineEraLayersFromOpacityMap,
+  shouldHideOverlappedEraLabel,
 } from "../../lib/time/childLayers";
 import {
   getVisibleTimelineMarkers,
@@ -1311,7 +1313,9 @@ function measureAxisLabelWidth(
 }
 
 function findEraAtYear(eras: Era[], year: number): Era | undefined {
-  return eras.find((era) => year >= era.startYear && year <= era.endYear);
+  return eras
+    .filter((era) => year >= era.startYear && year <= era.endYear)
+    .sort(compareEraPriorityDescending)[0];
 }
 
 function getTimelineLayout(
@@ -2176,7 +2180,9 @@ export function TimelineCanvas({
         context.fillRect(pad, 0, innerWidth, sceneHeight);
       }
 
-      const renderEra = (era: Era, opacity: number) => {
+      const renderEra = (layer: (typeof visibleEraLayers)[number]) => {
+        const { era, opacity } = layer;
+
         if (opacity < 0.01) return;
 
         const x0 = toX(era.startYear);
@@ -2215,12 +2221,29 @@ export function TimelineCanvas({
             (0.28 + Math.min(opacity, 1) * 0.22);
 
           context.save();
+          context.font = "11px var(--font-sans)";
+          const labelMetrics = context.measureText(era.name);
+          context.restore();
+
+          const shouldHideForPriorityOverlap = shouldHideOverlappedEraLabel(
+            layer,
+            visibleEraLayers,
+            sceneViewport,
+            sceneWidth,
+            PAD,
+            labelMetrics.width,
+          );
+
+          if (shouldHideForPriorityOverlap) {
+            return;
+          }
+
+          context.save();
           context.globalAlpha = labelAlpha;
           context.font = "11px var(--font-sans)";
           context.fillStyle = labelColor;
           context.textAlign = "center";
           context.textBaseline = "bottom";
-          const labelMetrics = context.measureText(era.name);
           context.fillText(era.name, labelX, labelBaselineY);
           context.restore();
 
@@ -2409,7 +2432,7 @@ export function TimelineCanvas({
       };
 
       for (const layer of visibleEraLayers) {
-        renderEra(layer.era, layer.opacity);
+        renderEra(layer);
       }
       markPerf("eraMs");
 

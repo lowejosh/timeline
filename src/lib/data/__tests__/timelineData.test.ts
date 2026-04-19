@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { ERA_SOURCES } from "../eraSources";
-import { ROOT_ERA, ROOT_TIMELINE, TIMELINE_DISPLAY } from "../eras";
+import {
+  ROOT_ERA,
+  ROOT_TIMELINE,
+  TIMELINE_DISPLAY,
+  getRootDisplayEras,
+} from "../eras";
 import {
   CIVILIZATION_OVERLAYS,
   CULTURE_OVERLAYS,
@@ -895,11 +900,16 @@ describe("root timeline display data", () => {
     expect(ageOfDinosaurs?.children).toBeUndefined();
   });
 
-  it("keeps the flattened root era child chronology stitched in the expected order", () => {
+  it("keeps family roots under the canonical root and a flattened top-level display chronology", () => {
     expect(ROOT_TIMELINE.rootEra.children?.map((child) => child.id)).toEqual(
       ROOT_ERA.children?.map((child) => child.id),
     );
     expect(ROOT_TIMELINE.rootEra.children?.map((child) => child.id)).toEqual([
+      "cosmic-history",
+      "geological-history",
+      "human-history",
+    ]);
+    expect(getRootDisplayEras(ROOT_TIMELINE.rootEra).map((child) => child.id)).toEqual([
       "early-universe",
       "dark-ages",
       "first-stars-and-reionization",

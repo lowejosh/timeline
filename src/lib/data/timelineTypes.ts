@@ -26,6 +26,17 @@ export type EraScheme =
   | "world-history"
   | "archaeological";
 
+export type EraFamilyId = "cosmic" | "geological" | "human-history";
+
+export type TimelineEraFamilyConfig = {
+  id: EraFamilyId;
+  label: string;
+  description?: string;
+  order: number;
+  priority: number;
+  defaultEnabled?: boolean;
+};
+
 export type Era = TimelineRegionalScope &
   TimelineApproximateRange & {
     id: string;
@@ -38,6 +49,9 @@ export type Era = TimelineRegionalScope &
     timeLabel?: string;
     description?: string;
     scheme?: EraScheme;
+    familyId?: EraFamilyId;
+    priority?: number;
+    isFamilyRoot?: boolean;
     sourceRefs?: TimelineSourceRef[];
     children?: Era[];
   };

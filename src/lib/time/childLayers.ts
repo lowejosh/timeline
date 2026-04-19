@@ -1,4 +1,8 @@
-import { type Era } from "../data/eras";
+import {
+  compareEraPriorityAscending,
+  compareEraPriorityDescending,
+  type Era,
+} from "../data/eras";
 import { worldToScreen, type TimelineViewport } from "./viewport";
 
 export type ResolvedTimelineEraLayer = {
@@ -108,7 +112,7 @@ export function resolveTimelineEraLayersFromOpacityMap(
   inheritedOpacity = 1,
   depth = 0,
 ): ResolvedTimelineEraLayer[] {
-  const currentLevel = eras.map((era) => {
+  const currentLevel = [...eras].sort(compareEraPriorityAscending).map((era) => {
     const visibleFillRatio = getVisibleEraFillRatio(era, viewport, width, pad);
     const isActive = era.id === activeEraId;
     const childOpacity =
@@ -156,7 +160,7 @@ export function resolveTimelineEraLayers(
   inheritedOpacity = 1,
   depth = 0,
 ): ResolvedTimelineEraLayer[] {
-  const currentLevel = eras.map((era) => {
+  const currentLevel = [...eras].sort(compareEraPriorityAscending).map((era) => {
     const visibleFillRatio = getVisibleEraFillRatio(era, viewport, width, pad);
     const isActive = era.id === activeEraId;
     const childOpacity = getEraChildOpacity(
@@ -204,8 +208,63 @@ export function getInteractiveDescendantEras(
 ) {
   return layers
     .filter((layer) => layer.depth > 0 && layer.opacity > minOpacity)
-    .sort((a, b) => b.depth - a.depth)
+    .sort(
+      (left, right) =>
+        right.depth - left.depth ||
+        compareEraPriorityDescending(left.era, right.era),
+    )
     .map((layer) => layer.era);
+}
+
+export function shouldHideOverlappedEraLabel(
+  targetLayer: ResolvedTimelineEraLayer,
+  layers: ResolvedTimelineEraLayer[],
+  viewport: TimelineViewport,
+  width: number,
+  pad: number,
+  labelWidth: number,
+  labelPadding = 8,
+) {
+  if (targetLayer.opacity <= 0.01) {
+    return true;
+  }
+
+  const innerWidth = width - pad * 2;
+  const targetX0 = pad + worldToScreen(targetLayer.era.startYear, viewport, innerWidth);
+  const targetX1 = pad + worldToScreen(targetLayer.era.endYear, viewport, innerWidth);
+  const targetLeft = Math.max(Math.min(targetX0, targetX1), pad);
+  const targetRight = Math.min(Math.max(targetX0, targetX1), width - pad);
+
+  if (targetRight - targetLeft <= 0) {
+    return true;
+  }
+
+  const labelCenterX = (targetLeft + targetRight) / 2;
+  const labelLeft = Math.max(labelCenterX - labelWidth / 2 - labelPadding, pad);
+  const labelRight = Math.min(
+    labelCenterX + labelWidth / 2 + labelPadding,
+    width - pad,
+  );
+  const targetPriority = targetLayer.era.priority ?? 0;
+
+  return layers.some((layer) => {
+    if (
+      layer.era.id === targetLayer.era.id ||
+      layer.depth > targetLayer.depth ||
+      layer.opacity <= 0.01 ||
+      (layer.era.priority ?? 0) <= targetPriority
+    ) {
+      return false;
+    }
+
+    const x0 = pad + worldToScreen(layer.era.startYear, viewport, innerWidth);
+    const x1 = pad + worldToScreen(layer.era.endYear, viewport, innerWidth);
+    const left = Math.max(Math.min(x0, x1), pad);
+    const right = Math.min(Math.max(x0, x1), width - pad);
+    const overlap = Math.min(right, labelRight) - Math.max(left, labelLeft);
+
+    return overlap > 1;
+  });
 }
 
 export function getPreviewFocusChain(
@@ -232,6 +291,7 @@ export function getPreviewFocusChain(
           right.layer.childOpacity - left.layer.childOpacity ||
           right.layer.visibleFillRatio - left.layer.visibleFillRatio ||
           Number(right.layer.isActive) - Number(left.layer.isActive) ||
+          compareEraPriorityDescending(left.era, right.era) ||
           left.era.startYear - right.era.startYear
         );
       });
