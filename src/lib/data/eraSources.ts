@@ -45,6 +45,26 @@ export const ERA_SOURCES = {
     notes:
       "Used for broad context on galaxy evolution and the Milky Way's place in cosmic history.",
   },
+  nasaMilkyWayGrowth: {
+    shortTitle: "NASA: Milky Way-like growth",
+    title: "The Growth of Milky Way-Like Galaxies Over Time",
+    organization: "NASA / Hubble",
+    citation:
+      'NASA, ESA, C. Papovich et al., "The Growth of Milky Way-Like Galaxies Over Time."',
+    url: "https://science.nasa.gov/asset/hubble/the-growth-of-milky-way-like-galaxies-over-time/",
+    notes:
+      "Used for the Hubble sequence showing Milky Way-like galaxies as compact star-forming systems 11.3 billion years ago, reaching a star-birth peak 10.3 billion years ago, and displaying spiral structure by 8.9 billion years ago.",
+  },
+  nasaSunLateToMilkyWayParty: {
+    shortTitle: "NASA: Sun came late",
+    title: "Our Sun Came Late to the Milky Way's Star-Birth Party",
+    organization: "NASA / Hubble",
+    citation:
+      'NASA, "Our Sun Came Late to the Milky Way’s Star-Birth Party."',
+    url: "https://science.nasa.gov/missions/hubble/our-sun-came-late-to-the-milky-ways-star-birth-party/",
+    notes:
+      "Used for the statement that Milky Way-like galaxies underwent a stellar baby boom, with their star-birthing frenzy peaking about 10 billion years ago and most stellar-mass growth happening in their first 5 billion years.",
+  },
   nasaSolarSystemFacts: {
     shortTitle: "NASA: Solar System Facts",
     title: "Solar System Facts",

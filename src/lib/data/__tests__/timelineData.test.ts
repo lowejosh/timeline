@@ -110,6 +110,8 @@ describe("root timeline display data", () => {
       "cosmic-microwave-background-released",
       "first-stars-ignite",
       "reionization-largely-complete",
+      "milky-way-like-star-birth-peaks",
+      "milky-way-like-spiral-shape-emerges",
       "solar-system-formation",
       "earth-formation",
       "moon-forms",

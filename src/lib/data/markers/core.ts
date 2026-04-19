@@ -66,6 +66,48 @@ export const CORE_TIMELINE_MARKERS: TimelineMarker[] = [
     ],
   },
   {
+    id: "milky-way-like-star-birth-peaks",
+    label: "Milky Way-like star birth peaks",
+    shortLabel: "Star-Birth Peak",
+    year: yearsAgo(10_300_000_000),
+    approximate: true,
+    description:
+      "Milky Way-like galaxies hit a stellar baby boom, forming stars far faster than our galaxy does today.",
+    minZoom: 0,
+    priority: 89,
+    sourceRefs: [
+      {
+        sourceId: "nasaMilkyWayGrowth",
+        note: "NASA's Hubble growth sequence says that at 10.3 billion years ago the firestorm of star birth in Milky Way-like galaxies was reaching its peak.",
+      },
+      {
+        sourceId: "nasaSunLateToMilkyWayParty",
+        note: "NASA's Hubble release says the Milky Way's star-birthing frenzy peaked 10 billion years ago and was producing stars about 30 times faster than today.",
+      },
+    ],
+  },
+  {
+    id: "milky-way-like-spiral-shape-emerges",
+    label: "Milky Way-like spiral shape emerges",
+    shortLabel: "Spiral Shape",
+    year: yearsAgo(8_900_000_000),
+    approximate: true,
+    description:
+      "By this stage, Milky Way-like galaxies have grown larger and show a clear spiral form with older stars concentrated toward the center.",
+    minZoom: 0,
+    priority: 88,
+    sourceRefs: [
+      {
+        sourceId: "nasaMilkyWayGrowth",
+        note: "NASA's Hubble image sequence says that by 8.9 billion years ago a Milky Way-like galaxy had developed a spiral shape and housed its oldest stars in the central region.",
+      },
+      {
+        sourceId: "nasaGalaxyBasics",
+        note: "NASA's Galaxy Basics page describes the Milky Way as a spiral galaxy with a disk of stars, providing the present-day reference point for this earlier structural milestone.",
+      },
+    ],
+  },
+  {
     id: "solar-system-formation",
     label: "Solar System forms",
     shortLabel: "Solar System",
