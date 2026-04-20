@@ -62,6 +62,7 @@ export type Era = TimelineRegionalScope &
     scheme?: EraScheme;
     familyId?: EraFamilyId;
     priority?: number;
+    setPriorityBoost?: number;
     isFamilyRoot?: boolean;
     sourceRefs?: TimelineSourceRef[];
     children?: Era[];
@@ -117,6 +118,7 @@ type TimelineDecorationBase = TimelineZoomVisibility &
     shortLabel?: string;
     description?: string;
     priority?: number;
+    setPriorityBoost?: number;
     groupId?: string;
     setId?: TimelineSetId;
     subGroup?: string;

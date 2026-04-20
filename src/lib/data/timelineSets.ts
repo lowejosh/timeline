@@ -17,12 +17,20 @@ import {
   HUMAN_SET_ID,
 } from "./sets/human";
 import type {
+  Era,
   EraFamilyId,
   TimelineMarker,
   TimelineOverlayBand,
   TimelineSetConfig,
   TimelineSetId,
 } from "./timelineTypes";
+
+const TIMELINE_SET_PRIORITY_STRIDE = 10_000;
+
+type TimelinePriorityBearing = {
+  priority?: number;
+  setPriorityBoost?: number;
+};
 
 export type TimelineSetAssignmentConfig = TimelineSetConfig & {
   /** Decoration `groupId`s owned entirely by this set. */
@@ -72,6 +80,138 @@ export const TIMELINE_SETS_BY_ID: Readonly<
 > = Object.fromEntries(TIMELINE_SETS.map((set) => [set.id, set])) as Readonly<
   Record<TimelineSetId, TimelineSetAssignmentConfig>
 >;
+
+function compareTimelineSetOrder(
+  left: TimelineSetAssignmentConfig,
+  right: TimelineSetAssignmentConfig,
+) {
+  return left.order - right.order || left.label.localeCompare(right.label);
+}
+
+export function getDefaultTimelineSetOrder(): TimelineSetId[] {
+  return [...TIMELINE_SETS].sort(compareTimelineSetOrder).map((set) => set.id);
+}
+
+export function normalizeTimelineSetOrder(
+  candidateOrder: readonly string[] | null | undefined,
+): TimelineSetId[] {
+  const normalized: TimelineSetId[] = [];
+  const seen = new Set<TimelineSetId>();
+
+  for (const candidateId of candidateOrder ?? []) {
+    if (!(candidateId in TIMELINE_SETS_BY_ID)) {
+      continue;
+    }
+
+    const setId = candidateId as TimelineSetId;
+
+    if (seen.has(setId)) {
+      continue;
+    }
+
+    seen.add(setId);
+    normalized.push(setId);
+  }
+
+  for (const setId of getDefaultTimelineSetOrder()) {
+    if (seen.has(setId)) {
+      continue;
+    }
+
+    normalized.push(setId);
+  }
+
+  return normalized;
+}
+
+function getTimelineSetPriorityBoosts(setOrder: readonly TimelineSetId[]) {
+  const normalizedOrder = normalizeTimelineSetOrder(setOrder);
+  const boostBySetId = new Map<TimelineSetId, number>();
+
+  normalizedOrder.forEach((setId, index) => {
+    boostBySetId.set(
+      setId,
+      (normalizedOrder.length - index) * TIMELINE_SET_PRIORITY_STRIDE,
+    );
+  });
+
+  return boostBySetId;
+}
+
+export function getEffectiveTimelinePriority(item: TimelinePriorityBearing) {
+  return (item.priority ?? 0) + (item.setPriorityBoost ?? 0);
+}
+
+export function applyTimelineSetOrderToMarkers(
+  markers: readonly TimelineMarker[],
+  setOrder: readonly TimelineSetId[],
+): TimelineMarker[] {
+  const boostBySetId = getTimelineSetPriorityBoosts(setOrder);
+
+  return markers.map((marker) => {
+    const setId = marker.setId ?? resolveDecorationSetId(marker);
+    const setPriorityBoost = setId ? boostBySetId.get(setId) : undefined;
+
+    if ((marker.setPriorityBoost ?? 0) === (setPriorityBoost ?? 0)) {
+      return marker;
+    }
+
+    return {
+      ...marker,
+      setPriorityBoost,
+    };
+  });
+}
+
+function applyTimelineSetOrderToOverlay(
+  overlay: TimelineOverlayBand,
+  boostBySetId: ReadonlyMap<TimelineSetId, number>,
+): TimelineOverlayBand {
+  const setId = overlay.setId ?? resolveDecorationSetId(overlay);
+  const setPriorityBoost = setId ? boostBySetId.get(setId) : undefined;
+
+  return {
+    ...overlay,
+    setPriorityBoost,
+    children: overlay.children?.map((child) =>
+      applyTimelineSetOrderToOverlay(child, boostBySetId),
+    ),
+  };
+}
+
+export function applyTimelineSetOrderToOverlays(
+  overlays: readonly TimelineOverlayBand[],
+  setOrder: readonly TimelineSetId[],
+): TimelineOverlayBand[] {
+  const boostBySetId = getTimelineSetPriorityBoosts(setOrder);
+
+  return overlays.map((overlay) =>
+    applyTimelineSetOrderToOverlay(overlay, boostBySetId),
+  );
+}
+
+function applyTimelineSetOrderToEra(
+  era: Era,
+  boostBySetId: ReadonlyMap<TimelineSetId, number>,
+): Era {
+  const setId = era.familyId ? getSetIdForEraFamily(era.familyId) : null;
+  const setPriorityBoost = setId ? boostBySetId.get(setId) : undefined;
+
+  return {
+    ...era,
+    setPriorityBoost,
+    children: era.children?.map((child) =>
+      applyTimelineSetOrderToEra(child, boostBySetId),
+    ),
+  };
+}
+
+export function applyTimelineSetOrderToEraTree(
+  root: Era,
+  setOrder: readonly TimelineSetId[],
+): Era {
+  return applyTimelineSetOrderToEra(root, getTimelineSetPriorityBoosts(setOrder));
+}
 
 export function getDefaultEnabledTimelineSetIds(): Set<TimelineSetId> {
   return new Set(

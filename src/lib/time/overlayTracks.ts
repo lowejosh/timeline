@@ -3,6 +3,7 @@ import type {
   TimelineOverlayBand,
   TimelineZoomVisibility,
 } from "../data/timelineTypes";
+import { getEffectiveTimelinePriority } from "../data/timelineSets";
 import {
   getVisibleRange,
   worldToScreen,
@@ -158,7 +159,7 @@ function compareDecorations(
   return (
     left.startYear - right.startYear ||
     left.endYear - right.endYear ||
-    (right.priority ?? 0) - (left.priority ?? 0) ||
+    getEffectiveTimelinePriority(right) - getEffectiveTimelinePriority(left) ||
     left.id.localeCompare(right.id)
   );
 }
@@ -174,7 +175,7 @@ function compareOverlayBandsForLaneAssignment(
   return (
     leftBiasedStartYear - rightBiasedStartYear ||
     right.endYear - left.endYear ||
-    (right.priority ?? 0) - (left.priority ?? 0) ||
+    getEffectiveTimelinePriority(right) - getEffectiveTimelinePriority(left) ||
     left.id.localeCompare(right.id)
   );
 }

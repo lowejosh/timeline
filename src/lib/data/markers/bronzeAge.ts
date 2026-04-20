@@ -34,7 +34,7 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Ancient Egypt",
     approximate: true,
     minZoom: 18,
-    priority: 78,
+    priority: 83,
     sourceRefs: [
       {
         sourceId: "worldHistoryGreatPyramidGiza",

@@ -2,7 +2,10 @@ import { COSMIC_ERA_DEFINITIONS } from "./eraTrees/cosmic";
 import { GEOLOGICAL_ERA_DEFINITIONS } from "./eraTrees/geological";
 import { HUMAN_HISTORY_ERA_DEFINITIONS } from "./eraTrees/humanHistory";
 import { TIMELINE_DISPLAY } from "./timelineDecorations";
-import { getSetIdForEraFamily } from "./timelineSets";
+import {
+  getEffectiveTimelinePriority,
+  getSetIdForEraFamily,
+} from "./timelineSets";
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "../time/timelineYears";
 import type {
   Era,
@@ -56,7 +59,7 @@ export function isEraFamilyRoot(era: Era): boolean {
 
 export function compareEraPriorityAscending(left: Era, right: Era) {
   return (
-    (left.priority ?? 0) - (right.priority ?? 0) ||
+    getEffectiveTimelinePriority(left) - getEffectiveTimelinePriority(right) ||
     left.startYear - right.startYear ||
     right.endYear - left.endYear ||
     left.id.localeCompare(right.id)
@@ -65,7 +68,7 @@ export function compareEraPriorityAscending(left: Era, right: Era) {
 
 export function compareEraPriorityDescending(left: Era, right: Era) {
   return (
-    (right.priority ?? 0) - (left.priority ?? 0) ||
+    getEffectiveTimelinePriority(right) - getEffectiveTimelinePriority(left) ||
     left.startYear - right.startYear ||
     right.endYear - left.endYear ||
     left.id.localeCompare(right.id)

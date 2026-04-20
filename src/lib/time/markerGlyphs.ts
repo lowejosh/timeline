@@ -1,4 +1,5 @@
 import { formatTimelinePointLabel } from "./bands";
+import { getEffectiveTimelinePriority } from "../data/timelineSets";
 import type { TimelineMarker } from "../data/timelineTypes";
 
 export type VisibleMarkerPosition = {
@@ -109,7 +110,8 @@ function getEffectivePriority(
   highlightedMarkerId?: string | null,
 ) {
   return (
-    (marker.priority ?? 0) + (marker.id === highlightedMarkerId ? 1_000_000 : 0)
+    getEffectiveTimelinePriority(marker) +
+    (marker.id === highlightedMarkerId ? 1_000_000 : 0)
   );
 }
 

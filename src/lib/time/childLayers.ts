@@ -3,6 +3,7 @@ import {
   compareEraPriorityDescending,
   type Era,
 } from "../data/eras";
+import { getEffectiveTimelinePriority } from "../data/timelineSets";
 import { worldToScreen, type TimelineViewport } from "./viewport";
 
 export type ResolvedTimelineEraLayer = {
@@ -245,14 +246,14 @@ export function shouldHideOverlappedEraLabel(
     labelCenterX + labelWidth / 2 + labelPadding,
     width - pad,
   );
-  const targetPriority = targetLayer.era.priority ?? 0;
+  const targetPriority = getEffectiveTimelinePriority(targetLayer.era);
 
   return layers.some((layer) => {
     if (
       layer.era.id === targetLayer.era.id ||
       layer.depth > targetLayer.depth ||
       layer.opacity <= 0.01 ||
-      (layer.era.priority ?? 0) <= targetPriority
+      getEffectiveTimelinePriority(layer.era) <= targetPriority
     ) {
       return false;
     }

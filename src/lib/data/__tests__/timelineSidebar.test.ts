@@ -29,6 +29,8 @@ describe("timeline sidebar tree", () => {
       120,
       ALL_SET_IDS,
       ALL_GROUP_IDS,
+      new Set(),
+      ["cosmic", "earth", "human"],
     );
 
     expect(tree.map((set) => set.id)).toEqual(["cosmic", "earth", "human"]);
@@ -79,6 +81,8 @@ describe("timeline sidebar tree", () => {
       120,
       ALL_SET_IDS,
       ALL_GROUP_IDS,
+      new Set(),
+      ["cosmic", "earth", "human"],
     );
 
     const earthSet = tree.find((set) => set.id === "earth");
@@ -132,6 +136,8 @@ describe("timeline sidebar tree", () => {
       120,
       ALL_SET_IDS,
       new Set(["human-history"]),
+      new Set(),
+      ["cosmic", "earth", "human"],
     );
 
     const humanSet = tree.find((set) => set.id === "human");
@@ -196,6 +202,8 @@ describe("timeline sidebar tree", () => {
       120,
       ALL_SET_IDS,
       ALL_GROUP_IDS,
+      new Set(),
+      ["cosmic", "earth", "human"],
     );
 
     const cultures = tree
@@ -238,6 +246,7 @@ describe("timeline sidebar tree", () => {
       ALL_SET_IDS,
       new Set(["civilizations"]),
       new Set(["civilizations"]),
+      ["cosmic", "earth", "human"],
     );
 
     const civilizations = tree
@@ -250,5 +259,26 @@ describe("timeline sidebar tree", () => {
       overlayCount: 0,
       relevantItemCount: 0,
     });
+  });
+
+  it("supports custom set ordering for the sidebar tree", () => {
+    const tree = resolveTimelineSidebarTree(
+      {
+        markers: [],
+        overlays: [],
+      },
+      {
+        centerYear: 1200,
+        zoom: 24,
+      },
+      1000,
+      120,
+      ALL_SET_IDS,
+      ALL_GROUP_IDS,
+      new Set(),
+      ["human", "cosmic", "earth"],
+    );
+
+    expect(tree.map((set) => set.id)).toEqual(["human", "cosmic", "earth"]);
   });
 });

@@ -1,7 +1,11 @@
 import { getVisibleRange, type TimelineViewport } from "../time/viewport";
 import { isTimelineDecorationVisibleAtZoom } from "../time/overlayTracks";
 import { TIMELINE_DECORATION_GROUPS_BY_ID } from "./timelineDecorations";
-import { TIMELINE_SETS } from "./timelineSets";
+import {
+  TIMELINE_SETS,
+  getDefaultTimelineSetOrder,
+  normalizeTimelineSetOrder,
+} from "./timelineSets";
 import type {
   TimelineDecorationContentType,
   TimelineDisplayConfig,
@@ -57,6 +61,7 @@ export function resolveTimelineSidebarTree(
   enabledSetIds: ReadonlySet<TimelineSetId>,
   enabledGroupIds: ReadonlySet<string>,
   suppressedGroupIds: ReadonlySet<string> = new Set(),
+  setOrder: readonly TimelineSetId[] = getDefaultTimelineSetOrder(),
 ): TimelineSidebarSetState[] {
   if (width <= pad * 2) {
     return [];
@@ -98,9 +103,17 @@ export function resolveTimelineSidebarTree(
     countsByGroupId.set(overlay.groupId, existing);
   }
 
+  const orderIndexBySetId = new Map(
+    normalizeTimelineSetOrder(setOrder).map((setId, index) => [setId, index]),
+  );
+
   return [...TIMELINE_SETS]
     .sort(
-      (left, right) => left.order - right.order || left.label.localeCompare(right.label),
+      (left, right) =>
+        (orderIndexBySetId.get(left.id) ?? Number.MAX_SAFE_INTEGER) -
+          (orderIndexBySetId.get(right.id) ?? Number.MAX_SAFE_INTEGER) ||
+        left.order - right.order ||
+        left.label.localeCompare(right.label),
     )
     .map((set) => {
       const children = set.groupIds

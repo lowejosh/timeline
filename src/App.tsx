@@ -27,10 +27,15 @@ import {
   getDefaultEnabledTimelineGroupIds,
 } from "./lib/data/timelineDecorations";
 import {
+  applyTimelineSetOrderToEraTree,
+  applyTimelineSetOrderToMarkers,
+  applyTimelineSetOrderToOverlays,
   filterMarkersBySets,
   filterOverlaysBySets,
+  getDefaultTimelineSetOrder,
   getDefaultEnabledTimelineSetIds,
   getSetIdForEraFamily,
+  normalizeTimelineSetOrder,
 } from "./lib/data/timelineSets";
 import { resolveTimelineSidebarTree } from "./lib/data/timelineSidebar";
 import { shouldAutoSuppressTimelineLayer } from "./lib/time/timelineLayerAutoToggle";
@@ -48,6 +53,33 @@ const HUMAN_EVOLUTION_GROUP_ID =
 const OVERVIEW_RULER_TIER_HEIGHT = 18;
 const OVERVIEW_RULER_MAX_TIERS = 3;
 const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
+const TIMELINE_SET_ORDER_STORAGE_KEY = "timeline:set-order:v1";
+
+function readStoredTimelineSetOrder() {
+  if (typeof window === "undefined") {
+    return getDefaultTimelineSetOrder();
+  }
+
+  try {
+    const storedValue = window.localStorage.getItem(
+      TIMELINE_SET_ORDER_STORAGE_KEY,
+    );
+
+    if (!storedValue) {
+      return getDefaultTimelineSetOrder();
+    }
+
+    const parsed = JSON.parse(storedValue);
+
+    return normalizeTimelineSetOrder(
+      Array.isArray(parsed)
+        ? parsed.filter((value): value is string => typeof value === "string")
+        : undefined,
+    );
+  } catch {
+    return getDefaultTimelineSetOrder();
+  }
+}
 
 function App() {
   const [stageRef, stageSize] = useElementSize<HTMLDivElement>();
@@ -70,6 +102,9 @@ function App() {
   // overlays will flip entries in this set to hide whole content families.
   const [enabledSetIds, setEnabledSetIds] = useState<Set<TimelineSetId>>(() =>
     getDefaultEnabledTimelineSetIds(),
+  );
+  const [orderedSetIds, setOrderedSetIds] = useState<TimelineSetId[]>(() =>
+    readStoredTimelineSetOrder(),
   );
   const [expandedSetIds, setExpandedSetIds] = useState<Set<TimelineSetId>>(
     () => new Set(),
@@ -99,6 +134,17 @@ function App() {
     viewportRef.current = animated.viewport;
     innerWidthRef.current = innerWidth;
   });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        TIMELINE_SET_ORDER_STORAGE_KEY,
+        JSON.stringify(normalizeTimelineSetOrder(orderedSetIds)),
+      );
+    } catch {
+      // Ignore storage failures, the sidebar can still work with in-memory order.
+    }
+  }, [orderedSetIds]);
 
   useEffect(() => {
     const nextAutoSuppressedGroupIds = new Set(autoSuppressedGroupIds);
@@ -213,19 +259,32 @@ function App() {
     return next;
   }, [autoSuppressedGroupIds, humanEvolutionToggleMode]);
 
-  const rootDisplayEras = useMemo(
-    () => getRootDisplayErasBySets(ROOT_ERA, enabledSetIds),
-    [enabledSetIds],
+  const prioritizedRootEra = useMemo(
+    () => applyTimelineSetOrderToEraTree(ROOT_ERA, orderedSetIds),
+    [orderedSetIds],
   );
 
-  const setFilteredMarkers = useMemo(
-    () => filterMarkersBySets(TIMELINE_DISPLAY.markers, enabledSetIds),
-    [enabledSetIds],
+  const rootDisplayEras = useMemo(
+    () => getRootDisplayErasBySets(prioritizedRootEra, enabledSetIds),
+    [enabledSetIds, prioritizedRootEra],
   );
-  const setFilteredOverlays = useMemo(
-    () => filterOverlaysBySets(TIMELINE_DISPLAY.overlays, enabledSetIds),
-    [enabledSetIds],
-  );
+
+  const setFilteredMarkers = useMemo(() => {
+    const filteredMarkers = filterMarkersBySets(
+      TIMELINE_DISPLAY.markers,
+      enabledSetIds,
+    );
+
+    return applyTimelineSetOrderToMarkers(filteredMarkers, orderedSetIds);
+  }, [enabledSetIds, orderedSetIds]);
+  const setFilteredOverlays = useMemo(() => {
+    const filteredOverlays = filterOverlaysBySets(
+      TIMELINE_DISPLAY.overlays,
+      enabledSetIds,
+    );
+
+    return applyTimelineSetOrderToOverlays(filteredOverlays, orderedSetIds);
+  }, [enabledSetIds, orderedSetIds]);
   const setFilteredDisplay = useMemo(
     () => ({
       markers: setFilteredMarkers,
@@ -234,21 +293,21 @@ function App() {
     [setFilteredMarkers, setFilteredOverlays],
   );
 
-  const activeEra = findEraById(ROOT_ERA, activeEraId) ?? ROOT_ERA;
-  const rawChain = getAncestorChain(ROOT_ERA, activeEraId);
-  const chain = getEraDisplayChain(ROOT_ERA, activeEraId);
+  const activeEra = findEraById(prioritizedRootEra, activeEraId) ?? prioritizedRootEra;
+  const rawChain = getAncestorChain(prioritizedRootEra, activeEraId);
+  const chain = getEraDisplayChain(prioritizedRootEra, activeEraId);
   const rawParentEra = rawChain.length > 1 ? rawChain[rawChain.length - 2] : null;
   const parentEra =
     rawParentEra &&
-    rawParentEra.id !== ROOT_ERA.id &&
+    rawParentEra.id !== prioritizedRootEra.id &&
     !isEraFamilyRoot(rawParentEra)
       ? rawParentEra
       : null;
   const isTopLevelDisplayEra =
-    rawParentEra === ROOT_ERA ||
+    rawParentEra?.id === prioritizedRootEra.id ||
     (rawParentEra !== null && isEraFamilyRoot(rawParentEra));
   const siblingEras =
-    activeEra.id === ROOT_ERA.id || isTopLevelDisplayEra
+    activeEra.id === prioritizedRootEra.id || isTopLevelDisplayEra
       ? rootDisplayEras
       : rawParentEra
         ? (rawParentEra.children ?? [])
@@ -257,11 +316,11 @@ function App() {
   // Check if we should auto-collapse when zoomed out
   const checkAutoTransition = useCallback(() => {
     setActiveEraId((currentId) => {
-      const era = findEraById(ROOT_ERA, currentId) ?? ROOT_ERA;
-      const navigableAncestor = getNavigableAncestor(ROOT_ERA, currentId);
+      const era = findEraById(prioritizedRootEra, currentId) ?? prioritizedRootEra;
+      const navigableAncestor = getNavigableAncestor(prioritizedRootEra, currentId);
 
       if (
-        currentId === ROOT_ERA.id ||
+        currentId === prioritizedRootEra.id ||
         isEraFamilyRoot(era) ||
         !navigableAncestor
       ) {
@@ -285,7 +344,7 @@ function App() {
 
       return currentId;
     });
-  }, []);
+  }, [prioritizedRootEra]);
 
   const scheduleAutoTransitionCheck = useCallback(() => {
     if (autoTransitionFrameRef.current) {
@@ -336,17 +395,17 @@ function App() {
   );
 
   const handleNavigateUp = useCallback(() => {
-    const parent = getNavigableAncestor(ROOT_ERA, activeEraId);
+    const parent = getNavigableAncestor(prioritizedRootEra, activeEraId);
 
-    if (parent && parent.id !== ROOT_ERA.id) {
+    if (parent && parent.id !== prioritizedRootEra.id) {
       setActiveEraId(parent.id);
       animated.animateToRange(parent.startYear, parent.endYear);
     } else {
       // Already at root — go home
-      setActiveEraId(ROOT_ERA.id);
+      setActiveEraId(prioritizedRootEra.id);
       animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1]);
     }
-  }, [activeEraId, animated]);
+  }, [activeEraId, animated, prioritizedRootEra]);
 
   const sidebarTree = useMemo(
     () =>
@@ -358,12 +417,14 @@ function App() {
         enabledSetIds,
         baseEnabledGroupIds,
         sidebarSuppressedGroupIds,
+        orderedSetIds,
       ),
     [
       animated.viewport,
       baseEnabledGroupIds,
       enabledSetIds,
       innerWidth,
+      orderedSetIds,
       sidebarSuppressedGroupIds,
       setFilteredDisplay,
     ],
@@ -397,7 +458,7 @@ function App() {
   const handleToggleSet = useCallback(
     (setId: TimelineSetId, nextEnabled: boolean) => {
       if (!nextEnabled) {
-        const activeFamilyId = getEraFamilyId(ROOT_ERA, activeEraId);
+        const activeFamilyId = getEraFamilyId(prioritizedRootEra, activeEraId);
         const activeSetId = activeFamilyId
           ? getSetIdForEraFamily(activeFamilyId)
           : null;
@@ -422,7 +483,7 @@ function App() {
 
       setOverlayVisibilityTransitionKey((current) => current + 1);
     },
-    [activeEraId, animated],
+    [activeEraId, animated, prioritizedRootEra],
   );
 
   const handleToggleSetExpanded = useCallback(
@@ -441,6 +502,22 @@ function App() {
     },
     [],
   );
+
+  const handleReorderSets = useCallback((nextOrder: TimelineSetId[]) => {
+    setOrderedSetIds((current) => {
+      const normalizedCurrent = normalizeTimelineSetOrder(current);
+      const normalizedNext = normalizeTimelineSetOrder(nextOrder);
+
+      if (
+        normalizedCurrent.length === normalizedNext.length &&
+        normalizedCurrent.every((setId, index) => setId === normalizedNext[index])
+      ) {
+        return current;
+      }
+
+      return normalizedNext;
+    });
+  }, []);
 
   const isOverviewVisible = stageSize.height >= MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER;
   const mainCanvasHeight = Math.max(
@@ -477,6 +554,7 @@ function App() {
       >
         <TimelineSidebar
           expandedSetIds={expandedSetIds}
+          onReorderSets={handleReorderSets}
           onToggleSet={handleToggleSet}
           onToggleSetExpanded={handleToggleSetExpanded}
           sets={sidebarTree}

@@ -37,7 +37,10 @@ import type {
   TimelineMarker,
   TimelineOverlayBand,
 } from "./timelineTypes";
-import { resolveDecorationSetId } from "./timelineSets";
+import {
+  getEffectiveTimelinePriority,
+  resolveDecorationSetId,
+} from "./timelineSets";
 
 const COSMIC_MILESTONES_CATEGORY_ID = COSMIC_MILESTONES_GROUP_ID;
 const EARTH_MILESTONES_CATEGORY_ID = EARTH_MILESTONES_GROUP_ID;
@@ -259,7 +262,7 @@ const TIMELINE_OVERLAY_COLLECTIONS: TimelineOverlayCollection[] = [
 function sortMarkers(left: TimelineMarker, right: TimelineMarker) {
   return (
     left.year - right.year ||
-    (right.priority ?? 0) - (left.priority ?? 0) ||
+    getEffectiveTimelinePriority(right) - getEffectiveTimelinePriority(left) ||
     left.id.localeCompare(right.id)
   );
 }
@@ -268,7 +271,7 @@ function sortOverlays(left: TimelineOverlayBand, right: TimelineOverlayBand) {
   return (
     left.startYear - right.startYear ||
     left.endYear - right.endYear ||
-    (right.priority ?? 0) - (left.priority ?? 0) ||
+    getEffectiveTimelinePriority(right) - getEffectiveTimelinePriority(left) ||
     left.id.localeCompare(right.id)
   );
 }

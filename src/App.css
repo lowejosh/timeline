@@ -206,14 +206,26 @@
   display: grid;
   gap: 0;
   margin: 0 -0.62rem -0.18rem;
+  position: relative;
 }
 
 .timeline-sidebar__set-shell {
   display: grid;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
 }
 
 .timeline-sidebar__set-shell + .timeline-sidebar__set-shell {
   border-top: 1px solid rgba(77, 61, 47, 0.08);
+}
+
+.timeline-sidebar__set-shell[data-drag-state="dragging"] {
+  filter: drop-shadow(0 12px 18px rgba(44, 31, 20, 0.12));
+}
+
+.timeline-sidebar__set-shell[data-drag-state="dragging"] .timeline-sidebar__set-card {
+  background: rgba(255, 252, 246, 0.82);
+  backdrop-filter: blur(12px);
 }
 
 .timeline-sidebar__set-card {
@@ -232,7 +244,7 @@
 
 .timeline-sidebar__set-row {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto auto 1fr auto;
   gap: 0.42rem;
   align-items: center;
   padding: 0.42rem 0.62rem;
@@ -249,6 +261,50 @@
 
 .timeline-sidebar__set-row[data-expanded="true"] {
   background: rgba(255, 251, 244, 0.14);
+}
+
+.timeline-sidebar__drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1.4rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.42rem;
+  background: transparent;
+  color: rgba(77, 61, 47, 0.36);
+  cursor: grab;
+  touch-action: none;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.timeline-sidebar__drag-handle:hover,
+.timeline-sidebar__set-shell[data-drag-state="dragging"] .timeline-sidebar__drag-handle {
+  color: rgba(77, 61, 47, 0.6);
+}
+
+.timeline-sidebar__drag-handle:hover {
+  background: rgba(255, 251, 244, 0.38);
+}
+
+.timeline-sidebar__drag-handle:active,
+.timeline-sidebar__set-shell[data-drag-state="dragging"] .timeline-sidebar__drag-handle {
+  cursor: grabbing;
+}
+
+.timeline-sidebar__drag-handle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+.timeline-sidebar__drag-glyph {
+  width: 0.68rem;
+  height: 0.68rem;
+  fill: currentColor;
 }
 
 /* disclosure glyph is now inline in .timeline-sidebar__set-row */

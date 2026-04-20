@@ -1,13 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { ROOT_ERA, TIMELINE_DISPLAY, getRootDisplayErasBySets } from "../eras";
 import {
+  ROOT_ERA,
+  TIMELINE_DISPLAY,
+  findEraById,
+  getRootDisplayErasBySets,
+} from "../eras";
+import {
+  applyTimelineSetOrderToEraTree,
+  applyTimelineSetOrderToMarkers,
+  applyTimelineSetOrderToOverlays,
+  getEffectiveTimelinePriority,
   TIMELINE_SETS,
   TIMELINE_SETS_BY_ID,
   filterMarkersBySets,
   filterOverlaysBySets,
   getDefaultEnabledTimelineSetIds,
+  getDefaultTimelineSetOrder,
   getSetIdForEraFamily,
   isDecorationSetEnabled,
+  normalizeTimelineSetOrder,
   resolveDecorationSetId,
 } from "../timelineSets";
 import type { TimelineSetId } from "../timelineTypes";
@@ -29,6 +40,13 @@ describe("timeline set registry", () => {
   it("defaults all three sets to enabled", () => {
     const defaults = getDefaultEnabledTimelineSetIds();
     expect([...defaults].sort()).toEqual(ALL_SET_IDS.slice().sort());
+  });
+
+  it("returns the default set order and normalizes custom persisted orders", () => {
+    expect(getDefaultTimelineSetOrder()).toEqual(["cosmic", "earth", "human"]);
+    expect(
+      normalizeTimelineSetOrder(["human", "earth", "human", "bogus"]),
+    ).toEqual(["human", "earth", "cosmic"]);
   });
 
   it("maps each era family to the correct owning set", () => {
@@ -181,5 +199,82 @@ describe("marker and overlay filtering by set", () => {
     expect(
       filterOverlaysBySets(TIMELINE_DISPLAY.overlays, defaults).length,
     ).toBe(TIMELINE_DISPLAY.overlays.length);
+  });
+
+  it("applies reordered set precedence to effective marker and overlay priority", () => {
+    const prioritizedMarkers = applyTimelineSetOrderToMarkers(
+      [
+        {
+          id: "earth-marker",
+          label: "Earth marker",
+          year: 0,
+          setId: "earth",
+          priority: 10,
+        },
+        {
+          id: "human-marker",
+          label: "Human marker",
+          year: 0,
+          setId: "human",
+          priority: 999,
+        },
+      ],
+      ["earth", "human", "cosmic"],
+    );
+    const earthMarker = prioritizedMarkers.find((marker) => marker.id === "earth-marker");
+    const humanMarker = prioritizedMarkers.find((marker) => marker.id === "human-marker");
+
+    expect(getEffectiveTimelinePriority(earthMarker!)).toBeGreaterThan(
+      getEffectiveTimelinePriority(humanMarker!),
+    );
+
+    const prioritizedOverlays = applyTimelineSetOrderToOverlays(
+      [
+        {
+          id: "cosmic-overlay",
+          label: "Cosmic overlay",
+          startYear: -10,
+          endYear: 10,
+          color: "rgb(0,0,0)",
+          setId: "cosmic",
+          priority: 500,
+        },
+        {
+          id: "human-overlay",
+          label: "Human overlay",
+          startYear: -10,
+          endYear: 10,
+          color: "rgb(0,0,0)",
+          setId: "human",
+          priority: 20,
+        },
+      ],
+      ["human", "earth", "cosmic"],
+    );
+    const cosmicOverlay = prioritizedOverlays.find(
+      (overlay) => overlay.id === "cosmic-overlay",
+    );
+    const humanOverlay = prioritizedOverlays.find(
+      (overlay) => overlay.id === "human-overlay",
+    );
+
+    expect(getEffectiveTimelinePriority(humanOverlay!)).toBeGreaterThan(
+      getEffectiveTimelinePriority(cosmicOverlay!),
+    );
+  });
+
+  it("applies reordered set precedence to era effective priority without mutating base priorities", () => {
+    const prioritizedRoot = applyTimelineSetOrderToEraTree(ROOT_ERA, [
+      "earth",
+      "human",
+      "cosmic",
+    ]);
+    const quaternary = findEraById(prioritizedRoot, "quaternary");
+    const paleolithic = findEraById(prioritizedRoot, "paleolithic");
+
+    expect(quaternary?.priority).toBe(findEraById(ROOT_ERA, "quaternary")?.priority);
+    expect(getEffectiveTimelinePriority(quaternary!)).toBeGreaterThan(
+      getEffectiveTimelinePriority(paleolithic!),
+    );
   });
 });

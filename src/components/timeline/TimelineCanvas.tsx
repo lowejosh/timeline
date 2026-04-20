@@ -21,6 +21,7 @@ import {
   type TimelineMarker,
   type TimelineOverlayBand,
 } from "../../lib/data/eras";
+import { getEffectiveTimelinePriority } from "../../lib/data/timelineSets";
 import {
   getEraTooltipContent,
   getMarkerTooltipContent,
@@ -1681,7 +1682,7 @@ function compareOverlayBands(
   return (
     left.startYear - right.startYear ||
     left.endYear - right.endYear ||
-    (right.priority ?? 0) - (left.priority ?? 0) ||
+    getEffectiveTimelinePriority(right) - getEffectiveTimelinePriority(left) ||
     left.id.localeCompare(right.id)
   );
 }
