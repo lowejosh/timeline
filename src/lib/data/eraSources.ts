@@ -1746,6 +1746,69 @@ export const ERA_SOURCES = {
     notes:
       "Used for the conventional 1517 start of the Protestant Reformation with Martin Luther's 95 Theses.",
   },
+  historyFerdinandMagellan: {
+    shortTitle: "History: Ferdinand Magellan",
+    title: "Ferdinand Magellan",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Ferdinand Magellan."',
+    url: "https://www.history.com/articles/ferdinand-magellan",
+    notes:
+      "Used for Magellan's 1519 expedition and for HISTORY's statement that the Victoria returned to Seville in September 1522 after completing the voyage around the world.",
+  },
+  historyJamestown: {
+    shortTitle: "History: Jamestown Colony",
+    title: "Jamestown Colony",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Jamestown Colony."',
+    url: "https://www.history.com/articles/jamestown",
+    notes:
+      "Used for Jamestown's founding on 14 May 1607 as the first permanent English settlement in North America.",
+  },
+  historyThirtyYearsWar: {
+    shortTitle: "History: Thirty Years' War",
+    title: "Thirty Years' War",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Thirty Years’ War."',
+    url: "https://www.history.com/articles/thirty-years-war",
+    notes:
+      "Used for the Thirty Years' War as a 17th-century conflict fought primarily in central Europe from 1618 to 1648 and for the Peace of Westphalia ending it in 1648.",
+  },
+  historyEnglishCivilWars: {
+    shortTitle: "History: English Civil Wars",
+    title: "English Civil Wars",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "English Civil Wars."',
+    url: "https://www.history.com/articles/english-civil-wars",
+    notes:
+      "Used for the English Civil Wars beginning in 1642 and for their broader 1642-1651 span across the three kingdoms of England, Scotland, and Ireland.",
+  },
+  historyEnlightenment: {
+    shortTitle: "History: Enlightenment",
+    title: "Enlightenment",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Enlightenment."',
+    url: "https://www.history.com/articles/enlightenment",
+    notes:
+      "Used for the Enlightenment as the long 18th century from 1685 to 1815 and for HISTORY's early, high, and late Enlightenment breakdown.",
+  },
+  britannicaSiegeOfVienna: {
+    shortTitle: "Britannica: Siege of Vienna",
+    title: "Siege of Vienna",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Siege of Vienna."',
+    url: "https://www.britannica.com/event/Siege-of-Vienna-1683",
+    notes:
+      "Used for the Ottoman siege of Vienna in 1683, Britannica's statement that it ended in Ottoman defeat by a combined force led by John III Sobieski, and Britannica's framing of the event as the beginning of the end of Ottoman domination in eastern Europe.",
+  },
+  britannicaEncyclopedie: {
+    shortTitle: "Britannica: Encyclopédie",
+    title: "Encyclopédie",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Encyclopédie."',
+    url: "https://www.britannica.com/topic/Encyclopedie",
+    notes:
+      "Used for the Encyclopédie as one of the chief works of the philosophes and for Britannica's statement that its text volumes were published between 1751 and 1765.",
+  },
   historyFrenchRevolution: {
     shortTitle: "History: French Revolution",
     title: "French Revolution",
@@ -1753,6 +1816,33 @@ export const ERA_SOURCES = {
     citation: 'HISTORY.com Editors, "French Revolution."',
     url: "https://www.history.com/articles/french-revolution",
     notes: "Used for the standard 1789 start of the French Revolution.",
+  },
+  britannicaRevolutionsOf1848: {
+    shortTitle: "Britannica: Revolutions of 1848",
+    title: "Revolutions of 1848",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Revolutions of 1848."',
+    url: "https://www.britannica.com/event/Revolutions-of-1848",
+    notes:
+      "Used for the revolutions of 1848 as a Europe-wide wave of republican revolts beginning in Sicily and spreading to France, Germany, Italy, and the Austrian Empire.",
+  },
+  britannicaRisorgimento: {
+    shortTitle: "Britannica: Risorgimento",
+    title: "Risorgimento",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Risorgimento."',
+    url: "https://www.britannica.com/event/Risorgimento",
+    notes:
+      "Used for the 19th-century movement for Italian unification culminating in the establishment of the Kingdom of Italy in 1861, with final unification completed by 1870.",
+  },
+  britannicaGermanEmpire: {
+    shortTitle: "Britannica: German Empire",
+    title: "German Empire",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "German Empire."',
+    url: "https://www.britannica.com/place/German-Empire",
+    notes:
+      "Used for the German Empire being founded on 18 January 1871 under Prussian leadership after the wars that unified Germany.",
   },
   britannicaScrambleForAfrica: {
     shortTitle: "Britannica: Scramble for Africa",
@@ -1796,6 +1886,15 @@ export const ERA_SOURCES = {
     url: "https://www.history.com/articles/world-war-ii-history",
     notes: "Used for the canonical 1939 start year of World War II.",
   },
+  historyGreatDepression: {
+    shortTitle: "History: Great Depression",
+    title: "Great Depression History",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Great Depression History."',
+    url: "https://www.history.com/articles/great-depression-history",
+    notes:
+      "Used for the Great Depression as the worst economic crisis in modern history, lasting from 1929 to the beginning of World War II in 1939, and for the October 1929 stock market crash as the trigger of the broader crisis.",
+  },
   historyIndustrialRevolution: {
     shortTitle: "History: Industrial Revolution",
     title: "Industrial Revolution",
@@ -1804,6 +1903,60 @@ export const ERA_SOURCES = {
     url: "https://www.history.com/articles/industrial-revolution",
     notes:
       "Used for industrialization as a transformation of agrarian societies into industrial and urban ones, driven by factories, steam power, coal, and rail transport.",
+  },
+  historyTelegraph: {
+    shortTitle: "History: Telegraph",
+    title: "Morse Code & the Telegraph",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Morse Code & the Telegraph."',
+    url: "https://www.history.com/articles/telegraph",
+    notes:
+      "Used for the telegraph being developed in the 1830s and 1840s and for Morse sending the first telegraph message on 24 May 1844 from Washington, D.C., to Baltimore.",
+  },
+  britannicaTelephone: {
+    shortTitle: "Britannica: telephone",
+    title: "telephone",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "telephone."',
+    url: "https://www.britannica.com/technology/telephone",
+    notes:
+      "Used for the telephone as an electrical device derived from Bell's inventions and for Britannica's statement that within 20 years of the 1876 Bell patent the instrument had assumed the lasting functional design of modern telephony.",
+  },
+  energyHistoryLightBulb: {
+    shortTitle: "DOE: history of the light bulb",
+    title: "The History of the Light Bulb",
+    organization: "U.S. Department of Energy",
+    citation: 'U.S. Department of Energy, "The History of the Light Bulb."',
+    url: "https://www.energy.gov/articles/history-light-bulb",
+    notes:
+      "Used for the incandescent light bulb's development, including DOE's statement that Edison patented it in 1879 and that by October 1879 his team had produced a carbonized-filament bulb lasting 14.5 hours.",
+  },
+  mercedesFirstAutomobile: {
+    shortTitle: "Mercedes-Benz: first automobile",
+    title: "1885–1886, The first automobile",
+    organization: "Mercedes-Benz Group",
+    citation: 'Mercedes-Benz Group, "1885–1886, The first automobile."',
+    url: "https://group.mercedes-benz.com/company/tradition/company-history/1885-1886.html",
+    notes:
+      "Used for Carl Benz completing the Patent Motor Car in 1885 and for the company's statement that on 29 January 1886 he applied for the patent regarded as the automobile's birth certificate.",
+  },
+  nobelMarconiBiographical: {
+    shortTitle: "Nobel: Guglielmo Marconi",
+    title: "Guglielmo Marconi, Biographical",
+    organization: "Nobel Prize Outreach",
+    citation: 'Nobel Prize Outreach, "Guglielmo Marconi – Biographical."',
+    url: "https://www.nobelprize.org/prizes/physics/1909/marconi/biographical/",
+    notes:
+      "Used for Marconi's 1895 experiments sending wireless signals over one and a half miles and for the 1896 wireless-telegraphy patent context that followed.",
+  },
+  historyWrightBrothers: {
+    shortTitle: "History: Wright Brothers",
+    title: "Wright Brothers",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Wright Brothers."',
+    url: "https://www.history.com/articles/wright-brothers",
+    notes:
+      "Used for the Wright brothers' first free, controlled flight of a power-driven, heavier-than-air plane on 17 December 1903 at Kitty Hawk.",
   },
   historyColdWar: {
     shortTitle: "History: Cold War",
@@ -1933,6 +2086,70 @@ export const ERA_SOURCES = {
     notes:
       "Used for Tim Berners-Lee's invention of the World Wide Web in 1989 and CERN's decision on April 30, 1993 to place the software in the public domain, allowing the web to spread globally.",
   },
+  cernShortHistoryWeb: {
+    shortTitle: "CERN: short history of the Web",
+    title: "A short history of the Web",
+    organization: "CERN",
+    citation: 'CERN, "A short history of the Web."',
+    url: "https://home.cern/science/computing/birth-web/short-history-web",
+    notes:
+      "Used for the 1991 release of WWW software, including the line-mode browser and server tools, and for the broader 1991-1994 chronology of the web's expansion beyond CERN.",
+  },
+  cernHiggsBoson2012: {
+    shortTitle: "CERN: Higgs boson announcement",
+    title: "CERN experiments observe particle consistent with long-sought Higgs boson",
+    organization: "CERN",
+    citation:
+      'CERN, "CERN experiments observe particle consistent with long-sought Higgs boson."',
+    url: "https://home.cern/news/press-release/cern/cern-experiments-observe-particle-consistent-long-sought-higgs-boson",
+    notes:
+      "Used for the 4 July 2012 CERN announcement that ATLAS and CMS had observed a new particle in the 125-126 GeV mass region, opening the way to more detailed Higgs-boson studies.",
+  },
+  trustMeBro: {
+    shortTitle: "Trust me bro",
+    title: "Trust me bro",
+    organization: "Personal bias",
+    citation: '"Trust me bro."',
+    notes:
+      "Used for intentionally tongue-in-cheek, explicitly unsourced editorial framing where the app wants to show personal-biased information rather than an external citation.",
+  },
+  appleIPhoneIntroduction: {
+    shortTitle: "Apple: iPhone introduced",
+    title: "Apple Reinvents the Phone with iPhone",
+    organization: "Apple",
+    citation: 'Apple, "Apple Reinvents the Phone with iPhone."',
+    url: "https://www.apple.com/newsroom/2007/01/09Apple-Reinvents-the-Phone-with-iPhone/",
+    notes:
+      "Used for Apple's 9 January 2007 introduction of the iPhone as a single device combining a phone, widescreen iPod, and Internet communications device.",
+  },
+  oecdAiWipsProgram: {
+    shortTitle: "OECD: AI-WIPS",
+    title: "AI in Work, Innovation, Productivity and Skills (AI-WIPS)",
+    organization: "Organisation for Economic Co-operation and Development",
+    citation:
+      'OECD, "AI in Work, Innovation, Productivity and Skills (AI-WIPS)."',
+    url: "https://www.oecd.org/en/about/programmes/ai-in-work-innovation-productivity-and-skills.html",
+    notes:
+      "Used for the OECD's framing that AI is expected to complement humans in some tasks, replace them in others, generate new types of work, and transform how people organise and carry out work.",
+  },
+  oecdAlgorithmicManagement: {
+    shortTitle: "OECD: algorithmic management",
+    title: "Algorithmic management in the workplace",
+    organization: "Organisation for Economic Co-operation and Development",
+    citation: 'OECD, "Algorithmic management in the workplace."',
+    url: "https://www.oecd.org/en/publications/algorithmic-management-in-the-workplace_287c13c4-en.html",
+    notes:
+      "Used for the definition of algorithmic management as software, potentially including AI, that fully or partially automates tasks traditionally carried out by human managers, and for the broader automated-decision context of the 2010s and 2020s.",
+  },
+  openAiIntroducingChatGpt: {
+    shortTitle: "OpenAI: Introducing ChatGPT",
+    title: "Introducing ChatGPT",
+    organization: "OpenAI",
+    citation: 'OpenAI, "Introducing ChatGPT."',
+    url: "https://openai.com/index/chatgpt/",
+    notes:
+      "Used for OpenAI's 30 November 2022 research-preview launch of ChatGPT and for the public framing of conversational generative AI reaching a mass audience.",
+  },
   britannicaYuriGagarin: {
     shortTitle: "Britannica: Yuri Gagarin",
     title: "Yuri Gagarin",
@@ -1951,6 +2168,43 @@ export const ERA_SOURCES = {
     url: "https://history.state.gov/milestones/1961-1968/cuban-missile-crisis",
     notes:
       "Used for the Cuban Missile Crisis as the moment when the United States and Soviet Union came closest to nuclear conflict, and for Khrushchev's 28 October 1962 public statement that Soviet missiles would be dismantled and removed from Cuba.",
+  },
+  britannicaVietnamWar: {
+    shortTitle: "Britannica: Vietnam War",
+    title: "Vietnam War",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Vietnam War."',
+    url: "https://www.britannica.com/event/Vietnam-War",
+    notes:
+      "Used for the Vietnam War's broad 1954-1975 framing and for Britannica's statement that South Vietnam fell in 1975 to a full-scale invasion by the North.",
+  },
+  britannicaIranianRevolution: {
+    shortTitle: "Britannica: Iranian Revolution",
+    title: "Iranian Revolution",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Iranian Revolution."',
+    url: "https://www.britannica.com/event/Iranian-Revolution",
+    notes:
+      "Used for Britannica's statement that the monarchy was toppled on 11 February 1979 and that the revolution led to the establishment of an Islamic republic.",
+  },
+  whoSmallpoxEradication: {
+    shortTitle: "WHO: smallpox eradication",
+    title: "WHO commemorates the 40th anniversary of smallpox eradication",
+    organization: "World Health Organization",
+    citation:
+      'World Health Organization, "WHO commemorates the 40th anniversary of smallpox eradication."',
+    url: "https://www.who.int/news/item/13-12-2019-who-commemorates-the-40th-anniversary-of-smallpox-eradication",
+    notes:
+      "Used for WHO's statement that the World Health Assembly issued its official declaration in May 1980 that the world and all its peoples had won freedom from smallpox.",
+  },
+  iaeaChernobylFaq: {
+    shortTitle: "IAEA: Chernobyl FAQs",
+    title: "Frequently Asked Chernobyl Questions",
+    organization: "International Atomic Energy Agency",
+    citation: 'International Atomic Energy Agency, "Frequently Asked Chernobyl Questions."',
+    url: "https://www.iaea.org/topics/chornobyl/faqs",
+    notes:
+      "Used for the 26 April 1986 Chernobyl reactor accident and for the IAEA's public-facing summary of the explosion, fire, and large radioactive release into the atmosphere.",
   },
   historySeptember11Attacks: {
     shortTitle: "History: September 11 Attacks",

@@ -76,9 +76,9 @@ export function TimelineDisclaimer() {
 
         <div className="timeline-disclaimer__body">
           <p>
-            Unfortunately there is no single clean, standardized single source
-            of truth to divide all of history, and also not really possible to
-            fit EVERYTHING on here.
+            Unfortunately there is no standardized single source of truth to
+            divide all of history, and also not really possible to fit
+            EVERYTHING on here.
           </p>
           <p>
             So the default information/eras are mostly biased around what I

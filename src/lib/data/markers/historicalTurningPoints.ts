@@ -39,6 +39,30 @@ const SOVIET_UNION_DISSOLVES_AT = createExactCalendarTimestamp({
   precision: "day",
 });
 
+const IPHONE_INTRODUCED_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 2007,
+  month: 1,
+  day: 9,
+  precision: "day",
+});
+
+const HIGGS_BOSON_ANNOUNCED_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 2012,
+  month: 7,
+  day: 4,
+  precision: "day",
+});
+
+const CHATGPT_INTRODUCED_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 2022,
+  month: 11,
+  day: 30,
+  precision: "day",
+});
+
 const WORLD_WIDE_WEB_OPENED_AT = createExactCalendarTimestamp({
   era: "ce",
   year: 1993,
@@ -79,6 +103,30 @@ const NATO_FOUNDED_AT = createExactCalendarTimestamp({
   precision: "day",
 });
 
+const FIRST_TELEGRAPH_MESSAGE_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1844,
+  month: 5,
+  day: 24,
+  precision: "day",
+});
+
+const FIRST_AUTOMOBILE_PATENT_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1886,
+  month: 1,
+  day: 29,
+  precision: "day",
+});
+
+const FIRST_POWERED_FLIGHT_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1903,
+  month: 12,
+  day: 17,
+  precision: "day",
+});
+
 const FIRST_HUMAN_IN_SPACE_AT = createExactCalendarTimestamp({
   era: "ce",
   year: 1961,
@@ -92,6 +140,22 @@ const CUBAN_MISSILE_CRISIS_RESOLVED_AT = createExactCalendarTimestamp({
   year: 1962,
   month: 10,
   day: 28,
+  precision: "day",
+});
+
+const IRANIAN_REVOLUTION_TOPPLES_MONARCHY_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1979,
+  month: 2,
+  day: 11,
+  precision: "day",
+});
+
+const CHERNOBYL_DISASTER_AT = createExactCalendarTimestamp({
+  era: "ce",
+  year: 1986,
+  month: 4,
+  day: 26,
   precision: "day",
 });
 
@@ -405,6 +469,141 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     ],
   },
   {
+    id: "fall-of-tenochtitlan",
+    label: "Tenochtitlan falls to Spanish conquest",
+    shortLabel: "Tenochtitlan Falls",
+    description:
+      "Spanish and Indigenous allied forces captured Tenochtitlan, breaking Aztec imperial power and transforming the future of Mesoamerica.",
+    year: ce(1521),
+    regionalScopeLabel: "Mesoamerica",
+    minZoom: 18,
+    priority: 82,
+    sourceRefs: [
+      {
+        sourceId: "historyAztecs",
+        note: "HISTORY's Aztecs overview gives the empire a concise 1428-1521 span ending with the Spanish conquest of Tenochtitlan, which the app uses as the clean public-facing marker year.",
+      },
+    ],
+  },
+  {
+    id: "magellan-expedition-circumnavigates-globe",
+    label: "Magellan expedition completes circumnavigation",
+    shortLabel: "First Circumnavigation",
+    description:
+      "The Victoria returned to Spain after Magellan's expedition, completing the first circumnavigation and proving the world's oceans were globally connected.",
+    year: ce(1522),
+    minZoom: 18,
+    priority: 80,
+    sourceRefs: [
+      {
+        sourceId: "historyFerdinandMagellan",
+        note: "HISTORY says only the Victoria completed the voyage around the world and arrived back in Seville in September 1522, which the app uses as the clean public-facing circumnavigation marker.",
+      },
+    ],
+  },
+  {
+    id: "jamestown-founded",
+    label: "Jamestown founded",
+    shortLabel: "Jamestown Founded",
+    description:
+      "Jamestown became the first permanent English settlement in North America, giving England a durable foothold in Atlantic colonization.",
+    year: ce(1607),
+    regionalScopeLabel: "British North America",
+    minZoom: 18,
+    priority: 79,
+    sourceRefs: [
+      {
+        sourceId: "historyJamestown",
+        note: "HISTORY says that on May 14, 1607 members of the Virginia Company founded Jamestown as the first permanent English settlement in North America.",
+      },
+    ],
+  },
+  {
+    id: "thirty-years-war-begins",
+    label: "Thirty Years' War begins",
+    shortLabel: "Thirty Years' War",
+    description:
+      "Open revolt in Bohemia began a brutal continental conflict that drew in dynasties, states, and rival confessions across Europe.",
+    year: ce(1618),
+    regionalScopeLabel: "Central Europe",
+    minZoom: 18,
+    priority: 82,
+    sourceRefs: [
+      {
+        sourceId: "historyThirtyYearsWar",
+        note: "HISTORY says the Defenestration of Prague in 1618 marked the beginning of open revolt and the start of the Thirty Years' War.",
+      },
+    ],
+  },
+  {
+    id: "english-civil-wars-begin",
+    label: "English Civil Wars begin",
+    shortLabel: "English Civil Wars",
+    description:
+      "Armies loyal to King Charles I and Parliament went to war over religion, taxation, and sovereignty across the three kingdoms.",
+    year: ce(1642),
+    regionalScopeLabel: "British Isles",
+    minZoom: 18,
+    priority: 80,
+    sourceRefs: [
+      {
+        sourceId: "historyEnglishCivilWars",
+        note: "HISTORY says the First English Civil War broke out in earnest in August 1642 and frames the wider conflict as civil wars fought between 1642 and 1651 across England, Scotland, and Ireland.",
+      },
+    ],
+  },
+  {
+    id: "peace-of-westphalia",
+    label: "Peace of Westphalia ends Thirty Years' War",
+    shortLabel: "Peace of Westphalia",
+    description:
+      "A series of treaties ended the Thirty Years' War and helped reset the balance of power among European states.",
+    year: ce(1648),
+    regionalScopeLabel: "Europe",
+    minZoom: 18,
+    priority: 81,
+    sourceRefs: [
+      {
+        sourceId: "historyThirtyYearsWar",
+        note: "HISTORY says that over the course of 1648 the various parties signed the Peace of Westphalia, effectively ending the Thirty Years' War.",
+      },
+    ],
+  },
+  {
+    id: "siege-of-vienna-broken",
+    label: "Siege of Vienna broken",
+    shortLabel: "Siege of Vienna",
+    description:
+      "A relief army led by John III Sobieski broke the Ottoman siege of Vienna, a turning point that checked Ottoman power in central Europe.",
+    year: ce(1683),
+    regionalScopeLabel: "Central Europe",
+    minZoom: 18,
+    priority: 80,
+    sourceRefs: [
+      {
+        sourceId: "britannicaSiegeOfVienna",
+        note: "Britannica dates the siege to July 17 to September 12, 1683, says it ended in Ottoman defeat by a combined force led by John III Sobieski, and calls the lifting of the siege the beginning of the end of Ottoman domination in eastern Europe.",
+      },
+    ],
+  },
+  {
+    id: "encyclopedie-begins-publication",
+    label: "Encyclopédie begins publication",
+    shortLabel: "Encyclopédie",
+    description:
+      "Diderot's Encyclopédie began publication, gathering science, crafts, and criticism into one of the Enlightenment's signature works.",
+    year: ce(1751),
+    regionalScopeLabel: "France",
+    minZoom: 18,
+    priority: 79,
+    sourceRefs: [
+      {
+        sourceId: "britannicaEncyclopedie",
+        note: "Britannica says seventeen volumes of the Encyclopédie's text were published between 1751 and 1765; the app uses the 1751 opening as a concise marker for one of the Enlightenment's signature publications.",
+      },
+    ],
+  },
+  {
     id: "american-independence-declared",
     label: "American independence declared",
     shortLabel: "American Independence",
@@ -433,6 +632,209 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
       {
         sourceId: "historyFrenchRevolution",
         note: "HISTORY identifies 1789 as the beginning of the French Revolution and treats the storming of the Bastille that year as its symbolic start.",
+      },
+    ],
+  },
+  {
+    id: "watt-steam-engine",
+    label: "Watt steam engine improves industrial power",
+    shortLabel: "Steam Engine",
+    description:
+      "James Watt's improvements made steam engines far more efficient, helping steam power spread through mills, mines, and transport.",
+    year: ce(1760),
+    approximate: true,
+    minZoom: 20,
+    priority: 78,
+    sourceRefs: [
+      {
+        sourceId: "historyIndustrialRevolution",
+        note: "HISTORY says that in the 1760s James Watt began improving a Newcomen steam engine with a separate condenser, a change that made it far more efficient and helped steam power spread across British industries; the app uses c. 1760 as a concise public-facing anchor for Watt's steam-engine breakthrough.",
+      },
+    ],
+  },
+  {
+    id: "steam-railway-opens",
+    label: "Steam railway links industrial cities",
+    shortLabel: "Steam Railway",
+    description:
+      "Steam locomotives began hauling freight and passengers between industrial cities, making rail transport a backbone of the industrial age.",
+    year: ce(1830),
+    minZoom: 20,
+    priority: 79,
+    sourceRefs: [
+      {
+        sourceId: "historyIndustrialRevolution",
+        note: "HISTORY says that in 1830 steam-powered locomotives started transporting freight and passengers between Manchester and Liverpool; the app uses that year as a clean early-railway marker.",
+      },
+    ],
+  },
+  {
+    id: "first-telegraph-message",
+    label: "First telegraph message sent",
+    shortLabel: "Telegraph",
+    description:
+      "Morse's system sent its first public message, showing that electrical communication could move information across distance almost instantly.",
+    year: getTimelineYearFromExactTimestamp(FIRST_TELEGRAPH_MESSAGE_AT),
+    exactTime: FIRST_TELEGRAPH_MESSAGE_AT,
+    dateLabel: "May 24, 1844",
+    minZoom: 20,
+    priority: 80,
+    sourceRefs: [
+      {
+        sourceId: "historyTelegraph",
+        note: 'HISTORY says that on May 24, 1844 Morse sent the first telegraph message, "What hath God wrought!", from Washington, D.C., to Baltimore, Maryland.',
+      },
+    ],
+  },
+  {
+    id: "revolutions-of-1848",
+    label: "Revolutions of 1848 spread across Europe",
+    shortLabel: "Revolutions of 1848",
+    description:
+      "Republican uprisings against monarchy spread from Sicily to France, Germany, Italy, and the Austrian Empire, tying nationalism to liberal revolt across Europe.",
+    year: ce(1848),
+    regionalScopeLabel: "Europe",
+    minZoom: 18,
+    priority: 83,
+    sourceRefs: [
+      {
+        sourceId: "britannicaRevolutionsOf1848",
+        note: "Britannica describes the Revolutions of 1848 as a series of republican revolts against European monarchies, beginning in Sicily and spreading to France, Germany, Italy, and the Austrian Empire; the app uses 1848 as the clean shorthand year for that continent-wide revolutionary wave.",
+      },
+    ],
+  },
+  {
+    id: "kingdom-of-italy-established",
+    label: "Kingdom of Italy established",
+    shortLabel: "Italy Unifies",
+    description:
+      "The Risorgimento produced a new Kingdom of Italy under Piedmontese leadership, turning Italian nationalism from movement into state.",
+    year: ce(1861),
+    regionalScopeLabel: "Italy",
+    minZoom: 18,
+    priority: 82,
+    sourceRefs: [
+      {
+        sourceId: "britannicaRisorgimento",
+        note: "Britannica says the Risorgimento was the 19th-century movement for Italian unification that culminated in the establishment of the Kingdom of Italy in 1861; the app uses that year as the principal state-formation marker.",
+      },
+    ],
+  },
+  {
+    id: "meiji-restoration",
+    label: "Meiji Restoration begins",
+    shortLabel: "Meiji Restoration",
+    description:
+      "The Tokugawa shogunate fell and imperial rule was restored, opening Japan's rapid program of state reform, modernization, and military strengthening.",
+    year: ce(1868),
+    regionalScopeLabel: "Japan",
+    minZoom: 18,
+    priority: 84,
+    sourceRefs: [
+      {
+        sourceId: "historyMeijiRestoration",
+        note: "HISTORY says the Meiji Restoration of 1868 toppled the long-reigning Tokugawa shoguns and propelled Japan into the modern era; the app uses 1868 as the movement's canonical threshold year.",
+      },
+    ],
+  },
+  {
+    id: "german-empire-founded",
+    label: "German Empire founded",
+    shortLabel: "German Unification",
+    description:
+      "The German Empire was proclaimed under Prussian leadership, uniting the major German states in a new continental power.",
+    year: ce(1871),
+    regionalScopeLabel: "Germany",
+    minZoom: 18,
+    priority: 84,
+    sourceRefs: [
+      {
+        sourceId: "britannicaGermanEmpire",
+        note: "Britannica says the German Empire was founded on January 18, 1871, in the wake of Prussia's successful wars; the app uses 1871 as the clean marker year for German unification under imperial rule.",
+      },
+    ],
+  },
+  {
+    id: "telephone-patented",
+    label: "Telephone patented",
+    shortLabel: "Telephone",
+    description:
+      "Bell's 1876 patent helped turn the telephone into a practical new way to carry human speech over distance.",
+    year: ce(1876),
+    minZoom: 20,
+    priority: 80,
+    sourceRefs: [
+      {
+        sourceId: "britannicaTelephone",
+        note: "Britannica says the modern telephone refers to electrical devices derived from Bell's inventions and notes that within 20 years of the 1876 Bell patent the instrument had taken on the functional design that would endure for more than a century.",
+      },
+    ],
+  },
+  {
+    id: "practical-light-bulb",
+    label: "Practical incandescent light bulb",
+    shortLabel: "Light Bulb",
+    description:
+      "Edison's team produced a longer-lasting carbon-filament bulb, helping electric light become practical for everyday use.",
+    year: ce(1879),
+    minZoom: 20,
+    priority: 85,
+    sourceRefs: [
+      {
+        sourceId: "energyHistoryLightBulb",
+        note: "The U.S. Department of Energy says Edison patented the incandescent light bulb in 1879 and that by October 1879 his team had produced a carbonized-filament bulb that could last for 14.5 hours.",
+      },
+    ],
+  },
+  {
+    id: "first-automobile-patent",
+    label: "First automobile patent filed",
+    shortLabel: "Automobile",
+    description:
+      "Carl Benz filed the patent for a gas-powered vehicle widely treated as the birth certificate of the automobile.",
+    year: getTimelineYearFromExactTimestamp(FIRST_AUTOMOBILE_PATENT_AT),
+    exactTime: FIRST_AUTOMOBILE_PATENT_AT,
+    dateLabel: "Jan 29, 1886",
+    minZoom: 20,
+    priority: 81,
+    sourceRefs: [
+      {
+        sourceId: "mercedesFirstAutomobile",
+        note: 'Mercedes-Benz says that on January 29, 1886 Carl Benz applied for a patent for his "vehicle powered by a gas engine" and that patent number 37435 may be regarded as the birth certificate of the automobile.',
+      },
+    ],
+  },
+  {
+    id: "marconi-wireless-signals",
+    label: "Marconi sends wireless signals",
+    shortLabel: "Radio",
+    description:
+      "Marconi sent wireless signals over more than a mile, showing that messages could travel without wires.",
+    year: ce(1895),
+    minZoom: 20,
+    priority: 80,
+    sourceRefs: [
+      {
+        sourceId: "nobelMarconiBiographical",
+        note: "The Nobel Prize biography says that in 1895 Marconi succeeded in sending wireless signals over a distance of one and a half miles at his father's estate, a clean early-radio milestone.",
+      },
+    ],
+  },
+  {
+    id: "wright-brothers-first-flight",
+    label: "First powered airplane flight",
+    shortLabel: "Powered Flight",
+    description:
+      "The Wright brothers made the first free, controlled flight of a power-driven, heavier-than-air airplane.",
+    year: getTimelineYearFromExactTimestamp(FIRST_POWERED_FLIGHT_AT),
+    exactTime: FIRST_POWERED_FLIGHT_AT,
+    dateLabel: "Dec 17, 1903",
+    minZoom: 20,
+    priority: 82,
+    sourceRefs: [
+      {
+        sourceId: "historyWrightBrothers",
+        note: "HISTORY says that on December 17, 1903 the Wright brothers succeeded in flying the first free, controlled flight of a power-driven, heavier-than-air plane.",
       },
     ],
   },
@@ -500,6 +902,22 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
       {
         sourceId: "historyRussianRevolution",
         note: "HISTORY identifies 1917 as the key date of the Russian Revolution, encompassing both the February and October revolutions.",
+      },
+    ],
+  },
+  {
+    id: "great-depression-begins",
+    label: "Great Depression begins",
+    shortLabel: "Great Depression",
+    description:
+      "The 1929 stock market crash helped trigger the worst economic crisis in modern history, with worldwide unemployment, bank failures, and collapsing demand.",
+    year: ce(1929),
+    minZoom: 20,
+    priority: 84,
+    sourceRefs: [
+      {
+        sourceId: "historyGreatDepression",
+        note: "HISTORY says the Great Depression lasted from 1929 until the beginning of World War II in 1939 and that the stock market crash in October 1929 triggered a crisis in the international economy.",
       },
     ],
   },
@@ -648,6 +1066,76 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     ],
   },
   {
+    id: "fall-of-saigon",
+    label: "Fall of Saigon",
+    shortLabel: "Saigon Falls",
+    description:
+      "South Vietnam collapsed as northern forces took Saigon, closing the long Vietnam War.",
+    year: ce(1975),
+    minZoom: 20,
+    priority: 82,
+    sourceRefs: [
+      {
+        sourceId: "britannicaVietnamWar",
+        note: "Britannica says that in 1975 South Vietnam fell to a full-scale invasion by the North, which the app uses as the canonical Fall of Saigon year marker.",
+      },
+    ],
+  },
+  {
+    id: "iranian-revolution",
+    label: "Iranian Revolution topples monarchy",
+    shortLabel: "Iranian Revolution",
+    description:
+      "Iran's monarchy fell and Khomeini's movement opened the way to an Islamic republic.",
+    year: getTimelineYearFromExactTimestamp(
+      IRANIAN_REVOLUTION_TOPPLES_MONARCHY_AT,
+    ),
+    exactTime: IRANIAN_REVOLUTION_TOPPLES_MONARCHY_AT,
+    dateLabel: "Feb 11, 1979",
+    minZoom: 20,
+    priority: 83,
+    sourceRefs: [
+      {
+        sourceId: "britannicaIranianRevolution",
+        note: "Britannica says the Iranian monarchy was toppled on 11 February 1979 and that the revolution led to the establishment of an Islamic republic.",
+      },
+    ],
+  },
+  {
+    id: "smallpox-eradicated",
+    label: "Smallpox eradication declared",
+    shortLabel: "Smallpox Eradicated",
+    description:
+      "The world officially declared smallpox eradicated, the first human disease eliminated worldwide.",
+    year: ce(1980),
+    minZoom: 20,
+    priority: 81,
+    sourceRefs: [
+      {
+        sourceId: "whoSmallpoxEradication",
+        note: "WHO says the 33rd World Health Assembly issued its official declaration in May 1980 that the world and all its peoples had won freedom from smallpox.",
+      },
+    ],
+  },
+  {
+    id: "chernobyl-disaster",
+    label: "Chernobyl disaster",
+    shortLabel: "Chernobyl",
+    description:
+      "A reactor explosion at Chernobyl spread radioactive contamination far beyond the plant itself.",
+    year: getTimelineYearFromExactTimestamp(CHERNOBYL_DISASTER_AT),
+    exactTime: CHERNOBYL_DISASTER_AT,
+    dateLabel: "Apr 26, 1986",
+    minZoom: 20,
+    priority: 82,
+    sourceRefs: [
+      {
+        sourceId: "iaeaChernobylFaq",
+        note: "The IAEA says that on 26 April 1986 reactor number four at Chernobyl went out of control during a test, leading to an explosion and fire that released large amounts of radiation into the atmosphere.",
+      },
+    ],
+  },
+  {
     id: "berlin-wall-falls",
     label: "Berlin Wall falls",
     shortLabel: "Berlin Wall Falls",
@@ -680,6 +1168,23 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
       {
         sourceId: "britannicaSovietCollapse",
         note: "Britannica states that the Soviet Union dissolved on December 31, 1991, making it a clean endpoint for the Cold War world order.",
+      },
+    ],
+  },
+  {
+    id: "www-software-released",
+    label: "WWW software released beyond CERN",
+    shortLabel: "WWW Software Released",
+    description:
+      "Berners-Lee released WWW software, including the line-mode browser and server tools, helping the web spread beyond CERN.",
+    year: ce(1991),
+    approximate: true,
+    minZoom: 20,
+    priority: 80,
+    sourceRefs: [
+      {
+        sourceId: "cernShortHistoryWeb",
+        note: "CERN says Berners-Lee released his WWW software in 1991, that it became available to CERN colleagues in March 1991, and that he announced it on Internet newsgroups in August 1991.",
       },
     ],
   },
@@ -720,6 +1225,24 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     ],
   },
   {
+    id: "iphone-introduced",
+    label: "Apple introduces iPhone",
+    shortLabel: "iPhone Introduced",
+    description:
+      "Apple unveiled the iPhone, combining a phone, iPod, and Internet communicator in one touchscreen device.",
+    year: getTimelineYearFromExactTimestamp(IPHONE_INTRODUCED_AT),
+    exactTime: IPHONE_INTRODUCED_AT,
+    dateLabel: "Jan 9, 2007",
+    minZoom: 20,
+    priority: 82,
+    sourceRefs: [
+      {
+        sourceId: "appleIPhoneIntroduction",
+        note: "Apple introduced iPhone on 9 January 2007 as a mobile phone, widescreen iPod, and breakthrough Internet communications device in one handheld product.",
+      },
+    ],
+  },
+  {
     id: "lehman-brothers-bankruptcy",
     label: "2008 financial crisis",
     shortLabel: "2008 Financial Crisis",
@@ -734,6 +1257,24 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
       {
         sourceId: "investopediaLehmanCollapse",
         note: "Investopedia dates Lehman's bankruptcy filing to September 15, 2008 and describes it as a pivotal moment in the financial crisis driven by heavy exposure to subprime mortgages and complex securities.",
+      },
+    ],
+  },
+  {
+    id: "higgs-boson-announced",
+    label: "Higgs boson announced at CERN",
+    shortLabel: "Higgs Boson",
+    description:
+      "CERN experiments announced a new particle consistent with the long-sought Higgs boson, a milestone in modern physics.",
+    year: getTimelineYearFromExactTimestamp(HIGGS_BOSON_ANNOUNCED_AT),
+    exactTime: HIGGS_BOSON_ANNOUNCED_AT,
+    dateLabel: "Jul 4, 2012",
+    minZoom: 20,
+    priority: 81,
+    sourceRefs: [
+      {
+        sourceId: "cernHiggsBoson2012",
+        note: "CERN announced on 4 July 2012 that ATLAS and CMS had observed a new particle in the 125-126 GeV mass region, consistent with the long-sought Higgs boson.",
       },
     ],
   },
@@ -770,6 +1311,24 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
       {
         sourceId: "whoCovid19Pandemic",
         note: "WHO says it characterized the COVID-19 outbreak as a pandemic on March 11, 2020.",
+      },
+    ],
+  },
+  {
+    id: "chatgpt-introduced",
+    label: "ChatGPT introduced",
+    shortLabel: "ChatGPT",
+    description:
+      "OpenAI released ChatGPT as a public research preview, helping push generative AI into everyday use.",
+    year: getTimelineYearFromExactTimestamp(CHATGPT_INTRODUCED_AT),
+    exactTime: CHATGPT_INTRODUCED_AT,
+    dateLabel: "Nov 30, 2022",
+    minZoom: 20,
+    priority: 82,
+    sourceRefs: [
+      {
+        sourceId: "openAiIntroducingChatGpt",
+        note: 'OpenAI published "Introducing ChatGPT" on 30 November 2022 and presented it as a research-preview conversational model available for public use and feedback.',
       },
     ],
   },

@@ -72,11 +72,13 @@ describe("era data", () => {
     });
   });
 
-  it("gives every described era at least one clickable source", () => {
+  it("gives every described era at least one displayable source, with a narrow exception for intentional in-app lore", () => {
     walkEraTree(ROOT_ERA, (era) => {
       if (!era.description) {
         return;
       }
+
+      expect((era.sourceRefs ?? []).length).toBeGreaterThan(0);
 
       const hasLinkedSource = (era.sourceRefs ?? []).some((reference) => {
         const source = ERA_SOURCES[reference.sourceId];
@@ -84,7 +86,11 @@ describe("era data", () => {
         return "url" in source && Boolean(source.url);
       });
 
-      expect(hasLinkedSource).toBe(true);
+      const hasIntentionalUnsourcedTag = (era.sourceRefs ?? []).some(
+        (reference) => reference.sourceId === "trustMeBro",
+      );
+
+      expect(hasLinkedSource || hasIntentionalUnsourcedTag).toBe(true);
     });
   });
 
@@ -253,7 +259,10 @@ describe("era data", () => {
         .map((era) => era.id) ?? [];
     const bronzeAge = findEraById(ROOT_ERA, "bronze-age");
     const ironAge = findEraById(ROOT_ERA, "iron-age");
+    const earlyModern = findEraById(ROOT_ERA, "early-modern-period");
     const contemporary = findEraById(ROOT_ERA, "contemporary-history");
+    const digitalAge = findEraById(ROOT_ERA, "digital-age");
+    const ageOfIndustryAndEmpire = findEraById(ROOT_ERA, "age-of-industry-and-empire");
 
     expect(humanHistoryChildIds).toEqual(
       expect.arrayContaining([
@@ -283,10 +292,27 @@ describe("era data", () => {
       "middle-iron-age",
       "late-iron-age",
     ]);
+    expect(earlyModern?.children?.map((era) => era.id)).toEqual([
+      "age-of-discovery",
+      "general-crisis",
+      "age-of-enlightenment",
+    ]);
+    expect(ageOfIndustryAndEmpire?.children?.map((era) => era.id)).toEqual([
+      "early-industrial-growth",
+      "nationalism-and-expansion",
+      "high-industrialization-and-empire",
+      "war-and-crisis",
+    ]);
     expect(contemporary?.children?.map((era) => era.id)).toEqual([
       "postwar-order",
       "cold-war-and-decolonization",
       "digital-age",
+    ]);
+    expect(digitalAge?.children?.map((era) => era.id)).toEqual([
+      "open-web-era",
+      "mobile-computing-era",
+      "algorithmic-era",
+      "ai-and-automation-era",
     ]);
   });
 

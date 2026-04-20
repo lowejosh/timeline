@@ -150,6 +150,29 @@ describe("timeline tooltip content", () => {
     });
   });
 
+  it("keeps intentionally non-link sources displayable in tooltips", () => {
+    const era: Era = {
+      id: "algorithmic-era",
+      name: "Algorithmic Era",
+      startYear: 2012,
+      endYear: 2022,
+      color: "rgba(0, 0, 0, 0.1)",
+      sourceRefs: [{ sourceId: "trustMeBro" }],
+    };
+
+    expect(getEraTooltipContent(era)).toMatchObject({
+      sources: [
+        {
+          id: "trustMeBro",
+          shortTitle: "Trust me bro",
+          title: "Trust me bro",
+          organization: "Personal bias",
+          url: undefined,
+        },
+      ],
+    });
+  });
+
   it("prefers explicit era time labels when provided", () => {
     const era: Era = {
       id: "quaternary",
