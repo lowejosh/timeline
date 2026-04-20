@@ -1,289 +1,53 @@
 import { describe, expect, it } from "vitest";
 import { yearsAgo } from "../timelineDateBuilders";
-import { resolveTimelineSidebarSections } from "../timelineSidebar";
-import type { TimelineDisplayConfig } from "../timelineTypes";
+import { resolveTimelineSidebarTree } from "../timelineSidebar";
+import type { TimelineDisplayConfig, TimelineSetId } from "../timelineTypes";
 
-describe("timeline sidebar selectors", () => {
-  it("returns only context-relevant flat sections for the current viewport", () => {
-    const display: TimelineDisplayConfig = {
-      markers: [
-        {
-          id: "neolithic-marker",
-          label: "Neolithic marker",
-          year: -9000,
-          groupId: "human-history",
-        },
-        {
-          id: "post-classical-marker",
-          label: "Post-classical marker",
-          year: 1200,
-          groupId: "human-history",
-        },
-      ],
-      overlays: [
-        {
-          id: "ancient-overlay",
-          label: "Ancient overlay",
-          startYear: -500,
-          endYear: 200,
-          color: "rgba(0, 0, 0, 0.1)",
-          groupId: "civilizations",
-        },
-      ],
-    };
+const ALL_SET_IDS = new Set<TimelineSetId>(["cosmic", "earth", "human"]);
+const ALL_GROUP_IDS = new Set([
+  "cosmic-milestones",
+  "earth-milestones",
+  "deep-time-life",
+  "human-history",
+  "human-evolution",
+  "cultures",
+  "civilizations",
+]);
 
-    const sections = resolveTimelineSidebarSections(
-      display,
+describe("timeline sidebar tree", () => {
+  it("returns the unified set tree in set order with the expected child toggles", () => {
+    const tree = resolveTimelineSidebarTree(
+      {
+        markers: [],
+        overlays: [],
+      },
       {
         centerYear: 1200,
-        zoom: 28,
+        zoom: 24,
       },
       1000,
       120,
-      new Set(["human-history"]),
+      ALL_SET_IDS,
+      ALL_GROUP_IDS,
     );
 
-    expect(sections.map((section) => section.label)).toEqual(["Markers"]);
-    expect(sections[0].entries.map((entry) => entry.id)).toEqual([
-      "human-history",
+    expect(tree.map((set) => set.id)).toEqual(["cosmic", "earth", "human"]);
+    expect(tree.find((set) => set.id === "cosmic")?.children.map((child) => child.id)).toEqual([
+      "cosmic-milestones",
     ]);
-    expect(sections[0].entries[0]).toMatchObject({
-      label: "Human History",
-      enabled: true,
-      mixed: false,
-      markerCount: 1,
-      overlayCount: 0,
-      relevantItemCount: 1,
-    });
+    expect(tree.find((set) => set.id === "earth")?.children.map((child) => child.id)).toEqual([
+      "earth-milestones",
+      "deep-time-life",
+    ]);
+    expect(tree.find((set) => set.id === "human")?.children.map((child) => child.id)).toEqual([
+      "human-evolution",
+      "human-history",
+      "cultures",
+      "civilizations",
+    ]);
   });
 
-  it("aggregates civilization overlays into the overlay section", () => {
-    const display: TimelineDisplayConfig = {
-      markers: [],
-      overlays: [
-        {
-          id: "post-classical-overlay",
-          label: "Post-classical overlay",
-          startYear: 800,
-          endYear: 1400,
-          color: "rgba(0, 0, 0, 0.1)",
-          groupId: "civilizations",
-        },
-      ],
-    };
-
-    const sections = resolveTimelineSidebarSections(
-      display,
-      {
-        centerYear: 1100,
-        zoom: 24,
-      },
-      1000,
-      120,
-      new Set(),
-    );
-
-    expect(sections.map((section) => section.label)).toEqual(["Overlays"]);
-    expect(sections[0].entries[0]).toMatchObject({
-      id: "civilizations",
-      enabled: false,
-      mixed: false,
-      overlayCount: 1,
-      relevantItemCount: 1,
-    });
-  });
-
-  it("aggregates culture overlays into the overlay section", () => {
-    const display: TimelineDisplayConfig = {
-      markers: [],
-      overlays: [
-        {
-          id: "natufian-culture",
-          label: "Natufian",
-          startYear: -12500,
-          endYear: -9500,
-          color: "rgba(0, 0, 0, 0.1)",
-          groupId: "cultures",
-        },
-      ],
-    };
-
-    const sections = resolveTimelineSidebarSections(
-      display,
-      {
-        centerYear: -11000,
-        zoom: 24,
-      },
-      1000,
-      120,
-      new Set(),
-    );
-
-    expect(sections.map((section) => section.label)).toEqual(["Overlays"]);
-    expect(sections[0].entries[0]).toMatchObject({
-      id: "cultures",
-      label: "Pre-Civilization Cultures",
-      enabled: false,
-      mixed: false,
-      overlayCount: 1,
-      relevantItemCount: 1,
-    });
-  });
-
-  it("hides suppressed civilization entries from the sidebar", () => {
-    const display: TimelineDisplayConfig = {
-      markers: [],
-      overlays: [
-        {
-          id: "post-classical-overlay",
-          label: "Post-classical overlay",
-          startYear: 800,
-          endYear: 1400,
-          color: "rgba(0, 0, 0, 0.1)",
-          groupId: "civilizations",
-        },
-      ],
-    };
-
-    const sections = resolveTimelineSidebarSections(
-      display,
-      {
-        centerYear: 1100,
-        zoom: 24,
-      },
-      1000,
-      120,
-      new Set(["civilizations"]),
-      new Set(["civilizations"]),
-    );
-
-    expect(sections).toEqual([]);
-  });
-
-  it("hides civilizations when human-history markers are no longer zoom-visible", () => {
-    const display: TimelineDisplayConfig = {
-      markers: [
-        {
-          id: "late-history-marker",
-          label: "Late history marker",
-          year: 1200,
-          minZoom: 20,
-          groupId: "human-history",
-        },
-      ],
-      overlays: [
-        {
-          id: "post-classical-overlay",
-          label: "Post-classical overlay",
-          startYear: 800,
-          endYear: 1400,
-          color: "rgba(0, 0, 0, 0.1)",
-          groupId: "civilizations",
-        },
-      ],
-    };
-
-    const sections = resolveTimelineSidebarSections(
-      display,
-      {
-        centerYear: 1100,
-        zoom: 10,
-      },
-      1000,
-      120,
-      new Set(["human-history", "civilizations"]),
-    );
-
-    expect(sections).toEqual([]);
-  });
-
-  it("hides cultures when human-history markers are no longer zoom-visible", () => {
-    const display: TimelineDisplayConfig = {
-      markers: [
-        {
-          id: "late-history-marker",
-          label: "Late history marker",
-          year: 1200,
-          minZoom: 20,
-          groupId: "human-history",
-        },
-      ],
-      overlays: [
-        {
-          id: "natufian-culture",
-          label: "Natufian",
-          startYear: -12_500,
-          endYear: -9_500,
-          color: "rgba(0, 0, 0, 0.1)",
-          groupId: "cultures",
-        },
-      ],
-    };
-
-    const sections = resolveTimelineSidebarSections(
-      display,
-      {
-        centerYear: -11_000,
-        zoom: 10,
-      },
-      1000,
-      120,
-      new Set(["human-history", "cultures"]),
-    );
-
-    expect(sections).toEqual([]);
-  });
-
-  it("surfaces the human evolution layer in overlays and counts both markers and overlays", () => {
-    const display: TimelineDisplayConfig = {
-      markers: [
-        {
-          id: "early-biped-marker",
-          label: "Early biped marker",
-          year: -7_000_000,
-          minZoom: 10,
-          priority: 92,
-          groupId: "human-evolution",
-        },
-      ],
-      overlays: [
-        {
-          id: "sahelanthropus",
-          label: "Sahelanthropus",
-          startYear: -7_000_000,
-          endYear: -6_000_000,
-          minZoom: 8,
-          priority: 95,
-          color: "rgba(0, 0, 0, 0.1)",
-          groupId: "human-evolution",
-        },
-      ],
-    };
-
-    const sections = resolveTimelineSidebarSections(
-      display,
-      {
-        centerYear: -6_500_000,
-        zoom: 6,
-      },
-      1000,
-      120,
-      new Set(["human-evolution"]),
-    );
-
-    expect(sections.map((section) => section.label)).toEqual(["Overlays"]);
-    expect(sections[0].entries[0]).toMatchObject({
-      id: "human-evolution",
-      label: "Human Evolution",
-      enabled: true,
-      mixed: false,
-      markerCount: 1,
-      overlayCount: 1,
-      relevantItemCount: 2,
-    });
-  });
-
-  it("surfaces deep time life in overlays and hides it once the viewport is far more recent", () => {
+  it("aggregates deep-time-life counts under the earth set", () => {
     const display: TimelineDisplayConfig = {
       markers: [
         {
@@ -305,7 +69,7 @@ describe("timeline sidebar selectors", () => {
       ],
     };
 
-    const deepTimeSections = resolveTimelineSidebarSections(
+    const tree = resolveTimelineSidebarTree(
       display,
       {
         centerYear: yearsAgo(500_000_000),
@@ -313,33 +77,178 @@ describe("timeline sidebar selectors", () => {
       },
       1000,
       120,
-      new Set(["deep-time-life"]),
+      ALL_SET_IDS,
+      ALL_GROUP_IDS,
     );
 
-    expect(deepTimeSections.map((section) => section.label)).toEqual([
-      "Overlays",
-    ]);
-    expect(deepTimeSections[0].entries[0]).toMatchObject({
-      id: "deep-time-life",
-      label: "Deep Time Life",
+    const earthSet = tree.find((set) => set.id === "earth");
+    const deepTimeLife = earthSet?.children.find(
+      (child) => child.id === "deep-time-life",
+    );
+
+    expect(earthSet).toMatchObject({
+      markerCount: 1,
+      overlayCount: 1,
+      relevantItemCount: 2,
+    });
+    expect(deepTimeLife).toMatchObject({
       enabled: true,
       mixed: false,
       markerCount: 1,
       overlayCount: 1,
       relevantItemCount: 2,
     });
+  });
 
-    const recentSections = resolveTimelineSidebarSections(
+  it("aggregates human history markers and civilization overlays under the human set", () => {
+    const display: TimelineDisplayConfig = {
+      markers: [
+        {
+          id: "post-classical-marker",
+          label: "Post-classical marker",
+          year: 1200,
+          groupId: "human-history",
+        },
+      ],
+      overlays: [
+        {
+          id: "post-classical-overlay",
+          label: "Post-classical overlay",
+          startYear: 800,
+          endYear: 1400,
+          color: "rgba(0, 0, 0, 0.1)",
+          groupId: "civilizations",
+        },
+      ],
+    };
+
+    const tree = resolveTimelineSidebarTree(
       display,
       {
-        centerYear: 1200,
+        centerYear: 1100,
         zoom: 24,
       },
       1000,
       120,
-      new Set(["deep-time-life"]),
+      ALL_SET_IDS,
+      new Set(["human-history"]),
     );
 
-    expect(recentSections).toEqual([]);
+    const humanSet = tree.find((set) => set.id === "human");
+    const humanHistory = humanSet?.children.find(
+      (child) => child.id === "human-history",
+    );
+    const civilizations = humanSet?.children.find(
+      (child) => child.id === "civilizations",
+    );
+
+    expect(humanSet).toMatchObject({
+      markerCount: 1,
+      overlayCount: 1,
+      relevantItemCount: 2,
+    });
+    expect(humanHistory).toMatchObject({
+      id: "human-history",
+      enabled: true,
+      markerCount: 1,
+      overlayCount: 0,
+      relevantItemCount: 1,
+    });
+    expect(civilizations).toMatchObject({
+      id: "civilizations",
+      enabled: false,
+      mixed: false,
+      overlayCount: 1,
+      relevantItemCount: 1,
+    });
+  });
+
+  it("keeps culture rows available without hiding them behind human-history zoom visibility rules", () => {
+    const display: TimelineDisplayConfig = {
+      markers: [
+        {
+          id: "late-history-marker",
+          label: "Late history marker",
+          year: 1200,
+          minZoom: 20,
+          groupId: "human-history",
+        },
+      ],
+      overlays: [
+        {
+          id: "natufian-culture",
+          label: "Natufian",
+          startYear: -12500,
+          endYear: -9500,
+          color: "rgba(0, 0, 0, 0.1)",
+          groupId: "cultures",
+        },
+      ],
+    };
+
+    const tree = resolveTimelineSidebarTree(
+      display,
+      {
+        centerYear: -11000,
+        zoom: 10,
+      },
+      1000,
+      120,
+      ALL_SET_IDS,
+      ALL_GROUP_IDS,
+    );
+
+    const cultures = tree
+      .find((set) => set.id === "human")
+      ?.children.find((child) => child.id === "cultures");
+
+    expect(cultures).toMatchObject({
+      id: "cultures",
+      label: "Pre-Civilization Cultures",
+      enabled: true,
+      mixed: false,
+      overlayCount: 1,
+      relevantItemCount: 1,
+    });
+  });
+
+  it("keeps suppressed child rows in the tree while marking them suppressed and clearing visible counts", () => {
+    const display: TimelineDisplayConfig = {
+      markers: [],
+      overlays: [
+        {
+          id: "post-classical-overlay",
+          label: "Post-classical overlay",
+          startYear: 800,
+          endYear: 1400,
+          color: "rgba(0, 0, 0, 0.1)",
+          groupId: "civilizations",
+        },
+      ],
+    };
+
+    const tree = resolveTimelineSidebarTree(
+      display,
+      {
+        centerYear: 1100,
+        zoom: 24,
+      },
+      1000,
+      120,
+      ALL_SET_IDS,
+      new Set(["civilizations"]),
+      new Set(["civilizations"]),
+    );
+
+    const civilizations = tree
+      .find((set) => set.id === "human")
+      ?.children.find((child) => child.id === "civilizations");
+
+    expect(civilizations).toMatchObject({
+      enabled: true,
+      suppressed: true,
+      overlayCount: 0,
+      relevantItemCount: 0,
+    });
   });
 });

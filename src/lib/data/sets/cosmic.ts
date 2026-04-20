@@ -3,6 +3,8 @@ import type {
   TimelineSetId,
 } from "../timelineTypes";
 
+export const COSMIC_MILESTONES_GROUP_ID = "cosmic-milestones";
+
 /**
  * Cosmic set — universe-scale history from the Big Bang through the formation
  * of the Solar System. Owns the `cosmic` era family and the pre-Earth portion
@@ -27,8 +29,10 @@ export const COSMIC_SET_CORE_MARKER_IDS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * Decoration `groupId`s fully owned by the cosmic set. Currently none — cosmic
- * markers are ungrouped core markers — but the field is declared to keep the
- * registry shape uniform and ready for future community overlays.
+ * Decoration `groupId`s fully owned by the cosmic set. The milestone markers
+ * are grouped into a dedicated marker-only bucket so the user-facing set tree
+ * can expose a consistent child-toggle model.
  */
-export const COSMIC_SET_GROUP_IDS: readonly string[] = [];
+export const COSMIC_SET_GROUP_IDS: readonly string[] = [
+  COSMIC_MILESTONES_GROUP_ID,
+];

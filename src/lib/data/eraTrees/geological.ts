@@ -7,6 +7,16 @@ function chartRef(note?: string): EraDefinition["sourceRefs"] {
     : [{ sourceId: "icsChart2024" }];
 }
 
+function chartAndGuideRefs(
+  guideNote: string,
+  chartNote?: string,
+): EraDefinition["sourceRefs"] {
+  return [
+    ...(chartRef(chartNote) ?? []),
+    { sourceId: "ucmpGeologicTimeScaleGuide", note: guideNote },
+  ];
+}
+
 function icsColor(red: number, green: number, blue: number): string {
   return `rgb(${red}, ${green}, ${blue})`;
 }
@@ -491,8 +501,12 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     startYear: yearsAgo(635_000_000),
     endYear: yearsAgo(538_800_000),
     color: icsColor(254, 217, 106),
+    description:
+      "Soft-bodied animals, colonial algae, and early sponges become conspicuous as multicellular life expands.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP's geologic time-scale guide describes the late Proterozoic as the interval when multicelled organisms, colonial algae, sponges, and soft-bodied invertebrates appear.",
+    ),
   },
 ];
 
@@ -503,8 +517,12 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     startYear: yearsAgo(538_800_000),
     endYear: yearsAgo(486_850_000),
     color: icsColor(127, 160, 86),
+    description:
+      "Major animal groups rise in the seas, with trilobites abundant and no terrestrial life yet known.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP summarizes the Cambrian as the rise of all major animal groups, abundant metazoan life in the seas, trilobite dominance, and no known terrestrial life.",
+    ),
     children: CAMBRIAN_SERIES,
   },
   {
@@ -513,8 +531,12 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     startYear: yearsAgo(486_850_000),
     endYear: yearsAgo(443_100_000),
     color: icsColor(0, 146, 112),
+    description:
+      "Marine life diversifies strongly while the first land plants, primitive fungi, and seaweeds appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP's guide characterizes the Ordovician by extensive marine diversification together with the first land plants, primitive fungi, and seaweeds.",
+    ),
     children: ORDOVICIAN_SERIES,
   },
   {
@@ -523,8 +545,12 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     startYear: yearsAgo(443_100_000),
     endYear: yearsAgo(419_620_000),
     color: icsColor(179, 225, 182),
+    description:
+      "Large reefs, jawed fish, vascular plants, and some of the first land arthropods appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP highlights the Silurian for large reef development, jawed fish, vascular plants, and some of the earliest evidence of spiders, scorpions, centipedes, and related arthropods on land.",
+    ),
     children: SILURIAN_SERIES,
   },
   {
@@ -533,8 +559,12 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     startYear: yearsAgo(419_620_000),
     endYear: yearsAgo(358_860_000),
     color: icsColor(203, 140, 55),
+    description:
+      "Fishes radiate dramatically as the first amphibians, forests, and many land plants spread.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP summarizes the Devonian as the interval when fish radiate strongly and the first amphibians, horsetails, ferns, and forests appear.",
+    ),
     children: DEVONIAN_SERIES,
   },
   {
@@ -543,8 +573,12 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     startYear: yearsAgo(358_860_000),
     endYear: yearsAgo(298_900_000),
     color: icsColor(103, 165, 153),
+    description:
+      "Coal-swamp forests spread while many seas teem with crinoids and bryozoans and the first reptiles appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP's guide describes the Carboniferous as a coal-swamp world with crinoids and bryozoans common in the seas, abundant winged insects, and the first reptiles appearing.",
+    ),
     children: CARBONIFEROUS_SERIES,
   },
   {
@@ -553,8 +587,12 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     startYear: yearsAgo(298_900_000),
     endYear: yearsAgo(251_902_000),
     color: icsColor(240, 64, 40),
+    description:
+      "Gymnosperms and amphibians dominate many landscapes before the period ends in catastrophic extinction.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP characterizes the Permian by gymnosperms, amphibians, and expanding insect groups, ending with the largest extinction of the Phanerozoic.",
+    ),
     children: PERMIAN_SERIES,
   },
 ];
@@ -566,8 +604,12 @@ const MESOZOIC_SYSTEMS: EraDefinition[] = [
     startYear: yearsAgo(251_902_000),
     endYear: yearsAgo(201_400_000),
     color: icsColor(129, 43, 146),
+    description:
+      "Reptiles diversify after the great dying, with the first mammals, dinosaurs, and true flies appearing.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP's guide describes the Triassic as the interval of the first mammals, dinosaurs, and true flies after end-Permian recovery.",
+    ),
     children: TRIASSIC_SERIES,
   },
   {
@@ -576,8 +618,12 @@ const MESOZOIC_SYSTEMS: EraDefinition[] = [
     startYear: yearsAgo(201_400_000),
     endYear: yearsAgo(143_100_000),
     color: icsColor(52, 178, 201),
+    description:
+      "Dinosaurs and gymnosperms dominate while birds and many marine reptiles appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP summarizes the Jurassic as a dinosaur- and gymnosperm-dominated world in which birds, marine reptiles, ammonites, and belemnites are prominent.",
+    ),
     children: JURASSIC_SERIES,
   },
   {
@@ -586,8 +632,12 @@ const MESOZOIC_SYSTEMS: EraDefinition[] = [
     startYear: yearsAgo(143_100_000),
     endYear: yearsAgo(66_000_000),
     color: icsColor(127, 198, 78),
+    description:
+      "Flowering plants spread widely while dinosaurs remain dominant until the end-Cretaceous extinction.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP's guide characterizes the Cretaceous by dinosaurs, marine reptiles, ammonites, and the rise of flowering plants before the period's terminal extinction.",
+    ),
     children: CRETACEOUS_SERIES,
   },
 ];
@@ -599,8 +649,12 @@ const CENOZOIC_PERIODS: EraDefinition[] = [
     startYear: yearsAgo(66_000_000),
     endYear: yearsAgo(23_040_000),
     color: icsColor(253, 154, 82),
+    description:
+      "Early placental mammals diversify rapidly as primates, modern birds, whales, and grasses appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP's Paleocene, Eocene, and Oligocene summaries together describe the Paleogene as a time of early placental-mammal diversification, first primates and modern birds, primitive whales, grasses, and increasingly modern mammal faunas.",
+    ),
     children: PALEOGENE_SERIES,
   },
   {
@@ -609,8 +663,12 @@ const CENOZOIC_PERIODS: EraDefinition[] = [
     startYear: yearsAgo(23_040_000),
     endYear: yearsAgo(2_580_000),
     color: icsColor(255, 230, 25),
+    description:
+      "Grasslands spread, many modern mammal groups flourish, and the first hominids appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP's Miocene and Pliocene summaries describe the Neogene as an interval of expanding grasslands, diverse modern mammals, and the first hominids.",
+    ),
     children: NEOGENE_SERIES,
   },
   {
@@ -619,8 +677,12 @@ const CENOZOIC_PERIODS: EraDefinition[] = [
     startYear: yearsAgo(2_580_000),
     endYear: yearsAgo(0),
     color: icsColor(249, 249, 127),
+    description:
+      "Modern humans appear, repeated glaciations reshape ecosystems, and agriculture and civilization rise late in the period.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP's Pleistocene and Holocene summaries describe the Quaternary as the age of modern humans, major glaciations, and eventually agriculture and civilization.",
+    ),
     children: QUATERNARY_SERIES,
   },
 ];
@@ -632,8 +694,12 @@ export const GEOLOGICAL_ERA_DEFINITIONS: EraDefinition[] = [
     startYear: yearsAgo(4_567_000_000),
     endYear: yearsAgo(4_000_000_000),
     color: icsColor(174, 2, 126),
+    description:
+      "Earth's crust cools and solidifies, but no life is yet known from this interval.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP's guide describes the Hadean as the interval when Earth's crust cooled and solidified and no life is known.",
+    ),
   },
   {
     id: "archean",
@@ -641,8 +707,12 @@ export const GEOLOGICAL_ERA_DEFINITIONS: EraDefinition[] = [
     startYear: yearsAgo(4_000_000_000),
     endYear: yearsAgo(2_500_000_000),
     color: icsColor(240, 4, 127),
+    description:
+      "Earth's earliest known life appears, largely microbial, while photosynthesis begins the long oxygenation of the atmosphere.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceRefs: chartAndGuideRefs(
+      "UCMP's guide characterizes the Archean as the time of earliest anaerobic prokaryotic life and the beginning of oxygen rise through photosynthetic organisms.",
+    ),
   },
   ...PROTEROZOIC_SUBDIVISIONS,
   ...PALEOZOIC_SYSTEMS,

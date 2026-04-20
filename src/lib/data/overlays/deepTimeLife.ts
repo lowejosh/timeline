@@ -69,6 +69,42 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     ],
   },
   {
+    id: "age-of-invertebrates",
+    label: "Age of Invertebrates",
+    shortLabel: "Invertebrates",
+    description:
+      "Shell-forming sea animals, crinoids, and giant sea scorpions flourished as reefs and fishes expanded.",
+    startYear: yearsAgo(443_100_000),
+    endYear: yearsAgo(419_620_000),
+    color: "rgb(76, 138, 132)",
+    minZoom: 0,
+    priority: 86,
+    sourceRefs: [
+      {
+        sourceId: "gutenbergHistoricalGeologyMiller1922",
+        note: "Miller's table labels the Silurian the 'Age of Invertebrates'; the app maps that label to the formal Silurian interval used in the geological track.",
+      },
+    ],
+  },
+  {
+    id: "age-of-fishes",
+    label: "Age of Fishes",
+    shortLabel: "Fishes",
+    description:
+      "Fishes spread through the seas while early amphibians and land plants gained ground.",
+    startYear: yearsAgo(419_620_000),
+    endYear: yearsAgo(358_860_000),
+    color: "rgb(79, 124, 156)",
+    minZoom: 0,
+    priority: 87,
+    sourceRefs: [
+      {
+        sourceId: "gutenbergHistoricalGeologyMiller1922",
+        note: "Miller labels the Devonian the 'Age of Fishes' and emphasizes widespread fishes, rising amphibians, and expanding land plants.",
+      },
+    ],
+  },
+  {
     id: "devonian-nekton-revolution",
     label: "Devonian Nekton Revolution",
     shortLabel: "Nekton Revolution",
@@ -89,6 +125,24 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
       {
         sourceId: "royalSocietyPalaeozoicWaterColumn",
         note: "The Royal Society review argues that water-column colonization was more gradual and cannot be pinned to a single narrow interval, which supports keeping this band broad and approximate rather than forcing a 410–400 Ma pulse.",
+      },
+    ],
+  },
+  {
+    id: "age-of-amphibians",
+    label: "Age of Amphibians",
+    shortLabel: "Amphibians",
+    description:
+      "Coal-swamp forests thrived and amphibians dominated many wet lowlands as early reptiles appeared.",
+    startYear: yearsAgo(358_860_000),
+    endYear: yearsAgo(251_902_000),
+    color: "rgb(108, 132, 88)",
+    minZoom: 0,
+    priority: 87,
+    sourceRefs: [
+      {
+        sourceId: "gutenbergHistoricalGeologyMiller1922",
+        note: "Miller groups the later Paleozoic coal-swamp world under an 'Age of Amphibians' framing; the app spans the Carboniferous and Permian intervals used in the geological track.",
       },
     ],
   },
@@ -141,28 +195,85 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     ],
   },
   {
-    id: "age-of-dinosaurs",
-    label: "Age of Dinosaurs",
-    shortLabel: "Dinosaurs",
+    id: "age-of-reptiles",
+    label: "Age of Reptiles",
+    shortLabel: "Reptiles",
     description:
-      "Dinosaurs and other archosaurs dominated life on land through most of the Mesozoic, while early birds and mammals emerged in their shadow.",
-    startYear: yearsAgo(201_400_000),
+      "Dinosaurs and other reptiles dominated land, sea, and air while the first birds and mammals appeared.",
+    startYear: yearsAgo(251_902_000),
     endYear: yearsAgo(66_000_000),
-    color: "rgb(136, 104, 76)",
+    color: "rgb(146, 104, 74)",
     minZoom: 0,
     priority: 88,
     sourceRefs: [
       {
-        sourceId: "ucmpMesozoicLife",
-        note: "UCMP summarizes Mesozoic terrestrial life by noting that dinosaurs and other archosaurs dominated the land biota; the app uses a broad post-end-Triassic to end-Cretaceous band for that familiar public-facing phase.",
+        sourceId: "gutenbergHistoricalGeologyMiller1922",
+        note: "Miller treats the Mesozoic as the 'Age of Reptiles'; the app maps that label across the Triassic, Jurassic, and Cretaceous intervals used in the geological track.",
+      },
+    ],
+    children: [
+      {
+        id: "age-of-archosaurs",
+        label: "Age of Archosaurs",
+        shortLabel: "Archosaurs",
+        description:
+          "Archosaurs diversify after the end-Permian crisis and go on to dominate terrestrial vertebrate life through most of the Mesozoic.",
+        startYear: yearsAgo(245_000_000),
+        endYear: yearsAgo(66_000_000),
+        approximateStart: true,
+        color: "rgb(184, 132, 67)",
+        minZoom: 0,
+        priority: 89,
+        sourceRefs: [
+          {
+            sourceId: "ucmpArchosauriaFossilRecord",
+            note: "UCMP's fossil-record overview says the first archosauromorphs appear about 245 million years ago in the Early Triassic and that the surviving archosaur lineages went on to dominate the rest of the Mesozoic; the app bounds this public-facing sub-band to the visible Mesozoic phase nested under the parent Age of Reptiles band.",
+          },
+        ],
       },
       {
-        sourceId: "smithsonianExtinctionOverTime",
-        note: "The band ends at the 66 million-year-old end-Cretaceous mass extinction, when all non-avian dinosaurs disappeared.",
+        id: "age-of-dinosaurs",
+        label: "Age of Dinosaurs",
+        shortLabel: "Dinosaurs",
+        description:
+          "Dinosaurs and other archosaurs dominated life on land through most of the Mesozoic, while early birds and mammals emerged in their shadow.",
+        startYear: yearsAgo(201_400_000),
+        endYear: yearsAgo(66_000_000),
+        color: "rgb(105, 136, 86)",
+        minZoom: 0,
+        priority: 90,
+        sourceRefs: [
+          {
+            sourceId: "ucmpMesozoicLife",
+            note: "UCMP summarizes Mesozoic terrestrial life by noting that dinosaurs and other archosaurs dominated the land biota; the app uses a broad post-end-Triassic to end-Cretaceous band for that familiar public-facing phase.",
+          },
+          {
+            sourceId: "smithsonianExtinctionOverTime",
+            note: "The band ends at the 66 million-year-old end-Cretaceous mass extinction, when all non-avian dinosaurs disappeared.",
+          },
+          {
+            sourceId: "icsChart2024",
+            note: "Band start is aligned to the app's Jurassic threshold for a clean system-level transition after the end-Triassic extinction interval.",
+          },
+        ],
       },
+    ],
+  },
+  {
+    id: "age-of-mammals",
+    label: "Age of Mammals",
+    shortLabel: "Mammals",
+    description:
+      "Mammals rose to prominence as flowering plants and increasingly modern ecosystems spread.",
+    startYear: yearsAgo(66_000_000),
+    endYear: yearsAgo(0),
+    color: "rgb(169, 122, 92)",
+    minZoom: 0,
+    priority: 88,
+    sourceRefs: [
       {
-        sourceId: "icsChart2024",
-        note: "Band start is aligned to the app's Jurassic threshold for a clean system-level transition after the end-Triassic extinction interval.",
+        sourceId: "gutenbergHistoricalGeologyMiller1922",
+        note: "Miller labels the Tertiary the 'Age of Mammals'; the app uses that older textbook framing as a broad Cenozoic overlay that continues to the present for a single public-facing mammal-dominance band.",
       },
     ],
   },

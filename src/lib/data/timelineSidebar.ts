@@ -1,129 +1,70 @@
 import { getVisibleRange, type TimelineViewport } from "../time/viewport";
 import { isTimelineDecorationVisibleAtZoom } from "../time/overlayTracks";
-import {
-  TIMELINE_DECORATION_CATEGORY_IDS,
-  TIMELINE_DECORATION_GROUPS,
-} from "./timelineDecorations";
-import type { TimelineDisplayConfig } from "./timelineTypes";
+import { TIMELINE_DECORATION_GROUPS_BY_ID } from "./timelineDecorations";
+import { TIMELINE_SETS } from "./timelineSets";
+import type {
+  TimelineDecorationContentType,
+  TimelineDisplayConfig,
+  TimelineSetId,
+} from "./timelineTypes";
 
-export type TimelineSidebarEntryState = {
+export type TimelineSidebarChildState = {
   id: string;
   label: string;
+  description?: string;
   groupIds: string[];
+  contentType: TimelineDecorationContentType;
   enabled: boolean;
   mixed: boolean;
+  suppressed: boolean;
   relevantItemCount: number;
   markerCount: number;
   overlayCount: number;
 };
 
-export type TimelineSidebarSectionState = {
-  id: string;
+export type TimelineSidebarSetState = {
+  id: TimelineSetId;
   label: string;
-  entries: TimelineSidebarEntryState[];
+  description?: string;
+  enabled: boolean;
+  relevantItemCount: number;
+  markerCount: number;
+  overlayCount: number;
+  children: TimelineSidebarChildState[];
 };
 
-type TimelineSidebarResolvedEntry = TimelineSidebarEntryState & {
-  sectionId: (typeof SIDEBAR_SECTIONS)[number]["id"];
+type TimelineSidebarCounts = {
+  markerCount: number;
+  overlayCount: number;
 };
 
-const SIDEBAR_ENTRY_DEFINITIONS = [
-  {
-    id: "deep-time-life",
-    label: "Deep Time Life",
-    sectionId: "overlays",
-    groupIds: TIMELINE_DECORATION_GROUPS.filter(
-      (group) =>
-        group.categoryId === TIMELINE_DECORATION_CATEGORY_IDS.deepTimeLife,
-    ).map((group) => group.id),
-  },
-  {
-    id: "human-evolution",
-    label: "Human Evolution",
-    sectionId: "overlays",
-    groupIds: TIMELINE_DECORATION_GROUPS.filter(
-      (group) =>
-        group.categoryId === TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution,
-    ).map((group) => group.id),
-  },
-  {
-    id: "cultures",
-    label: "Pre-Civilization Cultures",
-    sectionId: "overlays",
-    groupIds: TIMELINE_DECORATION_GROUPS.filter(
-      (group) =>
-        group.categoryId === TIMELINE_DECORATION_CATEGORY_IDS.cultures &&
-        group.contentType === "overlays",
-    ).map((group) => group.id),
-  },
-  {
-    id: "civilizations",
-    label: "Civilizations",
-    sectionId: "overlays",
-    groupIds: TIMELINE_DECORATION_GROUPS.filter(
-      (group) =>
-        group.categoryId === TIMELINE_DECORATION_CATEGORY_IDS.civilizations &&
-        group.contentType === "overlays",
-    ).map((group) => group.id),
-  },
-  {
-    id: "human-history",
-    label: "Human History",
-    sectionId: "markers",
-    groupIds: TIMELINE_DECORATION_GROUPS.filter(
-      (group) =>
-        group.categoryId === TIMELINE_DECORATION_CATEGORY_IDS.humanHistory &&
-        group.contentType === "markers",
-    ).map((group) => group.id),
-  },
-] as const;
+function createEmptyCounts(): TimelineSidebarCounts {
+  return {
+    markerCount: 0,
+    overlayCount: 0,
+  };
+}
 
-const SIDEBAR_SECTIONS = [
-  { id: "overlays", label: "Overlays" },
-  { id: "markers", label: "Markers" },
-] as const;
+function getRelevantItemCount(counts: TimelineSidebarCounts) {
+  return counts.markerCount + counts.overlayCount;
+}
 
-const HUMAN_HISTORY_GROUP_IDS = new Set(
-  SIDEBAR_ENTRY_DEFINITIONS.find(
-    (definition) => definition.id === "human-history",
-  )?.groupIds ?? [],
-);
-
-const OVERLAY_ENTRY_IDS_HIDDEN_WITHOUT_ZOOM_VISIBLE_HISTORY = new Set([
-  "civilizations",
-  "cultures",
-]);
-
-export function resolveTimelineSidebarSections(
+export function resolveTimelineSidebarTree(
   display: TimelineDisplayConfig,
   viewport: TimelineViewport,
   width: number,
   pad: number,
+  enabledSetIds: ReadonlySet<TimelineSetId>,
   enabledGroupIds: ReadonlySet<string>,
   suppressedGroupIds: ReadonlySet<string> = new Set(),
-): TimelineSidebarSectionState[] {
+): TimelineSidebarSetState[] {
   if (width <= pad * 2) {
     return [];
   }
 
   const innerWidth = Math.max(width - pad * 2, 1);
   const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
-  const hasHumanHistoryContent = display.markers.some(
-    (marker) => marker.groupId && HUMAN_HISTORY_GROUP_IDS.has(marker.groupId),
-  );
-  const hasZoomVisibleHumanHistoryMarkers = display.markers.some(
-    (marker) =>
-      marker.groupId &&
-      HUMAN_HISTORY_GROUP_IDS.has(marker.groupId) &&
-      isTimelineDecorationVisibleAtZoom(marker, viewport.zoom),
-  );
-  const countsByGroupId = new Map<
-    string,
-    {
-      markerCount: number;
-      overlayCount: number;
-    }
-  >();
+  const countsByGroupId = new Map<string, TimelineSidebarCounts>();
 
   for (const marker of display.markers) {
     if (
@@ -136,10 +77,7 @@ export function resolveTimelineSidebarSections(
       continue;
     }
 
-    const existing = countsByGroupId.get(marker.groupId) ?? {
-      markerCount: 0,
-      overlayCount: 0,
-    };
+    const existing = countsByGroupId.get(marker.groupId) ?? createEmptyCounts();
     existing.markerCount += 1;
     countsByGroupId.set(marker.groupId, existing);
   }
@@ -155,73 +93,61 @@ export function resolveTimelineSidebarSections(
       continue;
     }
 
-    const existing = countsByGroupId.get(overlay.groupId) ?? {
-      markerCount: 0,
-      overlayCount: 0,
-    };
+    const existing = countsByGroupId.get(overlay.groupId) ?? createEmptyCounts();
     existing.overlayCount += 1;
     countsByGroupId.set(overlay.groupId, existing);
   }
 
-  const entries = SIDEBAR_ENTRY_DEFINITIONS.reduce<
-    TimelineSidebarResolvedEntry[]
-  >((accumulator, definition) => {
-    const counts = definition.groupIds.reduce(
-      (totals, groupId) => {
-        const groupCounts = countsByGroupId.get(groupId);
+  return [...TIMELINE_SETS]
+    .sort(
+      (left, right) => left.order - right.order || left.label.localeCompare(right.label),
+    )
+    .map((set) => {
+      const children = set.groupIds
+        .map<TimelineSidebarChildState | null>((groupId) => {
+          const group = TIMELINE_DECORATION_GROUPS_BY_ID[groupId];
 
-        if (!groupCounts) {
-          return totals;
-        }
+          if (!group) {
+            return null;
+          }
 
-        totals.markerCount += groupCounts.markerCount;
-        totals.overlayCount += groupCounts.overlayCount;
-        return totals;
-      },
-      {
-        markerCount: 0,
-        overlayCount: 0,
-      },
-    );
+          const counts = countsByGroupId.get(group.id) ?? createEmptyCounts();
+          const enabledCount = enabledGroupIds.has(group.id) ? 1 : 0;
 
-    const relevantItemCount = counts.markerCount + counts.overlayCount;
+          return {
+            id: group.id,
+            label: group.label,
+            description: group.description,
+            groupIds: [group.id],
+            contentType: group.contentType,
+            enabled: enabledCount === 1,
+            mixed: false,
+            suppressed: suppressedGroupIds.has(group.id),
+            markerCount: counts.markerCount,
+            overlayCount: counts.overlayCount,
+            relevantItemCount: getRelevantItemCount(counts),
+          };
+        })
+        .filter((child): child is TimelineSidebarChildState => child !== null);
 
-    if (relevantItemCount === 0) {
-      return accumulator;
-    }
+      const totals = children.reduce(
+        (aggregate, child) => {
+          aggregate.markerCount += child.markerCount;
+          aggregate.overlayCount += child.overlayCount;
+          return aggregate;
+        },
+        createEmptyCounts(),
+      );
 
-    if (
-      OVERLAY_ENTRY_IDS_HIDDEN_WITHOUT_ZOOM_VISIBLE_HISTORY.has(
-        definition.id,
-      ) &&
-      hasHumanHistoryContent &&
-      !hasZoomVisibleHumanHistoryMarkers
-    ) {
-      return accumulator;
-    }
-
-    const enabledCount = definition.groupIds.filter((groupId) =>
-      enabledGroupIds.has(groupId),
-    ).length;
-
-    accumulator.push({
-      id: definition.id,
-      label: definition.label,
-      groupIds: [...definition.groupIds],
-      enabled: enabledCount === definition.groupIds.length,
-      mixed: enabledCount > 0 && enabledCount < definition.groupIds.length,
-      markerCount: counts.markerCount,
-      overlayCount: counts.overlayCount,
-      relevantItemCount,
-      sectionId: definition.sectionId,
+      return {
+        id: set.id,
+        label: set.label,
+        description: set.description,
+        enabled: enabledSetIds.has(set.id),
+        markerCount: totals.markerCount,
+        overlayCount: totals.overlayCount,
+        relevantItemCount: getRelevantItemCount(totals),
+        children,
+      } satisfies TimelineSidebarSetState;
     });
-
-    return accumulator;
-  }, []);
-
-  return SIDEBAR_SECTIONS.map((section) => ({
-    id: section.id,
-    label: section.label,
-    entries: entries.filter((entry) => entry.sectionId === section.id),
-  })).filter((section) => section.entries.length > 0);
 }

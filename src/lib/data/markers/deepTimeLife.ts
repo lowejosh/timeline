@@ -3,6 +3,21 @@ import { yearsAgo } from "../timelineDateBuilders";
 
 export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
   {
+    id: "earliest-evidence-of-life",
+    label: "Earliest evidence of life on Earth",
+    shortLabel: "Earliest Life",
+    year: yearsAgo(3_500_000_000),
+    approximate: true,
+    minZoom: 0,
+    priority: 95,
+    sourceRefs: [
+      {
+        sourceId: "berkeleyOriginOfLife",
+        note: "Understanding Evolution says evidence suggests life first evolved around 3.5 billion years ago; the app phrases this conservatively as the earliest evidence of life rather than an exact moment life began.",
+      },
+    ],
+  },
+  {
     id: "great-oxidation-event",
     label: "Great Oxidation Event",
     shortLabel: "Oxygen Crisis",

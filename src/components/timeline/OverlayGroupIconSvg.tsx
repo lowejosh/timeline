@@ -5,6 +5,13 @@ import {
 
 function renderIcon(iconId: OverlayGroupIconId) {
   switch (iconId) {
+    case "markers":
+      return (
+        <>
+          <circle cx="0" cy="-1.9" r="1.5" fill="currentColor" stroke="none" />
+          <path d="M 0 -0.6 L 0 3.2 M -1.8 3.2 L 1.8 3.2" />
+        </>
+      );
     case "deep-time-life":
       return (
         <>

@@ -3,6 +3,8 @@ import type {
   TimelineSetId,
 } from "../timelineTypes";
 
+export const EARTH_MILESTONES_GROUP_ID = "earth-milestones";
+
 /**
  * Earth set — Earth-system history from planetary formation through the end
  * of prehistory (deep-time life, geological eras). Owns the `geological` era
@@ -14,14 +16,14 @@ export const EARTH_SET_FAMILY_IDS: readonly EraFamilyId[] = ["geological"];
 
 /**
  * Marker IDs from the shared core markers file that belong to the earth set
- * (Earth formation through earliest evidence of life).
+ * (Earth formation through the early hydrosphere, before life-specific
+ * milestones hand off to the deep-time-life group).
  */
 export const EARTH_SET_CORE_MARKER_IDS: ReadonlySet<string> = new Set([
   "earth-formation",
   "moon-forms",
   "oldest-known-zircons-form",
   "early-oceans-and-hydrosphere",
-  "earliest-evidence-of-life",
 ]);
 
 /**
@@ -29,4 +31,7 @@ export const EARTH_SET_CORE_MARKER_IDS: ReadonlySet<string> = new Set([
  * `TIMELINE_DECORATION_CATEGORY_IDS` string literals in `timelineDecorations.ts`
  * but are redeclared here to avoid a circular dependency with the set registry.
  */
-export const EARTH_SET_GROUP_IDS: readonly string[] = ["deep-time-life"];
+export const EARTH_SET_GROUP_IDS: readonly string[] = [
+  EARTH_MILESTONES_GROUP_ID,
+  "deep-time-life",
+];

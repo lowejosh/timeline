@@ -1,4 +1,17 @@
 import {
+  CIVILIZATIONS_AUTO_TOGGLE_RULE,
+  DEEP_TIME_LIFE_AUTO_TOGGLE_RULE,
+  HUMAN_EVOLUTION_AUTO_TOGGLE_RULE,
+} from "../time/timelineLayerAutoToggle";
+import {
+  COSMIC_MILESTONES_GROUP_ID,
+  COSMIC_SET_CORE_MARKER_IDS,
+} from "./sets/cosmic";
+import {
+  EARTH_MILESTONES_GROUP_ID,
+  EARTH_SET_CORE_MARKER_IDS,
+} from "./sets/earth";
+import {
   CHALCOLITHIC_MARKERS,
   CLASSICAL_ANTIQUITY_MARKERS,
   BRONZE_AGE_MARKERS,
@@ -26,6 +39,8 @@ import type {
 } from "./timelineTypes";
 import { resolveDecorationSetId } from "./timelineSets";
 
+const COSMIC_MILESTONES_CATEGORY_ID = COSMIC_MILESTONES_GROUP_ID;
+const EARTH_MILESTONES_CATEGORY_ID = EARTH_MILESTONES_GROUP_ID;
 const HUMAN_HISTORY_CATEGORY_ID = "human-history";
 const DEEP_TIME_LIFE_CATEGORY_ID = "deep-time-life";
 const HUMAN_EVOLUTION_CATEGORY_ID = "human-evolution";
@@ -33,6 +48,8 @@ const CULTURES_CATEGORY_ID = "cultures";
 const CIVILIZATIONS_CATEGORY_ID = "civilizations";
 
 export const TIMELINE_DECORATION_CATEGORY_IDS = {
+  cosmicMilestones: COSMIC_MILESTONES_CATEGORY_ID,
+  earthMilestones: EARTH_MILESTONES_CATEGORY_ID,
   deepTimeLife: DEEP_TIME_LIFE_CATEGORY_ID,
   humanHistory: HUMAN_HISTORY_CATEGORY_ID,
   humanEvolution: HUMAN_EVOLUTION_CATEGORY_ID,
@@ -48,39 +65,69 @@ const CIVILIZATIONS_GROUP_ID = CIVILIZATIONS_CATEGORY_ID;
 
 export const TIMELINE_DECORATION_CATEGORIES: TimelineDecorationCategory[] = [
   {
+    id: COSMIC_MILESTONES_CATEGORY_ID,
+    label: "Cosmic Milestones",
+    description: "Foundational universe-scale milestone markers.",
+    order: 0,
+  },
+  {
+    id: EARTH_MILESTONES_CATEGORY_ID,
+    label: "Earth Milestones",
+    description: "Planetary formation and early-Earth milestone markers.",
+    order: 1,
+  },
+  {
     id: DEEP_TIME_LIFE_CATEGORY_ID,
     label: "Deep Time Life",
     description: "Toggleable deep-time life overlays and milestone markers.",
-    order: 0,
+    order: 2,
   },
   {
     id: HUMAN_HISTORY_CATEGORY_ID,
     label: "Human History",
     description: "All toggleable human-history marker collections.",
-    order: 1,
+    order: 3,
   },
   {
     id: HUMAN_EVOLUTION_CATEGORY_ID,
     label: "Human Evolution",
     description: "Toggleable hominin overlays and milestone markers.",
-    order: 2,
+    order: 4,
   },
   {
     id: CULTURES_CATEGORY_ID,
     label: "Pre-Civilization Cultures",
     description:
       "Toggleable archaeological cultures and village worlds before early states and cities.",
-    order: 3,
+    order: 5,
   },
   {
     id: CIVILIZATIONS_CATEGORY_ID,
     label: "Civilizations",
     description: "All toggleable civilization overlay bands.",
-    order: 4,
+    order: 6,
   },
 ];
 
 export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
+  {
+    id: COSMIC_MILESTONES_GROUP_ID,
+    categoryId: COSMIC_MILESTONES_CATEGORY_ID,
+    label: "Cosmic Milestones",
+    description:
+      "Core universe-scale milestone markers from recombination through solar-system formation.",
+    contentType: "markers",
+    order: 0,
+  },
+  {
+    id: EARTH_MILESTONES_GROUP_ID,
+    categoryId: EARTH_MILESTONES_CATEGORY_ID,
+    label: "Earth Milestones",
+    description:
+      "Core early-Earth milestone markers from planetary formation through the earliest evidence of life.",
+    contentType: "markers",
+    order: 0,
+  },
   {
     id: DEEP_TIME_LIFE_GROUP_ID,
     categoryId: DEEP_TIME_LIFE_CATEGORY_ID,
@@ -89,6 +136,7 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
       "Major life-history overlays and milestone markers across deep time.",
     contentType: "mixed",
     order: 0,
+    autoToggleRule: DEEP_TIME_LIFE_AUTO_TOGGLE_RULE,
   },
   {
     id: HUMAN_HISTORY_GROUP_ID,
@@ -105,6 +153,7 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     description: "Branching hominin overlays and major evolutionary markers.",
     contentType: "mixed",
     order: 0,
+    autoToggleRule: HUMAN_EVOLUTION_AUTO_TOGGLE_RULE,
   },
   {
     id: CULTURES_GROUP_ID,
@@ -122,6 +171,7 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     description: "Ancient through early-modern civilization overlays.",
     contentType: "overlays",
     order: 0,
+    autoToggleRule: CIVILIZATIONS_AUTO_TOGGLE_RULE,
   },
 ];
 
@@ -135,8 +185,46 @@ type TimelineOverlayCollection = {
   items: TimelineOverlayBand[];
 };
 
+const CORE_GROUPED_MARKER_IDS = new Set<string>([
+  ...COSMIC_SET_CORE_MARKER_IDS,
+  ...EARTH_SET_CORE_MARKER_IDS,
+]);
+
+function filterMarkersByIdSet(
+  markers: TimelineMarker[],
+  markerIds: ReadonlySet<string>,
+) {
+  return markers.filter((marker) => markerIds.has(marker.id));
+}
+
+function filterMarkersOutsideIdSet(
+  markers: TimelineMarker[],
+  markerIds: ReadonlySet<string>,
+) {
+  return markers.filter((marker) => !markerIds.has(marker.id));
+}
+
 const TIMELINE_MARKER_COLLECTIONS: TimelineMarkerCollection[] = [
-  { items: CORE_TIMELINE_MARKERS },
+  {
+    groupId: COSMIC_MILESTONES_GROUP_ID,
+    items: filterMarkersByIdSet(
+      CORE_TIMELINE_MARKERS,
+      COSMIC_SET_CORE_MARKER_IDS,
+    ),
+  },
+  {
+    groupId: EARTH_MILESTONES_GROUP_ID,
+    items: filterMarkersByIdSet(
+      CORE_TIMELINE_MARKERS,
+      EARTH_SET_CORE_MARKER_IDS,
+    ),
+  },
+  {
+    items: filterMarkersOutsideIdSet(
+      CORE_TIMELINE_MARKERS,
+      CORE_GROUPED_MARKER_IDS,
+    ),
+  },
   { groupId: DEEP_TIME_LIFE_GROUP_ID, items: DEEP_TIME_LIFE_MARKERS },
   { groupId: HUMAN_EVOLUTION_GROUP_ID, items: HUMAN_EVOLUTION_MARKERS },
   { groupId: HUMAN_HISTORY_GROUP_ID, items: PALEOLITHIC_MARKERS },

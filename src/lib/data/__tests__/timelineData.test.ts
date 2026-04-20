@@ -90,6 +90,7 @@ describe("root timeline display data", () => {
       TIMELINE_DISPLAY.markers
         .filter((marker) =>
           [
+            "earliest-evidence-of-life",
             "great-oxidation-event",
             "first-eukaryotic-cells",
             "k-pg-asteroid-impact",
@@ -99,16 +100,22 @@ describe("root timeline display data", () => {
     ).toBe(true);
 
     expect(
-      TIMELINE_DISPLAY.overlays
+      flattenOverlayBands(TIMELINE_DISPLAY.overlays)
         .filter((band) =>
           [
             "cambrian-explosion",
             "cambrian-substrate-revolution",
             "great-ordovician-biodiversification-event",
+            "age-of-invertebrates",
+            "age-of-fishes",
             "devonian-nekton-revolution",
+            "age-of-amphibians",
             "carboniferous-rainforest-collapse",
             "mesozoic-marine-revolution",
+            "age-of-reptiles",
+            "age-of-archosaurs",
             "age-of-dinosaurs",
+            "age-of-mammals",
             "paleocene-eocene-thermal-maximum",
           ].includes(band.id),
         )
@@ -539,10 +546,14 @@ describe("root timeline display data", () => {
       "cambrian-substrate-revolution",
       "cambrian-explosion",
       "great-ordovician-biodiversification-event",
+      "age-of-invertebrates",
+      "age-of-fishes",
       "devonian-nekton-revolution",
+      "age-of-amphibians",
       "carboniferous-rainforest-collapse",
       "mesozoic-marine-revolution",
-      "age-of-dinosaurs",
+      "age-of-reptiles",
+      "age-of-mammals",
       "paleocene-eocene-thermal-maximum",
       "sahelanthropus-tchadensis",
       "orrorin-tugenensis",
@@ -816,9 +827,9 @@ describe("root timeline display data", () => {
 
     expect(
       TIMELINE_DISPLAY.overlays
-        .find((band) => band.id === "age-of-dinosaurs")
+        .find((band) => band.id === "age-of-reptiles")
         ?.children?.map((band) => band.id),
-    ).toBeUndefined();
+    ).toEqual(["age-of-archosaurs", "age-of-dinosaurs"]);
 
     expect(
       TIMELINE_DISPLAY.overlays
@@ -852,8 +863,26 @@ describe("root timeline display data", () => {
     const marineRevolution = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "mesozoic-marine-revolution",
     );
-    const ageOfDinosaurs = TIMELINE_DISPLAY.overlays.find(
+    const ageOfInvertebrates = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "age-of-invertebrates",
+    );
+    const ageOfFishes = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "age-of-fishes",
+    );
+    const ageOfAmphibians = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "age-of-amphibians",
+    );
+    const ageOfReptiles = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "age-of-reptiles",
+    );
+    const ageOfArchosaurs = flattenOverlayBands(TIMELINE_DISPLAY.overlays).find(
+      (band) => band.id === "age-of-archosaurs",
+    );
+    const ageOfDinosaurs = flattenOverlayBands(TIMELINE_DISPLAY.overlays).find(
       (band) => band.id === "age-of-dinosaurs",
+    );
+    const ageOfMammals = TIMELINE_DISPLAY.overlays.find(
+      (band) => band.id === "age-of-mammals",
     );
     const petm = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "paleocene-eocene-thermal-maximum",
@@ -887,8 +916,39 @@ describe("root timeline display data", () => {
       approximateStart: true,
       approximateEnd: true,
     });
+    expect(ageOfInvertebrates).toMatchObject({
+      description: expect.stringContaining("Shell-forming sea animals"),
+      startYear: yearsAgo(443_100_000),
+      endYear: yearsAgo(419_620_000),
+    });
+    expect(ageOfFishes).toMatchObject({
+      description: expect.stringContaining("early amphibians"),
+      startYear: yearsAgo(419_620_000),
+      endYear: yearsAgo(358_860_000),
+    });
+    expect(ageOfAmphibians).toMatchObject({
+      description: expect.stringContaining("Coal-swamp forests"),
+      startYear: yearsAgo(358_860_000),
+      endYear: yearsAgo(251_902_000),
+    });
+    expect(ageOfReptiles).toMatchObject({
+      description: expect.stringContaining("first birds and mammals"),
+      startYear: yearsAgo(251_902_000),
+      endYear: yearsAgo(66_000_000),
+    });
+    expect(ageOfArchosaurs).toMatchObject({
+      description: expect.stringContaining("dominate terrestrial vertebrate life"),
+      startYear: yearsAgo(245_000_000),
+      endYear: yearsAgo(66_000_000),
+      approximateStart: true,
+    });
     expect(ageOfDinosaurs).toMatchObject({
       description: expect.stringContaining("archosaurs"),
+    });
+    expect(ageOfMammals).toMatchObject({
+      description: expect.stringContaining("flowering plants"),
+      startYear: yearsAgo(66_000_000),
+      endYear: yearsAgo(0),
     });
     expect(petm).toMatchObject({
       description: expect.stringContaining("5 to 9°C"),
@@ -901,8 +961,15 @@ describe("root timeline display data", () => {
     expect(nektonRevolution?.sourceRefs?.length).toBeGreaterThan(0);
     expect(rainforestCollapse?.sourceRefs?.length).toBeGreaterThan(0);
     expect(marineRevolution?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(ageOfInvertebrates?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(ageOfFishes?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(ageOfAmphibians?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(ageOfReptiles?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(ageOfArchosaurs?.sourceRefs?.length).toBeGreaterThan(0);
     expect(ageOfDinosaurs?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(ageOfMammals?.sourceRefs?.length).toBeGreaterThan(0);
     expect(petm?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(ageOfArchosaurs?.children).toBeUndefined();
     expect(ageOfDinosaurs?.children).toBeUndefined();
   });
 

@@ -77,6 +77,19 @@ export type TimelineZoomVisibility = {
   maxZoom?: number;
 };
 
+export type TimelineLayerAutoToggleRule =
+  | {
+      kind: "coverage-after-year";
+      thresholdYear: number;
+      hideCoverage?: number;
+      showCoverage?: number;
+    }
+  | {
+      kind: "max-visible-span";
+      hideAtOrBelowYears: number;
+      showAboveYears?: number;
+    };
+
 export type TimelineDecorationContentType = "markers" | "overlays" | "mixed";
 
 export type TimelineDecorationCategory = {
@@ -94,6 +107,7 @@ export type TimelineDecorationGroup = {
   contentType: TimelineDecorationContentType;
   order: number;
   defaultEnabled?: boolean;
+  autoToggleRule?: TimelineLayerAutoToggleRule;
 };
 
 type TimelineDecorationBase = TimelineZoomVisibility &

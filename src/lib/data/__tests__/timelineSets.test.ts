@@ -39,6 +39,12 @@ describe("timeline set registry", () => {
 
   it("resolves decoration set IDs by groupId and by core marker id", () => {
     expect(
+      resolveDecorationSetId({ id: "ignored", groupId: "cosmic-milestones" }),
+    ).toBe("cosmic");
+    expect(
+      resolveDecorationSetId({ id: "ignored", groupId: "earth-milestones" }),
+    ).toBe("earth");
+    expect(
       resolveDecorationSetId({ id: "ignored", groupId: "deep-time-life" }),
     ).toBe("earth");
     expect(

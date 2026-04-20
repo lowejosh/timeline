@@ -589,6 +589,13 @@ type ExpandedOverlayConnectorGeometry = {
   railY: number;
 };
 
+type CanvasOcclusionRect = {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+};
+
 type AnimatedOverlayBandState = {
   overlay: ResolvedTimelineOverlayBand;
   currentOpacity: number;
@@ -1964,6 +1971,48 @@ function resolveOverlayBandLabelInsets({
   };
 }
 
+function pushCanvasOcclusionRect(
+  rects: CanvasOcclusionRect[],
+  rect: CanvasOcclusionRect,
+) {
+  const left = Math.min(rect.left, rect.right);
+  const right = Math.max(rect.left, rect.right);
+  const top = Math.min(rect.top, rect.bottom);
+  const bottom = Math.max(rect.top, rect.bottom);
+
+  if (right - left < 0.5 || bottom - top < 0.5) {
+    return;
+  }
+
+  rects.push({ left, right, top, bottom });
+}
+
+function clipCanvasOutsideOcclusionRects(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  rects: readonly CanvasOcclusionRect[],
+  padding = 1,
+) {
+  if (rects.length === 0) {
+    return;
+  }
+
+  context.beginPath();
+  context.rect(0, 0, width, height);
+
+  for (const rect of rects) {
+    context.rect(
+      rect.left - padding,
+      rect.top - padding,
+      rect.right - rect.left + padding * 2,
+      rect.bottom - rect.top + padding * 2,
+    );
+  }
+
+  context.clip("evenodd");
+}
+
 export function TimelineCanvas({
   width,
   height,
@@ -2406,6 +2455,7 @@ export function TimelineCanvas({
       let hasActiveOverlayLabelAnimation = false;
       const hoverRegions: HoverRegion[] = [];
       const overlayInteractionRegions: OverlayInteractionRegion[] = [];
+      const overlayOcclusionRects: CanvasOcclusionRect[] = [];
       const resolvedAxisTickStates = [...axisTickAnimationRef.current.values()]
         .filter(
           (tick) => tick.visibleProgress > 0.01 || tick.labelOpacity > 0.01,
@@ -2938,6 +2988,13 @@ export function TimelineCanvas({
             });
           }
 
+          pushCanvasOcclusionRect(overlayOcclusionRects, {
+            left: overlay.renderX,
+            right: overlay.renderX + bandWidth,
+            top: y,
+            bottom: y + OVERLAY_LANE_HEIGHT,
+          });
+
           context.save();
           const overlayBandOpacity = OVERLAY_BAND_ALPHA;
           const overlayLabelPaint = getOverlayLabelPaint(
@@ -3101,6 +3158,12 @@ export function TimelineCanvas({
         });
 
         context.save();
+        clipCanvasOutsideOcclusionRects(
+          context,
+          width,
+          height,
+          overlayOcclusionRects,
+        );
         context.strokeStyle = connectorStroke;
         context.lineWidth = EXPANDED_OVERLAY_CONNECTOR_LINE_WIDTH;
         context.lineCap = "round";
@@ -3162,6 +3225,13 @@ export function TimelineCanvas({
             paper,
           );
 
+          pushCanvasOcclusionRect(overlayOcclusionRects, {
+            left: renderX,
+            right: renderX + renderWidth,
+            top: childRenderY,
+            bottom: childRenderY + OVERLAY_LANE_HEIGHT,
+          });
+
           if (childReveal >= EXPANDED_OVERLAY_INTERACTION_REVEAL_THRESHOLD) {
             overlayInteractionRegions.push({
               id: child.band.id,
@@ -3175,6 +3245,12 @@ export function TimelineCanvas({
           }
 
           context.save();
+          clipCanvasOutsideOcclusionRects(
+            context,
+            width,
+            height,
+            overlayOcclusionRects,
+          );
           context.strokeStyle = connectorStroke;
           context.lineWidth = 1;
           context.lineCap = "round";
@@ -4275,8 +4351,10 @@ export function TimelineCanvas({
     },
     [
       commitHoveredTooltip,
+      height,
       isViewportInteractionActive,
       resolveHoveredTooltipForCanvasDraw,
+      width,
     ],
   );
 
@@ -5341,6 +5419,7 @@ export function TimelineCanvas({
     );
     const hoverRegions: HoverRegion[] = [];
     const overlayInteractionRegions: OverlayInteractionRegion[] = [];
+    const overlayOcclusionRects: CanvasOcclusionRect[] = [];
     const resolvedAxisTickStates = [...axisTickAnimationRef.current.values()]
       .filter((tick) => tick.visibleProgress > 0.01 || tick.labelOpacity > 0.01)
       .sort((left, right) => left.step - right.step || left.year - right.year);
@@ -5449,6 +5528,13 @@ export function TimelineCanvas({
             role: "parent",
           });
         }
+
+        pushCanvasOcclusionRect(overlayOcclusionRects, {
+          left: overlay.renderX,
+          right: overlay.renderX + bandWidth,
+          top: y,
+          bottom: y + OVERLAY_LANE_HEIGHT,
+        });
 
         context.save();
         const overlayBandOpacity = OVERLAY_BAND_ALPHA;
@@ -5624,6 +5710,12 @@ export function TimelineCanvas({
       });
 
       context.save();
+      clipCanvasOutsideOcclusionRects(
+        context,
+        width,
+        height,
+        overlayOcclusionRects,
+      );
       context.strokeStyle = connectorStroke;
       context.lineWidth = EXPANDED_OVERLAY_CONNECTOR_LINE_WIDTH;
       context.lineCap = "round";
@@ -5684,6 +5776,13 @@ export function TimelineCanvas({
           paper,
         );
 
+        pushCanvasOcclusionRect(overlayOcclusionRects, {
+          left: renderX,
+          right: renderX + renderWidth,
+          top: childRenderY,
+          bottom: childRenderY + OVERLAY_LANE_HEIGHT,
+        });
+
         if (childReveal >= EXPANDED_OVERLAY_INTERACTION_REVEAL_THRESHOLD) {
           overlayInteractionRegions.push({
             id: child.band.id,
@@ -5697,6 +5796,12 @@ export function TimelineCanvas({
         }
 
         context.save();
+        clipCanvasOutsideOcclusionRects(
+          context,
+          width,
+          height,
+          overlayOcclusionRects,
+        );
         context.strokeStyle = connectorStroke;
         context.lineWidth = 1;
         context.lineCap = "round";

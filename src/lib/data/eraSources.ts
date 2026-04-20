@@ -120,6 +120,26 @@ export const ERA_SOURCES = {
     notes:
       "Used for formal deep-time boundaries. Some app bands are intentionally truncated where the timeline hands off to human-history periods.",
   },
+  ucmpGeologicTimeScaleGuide: {
+    shortTitle: "UCMP: geologic time scale",
+    title: "The Geologic Time Scale",
+    organization: "University of California Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "The Geologic Time Scale."',
+    url: "https://ucmp.berkeley.edu/help/timeform.php",
+    notes:
+      "Used for concise period-by-period biological summaries on the geological track, especially Phanerozoic life-history descriptions and broad Hadean/Archean context.",
+  },
+  gutenbergHistoricalGeologyMiller1922: {
+    shortTitle: "Miller: Historical Geology",
+    title: "An Introduction to Historical Geology",
+    organization: "Project Gutenberg",
+    citation:
+      'Miller, W. J. (1922), An Introduction to Historical Geology. Project Gutenberg eBook #41660.',
+    url: "https://www.gutenberg.org/files/41660/41660-h/41660-h.htm",
+    notes:
+      "Used for older textbook 'Age of X' framings such as the Age of Fishes, Reptiles, and Mammals; the app maps those labels onto the corresponding formal intervals already used in the geological timeline.",
+  },
   smithsonianExtinctionOverTime: {
     shortTitle: "Smithsonian: Extinction Over Time",
     title: "Extinction Over Time",
@@ -478,6 +498,16 @@ export const ERA_SOURCES = {
     url: "https://ucmp.berkeley.edu/mesozoic/mesozoiclife.html",
     notes:
       "Used for the public-facing framing that dinosaurs and other archosaurs dominated terrestrial life through much of the Mesozoic.",
+  },
+  ucmpArchosauriaFossilRecord: {
+    shortTitle: "UCMP: Archosaur fossil record",
+    title: "Archosauria: Fossil Record",
+    organization: "UC Museum of Paleontology",
+    citation:
+      'University of California Museum of Paleontology, "Archosauria: Fossil Record."',
+    url: "https://ucmp.berkeley.edu/diapsids/archofr.html",
+    notes:
+      "Used for the broad archosaur timeline: early archosauromorphs appear about 245 million years ago in the Early Triassic, later archosaur survivors dominate the rest of the Mesozoic, and only birds and crocodilians remain today.",
   },
   ucmpJurassicLife: {
     shortTitle: "UCMP: Jurassic life",

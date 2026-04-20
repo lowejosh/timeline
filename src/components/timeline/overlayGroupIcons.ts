@@ -1,4 +1,5 @@
 export type OverlayGroupIconId =
+  | "markers"
   | "cultures"
   | "civilizations"
   | "human-evolution"
@@ -33,6 +34,10 @@ export function resolveOverlayGroupIconId(
   groupId?: string,
 ): OverlayGroupIconId | null {
   switch (groupId) {
+    case "cosmic-milestones":
+    case "earth-milestones":
+    case "human-history":
+      return "markers";
     case "cultures":
     case "civilizations":
     case "human-evolution":
@@ -81,7 +86,6 @@ export function resolveOverlayGroupIconLayout({
 
 function drawDeepTimeLifeIcon(
   context: CanvasRenderingContext2D,
-  _half: number,
 ) {
   context.beginPath();
   context.moveTo(-0.25, 0.75);
@@ -105,6 +109,23 @@ function drawDeepTimeLifeIcon(
   context.quadraticCurveTo(0.55, 0.55, 0.72, 0.18);
   context.moveTo(0.15, 1.52);
   context.quadraticCurveTo(1.45, 1.1, 2.5, 0.28);
+  context.stroke();
+}
+
+function drawMarkersIcon(context: CanvasRenderingContext2D, half: number) {
+  const circleY = -half + 2.2;
+  const stemTop = circleY + 1.2;
+  const stemBottom = half - 1.1;
+
+  context.beginPath();
+  context.arc(0, circleY, 1.5, 0, Math.PI * 2);
+  context.fill();
+
+  context.beginPath();
+  context.moveTo(0, stemTop);
+  context.lineTo(0, stemBottom);
+  context.moveTo(-1.8, stemBottom);
+  context.lineTo(1.8, stemBottom);
   context.stroke();
 }
 
@@ -207,8 +228,11 @@ export function drawOverlayGroupIcon({
   context.lineJoin = "round";
 
   switch (layout.iconId) {
+    case "markers":
+      drawMarkersIcon(context, half);
+      break;
     case "deep-time-life":
-      drawDeepTimeLifeIcon(context, half);
+      drawDeepTimeLifeIcon(context);
       break;
     case "human-evolution":
       drawHumanEvolutionIcon(context, half);
