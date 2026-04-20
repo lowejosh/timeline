@@ -28,6 +28,17 @@ export type EraScheme =
 
 export type EraFamilyId = "cosmic" | "geological" | "human-history";
 
+export type TimelineSetId = "cosmic" | "earth" | "human";
+
+export type TimelineSetConfig = {
+  id: TimelineSetId;
+  label: string;
+  description?: string;
+  order: number;
+  defaultEnabled?: boolean;
+  familyIds: EraFamilyId[];
+};
+
 export type TimelineEraFamilyConfig = {
   id: EraFamilyId;
   label: string;
@@ -93,6 +104,7 @@ type TimelineDecorationBase = TimelineZoomVisibility &
     description?: string;
     priority?: number;
     groupId?: string;
+    setId?: TimelineSetId;
     subGroup?: string;
     sourceRefs?: TimelineSourceRef[];
   };

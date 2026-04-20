@@ -21,6 +21,7 @@ import {
 import { splitTimelineYear, TIMELINE_MIN_YEAR } from "../viewport";
 import {
   getTimelineYearFromYearsAgo,
+  TIMELINE_MAX_YEAR,
   getYearsAgoFromPresent,
 } from "../timelineYears";
 
@@ -196,6 +197,15 @@ describe("timeline tick generation", () => {
         approximateStart: true,
       }),
     ).toBe("~3,500 BCE — 539 BCE");
+  });
+
+  it("formats present-ending ranges with a Present label", () => {
+    expect(formatTimelineRange(2000, TIMELINE_MAX_YEAR)).toBe(
+      "2,000 CE — Present",
+    );
+    expect(formatTimelineRange(TIMELINE_MAX_YEAR, TIMELINE_MAX_YEAR)).toBe(
+      "Present",
+    );
   });
 
   it("formats sub-year long-ago labels as years and days ago", () => {

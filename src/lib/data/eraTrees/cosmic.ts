@@ -8,6 +8,7 @@ const RECOMBINATION_END = afterBigBang(380_000);
 export const EARLY_UNIVERSE_END_YEAR = RECOMBINATION_END;
 export const DARK_AGES_END_YEAR = afterBigBang(200_000_000);
 export const REIONIZATION_END_YEAR = afterBigBang(1_000_000_000);
+export const DARK_ENERGY_ACCELERATION_START_YEAR = afterBigBang(10_000_000_000);
 export const EARLY_UNIVERSE_CHILD_ERA_ORDER = [
   "planck-epoch",
   "grand-unification-epoch",
@@ -346,20 +347,33 @@ export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
     id: "galaxy-assembly",
     name: "Galaxy Assembly",
     startYear: REIONIZATION_END_YEAR,
-    endYear: yearsAgo(4_567_000_000),
+    endYear: DARK_ENERGY_ACCELERATION_START_YEAR,
     approximateStart: true,
     approximateEnd: true,
     description:
-      "Galaxies grow, merge, and settle into the large-scale cosmic web long before the solar nebula forms.",
+      "Galaxies keep growing into groups, clusters, and the large-scale cosmic web.",
     scheme: "cosmic",
     sourceRefs: [
       {
-        sourceId: "nasaLambdaCosmology",
-        note: "After reionization, NASA LAMBDA describes structure continuing to grow and merge under gravity into the large-scale cosmic web, clusters, and galaxy systems.",
+        sourceId: "nasaUniverseOverview",
+        note: "On NASA's Cosmic History overview, the visible infographic places 'Galaxies & Dark Matter' at about 400 million years and 'Dark Energy' at 10 billion years, framing this interval as the long era of galaxy building before accelerating expansion dominates.",
       },
+    ],
+  },
+  {
+    id: "dark-energy-acceleration",
+    name: "Dark Energy Acceleration",
+    startYear: DARK_ENERGY_ACCELERATION_START_YEAR,
+    endYear: yearsAgo(0),
+    approximateStart: true,
+    timeLabel: "10 billion years after the Big Bang to Present",
+    description:
+      "Cosmic expansion speeds up as dark energy stretches space ever faster while galaxies continue drifting apart.",
+    scheme: "cosmic",
+    sourceRefs: [
       {
-        sourceId: "nasaSolarSystemFacts",
-        note: "This band ends when the solar system forms about 4.6 billion years ago from a collapsing cloud of gas and dust that became a solar nebula.",
+        sourceId: "nasaUniverseOverview",
+        note: "The History of the Universe infographic on NASA's Cosmic History overview places 'Dark Energy' at 10 billion years and describes this stage as the point where expansion accelerates.",
       },
     ],
   },

@@ -230,6 +230,7 @@ describe("era data", () => {
       "dark-ages",
       "first-stars-and-reionization",
       "galaxy-assembly",
+      "dark-energy-acceleration",
     ]);
   });
 
@@ -282,6 +283,7 @@ describe("era data", () => {
       expect.arrayContaining([
         "planck-epoch",
         "recombination",
+        "dark-energy-acceleration",
         "hadean",
         "quaternary",
         "paleolithic",
@@ -299,5 +301,20 @@ describe("era data", () => {
     expect(holocene?.familyId).toBe("geological");
     expect(paleolithic?.familyId).toBe("human-history");
     expect((paleolithic?.priority ?? 0) > (quaternary?.priority ?? 0)).toBe(true);
+  });
+
+  it("keeps overlapping geological eras above late cosmic eras", () => {
+    const darkEnergyAcceleration = findEraById(
+      ROOT_ERA,
+      "dark-energy-acceleration",
+    );
+    const quaternary = findEraById(ROOT_ERA, "quaternary");
+    const holocene = findEraById(ROOT_ERA, "holocene");
+
+    expect(darkEnergyAcceleration?.familyId).toBe("cosmic");
+    expect(quaternary?.familyId).toBe("geological");
+    expect(holocene?.familyId).toBe("geological");
+    expect((quaternary?.priority ?? 0) > (darkEnergyAcceleration?.priority ?? 0)).toBe(true);
+    expect((holocene?.priority ?? 0) > (darkEnergyAcceleration?.priority ?? 0)).toBe(true);
   });
 });

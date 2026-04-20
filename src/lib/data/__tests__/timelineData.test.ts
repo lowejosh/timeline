@@ -5,6 +5,7 @@ import {
   ROOT_TIMELINE,
   TIMELINE_DISPLAY,
   getRootDisplayEras,
+  getRootDisplayErasBySets,
 } from "../eras";
 import {
   CIVILIZATION_OVERLAYS,
@@ -14,6 +15,11 @@ import {
   TIMELINE_DECORATION_CATEGORIES,
   TIMELINE_DECORATION_GROUPS,
 } from "../timelineDecorations";
+import {
+  TIMELINE_SETS,
+  filterMarkersBySets,
+  filterOverlaysBySets,
+} from "../timelineSets";
 import { bce, yearsAgo } from "../timelineDateBuilders";
 import type { TimelineOverlayBand } from "../timelineTypes";
 
@@ -910,10 +916,20 @@ describe("root timeline display data", () => {
       "human-history",
     ]);
     expect(getRootDisplayEras(ROOT_TIMELINE.rootEra).map((child) => child.id)).toEqual([
-      "early-universe",
+      "planck-epoch",
+      "grand-unification-epoch",
+      "inflationary-epoch",
+      "electroweak-epoch",
+      "quark-epoch",
+      "hadron-epoch",
+      "lepton-epoch",
+      "big-bang-nucleosynthesis",
+      "photon-epoch",
+      "recombination",
       "dark-ages",
       "first-stars-and-reionization",
       "galaxy-assembly",
+      "dark-energy-acceleration",
       "hadean",
       "archean",
       "siderian",
@@ -950,5 +966,99 @@ describe("root timeline display data", () => {
       "age-of-industry-and-empire",
       "contemporary-history",
     ]);
+  });
+
+  it("defines the three timeline sets with the intended family ownership", () => {
+    expect(TIMELINE_SETS.map((set) => set.id)).toEqual([
+      "cosmic",
+      "earth",
+      "human",
+    ]);
+
+    expect(TIMELINE_SETS.map((set) => set.familyIds)).toEqual([
+      ["cosmic"],
+      ["geological"],
+      ["human-history"],
+    ]);
+  });
+
+  it("filters root display eras by enabled sets", () => {
+    const cosmicEraIds = getRootDisplayErasBySets(
+      ROOT_TIMELINE.rootEra,
+      new Set(["cosmic"]),
+    ).map((era) => era.id);
+    expect(cosmicEraIds).toContain("planck-epoch");
+    expect(cosmicEraIds).toContain("dark-ages");
+    expect(cosmicEraIds).toContain("galaxy-assembly");
+    expect(cosmicEraIds).toContain("dark-energy-acceleration");
+    expect(cosmicEraIds).not.toContain("hadean");
+    expect(cosmicEraIds).not.toContain("paleolithic");
+
+    const earthEraIds = getRootDisplayErasBySets(
+      ROOT_TIMELINE.rootEra,
+      new Set(["earth"]),
+    ).map((era) => era.id);
+    expect(earthEraIds).toContain("hadean");
+    expect(earthEraIds).not.toContain("planck-epoch");
+    expect(earthEraIds).not.toContain("paleolithic");
+
+    const humanEraIds = getRootDisplayErasBySets(
+      ROOT_TIMELINE.rootEra,
+      new Set(["human"]),
+    ).map((era) => era.id);
+    expect(humanEraIds).toContain("paleolithic");
+    expect(humanEraIds).not.toContain("hadean");
+    expect(humanEraIds).not.toContain("planck-epoch");
+  });
+
+  it("filters markers and overlays by set ownership", () => {
+    const cosmicMarkers = filterMarkersBySets(
+      TIMELINE_DISPLAY.markers,
+      new Set(["cosmic"]),
+    );
+    const earthMarkers = filterMarkersBySets(
+      TIMELINE_DISPLAY.markers,
+      new Set(["earth"]),
+    );
+    const humanMarkers = filterMarkersBySets(
+      TIMELINE_DISPLAY.markers,
+      new Set(["human"]),
+    );
+
+    expect(cosmicMarkers.some((marker) => marker.id === "solar-system-formation")).toBe(true);
+    expect(cosmicMarkers.some((marker) => marker.id === "earth-formation")).toBe(false);
+
+    expect(earthMarkers.some((marker) => marker.id === "earth-formation")).toBe(true);
+    expect(earthMarkers.some((marker) => marker.id === "earliest-evidence-of-life")).toBe(true);
+    expect(earthMarkers.some((marker) => marker.groupId === "deep-time-life")).toBe(true);
+    expect(earthMarkers.some((marker) => marker.groupId === "human-history")).toBe(false);
+
+    expect(humanMarkers.some((marker) => marker.groupId === "human-history")).toBe(true);
+    expect(humanMarkers.some((marker) => marker.groupId === "human-evolution")).toBe(true);
+    expect(humanMarkers.some((marker) => marker.id === "earth-formation")).toBe(false);
+
+    const cosmicOverlays = filterOverlaysBySets(
+      TIMELINE_DISPLAY.overlays,
+      new Set(["cosmic"]),
+    );
+    const earthOverlays = filterOverlaysBySets(
+      TIMELINE_DISPLAY.overlays,
+      new Set(["earth"]),
+    );
+    const humanOverlays = filterOverlaysBySets(
+      TIMELINE_DISPLAY.overlays,
+      new Set(["human"]),
+    );
+
+    expect(cosmicOverlays).toHaveLength(0);
+    expect(earthOverlays.every((overlay) => overlay.groupId === "deep-time-life")).toBe(true);
+    expect(
+      humanOverlays.every(
+        (overlay) =>
+          overlay.groupId === "human-evolution" ||
+          overlay.groupId === "cultures" ||
+          overlay.groupId === "civilizations",
+      ),
+    ).toBe(true);
   });
 });

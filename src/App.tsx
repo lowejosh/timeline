@@ -13,15 +13,24 @@ import {
   findEraById,
   getAncestorChain,
   getEraDisplayChain,
+  getEraFamilyId,
   getNavigableAncestor,
-  getRootDisplayEras,
+  getRootDisplayErasBySets,
   isEraFamilyRoot,
   type Era,
+  type TimelineSetId,
 } from "./lib/data/eras";
 import {
   TIMELINE_DECORATION_CATEGORY_IDS,
   getDefaultEnabledTimelineGroupIds,
 } from "./lib/data/timelineDecorations";
+import {
+  filterMarkersBySets,
+  filterOverlaysBySets,
+  getDefaultEnabledTimelineSetIds,
+  getSetIdForEraFamily,
+  TIMELINE_SETS,
+} from "./lib/data/timelineSets";
 import { resolveTimelineSidebarSections } from "./lib/data/timelineSidebar";
 import {
   shouldAutoSuppressCivilizations,
@@ -42,6 +51,7 @@ const CIVILIZATIONS_GROUP_ID = TIMELINE_DECORATION_CATEGORY_IDS.civilizations;
 const OVERVIEW_RULER_TIER_HEIGHT = 18;
 const OVERVIEW_RULER_MAX_TIERS = 3;
 const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
+const IS_DEV_BUILD = import.meta.env.DEV;
 
 function App() {
   const [stageRef, stageSize] = useElementSize<HTMLDivElement>();
@@ -59,6 +69,12 @@ function App() {
   const [manualEnabledGroupIds, setManualEnabledGroupIds] = useState<
     Set<string>
   >(() => getDefaultEnabledTimelineGroupIds());
+  // Backend-only set enablement. No UI controls yet; all sets enabled by
+  // default so the visible app matches prior behavior. Future community/custom
+  // overlays will flip entries in this set to hide whole content families.
+  const [enabledSetIds, setEnabledSetIds] = useState<Set<TimelineSetId>>(() =>
+    getDefaultEnabledTimelineSetIds(),
+  );
   const [humanEvolutionToggleMode, setHumanEvolutionToggleMode] =
     useState<LayerAutoToggleMode>("auto");
   const [isHumanEvolutionAutoSuppressed, setIsHumanEvolutionAutoSuppressed] =
@@ -155,7 +171,26 @@ function App() {
     return next;
   }, [enabledGroupIds, isCivilizationsAutoHidden]);
 
-  const rootDisplayEras = useMemo(() => getRootDisplayEras(ROOT_ERA), []);
+  const rootDisplayEras = useMemo(
+    () => getRootDisplayErasBySets(ROOT_ERA, enabledSetIds),
+    [enabledSetIds],
+  );
+
+  const setFilteredMarkers = useMemo(
+    () => filterMarkersBySets(TIMELINE_DISPLAY.markers, enabledSetIds),
+    [enabledSetIds],
+  );
+  const setFilteredOverlays = useMemo(
+    () => filterOverlaysBySets(TIMELINE_DISPLAY.overlays, enabledSetIds),
+    [enabledSetIds],
+  );
+  const setFilteredDisplay = useMemo(
+    () => ({
+      markers: setFilteredMarkers,
+      overlays: setFilteredOverlays,
+    }),
+    [setFilteredMarkers, setFilteredOverlays],
+  );
 
   const activeEra = findEraById(ROOT_ERA, activeEraId) ?? ROOT_ERA;
   const rawChain = getAncestorChain(ROOT_ERA, activeEraId);
@@ -269,7 +304,7 @@ function App() {
   const sidebarSections = useMemo(
     () =>
       resolveTimelineSidebarSections(
-        TIMELINE_DISPLAY,
+        setFilteredDisplay,
         animated.viewport,
         innerWidth,
         TIMELINE_CANVAS_PAD,
@@ -278,7 +313,13 @@ function App() {
           ? new Set([CIVILIZATIONS_GROUP_ID])
           : new Set(),
       ),
-    [animated.viewport, enabledGroupIds, innerWidth, isCivilizationsAutoHidden],
+    [
+      animated.viewport,
+      enabledGroupIds,
+      innerWidth,
+      isCivilizationsAutoHidden,
+      setFilteredDisplay,
+    ],
   );
 
   const handleToggleEntry = useCallback(
@@ -305,6 +346,60 @@ function App() {
     },
     [],
   );
+
+  const handleToggleSet = useCallback(
+    (setId: TimelineSetId, nextEnabled: boolean) => {
+      if (!nextEnabled) {
+        const activeFamilyId = getEraFamilyId(ROOT_ERA, activeEraId);
+        const activeSetId = activeFamilyId
+          ? getSetIdForEraFamily(activeFamilyId)
+          : null;
+
+        if (activeSetId === setId) {
+          setActiveEraId(ROOT_ERA.id);
+          animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1]);
+        }
+      }
+
+      setEnabledSetIds((current) => {
+        const next = new Set(current);
+
+        if (nextEnabled) {
+          next.add(setId);
+        } else {
+          next.delete(setId);
+        }
+
+        return next;
+      });
+
+      setOverlayVisibilityTransitionKey((current) => current + 1);
+    },
+    [activeEraId, animated],
+  );
+
+  const handleEnableAllSets = useCallback(() => {
+    setEnabledSetIds(getDefaultEnabledTimelineSetIds());
+    setOverlayVisibilityTransitionKey((current) => current + 1);
+  }, []);
+
+  const devSetControls = useMemo(
+    () =>
+      !IS_DEV_BUILD
+        ? null
+        : {
+            items: TIMELINE_SETS.map((set) => ({
+              id: set.id,
+              label: set.label,
+              description: set.description,
+              enabled: enabledSetIds.has(set.id),
+            })),
+            onToggleSet: handleToggleSet,
+            onEnableAll: handleEnableAllSets,
+          },
+    [enabledSetIds, handleEnableAllSets, handleToggleSet],
+  );
+
   const isOverviewVisible = stageSize.height >= MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER;
   const mainCanvasHeight = Math.max(
     timelineSize.height > 0 ? timelineSize.height : stageSize.height,
@@ -338,6 +433,7 @@ function App() {
         id="timeline-layers-panel"
       >
         <TimelineSidebar
+          devSetControls={devSetControls}
           sections={sidebarSections}
           onToggleEntry={handleToggleEntry}
         />
@@ -353,8 +449,8 @@ function App() {
                 activeEra={activeEra}
                 activeChain={chain}
                 siblingEras={siblingEras}
-                markers={TIMELINE_DISPLAY.markers}
-                overlayBands={TIMELINE_DISPLAY.overlays}
+                markers={setFilteredMarkers}
+                overlayBands={setFilteredOverlays}
                 enabledGroupIds={renderEnabledGroupIds}
                 overlayVisibilityTransitionKey={overlayVisibilityTransitionKey}
                 parentEra={parentEra}

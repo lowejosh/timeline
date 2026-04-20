@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { TimelineSidebarSectionState } from "../../lib/data/timelineSidebar";
+import type { TimelineSetId } from "../../lib/data/timelineTypes";
 import { OverlayGroupIconSvg } from "../timeline/OverlayGroupIconSvg";
 
 type RenderedTimelineSidebarSection = TimelineSidebarSectionState & {
@@ -57,6 +58,16 @@ function mergeRenderedSections(
 }
 
 type TimelineSidebarProps = {
+  devSetControls?: {
+    items: Array<{
+      id: TimelineSetId;
+      label: string;
+      description?: string;
+      enabled: boolean;
+    }>;
+    onToggleSet: (setId: TimelineSetId, nextEnabled: boolean) => void;
+    onEnableAll: () => void;
+  } | null;
   sections: TimelineSidebarSectionState[];
   onToggleEntry: (
     entryId: string,
@@ -66,6 +77,7 @@ type TimelineSidebarProps = {
 };
 
 export function TimelineSidebar({
+  devSetControls,
   sections,
   onToggleEntry,
 }: TimelineSidebarProps) {
@@ -155,6 +167,64 @@ export function TimelineSidebar({
           <h1 className="timeline-sidebar__title">Layers</h1>
         </header>
 
+        {devSetControls ? (
+          <section
+            aria-label="Development timeline set controls"
+            className="timeline-sidebar__dev-panel"
+          >
+            <div className="timeline-sidebar__dev-header">
+              <h2 className="timeline-sidebar__dev-title">Sets</h2>
+              <span className="timeline-sidebar__dev-badge">Dev</span>
+            </div>
+            <p className="timeline-sidebar__dev-note">
+              Quick backend set toggles for testing.
+            </p>
+            <button
+              className="timeline-sidebar__dev-action"
+              disabled={devSetControls.items.every((item) => item.enabled)}
+              onClick={devSetControls.onEnableAll}
+              type="button"
+            >
+              Enable all
+            </button>
+
+            <ul className="timeline-sidebar__item-list">
+              {devSetControls.items.map((item) => (
+                <li className="timeline-sidebar__item" key={item.id}>
+                  <label className="timeline-sidebar__toggle timeline-sidebar__toggle--item">
+                    <input
+                      checked={item.enabled}
+                      onChange={(event) => {
+                        devSetControls.onToggleSet(
+                          item.id,
+                          event.currentTarget.checked,
+                        );
+                      }}
+                      type="checkbox"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="timeline-sidebar__checkbox"
+                    />
+                    <span className="timeline-sidebar__toggle-copy">
+                      <span className="timeline-sidebar__item-header">
+                        <span className="timeline-sidebar__item-title">
+                          {item.label}
+                        </span>
+                      </span>
+                      {item.description ? (
+                        <span className="timeline-sidebar__item-description">
+                          {item.description}
+                        </span>
+                      ) : null}
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         <div className="timeline-sidebar__sections">
           {renderedSections.map((section) => {
             return (
@@ -200,11 +270,7 @@ export function TimelineSidebar({
                               </span>
                               <OverlayGroupIconSvg
                                 className="timeline-sidebar__item-icon"
-                                groupId={
-                                  section.id === "overlays"
-                                    ? entry.id
-                                    : undefined
-                                }
+                                groupId={section.id === "overlays" ? entry.id : undefined}
                               />
                             </span>
                           </span>

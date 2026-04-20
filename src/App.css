@@ -188,6 +188,77 @@
   gap: 0.42rem;
 }
 
+.timeline-sidebar__dev-panel {
+  display: grid;
+  gap: 0.34rem;
+  margin: 0 0.08rem 0.56rem;
+  padding: 0.52rem;
+  border: 1px solid rgba(77, 61, 47, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 251, 244, 0.3);
+  box-shadow: 0 3px 10px rgba(44, 31, 20, 0.03);
+}
+
+.timeline-sidebar__dev-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.timeline-sidebar__dev-title {
+  margin: 0;
+  color: var(--ink);
+  font: 700 0.62rem/1.2 var(--font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.timeline-sidebar__dev-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.14rem 0.38rem;
+  border-radius: 999px;
+  background: rgba(124, 92, 59, 0.12);
+  color: rgba(77, 61, 47, 0.82);
+  font: 700 0.56rem/1 var(--font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.timeline-sidebar__dev-note {
+  margin: 0;
+  color: rgba(77, 61, 47, 0.72);
+  font: 0.67rem/1.3 var(--font-sans);
+}
+
+.timeline-sidebar__dev-action {
+  justify-self: start;
+  padding: 0.32rem 0.56rem;
+  border: 1px solid rgba(77, 61, 47, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 252, 246, 0.5);
+  color: var(--ink);
+  font: 600 0.66rem/1 var(--font-sans);
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+.timeline-sidebar__dev-action:hover:not(:disabled) {
+  background: rgba(255, 251, 244, 0.62);
+  border-color: rgba(77, 61, 47, 0.2);
+  transform: translateY(-1px);
+}
+
+.timeline-sidebar__dev-action:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .timeline-sidebar__section-shell {
   display: grid;
   grid-template-rows: 1fr;
@@ -385,6 +456,11 @@
   flex: 1 1 auto;
   min-width: 0;
   font: 600 0.76rem/1.18 var(--font-sans);
+}
+
+.timeline-sidebar__item-description {
+  color: rgba(77, 61, 47, 0.74);
+  font: 0.64rem/1.28 var(--font-sans);
 }
 
 .timeline-canvas {

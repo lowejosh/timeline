@@ -24,6 +24,7 @@ import type {
   TimelineMarker,
   TimelineOverlayBand,
 } from "./timelineTypes";
+import { resolveDecorationSetId } from "./timelineSets";
 
 const HUMAN_HISTORY_CATEGORY_ID = "human-history";
 const DEEP_TIME_LIFE_CATEGORY_ID = "deep-time-life";
@@ -185,23 +186,28 @@ function sortOverlays(left: TimelineOverlayBand, right: TimelineOverlayBand) {
 }
 
 function assignMarkerGroupId(markers: TimelineMarker[], groupId?: string) {
-  return markers.map((marker) => ({
-    ...marker,
-    groupId,
-  }));
+  return markers.map((marker) => {
+    const withGroup: TimelineMarker = { ...marker, groupId };
+    const setId = resolveDecorationSetId(withGroup);
+    return setId ? { ...withGroup, setId } : withGroup;
+  });
 }
 
 function assignOverlayGroupId(
   overlays: TimelineOverlayBand[],
   groupId?: string,
 ): TimelineOverlayBand[] {
-  return overlays.map((overlay) => ({
-    ...overlay,
-    groupId,
-    children: overlay.children
-      ? assignOverlayGroupId(overlay.children, groupId)
-      : undefined,
-  }));
+  return overlays.map((overlay) => {
+    const withGroup: TimelineOverlayBand = {
+      ...overlay,
+      groupId,
+      children: overlay.children
+        ? assignOverlayGroupId(overlay.children, groupId)
+        : undefined,
+    };
+    const setId = resolveDecorationSetId(withGroup);
+    return setId ? { ...withGroup, setId } : withGroup;
+  });
 }
 
 export const TIMELINE_MARKERS = TIMELINE_MARKER_COLLECTIONS.flatMap(

@@ -397,7 +397,7 @@ const QUATERNARY_SERIES: EraDefinition[] = [
     name: "Holocene",
     startYear: yearsAgo(11_700),
     endYear: yearsAgo(0),
-    color: icsHex("#FFF2AE"),
+    color: icsHex("#FEEBD2"),
     scheme: "chronostratigraphic",
     sourceRefs: chartRef(),
   },

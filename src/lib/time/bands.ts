@@ -971,14 +971,20 @@ export function formatTimelineRange(
   endYear: number,
   options: TimelineRangeLabelOptions = {},
 ) {
-  const startLabel = formatTimelinePointLabel(startYear, {
-    step: options.step,
-    approximate: options.approximateStart,
-  });
-  const endLabel = formatTimelinePointLabel(endYear, {
-    step: options.step,
-    approximate: options.approximateEnd,
-  });
+  const startIsPresent = Math.abs(startYear - TIMELINE_MAX_YEAR) <= 1e-9;
+  const endIsPresent = Math.abs(endYear - TIMELINE_MAX_YEAR) <= 1e-9;
+  const startLabel = startIsPresent
+    ? "Present"
+    : formatTimelinePointLabel(startYear, {
+        step: options.step,
+        approximate: options.approximateStart,
+      });
+  const endLabel = endIsPresent
+    ? "Present"
+    : formatTimelinePointLabel(endYear, {
+        step: options.step,
+        approximate: options.approximateEnd,
+      });
 
   return startLabel === endLabel ? startLabel : `${startLabel} — ${endLabel}`;
 }

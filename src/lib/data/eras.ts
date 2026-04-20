@@ -2,6 +2,7 @@ import { COSMIC_ERA_DEFINITIONS } from "./eraTrees/cosmic";
 import { GEOLOGICAL_ERA_DEFINITIONS } from "./eraTrees/geological";
 import { HUMAN_HISTORY_ERA_DEFINITION } from "./eraTrees/humanHistory";
 import { TIMELINE_DISPLAY } from "./timelineDecorations";
+import { getSetIdForEraFamily } from "./timelineSets";
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "../time/timelineYears";
 import type {
   Era,
@@ -9,6 +10,7 @@ import type {
   EraFamilyId,
   RootTimelineData,
   TimelineEraFamilyConfig,
+  TimelineSetId,
   TimelineSourceRef,
 } from "./timelineTypes";
 
@@ -22,6 +24,7 @@ export type {
   TimelineEraFamilyConfig,
   TimelineMarker,
   TimelineOverlayBand,
+  TimelineSetId,
 } from "./timelineTypes";
 export { TIMELINE_DISPLAY } from "./timelineDecorations";
 
@@ -77,6 +80,29 @@ export function getRootDisplayEras(root: Era): Era[] {
   return (root.children ?? []).flatMap((child) =>
     isEraFamilyRoot(child) ? (child.children ?? []) : [child],
   );
+}
+
+/**
+ * Same as `getRootDisplayEras` but only emits children of family roots whose
+ * owning set is present in `enabledSetIds`. Non-family-root children are always
+ * kept — they're top-level eras that don't belong to any family and thus to any
+ * set. Family roots with no registered set are also kept (safe default).
+ */
+export function getRootDisplayErasBySets(
+  root: Era,
+  enabledSetIds: ReadonlySet<TimelineSetId>,
+): Era[] {
+  return (root.children ?? []).flatMap((child) => {
+    if (!isEraFamilyRoot(child)) {
+      return [child];
+    }
+    const familyId = child.familyId;
+    const setId = familyId ? getSetIdForEraFamily(familyId) : null;
+    if (setId && !enabledSetIds.has(setId)) {
+      return [];
+    }
+    return child.children ?? [];
+  });
 }
 
 export function getEraDisplayChain(root: Era, targetId: string): Era[] {
