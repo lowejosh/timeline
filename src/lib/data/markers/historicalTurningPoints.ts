@@ -124,6 +124,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "gobekli-tepe-monuments",
     label: "Göbekli Tepe monuments",
     shortLabel: "Göbekli Tepe",
+    description:
+      "Hunter-gatherer communities at Göbekli Tepe raised monumental T-shaped stone enclosures, among the earliest known ritual architecture.",
     year: bce(9_600),
     regionalScopeLabel: "Southeastern Anatolia",
     approximate: true,
@@ -162,6 +164,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "catalhoyuk-settled-farming-community",
     label: "Çatalhöyük settled farming community",
     shortLabel: "Çatalhöyük",
+    description:
+      "Çatalhöyük was a densely settled farming community of mud-brick houses entered from the roof, reflecting early agricultural town life.",
     year: bce(7_400),
     regionalScopeLabel: "Anatolia",
     approximate: true,
@@ -178,6 +182,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "jericho-ritual-community",
     label: "Jericho ritual community",
     shortLabel: "Jericho",
+    description:
+      "Jericho's plastered skulls and settled life show a Neolithic community combining village life with elaborate ritual practices.",
     year: bce(7_200),
     regionalScopeLabel: "Levant",
     approximate: true,
@@ -194,6 +200,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "stonehenge-begins",
     label: "Stonehenge construction begins",
     shortLabel: "Stonehenge",
+    description:
+      "Stonehenge began within a vast ceremonial landscape whose earthworks and stone settings were built over many centuries.",
     year: bce(3_000),
     regionalScopeLabel: "Southern Britain",
     approximate: true,
@@ -214,6 +222,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "bronze-age-collapse",
     label: "Bronze Age collapse",
     shortLabel: "Bronze Age Collapse",
+    description:
+      "A wave of destruction and disruption brought down major palace societies across the eastern Mediterranean at the end of the Bronze Age.",
     year: bce(1_200),
     regionalScopeLabel: "Eastern Mediterranean",
     approximate: true,
@@ -234,6 +244,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "augustus-becomes-emperor",
     label: "Augustus becomes first emperor",
     shortLabel: "Augustus becomes emperor",
+    description:
+      "Octavian took the title Augustus, marking the start of imperial rule and the Roman Empire under its first emperor.",
     year: bce(27),
     minZoom: 18,
     priority: 83,
@@ -252,6 +264,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "fall-of-western-rome",
     label: "Fall of Western Rome",
     shortLabel: "Western Rome Falls",
+    description:
+      "The deposition of Romulus Augustulus in 476 CE became the conventional endpoint of the western Roman Empire.",
     year: ce(476),
     minZoom: 18,
     priority: 81,
@@ -266,6 +280,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "hijra",
     label: "Muhammad's migration to Medina",
     shortLabel: "Migration to Medina",
+    description:
+      "Muhammad's migration from Mecca to Medina, the Hijra, became the founding event of the Islamic calendar.",
     year: ce(622),
     minZoom: 18,
     priority: 82,
@@ -280,6 +296,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "charlemagne-crowned-emperor",
     label: "Charlemagne crowned Holy Roman Emperor",
     shortLabel: "Holy Roman Emperor",
+    description:
+      "On Christmas Day 800, Pope Leo III crowned Charlemagne emperor, binding Frankish power more closely to Latin Christendom.",
     year: ce(800),
     minZoom: 18,
     priority: 81,
@@ -294,6 +312,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "genghis-khan-proclaimed",
     label: "Genghis Khan proclaimed ruler",
     shortLabel: "Mongol Empire Begins",
+    description:
+      "After uniting the Mongol tribes, Temujin was proclaimed Genghis Khan, launching the empire that would span much of Eurasia.",
     year: ce(1206),
     minZoom: 18,
     priority: 83,
@@ -308,6 +328,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "black-death",
     label: "Black Death reaches Europe",
     shortLabel: "Black Death",
+    description:
+      "Plague-bearing ships brought the Black Death to Europe, beginning a catastrophe that killed more than 20 million people there.",
     year: ce(1347),
     minZoom: 18,
     priority: 80,
@@ -322,6 +344,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "fall-of-constantinople",
     label: "Fall of Constantinople",
     shortLabel: "Constantinople",
+    description:
+      "Ottoman forces captured Constantinople, ending the Byzantine Empire and remaking the balance of power in the eastern Mediterranean.",
     year: ce(1453),
     minZoom: 18,
     priority: 82,
@@ -336,6 +360,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "gutenberg-press",
     label: "Gutenberg press",
     shortLabel: "Printing Press",
+    description:
+      "Gutenberg's movable-type press made large-scale book production far faster and transformed the spread of ideas in Europe.",
     year: ce(1450),
     minZoom: 20,
     priority: 72,
@@ -350,6 +376,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "columbian-exchange-begins",
     label: "Columbian Exchange begins",
     shortLabel: "Columbian Exchange",
+    description:
+      "Columbus's 1492 Atlantic voyage opened sustained exchange of plants, animals, diseases, and people between the Americas and Afro-Eurasia.",
     year: ce(1492),
     minZoom: 18,
     priority: 84,
@@ -364,6 +392,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "protestant-reformation",
     label: "Protestant Reformation",
     shortLabel: "Reformation",
+    description:
+      "Luther's 95 Theses challenged indulgences and helped ignite the Protestant Reformation across Europe.",
     year: ce(1517),
     minZoom: 18,
     priority: 85,
@@ -378,6 +408,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "american-independence-declared",
     label: "American independence declared",
     shortLabel: "American Independence",
+    description:
+      "The Continental Congress declared the colonies free and independent states, giving the American Revolution its defining political statement.",
     year: ce(1776),
     minZoom: 20,
     priority: 75,
@@ -392,6 +424,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "french-revolution",
     label: "French Revolution begins",
     shortLabel: "French Revolution",
+    description:
+      "The French Revolution began as a revolt against monarchy and privilege, then reordered French politics in the name of liberty and citizenship.",
     year: ce(1789),
     minZoom: 18,
     priority: 86,
@@ -423,6 +457,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "titanic-sinks",
     label: "Titanic sinks in North Atlantic",
     shortLabel: "Titanic Sinks",
+    description:
+      "Titanic struck an iceberg on its maiden voyage and sank in the North Atlantic, killing more than 1,500 people.",
     year: getTimelineYearFromExactTimestamp(TITANIC_SINKS_AT),
     exactTime: TITANIC_SINKS_AT,
     dateLabel: "Apr 15, 1912",
@@ -439,6 +475,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "world-war-i",
     label: "World War I begins",
     shortLabel: "World War I",
+    description:
+      "The assassination of Archduke Franz Ferdinand helped trigger a general European war that grew into World War I.",
     year: ce(1914),
     minZoom: 18,
     priority: 88,
@@ -453,6 +491,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "russian-revolution",
     label: "Russian Revolution",
     shortLabel: "Russian Revolution",
+    description:
+      "Revolutions in 1917 toppled the Romanov dynasty and eventually brought the Bolsheviks to power.",
     year: ce(1917),
     minZoom: 18,
     priority: 87,
@@ -467,6 +507,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "world-war-ii",
     label: "World War II begins",
     shortLabel: "World War II",
+    description:
+      "Germany's invasion of Poland in 1939 began a global war of unprecedented scale and destruction.",
     year: ce(1939),
     minZoom: 18,
     priority: 90,
@@ -593,6 +635,8 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     id: "apollo-11-moon-landing",
     label: "Apollo 11 Moon landing",
     shortLabel: "Moon Landing",
+    description:
+      "Apollo 11 carried Neil Armstrong and Buzz Aldrin to the Moon, making them the first humans to land on another world.",
     year: ce(1969),
     minZoom: 20,
     priority: 83,

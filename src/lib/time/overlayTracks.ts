@@ -40,6 +40,7 @@ const PRIORITY_ZOOM_GRACE_START = 75;
 const PRIORITY_ZOOM_GRACE_STEP = 5;
 const PRIORITY_ZOOM_GRACE_MAX = 5;
 const CHINA_OVERLAY_LANE_START_BIAS_YEARS = -250;
+const HOMO_SAPIENS_OVERLAY_LANE_START_BIAS_YEARS = -7_000_000;
 const overlayLaneAssignmentCache = new WeakMap<
   TimelineOverlayBand[],
   CachedOverlayLaneAssignment
@@ -166,16 +167,9 @@ function compareOverlayBandsForLaneAssignment(
   left: TimelineOverlayBand,
   right: TimelineOverlayBand,
 ) {
-  const leftBiasedStartYear =
-    left.startYear +
-    (left.id === "chinese-civilization"
-      ? CHINA_OVERLAY_LANE_START_BIAS_YEARS
-      : 0);
+  const leftBiasedStartYear = left.startYear + getOverlayLaneStartBias(left.id);
   const rightBiasedStartYear =
-    right.startYear +
-    (right.id === "chinese-civilization"
-      ? CHINA_OVERLAY_LANE_START_BIAS_YEARS
-      : 0);
+    right.startYear + getOverlayLaneStartBias(right.id);
 
   return (
     leftBiasedStartYear - rightBiasedStartYear ||
@@ -183,6 +177,17 @@ function compareOverlayBandsForLaneAssignment(
     (right.priority ?? 0) - (left.priority ?? 0) ||
     left.id.localeCompare(right.id)
   );
+}
+
+function getOverlayLaneStartBias(id: string) {
+  switch (id) {
+    case "chinese-civilization":
+      return CHINA_OVERLAY_LANE_START_BIAS_YEARS;
+    case "homo-sapiens":
+      return HOMO_SAPIENS_OVERLAY_LANE_START_BIAS_YEARS;
+    default:
+      return 0;
+  }
 }
 
 function assignOverlayLanes(overlays: TimelineOverlayBand[]) {

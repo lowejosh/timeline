@@ -4,6 +4,8 @@ import {
   CIVILIZATION_OVERLAYS,
   POST_CLASSICAL_EARLY_MODERN_OVERLAYS,
 } from "../../data/overlays/civilizations";
+import { DEEP_TIME_LIFE_OVERLAYS } from "../../data/overlays/deepTimeLife";
+import { HUMAN_EVOLUTION_OVERLAYS } from "../../data/overlays/humanEvolution";
 import type {
   TimelineMarker,
   TimelineOverlayBand,
@@ -651,5 +653,35 @@ describe("timeline overlay tracks", () => {
     expect(china).toBeDefined();
     expect(inca).toBeDefined();
     expect(china?.laneIndex).toBeLessThan(inca?.laneIndex ?? 0);
+  });
+
+  it("keeps Homo sapiens at the bottom of the hominin stack but above mammals", () => {
+    const width = 1000;
+    const pad = 100;
+    const viewport = {
+      centerYear: -33_000_000,
+      zoom: 8,
+    };
+
+    const resolved = resolveTimelineOverlayTracks(
+      [...DEEP_TIME_LIFE_OVERLAYS, ...HUMAN_EVOLUTION_OVERLAYS],
+      viewport,
+      width,
+      pad,
+    );
+
+    const mammals = resolved.find((band) => band.band.id === "age-of-mammals");
+    const homoSapiens = resolved.find((band) => band.band.id === "homo-sapiens");
+    const sahelanthropus = resolved.find(
+      (band) => band.band.id === "sahelanthropus-tchadensis",
+    );
+
+    expect(mammals).toBeDefined();
+    expect(homoSapiens).toBeDefined();
+    expect(sahelanthropus).toBeDefined();
+    expect(mammals?.laneIndex).toBeLessThan(homoSapiens?.laneIndex ?? 0);
+    expect(homoSapiens?.laneIndex).toBeLessThan(
+      sahelanthropus?.laneIndex ?? 0,
+    );
   });
 });

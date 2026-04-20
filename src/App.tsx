@@ -3,6 +3,7 @@ import {
   TimelineCanvas,
   TIMELINE_CANVAS_PAD,
 } from "./components/timeline/TimelineCanvas";
+import { TimelineDisclaimer } from "./components/chrome/TimelineDisclaimer";
 import { TimelineSidebar } from "./components/chrome/TimelineSidebar";
 import { TimelineOverviewRulerStack } from "./components/timeline/TimelineOverviewRulerStack";
 import { useAnimatedViewport } from "./hooks/useAnimatedViewport";
@@ -47,6 +48,7 @@ const HUMAN_EVOLUTION_GROUP_ID =
 const OVERVIEW_RULER_TIER_HEIGHT = 18;
 const OVERVIEW_RULER_MAX_TIERS = 3;
 const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
+
 function App() {
   const [stageRef, stageSize] = useElementSize<HTMLDivElement>();
   const [timelineRef, timelineSize] = useElementSize<HTMLDivElement>();
@@ -451,6 +453,7 @@ function App() {
       className="app-shell"
       data-sidebar-open={isSidebarOpen ? "true" : "false"}
     >
+      <TimelineDisclaimer />
       <button
         aria-controls="timeline-layers-panel"
         aria-expanded={isSidebarOpen}

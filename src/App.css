@@ -805,4 +805,5 @@
     width: min(var(--sidebar-width), calc(100vw - 20px));
     max-height: min(calc(100% - 60px), var(--sidebar-max-height));
   }
+
 }

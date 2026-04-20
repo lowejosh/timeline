@@ -732,6 +732,8 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     id: "byzantine-empire",
     label: "Byzantine Empire",
     shortLabel: "Byzantium",
+    description:
+      "Eastern Roman empire centered on Constantinople, preserving Roman state traditions while becoming a major Greek-speaking Christian power.",
     startYear: ce(330),
     endYear: ce(1453),
     regionalScopeLabel: "Eastern Mediterranean",
@@ -754,6 +756,8 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     id: "abbasid-caliphate",
     label: "Abbasid Caliphate",
     shortLabel: "Abbasids",
+    description:
+      "Caliphate centered on Baghdad, remembered for imperial rule, scholarship, and a flourishing urban culture in the Islamic Golden Age.",
     startYear: ce(750),
     endYear: ce(1258),
     regionalScopeLabel: "Islamic world",
@@ -792,6 +796,8 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     id: "mongol-empire",
     label: "Mongol Empire",
     shortLabel: "Mongols",
+    description:
+      "Steppe empire forged by Genghis Khan and his successors, uniting vast stretches of Eurasia under Mongol rule.",
     startYear: ce(1206),
     endYear: ce(1368),
     regionalScopeLabel: "Central Asia and East Asia",
@@ -836,6 +842,8 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     id: "ottoman-empire",
     label: "Ottoman Empire",
     shortLabel: "Ottomans",
+    description:
+      "Dynasty that grew from an Anatolian frontier state into an empire spanning the Balkans, the eastern Mediterranean, and the Middle East.",
     startYear: ce(1299),
     endYear: ce(1800),
     regionalScopeLabel: "Eastern Mediterranean and Balkans",
@@ -854,6 +862,8 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     id: "aztec-empire",
     label: "Aztec Empire",
     shortLabel: "Aztecs",
+    description:
+      "Mesoamerican empire built through the Triple Alliance, with Tenochtitlan at its center and tribute tying many city-states to imperial rule.",
     startYear: ce(1428),
     endYear: ce(1521),
     regionalScopeLabel: "Mesoamerica",
@@ -872,6 +882,8 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     id: "inca-empire",
     label: "Inca Empire",
     shortLabel: "Inca",
+    description:
+      "Andean empire centered on Cusco, linked by roads, terraces, and state administration across a vast mountain realm.",
     startYear: ce(1438),
     endYear: ce(1572),
     regionalScopeLabel: "Andes",
