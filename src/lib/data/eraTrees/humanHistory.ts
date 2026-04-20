@@ -18,27 +18,39 @@ const COLD_WAR_DIGITAL_AGE_HANDOFF_YEAR = getTimelineYearFromExactTimestamp(
   COLD_WAR_DIGITAL_AGE_HANDOFF_AT,
 );
 
-export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
-  id: "human-history",
-  name: "Human History",
-  startYear: yearsAgo(300_000),
-  endYear: CURRENT_YEAR,
-  description:
-    "From stone tools to global networks, this track follows the broad story of human societies.",
-  scheme: "world-history",
-  sourceRefs: [
-    { sourceId: "smithsonianHumanOrigins" },
-    { sourceId: "periodo" },
-    { sourceId: "stearnsPeriodization" },
-    { sourceId: "bentleyEarlyModern" },
-    { sourceId: "brivatiContemporary" },
-  ],
-  children: [
-    {
+const HUMAN_HISTORY_COLORS = {
+  paleolithic: "rgb(64, 167, 226)",
+  epipaleolithic: "rgb(232, 134, 69)",
+  neolithic: "rgb(88, 217, 69)",
+  prePotteryNeolithicA: "rgb(191, 82, 224)",
+  prePotteryNeolithicB: "rgb(229, 208, 67)",
+  potteryNeolithic: "rgb(63, 213, 188)",
+  chalcolithic: "rgb(227, 84, 93)",
+  bronzeAge: "rgb(81, 114, 225)",
+  earlyBronzeAge: "rgb(65, 216, 120)",
+  middleBronzeAge: "rgb(225, 110, 61)",
+  lateBronzeAge: "rgb(223, 88, 214)",
+  ironAge: "rgb(151, 214, 56)",
+  earlyIronAge: "rgb(64, 185, 221)",
+  middleIronAge: "rgb(224, 82, 129)",
+  lateIronAge: "rgb(230, 168, 61)",
+  classicalAntiquity: "rgb(130, 84, 222)",
+  postClassicalHistory: "rgb(69, 217, 98)",
+  earlyModernPeriod: "rgb(227, 95, 69)",
+  ageOfIndustryAndEmpire: "rgb(65, 132, 220)",
+  contemporaryHistory: "rgb(58, 217, 159)",
+  postwarOrder: "rgb(232, 199, 69)",
+  coldWarAndDecolonization: "rgb(223, 83, 181)",
+  digitalAge: "rgb(58, 206, 223)",
+} as const;
+
+export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
+  {
       id: "paleolithic",
       name: "Paleolithic",
       startYear: yearsAgo(300_000),
       endYear: bce(20_000),
+      color: HUMAN_HISTORY_COLORS.paleolithic,
       description:
         "Long era of mobile hunter-gatherers, stone tools, and the first known art.",
       scheme: "archaeological",
@@ -55,6 +67,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Epipaleolithic",
       startYear: bce(20_000),
       endYear: bce(10_000),
+      color: HUMAN_HISTORY_COLORS.epipaleolithic,
       regionalScopeLabel: "Ancient Near East",
       approximateStart: true,
       approximateEnd: true,
@@ -73,6 +86,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Neolithic",
       startYear: bce(10_000),
       endYear: bce(4_500),
+      color: HUMAN_HISTORY_COLORS.neolithic,
       regionalScopeLabel: "Ancient Near East",
       approximateStart: true,
       approximateEnd: true,
@@ -92,6 +106,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Pre-Pottery Neolithic A",
           startYear: bce(10_000),
           endYear: bce(8_800),
+          color: HUMAN_HISTORY_COLORS.prePotteryNeolithicA,
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -105,6 +120,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Pre-Pottery Neolithic B",
           startYear: bce(8_800),
           endYear: bce(6_500),
+          color: HUMAN_HISTORY_COLORS.prePotteryNeolithicB,
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -118,6 +134,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Pottery Neolithic",
           startYear: bce(6_500),
           endYear: bce(4_500),
+          color: HUMAN_HISTORY_COLORS.potteryNeolithic,
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -133,6 +150,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Chalcolithic",
       startYear: bce(4_500),
       endYear: bce(3_300),
+      color: HUMAN_HISTORY_COLORS.chalcolithic,
       regionalScopeLabel: "Ancient Near East",
       approximateStart: true,
       approximateEnd: true,
@@ -151,6 +169,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Bronze Age",
       startYear: bce(3_300),
       endYear: bce(1_200),
+      color: HUMAN_HISTORY_COLORS.bronzeAge,
       regionalScopeLabel: "Ancient Near East",
       approximateStart: true,
       approximateEnd: true,
@@ -167,6 +186,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Early Bronze Age",
           startYear: bce(3_300),
           endYear: bce(2_000),
+          color: HUMAN_HISTORY_COLORS.earlyBronzeAge,
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -180,6 +200,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Middle Bronze Age",
           startYear: bce(2_000),
           endYear: bce(1_550),
+          color: HUMAN_HISTORY_COLORS.middleBronzeAge,
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -193,6 +214,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Late Bronze Age",
           startYear: bce(1_550),
           endYear: bce(1_200),
+          color: HUMAN_HISTORY_COLORS.lateBronzeAge,
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -208,6 +230,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Iron Age",
       startYear: bce(1_200),
       endYear: bce(539),
+      color: HUMAN_HISTORY_COLORS.ironAge,
       regionalScopeLabel: "Ancient Near East",
       approximateStart: true,
       description:
@@ -227,6 +250,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Early Iron Age",
           startYear: bce(1_200),
           endYear: bce(900),
+          color: HUMAN_HISTORY_COLORS.earlyIronAge,
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -249,6 +273,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Middle Iron Age",
           startYear: bce(900),
           endYear: bce(609),
+          color: HUMAN_HISTORY_COLORS.middleIronAge,
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           approximateEnd: true,
@@ -271,6 +296,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Late Iron Age",
           startYear: bce(609),
           endYear: bce(539),
+          color: HUMAN_HISTORY_COLORS.lateIronAge,
           regionalScopeLabel: "Ancient Near East",
           approximateStart: true,
           description:
@@ -294,6 +320,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Classical Antiquity",
       startYear: bce(539),
       endYear: ce(500),
+      color: HUMAN_HISTORY_COLORS.classicalAntiquity,
       description:
         "Greco-Roman age that shaped Mediterranean law, architecture, philosophy, and urban life.",
       scheme: "world-history",
@@ -304,6 +331,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Post-classical History",
       startYear: ce(500),
       endYear: ce(1500),
+      color: HUMAN_HISTORY_COLORS.postClassicalHistory,
       description:
         "Major religions, caravan routes, and maritime trade bind Afro-Eurasia more tightly.",
       scheme: "world-history",
@@ -318,6 +346,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Early Modern Period",
       startYear: ce(1500),
       endYear: ce(1800),
+      color: HUMAN_HISTORY_COLORS.earlyModernPeriod,
       description:
         "Print culture, oceanic empires, gunpowder states, and global exchange redraw the world.",
       scheme: "world-history",
@@ -332,6 +361,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Age of Industry & Empire",
       startYear: ce(1800),
       endYear: ce(1945),
+      color: HUMAN_HISTORY_COLORS.ageOfIndustryAndEmpire,
       description:
         "Factories, coal, steam transport, and industrial war transform work, cities, and state power.",
       scheme: "world-history",
@@ -346,7 +376,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
       name: "Contemporary History",
       startYear: ce(1945),
       endYear: CURRENT_YEAR,
-      color: "rgb(0, 120, 100)",
+      color: HUMAN_HISTORY_COLORS.contemporaryHistory,
       description:
         "Post-1945 world of decolonization, superpower rivalry, and rapidly networked global life.",
       scheme: "world-history",
@@ -361,6 +391,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Postwar Order",
           startYear: ce(1945),
           endYear: ce(1960),
+          color: HUMAN_HISTORY_COLORS.postwarOrder,
           description:
             "Reconstruction, new international institutions, and nuclear superpowers define the early postwar world.",
           scheme: "world-history",
@@ -384,6 +415,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Cold War & Decolonization",
           startYear: ce(1960),
           endYear: COLD_WAR_DIGITAL_AGE_HANDOFF_YEAR,
+          color: HUMAN_HISTORY_COLORS.coldWarAndDecolonization,
           description:
             "Independence movements redraw the map while proxy wars, ideology, and nuclear rivalry shape a divided world.",
           scheme: "world-history",
@@ -403,6 +435,7 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           name: "Digital Age",
           startYear: COLD_WAR_DIGITAL_AGE_HANDOFF_YEAR,
           endYear: CURRENT_YEAR,
+          color: HUMAN_HISTORY_COLORS.digitalAge,
           description:
             "The web, personal computing, and mobile networks tighten global connections across culture, finance, and politics.",
           scheme: "world-history",
@@ -418,6 +451,5 @@ export const HUMAN_HISTORY_ERA_DEFINITION: EraDefinition = {
           ],
         },
       ],
-    },
-  ],
-};
+  },
+];

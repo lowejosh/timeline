@@ -126,7 +126,7 @@ export function resolveTimelineEraLayersFromOpacityMap(
       isActive,
       visibleFillRatio,
       childOpacity,
-      opacity: inheritedOpacity * (1 - childOpacity * 0.8),
+      opacity: inheritedOpacity,
     };
   });
 
@@ -178,7 +178,7 @@ export function resolveTimelineEraLayers(
       isActive,
       visibleFillRatio,
       childOpacity,
-      opacity: inheritedOpacity * (1 - childOpacity * 0.8),
+      opacity: inheritedOpacity,
     };
   });
 

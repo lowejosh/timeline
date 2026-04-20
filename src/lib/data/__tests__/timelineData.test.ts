@@ -977,11 +977,19 @@ describe("root timeline display data", () => {
     expect(ROOT_TIMELINE.rootEra.children?.map((child) => child.id)).toEqual(
       ROOT_ERA.children?.map((child) => child.id),
     );
-    expect(ROOT_TIMELINE.rootEra.children?.map((child) => child.id)).toEqual([
+    expect(ROOT_TIMELINE.rootEra.children?.slice(0, 2).map((child) => child.id)).toEqual([
       "cosmic-history",
       "geological-history",
-      "human-history",
     ]);
+    expect(ROOT_TIMELINE.rootEra.children?.map((child) => child.id)).toContain(
+      "paleolithic",
+    );
+    expect(ROOT_TIMELINE.rootEra.children?.map((child) => child.id)).toContain(
+      "contemporary-history",
+    );
+    expect(ROOT_TIMELINE.rootEra.children?.map((child) => child.id)).not.toContain(
+      "human-history",
+    );
     expect(getRootDisplayEras(ROOT_TIMELINE.rootEra).map((child) => child.id)).toEqual([
       "planck-epoch",
       "grand-unification-epoch",

@@ -15,6 +15,7 @@ import {
   formatTimelineYear,
 } from "../../lib/time/bands";
 import {
+  compareEraPriorityAscending,
   compareEraPriorityDescending,
   type Era,
   type TimelineMarker,
@@ -326,8 +327,20 @@ function getActualEraScreenSpan(
   pad: number,
 ): EraScreenSpan {
   return {
-    x0: pad + worldPreciseToScreen(getEraBoundaryPreciseYear(era, "start"), viewport, innerWidth),
-    x1: pad + worldPreciseToScreen(getEraBoundaryPreciseYear(era, "end"), viewport, innerWidth),
+    x0:
+      pad +
+      worldPreciseToScreen(
+        getEraBoundaryPreciseYear(era, "start"),
+        viewport,
+        innerWidth,
+      ),
+    x1:
+      pad +
+      worldPreciseToScreen(
+        getEraBoundaryPreciseYear(era, "end"),
+        viewport,
+        innerWidth,
+      ),
     usesVisualExpansion: false,
   };
 }
@@ -353,14 +366,20 @@ function resolveEraScreenSpanMap(
   const spans = new Map<string, EraScreenSpan>();
 
   for (const layer of layers) {
-    spans.set(layer.era.id, getActualEraScreenSpan(layer.era, viewport, innerWidth, pad));
+    spans.set(
+      layer.era.id,
+      getActualEraScreenSpan(layer.era, viewport, innerWidth, pad),
+    );
   }
 
   if (!allowPrimordialSyntheticExpansion) {
     return spans;
   }
 
-  const [visibleStart, visibleEnd] = getVisibleRangePrecise(viewport, innerWidth);
+  const [visibleStart, visibleEnd] = getVisibleRangePrecise(
+    viewport,
+    innerWidth,
+  );
   const visibleSpan = Math.max(
     Math.abs(subtractPreciseTimelineYears(visibleEnd, visibleStart)),
     1e-18,
@@ -398,7 +417,10 @@ function resolvePrimordialDetailStripSegments(
   pad: number,
 ) {
   const innerWidth = Math.max(width - pad * 2, 1);
-  const [visibleStart, visibleEnd] = getVisibleRangePrecise(viewport, innerWidth);
+  const [visibleStart, visibleEnd] = getVisibleRangePrecise(
+    viewport,
+    innerWidth,
+  );
 
   const visibleSpan = Math.max(
     Math.abs(subtractPreciseTimelineYears(visibleEnd, visibleStart)),
@@ -446,7 +468,8 @@ function resolvePrimordialDetailStripSegments(
     }
 
     const visibleWidth =
-      Math.min(actualSpan.x1, viewportRight) - Math.max(actualSpan.x0, viewportLeft);
+      Math.min(actualSpan.x1, viewportRight) -
+      Math.max(actualSpan.x0, viewportLeft);
 
     return visibleWidth >= EARLY_UNIVERSE_NATURAL_SPAN_MIN_WIDTH_PX;
   });
@@ -455,7 +478,9 @@ function resolvePrimordialDetailStripSegments(
       ? null
       : orderedLayers[firstNaturallyVisibleIndex];
 
-  if (firstNaturallyVisibleLayer?.era.id !== PRIMORDIAL_DETAIL_STRIP_FOCUS_ERA_ID) {
+  if (
+    firstNaturallyVisibleLayer?.era.id !== PRIMORDIAL_DETAIL_STRIP_FOCUS_ERA_ID
+  ) {
     return [] as PrimordialDetailStripSegment[];
   }
 
@@ -757,9 +782,13 @@ function roundMetric(value: number) {
   return Number(value.toFixed(2));
 }
 
-function areStringArraysEqual(left: readonly string[], right: readonly string[]) {
+function areStringArraysEqual(
+  left: readonly string[],
+  right: readonly string[],
+) {
   return (
-    left.length === right.length && left.every((value, index) => value === right[index])
+    left.length === right.length &&
+    left.every((value, index) => value === right[index])
   );
 }
 
@@ -1046,6 +1075,25 @@ function clamp01(value: number) {
 function smoothstep01(value: number) {
   const t = clamp01(value);
   return t * t * (3 - 2 * t);
+}
+
+function getEraInlineLabelVisibility(childOpacity: number) {
+  return 1 - smoothstep01((childOpacity - 0.12) / 0.36);
+}
+
+function getEraBackdropResetAlpha(depth: number, opacity: number) {
+  if (depth <= 0) {
+    return 1;
+  }
+
+  return clamp01(opacity);
+}
+
+function getEraBandAlphaMultiplier(era: Era, depth: number) {
+  void era;
+  void depth;
+
+  return 1;
 }
 
 function interpolateProgress(progress: number, start: number, end: number) {
@@ -1963,8 +2011,7 @@ function resolveOverlayBandLabelInsets({
   hasDisclosure?: boolean;
 }) {
   return {
-    left:
-      OVERLAY_BAND_SIDE_PADDING + Math.max(iconReservedWidth, 0),
+    left: OVERLAY_BAND_SIDE_PADDING + Math.max(iconReservedWidth, 0),
     right:
       OVERLAY_BAND_SIDE_PADDING +
       (hasDisclosure ? OVERLAY_BAND_DISCLOSURE_RESERVED_WIDTH : 0),
@@ -2344,14 +2391,16 @@ export function TimelineCanvas({
         }
       }
 
-      const visibleExpandedOverlayIds = renderedExpandedOverlayIdsRef.current.filter(
-        (expandedOverlayId, index, allIds) =>
-          allIds.indexOf(expandedOverlayId) === index &&
-          sceneResolvedOverlayBands.some(
-            ({ band }) =>
-              band.id === expandedOverlayId && (band.children?.length ?? 0) > 0,
-          ),
-      );
+      const visibleExpandedOverlayIds =
+        renderedExpandedOverlayIdsRef.current.filter(
+          (expandedOverlayId, index, allIds) =>
+            allIds.indexOf(expandedOverlayId) === index &&
+            sceneResolvedOverlayBands.some(
+              ({ band }) =>
+                band.id === expandedOverlayId &&
+                (band.children?.length ?? 0) > 0,
+            ),
+        );
       const expandedOverlayDetails = resolveExpandedOverlayDetails(
         visibleExpandedOverlayIds,
         sceneResolvedOverlayBands,
@@ -2363,7 +2412,8 @@ export function TimelineCanvas({
         (detail) => {
           const fullHeight = getExpandedOverlayPanelHeight(detail);
           const progress =
-            expandedOverlayProgressByIdRef.current.get(detail.parent.band.id) ?? 0;
+            expandedOverlayProgressByIdRef.current.get(detail.parent.band.id) ??
+            0;
 
           return {
             detail,
@@ -2435,11 +2485,13 @@ export function TimelineCanvas({
           renderWidth: overlay.renderWidth,
           baseY: getOverlayLaneY(layout, overlay.laneIndex),
         })),
-        expandedOverlayExpansionStates.map(({ detail, fullHeight, progress }) => ({
-          parentId: detail.parent.band.id,
-          panelHeight: fullHeight,
-          expansionProgress: progress,
-        })),
+        expandedOverlayExpansionStates.map(
+          ({ detail, fullHeight, progress }) => ({
+            parentId: detail.parent.band.id,
+            panelHeight: fullHeight,
+            expansionProgress: progress,
+          }),
+        ),
         overlayBottomY,
         OVERLAY_LANE_HEIGHT,
         OVERLAY_LANE_GAP,
@@ -2449,6 +2501,11 @@ export function TimelineCanvas({
       );
       const visibleOverlayIds = new Set(
         sceneResolvedOverlayBands.map(({ band }) => band.id),
+      );
+      const paintOrderedEraLayers = [...visibleEraLayers].sort(
+        (left, right) =>
+          compareEraPriorityAscending(left.era, right.era) ||
+          left.depth - right.depth,
       );
       const overlayLabelAnimationStates = overlayLabelAnimationRef.current;
       const activeOverlayLabelKeys = new Set<string>();
@@ -2477,19 +2534,22 @@ export function TimelineCanvas({
         pad,
         allowPrimordialSyntheticDetail,
       );
-      const primordialDetailStripSegments = resolvePrimordialDetailStripSegments(
-        visibleEraLayers,
-        eraScreenSpanById,
-        sceneViewport,
-        sceneWidth,
-        pad,
-      );
+      const primordialDetailStripSegments =
+        resolvePrimordialDetailStripSegments(
+          visibleEraLayers,
+          eraScreenSpanById,
+          sceneViewport,
+          sceneWidth,
+          pad,
+        );
       const primordialDetailStripAnimation =
         primordialDetailStripAnimationRef.current;
       const hasPrimordialDetailStripTarget =
         primordialDetailStripSegments.length > 0;
 
-      primordialDetailStripAnimation.target = hasPrimordialDetailStripTarget ? 1 : 0;
+      primordialDetailStripAnimation.target = hasPrimordialDetailStripTarget
+        ? 1
+        : 0;
 
       if (hasPrimordialDetailStripTarget) {
         primordialDetailStripAnimation.segments = primordialDetailStripSegments;
@@ -2534,7 +2594,8 @@ export function TimelineCanvas({
         primordialDetailStripAnimation.target > 0
           ? primordialDetailStripSegments
           : primordialDetailStripAnimation.segments;
-      const primordialDetailStripOpacity = primordialDetailStripAnimation.opacity;
+      const primordialDetailStripOpacity =
+        primordialDetailStripAnimation.opacity;
 
       const toX = (year: number) =>
         pad + worldToScreen(year, sceneViewport, innerWidth);
@@ -2578,8 +2639,25 @@ export function TimelineCanvas({
         if (!renderState) return;
 
         context.save();
+        const backdropResetAlpha =
+          getEraBackdropResetAlpha(layer.depth, opacity) *
+          renderState.alphaMultiplier;
+
+        if (backdropResetAlpha > 0.001) {
+          context.globalAlpha = backdropResetAlpha;
+          context.fillStyle = background;
+          context.fillRect(
+            renderState.renderLeft,
+            0,
+            renderState.renderWidth,
+            sceneHeight,
+          );
+        }
         context.globalAlpha =
-          opacity * ERA_BAND_ALPHA * renderState.alphaMultiplier;
+          opacity *
+          ERA_BAND_ALPHA *
+          getEraBandAlphaMultiplier(era, layer.depth) *
+          renderState.alphaMultiplier;
         context.fillStyle = era.color;
         context.fillRect(
           renderState.renderLeft,
@@ -2602,7 +2680,8 @@ export function TimelineCanvas({
           FORCED_PRIMORDIAL_LABEL_IDS.has(era.id) &&
           visibleEraWidth < 44;
         const usesExpandedPrimordialLabel =
-          allowPrimordialSyntheticDetail && screenSpan?.usesVisualExpansion === true;
+          allowPrimordialSyntheticDetail &&
+          screenSpan?.usesVisualExpansion === true;
         const usesCompactPrimordialLabel =
           allowPrimordialSyntheticDetail &&
           isPrimordialEra &&
@@ -2626,12 +2705,11 @@ export function TimelineCanvas({
             : usesCompactPrimordialLabel
               ? EARLY_UNIVERSE_COMPACT_LABEL_FADE_WIDTH_PX
               : 120;
-        const labelFont =
-          usesForcedPrimordialLabel
-            ? "9px var(--font-sans)"
-            : usesExpandedPrimordialLabel || usesCompactPrimordialLabel
-              ? "10px var(--font-sans)"
-              : "11px var(--font-sans)";
+        const labelFont = usesForcedPrimordialLabel
+          ? "9px var(--font-sans)"
+          : usesExpandedPrimordialLabel || usesCompactPrimordialLabel
+            ? "10px var(--font-sans)"
+            : "11px var(--font-sans)";
 
         if (
           visibleEraWidth > labelMinWidth &&
@@ -2640,8 +2718,12 @@ export function TimelineCanvas({
           const labelX =
             Math.max(x0, pad) / 2 + Math.min(x1, sceneWidth - pad) / 2;
           const labelBaselineY = axisY - 44;
+          const labelVisibility = getEraInlineLabelVisibility(
+            layer.childOpacity,
+          );
           const labelAlpha =
             Math.min((visibleEraWidth - labelMinWidth) / labelFadeWidth, 1) *
+            labelVisibility *
             (usesForcedPrimordialLabel
               ? 0.68
               : 0.28 + Math.min(opacity, 1) * 0.22);
@@ -2863,7 +2945,7 @@ export function TimelineCanvas({
         context.restore();
       };
 
-      for (const layer of visibleEraLayers) {
+      for (const layer of paintOrderedEraLayers) {
         renderEra(layer);
       }
 
@@ -3036,7 +3118,8 @@ export function TimelineCanvas({
               context,
               layout: iconLayout,
               strokeStyle: overlayLabelPaint.fillStyle,
-              alpha: OVERLAY_GROUP_ICON_PARENT_ALPHA * overlayState.currentOpacity,
+              alpha:
+                OVERLAY_GROUP_ICON_PARENT_ALPHA * overlayState.currentOpacity,
             });
           }
 
@@ -3066,7 +3149,8 @@ export function TimelineCanvas({
               const indicatorCenterX = overlay.renderX + bandWidth - 10;
               const indicatorCenterY = y + OVERLAY_LANE_HEIGHT / 2;
               const indicatorProgress =
-                expandedOverlayProgressByIdRef.current.get(overlay.band.id) ?? 0;
+                expandedOverlayProgressByIdRef.current.get(overlay.band.id) ??
+                0;
 
               drawAnimatedOverlayDisclosureIndicator({
                 centerX: indicatorCenterX,
@@ -3443,7 +3527,8 @@ export function TimelineCanvas({
           splitTimelineYear(TIMELINE_MIN_YEAR),
         ) === 0;
       const viewportFullyInEarlyUniverse =
-        edgeLeftPreciseYear.wholeYear >= Math.floor(EARLY_UNIVERSE_START_YEAR) &&
+        edgeLeftPreciseYear.wholeYear >=
+          Math.floor(EARLY_UNIVERSE_START_YEAR) &&
         edgeRightPreciseYear.wholeYear <= Math.ceil(EARLY_UNIVERSE_END_YEAR);
       const isFullyZoomedOut =
         sceneViewport.zoom <= getMinZoomForWidth(innerWidth) + 0.001;
@@ -3472,15 +3557,17 @@ export function TimelineCanvas({
       const visiblePrimordialLayerIds = visibleEraLayers
         .filter((layer) => EARLY_UNIVERSE_BAND_EXPANSION_IDS.has(layer.era.id))
         .map((layer) => layer.era.id);
-      const primordialSpanDebug = EARLY_UNIVERSE_CHILD_ERA_ORDER.map((eraId) => {
-        const span = eraScreenSpanById.get(eraId);
+      const primordialSpanDebug = EARLY_UNIVERSE_CHILD_ERA_ORDER.map(
+        (eraId) => {
+          const span = eraScreenSpanById.get(eraId);
 
-        return {
-          id: eraId,
-          width: span ? Number((span.x1 - span.x0).toFixed(2)) : null,
-          expanded: span?.usesVisualExpansion === true,
-        };
-      });
+          return {
+            id: eraId,
+            width: span ? Number((span.x1 - span.x0).toFixed(2)) : null,
+            expanded: span?.usesVisualExpansion === true,
+          };
+        },
+      );
       const primordialDetailStripDebug = primordialDetailStripSegments.map(
         (segment) => ({
           id: segment.era.id,
@@ -3503,7 +3590,9 @@ export function TimelineCanvas({
           breadcrumbIds: breadcrumbChain.map((era) => era.id),
           zoom: Number(sceneViewport.zoom.toFixed(6)),
           sceneMaxZoom: Number(sceneMaxZoom.toFixed(6)),
-          zoomDeltaToMax: Number((sceneMaxZoom - sceneViewport.zoom).toFixed(6)),
+          zoomDeltaToMax: Number(
+            (sceneMaxZoom - sceneViewport.zoom).toFixed(6),
+          ),
           allowPrimordialSyntheticDetail,
           startsAtBigBang,
           viewportFullyInEarlyUniverse,
@@ -3527,7 +3616,9 @@ export function TimelineCanvas({
           primordialDetailStripOpacity: Number(
             primordialDetailStripOpacity.toFixed(3),
           ),
-          axisTickSteps: [...new Set(resolvedAxisTickStates.map((tick) => tick.step))]
+          axisTickSteps: [
+            ...new Set(resolvedAxisTickStates.map((tick) => tick.step)),
+          ]
             .slice(0, 8)
             .map((step) => Number(step.toExponential(6))),
         };
@@ -4340,7 +4431,8 @@ export function TimelineCanvas({
       }
 
       if (
-        (hasActiveOverlayLabelAnimation || hasActivePrimordialDetailStripAnimation) &&
+        (hasActiveOverlayLabelAnimation ||
+          hasActivePrimordialDetailStripAnimation) &&
         !drawFrameRef.current
       ) {
         drawFrameRef.current = requestAnimationFrame(() => {
@@ -4841,10 +4933,7 @@ export function TimelineCanvas({
       tickStart,
       EARLY_UNIVERSE_START_YEAR,
     );
-    const earlyUniverseOverlapEnd = Math.min(
-      tickEnd,
-      EARLY_UNIVERSE_END_YEAR,
-    );
+    const earlyUniverseOverlapEnd = Math.min(tickEnd, EARLY_UNIVERSE_END_YEAR);
     const earlyUniverseOverlap = Math.max(
       0,
       earlyUniverseOverlapEnd - earlyUniverseOverlapStart,
@@ -5232,7 +5321,10 @@ export function TimelineCanvas({
   useEffect(() => {
     if (expandedOverlayIds.length > 0) {
       renderedExpandedOverlayIdsRef.current = [
-        ...new Set([...renderedExpandedOverlayIdsRef.current, ...expandedOverlayIds]),
+        ...new Set([
+          ...renderedExpandedOverlayIdsRef.current,
+          ...expandedOverlayIds,
+        ]),
       ];
     }
 
@@ -5448,7 +5540,9 @@ export function TimelineCanvas({
     }
 
     // Helper to render one era band
-    const renderEra = (era: Era, opacity: number) => {
+    const renderEra = (layer: (typeof visibleEraLayers)[number]) => {
+      const { era, opacity, childOpacity } = layer;
+
       if (opacity < 0.01) return;
 
       const x0 = toX(era.startYear);
@@ -5469,8 +5563,10 @@ export function TimelineCanvas({
 
       if (eraWidth > 60 && !shouldHideInlineLabel) {
         const labelX = Math.max(x0, pad) / 2 + Math.min(x1, width - pad) / 2;
+        const labelVisibility = getEraInlineLabelVisibility(childOpacity);
         const labelAlpha =
           Math.min((eraWidth - 60) / 120, 1) *
+          labelVisibility *
           (0.28 + Math.min(opacity, 1) * 0.22);
 
         context.save();
@@ -5486,7 +5582,7 @@ export function TimelineCanvas({
 
     // Render the resolved recursive era tree in depth order.
     for (const layer of visibleEraLayers) {
-      renderEra(layer.era, layer.opacity);
+      renderEra(layer);
     }
     markPerf("eraMs");
 
@@ -7151,13 +7247,17 @@ export function TimelineCanvas({
           setExpandedOverlayIds((current) => {
             const parentId = clickedRegion.parentId ?? clickedRegion.id;
 
-            return current.includes(parentId) ? current : [...current, parentId];
+            return current.includes(parentId)
+              ? current
+              : [...current, parentId];
           });
         } else if (clickedRegion?.role === "panel") {
           setExpandedOverlayIds((current) => {
             const parentId = clickedRegion.parentId ?? clickedRegion.id;
 
-            return current.includes(parentId) ? current : [...current, parentId];
+            return current.includes(parentId)
+              ? current
+              : [...current, parentId];
           });
         } else {
           setExpandedOverlayIds([]);

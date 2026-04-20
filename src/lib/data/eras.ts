@@ -1,6 +1,6 @@
 import { COSMIC_ERA_DEFINITIONS } from "./eraTrees/cosmic";
 import { GEOLOGICAL_ERA_DEFINITIONS } from "./eraTrees/geological";
-import { HUMAN_HISTORY_ERA_DEFINITION } from "./eraTrees/humanHistory";
+import { HUMAN_HISTORY_ERA_DEFINITIONS } from "./eraTrees/humanHistory";
 import { TIMELINE_DISPLAY } from "./timelineDecorations";
 import { getSetIdForEraFamily } from "./timelineSets";
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "../time/timelineYears";
@@ -83,10 +83,10 @@ export function getRootDisplayEras(root: Era): Era[] {
 }
 
 /**
- * Same as `getRootDisplayEras` but only emits children of family roots whose
- * owning set is present in `enabledSetIds`. Non-family-root children are always
- * kept — they're top-level eras that don't belong to any family and thus to any
- * set. Family roots with no registered set are also kept (safe default).
+ * Same as `getRootDisplayEras` but only emits eras whose owning set is present
+ * in `enabledSetIds`. This covers both children of family roots and direct
+ * top-level eras that still belong to a family (like flattened human history).
+ * Family roots with no registered set are kept as a safe default.
  */
 export function getRootDisplayErasBySets(
   root: Era,
@@ -94,6 +94,12 @@ export function getRootDisplayErasBySets(
 ): Era[] {
   return (root.children ?? []).flatMap((child) => {
     if (!isEraFamilyRoot(child)) {
+      const setId = child.familyId ? getSetIdForEraFamily(child.familyId) : null;
+
+      if (setId && !enabledSetIds.has(setId)) {
+        return [];
+      }
+
       return [child];
     }
     const familyId = child.familyId;
@@ -126,10 +132,12 @@ export function getNavigableAncestor(root: Era, targetId: string): Era | null {
 }
 
 export function getEraFamilyId(root: Era, targetId: string): EraFamilyId | null {
+  const targetEra = findEraById(root, targetId);
+
   return (
     getAncestorChain(root, targetId).find(
       (era) => era.id !== root.id && isEraFamilyRoot(era),
-    )?.familyId ?? null
+    )?.familyId ?? (targetEra?.id !== root.id ? targetEra?.familyId ?? null : null)
   );
 }
 
@@ -276,13 +284,13 @@ const GEOLOGICAL_FAMILY_ROOT_DEFINITION: EraDefinition = {
   children: GEOLOGICAL_ERA_DEFINITIONS,
 };
 
-const HUMAN_HISTORY_FAMILY_ROOT_DEFINITION: EraDefinition = {
-  ...HUMAN_HISTORY_ERA_DEFINITION,
-  color: HUMAN_HISTORY_ERA_DEFINITION.color ?? "rgba(0, 0, 0, 0)",
+const HUMAN_HISTORY_TOP_LEVEL_DEFINITIONS: EraDefinition[] = (
+  HUMAN_HISTORY_ERA_DEFINITIONS
+).map((definition) => ({
+  ...definition,
   familyId: "human-history",
   priority: ERA_FAMILY_CONFIG_BY_ID.get("human-history")?.priority,
-  isFamilyRoot: true,
-};
+}));
 
 export const ROOT_ERA: Era = materializeEra({
   id: "universe",
@@ -300,7 +308,7 @@ export const ROOT_ERA: Era = materializeEra({
   children: [
     COSMIC_FAMILY_ROOT_DEFINITION,
     GEOLOGICAL_FAMILY_ROOT_DEFINITION,
-    HUMAN_HISTORY_FAMILY_ROOT_DEFINITION,
+    ...HUMAN_HISTORY_TOP_LEVEL_DEFINITIONS,
   ],
 });
 

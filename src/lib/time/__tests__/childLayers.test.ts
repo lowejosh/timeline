@@ -157,6 +157,28 @@ describe("timeline child layers", () => {
     );
   });
 
+  it("keeps the parent band opacity stable while child layers animate in", () => {
+    const width = 1000;
+    const pad = 100;
+    const innerWidth = width - pad * 2;
+    const child = makeEra("child", -100, 0);
+    const parent = makeEra("parent", -100, 0);
+    parent.children = [child];
+    const viewport = getViewportForRange(-100, 0, innerWidth, 0);
+
+    const layers = resolveTimelineEraLayersFromOpacityMap(
+      [parent],
+      "none",
+      viewport,
+      width,
+      pad,
+      new Map([["parent", 1]]),
+    );
+
+    expect(layers.find((layer) => layer.era.id === "parent")?.opacity).toBe(1);
+    expect(layers.find((layer) => layer.era.id === "child")?.opacity).toBe(1);
+  });
+
   it("resolves grandchildren when a child fills enough of the viewport", () => {
     const width = 1000;
     const pad = 100;

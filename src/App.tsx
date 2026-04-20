@@ -237,9 +237,14 @@ function App() {
   const chain = getEraDisplayChain(ROOT_ERA, activeEraId);
   const rawParentEra = rawChain.length > 1 ? rawChain[rawChain.length - 2] : null;
   const parentEra =
-    rawParentEra && !isEraFamilyRoot(rawParentEra) ? rawParentEra : null;
+    rawParentEra &&
+    rawParentEra.id !== ROOT_ERA.id &&
+    !isEraFamilyRoot(rawParentEra)
+      ? rawParentEra
+      : null;
   const isTopLevelDisplayEra =
-    rawParentEra !== null && isEraFamilyRoot(rawParentEra);
+    rawParentEra === ROOT_ERA ||
+    (rawParentEra !== null && isEraFamilyRoot(rawParentEra));
   const siblingEras =
     activeEra.id === ROOT_ERA.id || isTopLevelDisplayEra
       ? rootDisplayEras

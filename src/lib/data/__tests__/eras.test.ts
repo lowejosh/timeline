@@ -34,7 +34,16 @@ describe("era data", () => {
       }
 
       if (era.id === ROOT_ERA.id) {
-        expect(era.children.every((child) => isEraFamilyRoot(child))).toBe(true);
+        expect(era.children?.[0] && isEraFamilyRoot(era.children[0])).toBe(true);
+        expect(era.children?.[1] && isEraFamilyRoot(era.children[1])).toBe(true);
+        expect(
+          era.children
+            ?.slice(2)
+            .every(
+              (child) =>
+                !isEraFamilyRoot(child) && child.familyId === "human-history",
+            ),
+        ).toBe(true);
         return;
       }
 
@@ -111,11 +120,12 @@ describe("era data", () => {
     expect(lateIronAge?.approximateEnd).toBeUndefined();
   });
 
-  it("uses seeded colors by default and respects explicit geological overrides", () => {
+  it("respects explicit human and geological color overrides", () => {
     const paleolithic = findEraById(ROOT_ERA, "paleolithic");
     const cambrian = findEraById(ROOT_ERA, "cambrian");
 
-    expect(paleolithic?.color).toBe(getSeededEraColor("paleolithic"));
+    expect(paleolithic?.color).toBe("rgb(64, 167, 226)");
+    expect(paleolithic?.color).not.toBe(getSeededEraColor("paleolithic"));
     expect(cambrian?.color).toBe("rgb(127, 160, 86)");
     expect(cambrian?.color).not.toBe(getSeededEraColor("cambrian"));
   });
@@ -161,11 +171,13 @@ describe("era data", () => {
   it("keeps era families directly under the root timeline", () => {
     const rootChildIds = ROOT_ERA.children?.map((era) => era.id) ?? [];
 
-    expect(rootChildIds).toEqual([
+    expect(rootChildIds.slice(0, 2)).toEqual([
       "cosmic-history",
       "geological-history",
-      "human-history",
     ]);
+    expect(rootChildIds).toContain("paleolithic");
+    expect(rootChildIds).toContain("contemporary-history");
+    expect(rootChildIds).not.toContain("human-history");
   });
 
   it("keeps geological eras directly under the geological family root", () => {
@@ -234,9 +246,11 @@ describe("era data", () => {
     ]);
   });
 
-  it("keeps prehistoric and historical eras directly under the human-history family root", () => {
-    const humanHistory = findEraById(ROOT_ERA, "human-history");
-    const humanHistoryChildIds = humanHistory?.children?.map((era) => era.id) ?? [];
+  it("keeps prehistoric and historical eras directly under the root timeline", () => {
+    const humanHistoryChildIds =
+      ROOT_ERA.children
+        ?.filter((era) => era.familyId === "human-history")
+        .map((era) => era.id) ?? [];
     const bronzeAge = findEraById(ROOT_ERA, "bronze-age");
     const ironAge = findEraById(ROOT_ERA, "iron-age");
     const contemporary = findEraById(ROOT_ERA, "contemporary-history");

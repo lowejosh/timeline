@@ -80,6 +80,9 @@ export function TimelineSidebar({
       <div className="timeline-sidebar__inner">
         <header className="timeline-sidebar__header">
           <h1 className="timeline-sidebar__title">Layers</h1>
+          <span className="timeline-sidebar__title-meta">
+            {pluralize(sets.length, "set")}
+          </span>
         </header>
 
         <div className="timeline-sidebar__tree">
@@ -93,8 +96,29 @@ export function TimelineSidebar({
                 key={set.id}
               >
                 <div className="timeline-sidebar__set-card">
-                  <div className="timeline-sidebar__set-row">
-                    <label className="timeline-sidebar__toggle timeline-sidebar__toggle--item timeline-sidebar__toggle--set">
+                  <div
+                    className="timeline-sidebar__set-row"
+                    onClick={() => {
+                      onToggleSetExpanded(set.id, !expanded);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={expanded}
+                    aria-label={`${expanded ? "Collapse" : "Expand"} ${set.label}`}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onToggleSetExpanded(set.id, !expanded);
+                      }
+                    }}
+                    data-expanded={expanded ? "true" : "false"}
+                  >
+                    <label
+                      className="timeline-sidebar__toggle timeline-sidebar__toggle--set-checkbox"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                      }}
+                    >
                       <input
                         checked={set.enabled}
                         onChange={(event) => {
@@ -106,39 +130,27 @@ export function TimelineSidebar({
                         aria-hidden="true"
                         className="timeline-sidebar__checkbox"
                       />
-                      <span className="timeline-sidebar__toggle-copy">
-                        <span className="timeline-sidebar__item-header">
-                          <span
-                            className="timeline-sidebar__item-title timeline-sidebar__item-title--hint"
-                            title={set.description}
-                          >
-                            {set.label}
-                          </span>
-                        </span>
-                        <span className="timeline-sidebar__item-meta">
-                          {formatSetMeta(set)}
-                        </span>
-                      </span>
                     </label>
 
-                    <button
-                      aria-expanded={expanded}
-                      aria-label={`${expanded ? "Collapse" : "Expand"} ${set.label}`}
-                      className="timeline-sidebar__disclosure"
-                      data-expanded={expanded ? "true" : "false"}
-                      onClick={() => {
-                        onToggleSetExpanded(set.id, !expanded);
-                      }}
-                      type="button"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        className="timeline-sidebar__disclosure-glyph"
-                        viewBox="0 0 12 12"
+                    <span className="timeline-sidebar__set-copy">
+                      <span
+                        className="timeline-sidebar__item-title"
+                        title={set.description}
                       >
-                        <path d="M3 4.5 6 7.5 9 4.5" />
-                      </svg>
-                    </button>
+                        {set.label}
+                      </span>
+                      <span className="timeline-sidebar__item-meta">
+                        {formatSetMeta(set)}
+                      </span>
+                    </span>
+
+                    <svg
+                      aria-hidden="true"
+                      className="timeline-sidebar__disclosure-glyph"
+                      viewBox="0 0 12 12"
+                    >
+                      <path d="M3 4.5 6 7.5 9 4.5" />
+                    </svg>
                   </div>
 
                   {expanded ? (
