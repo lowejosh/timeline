@@ -1,33 +1,56 @@
 import type { TimelineLayerAutoToggleRule } from "../data/timelineTypes";
+import { bce } from "../data/timelineDateBuilders";
+import { TIMELINE_DECORATION_GROUPS_BY_ID } from "../data/timelineDecorations";
 import { getTimelineYearFromYearsAgo } from "./timelineYears";
 import { getVisibleRange, type TimelineViewport } from "./viewport";
 
-export const HUMAN_EVOLUTION_AUTO_HIDE_YEAR = -10_000;
+export const HUMAN_EVOLUTION_AUTO_HIDE_YEAR = bce(4_000);
 export const CIVILIZATIONS_AUTO_HIDE_YEAR = 1_800;
-export const DEEP_TIME_LIFE_AUTO_HIDE_YEAR = getTimelineYearFromYearsAgo(12_000_000);
+export const DEEP_TIME_LIFE_AUTO_HIDE_YEAR = getTimelineYearFromYearsAgo(7_000_000);
 const DEFAULT_HIDE_RECENT_COVERAGE = 0.82;
 const DEFAULT_SHOW_RECENT_COVERAGE = 0.68;
 
-export const HUMAN_EVOLUTION_AUTO_TOGGLE_RULE: TimelineLayerAutoToggleRule = {
-  kind: "coverage-after-year",
-  thresholdYear: HUMAN_EVOLUTION_AUTO_HIDE_YEAR,
-  hideCoverage: DEFAULT_HIDE_RECENT_COVERAGE,
-  showCoverage: DEFAULT_SHOW_RECENT_COVERAGE,
-};
+export const HUMAN_EVOLUTION_AUTO_TOGGLE_RULE =
+  TIMELINE_DECORATION_GROUPS_BY_ID["human-evolution"].autoToggleRule!;
 
-export const CIVILIZATIONS_AUTO_TOGGLE_RULE: TimelineLayerAutoToggleRule = {
-  kind: "coverage-after-year",
-  thresholdYear: CIVILIZATIONS_AUTO_HIDE_YEAR,
-  hideCoverage: DEFAULT_HIDE_RECENT_COVERAGE,
-  showCoverage: DEFAULT_SHOW_RECENT_COVERAGE,
-};
+export const CIVILIZATIONS_AUTO_TOGGLE_RULE =
+  TIMELINE_DECORATION_GROUPS_BY_ID.civilizations.autoToggleRule!;
 
-export const DEEP_TIME_LIFE_AUTO_TOGGLE_RULE: TimelineLayerAutoToggleRule = {
-  kind: "coverage-after-year",
-  thresholdYear: DEEP_TIME_LIFE_AUTO_HIDE_YEAR,
-  hideCoverage: DEFAULT_HIDE_RECENT_COVERAGE,
-  showCoverage: DEFAULT_SHOW_RECENT_COVERAGE,
-};
+export const DEEP_TIME_LIFE_AUTO_TOGGLE_RULE =
+  TIMELINE_DECORATION_GROUPS_BY_ID["deep-time-life"].autoToggleRule!;
+
+export function isTimelineLayerAutoToggleEnabled(
+  rule: TimelineLayerAutoToggleRule,
+  enabledSetIds?: ReadonlySet<string> | null,
+  enabledGroupIds?: ReadonlySet<string> | null,
+  visibleGroupIds?: ReadonlySet<string> | null,
+) {
+  if (
+    rule.onlyWhenAnySetEnabled &&
+    rule.onlyWhenAnySetEnabled.length > 0 &&
+    !rule.onlyWhenAnySetEnabled.some((setId) => enabledSetIds?.has(setId))
+  ) {
+    return false;
+  }
+
+  if (
+    rule.onlyWhenAnyGroupEnabled &&
+    rule.onlyWhenAnyGroupEnabled.length > 0 &&
+    !rule.onlyWhenAnyGroupEnabled.some((groupId) => enabledGroupIds?.has(groupId))
+  ) {
+    return false;
+  }
+
+  if (
+    rule.onlyWhenAnyGroupVisible &&
+    rule.onlyWhenAnyGroupVisible.length > 0 &&
+    !rule.onlyWhenAnyGroupVisible.some((groupId) => visibleGroupIds?.has(groupId))
+  ) {
+    return false;
+  }
+
+  return true;
+}
 
 function getVisibleRangeBounds(
   viewport: TimelineViewport,
@@ -88,6 +111,9 @@ export function shouldAutoSuppressTimelineLayer(
         : rule.hideAtOrBelowYears;
 
       return visibleSpan <= threshold;
+    }
+    case "viewport-start-after-year": {
+      return visibleStart >= rule.thresholdYear;
     }
   }
 }

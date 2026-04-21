@@ -38,12 +38,21 @@ import {
   normalizeTimelineSetOrder,
 } from "./lib/data/timelineSets";
 import { resolveTimelineSidebarTree } from "./lib/data/timelineSidebar";
-import { shouldAutoSuppressTimelineLayer } from "./lib/time/timelineLayerAutoToggle";
+import {
+  isTimelineLayerAutoToggleEnabled,
+  shouldAutoSuppressTimelineLayer,
+} from "./lib/time/timelineLayerAutoToggle";
 import {
   getHomeViewport,
   HOME_RANGE,
+  getVisibleRange,
   worldToScreen,
 } from "./lib/time/viewport";
+import { isTimelineDecorationVisibleAtZoom } from "./lib/time/overlayTracks";
+import type {
+  TimelineMarker,
+  TimelineOverlayBand,
+} from "./lib/data/timelineTypes";
 import "./App.css";
 
 type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
@@ -54,6 +63,78 @@ const OVERVIEW_RULER_TIER_HEIGHT = 18;
 const OVERVIEW_RULER_MAX_TIERS = 3;
 const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
 const TIMELINE_SET_ORDER_STORAGE_KEY = "timeline:set-order:v1";
+
+function addVisibleOverlayGroupIds(
+  overlays: TimelineOverlayBand[],
+  visibleStart: number,
+  visibleEnd: number,
+  zoom: number,
+  enabledGroupIds: ReadonlySet<string>,
+  visibleGroupIds: Set<string>,
+) {
+  for (const overlay of overlays) {
+    if (
+      overlay.groupId &&
+      enabledGroupIds.has(overlay.groupId) &&
+      isTimelineDecorationVisibleAtZoom(overlay, zoom) &&
+      overlay.startYear <= visibleEnd &&
+      overlay.endYear >= visibleStart
+    ) {
+      visibleGroupIds.add(overlay.groupId);
+    }
+
+    if (overlay.children && overlay.children.length > 0) {
+      addVisibleOverlayGroupIds(
+        overlay.children,
+        visibleStart,
+        visibleEnd,
+        zoom,
+        enabledGroupIds,
+        visibleGroupIds,
+      );
+    }
+  }
+}
+
+function getVisibleTimelineGroupIds(
+  markers: TimelineMarker[],
+  overlays: TimelineOverlayBand[],
+  viewport: import("./lib/time/viewport").TimelineViewport,
+  width: number,
+  pad: number,
+  enabledGroupIds: ReadonlySet<string>,
+) {
+  if (width <= pad * 2) {
+    return new Set<string>();
+  }
+
+  const innerWidth = Math.max(width - pad * 2, 1);
+  const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
+  const visibleGroupIds = new Set<string>();
+
+  for (const marker of markers) {
+    if (
+      marker.groupId &&
+      enabledGroupIds.has(marker.groupId) &&
+      isTimelineDecorationVisibleAtZoom(marker, viewport.zoom) &&
+      marker.year >= visibleStart &&
+      marker.year <= visibleEnd
+    ) {
+      visibleGroupIds.add(marker.groupId);
+    }
+  }
+
+  addVisibleOverlayGroupIds(
+    overlays,
+    visibleStart,
+    visibleEnd,
+    viewport.zoom,
+    enabledGroupIds,
+    visibleGroupIds,
+  );
+
+  return visibleGroupIds;
+}
 
 function readStoredTimelineSetOrder() {
   if (typeof window === "undefined") {
@@ -146,6 +227,39 @@ function App() {
     }
   }, [orderedSetIds]);
 
+  const baseEnabledGroupIds = useMemo(() => {
+    const next = new Set(manualEnabledGroupIds);
+
+    if (humanEvolutionToggleMode === "manual-on") {
+      next.add(HUMAN_EVOLUTION_GROUP_ID);
+    } else if (humanEvolutionToggleMode === "manual-off") {
+      next.delete(HUMAN_EVOLUTION_GROUP_ID);
+    } else if (defaultEnabledGroupIds.has(HUMAN_EVOLUTION_GROUP_ID)) {
+      next.add(HUMAN_EVOLUTION_GROUP_ID);
+    } else {
+      next.delete(HUMAN_EVOLUTION_GROUP_ID);
+    }
+
+    return next;
+  }, [
+    defaultEnabledGroupIds,
+    humanEvolutionToggleMode,
+    manualEnabledGroupIds,
+  ]);
+
+  const autoToggleVisibleGroupIds = useMemo(
+    () =>
+      getVisibleTimelineGroupIds(
+        filterMarkersBySets(TIMELINE_DISPLAY.markers, enabledSetIds),
+        filterOverlaysBySets(TIMELINE_DISPLAY.overlays, enabledSetIds),
+        animated.viewport,
+        innerWidth,
+        TIMELINE_CANVAS_PAD,
+        baseEnabledGroupIds,
+      ),
+    [animated.viewport, baseEnabledGroupIds, enabledSetIds, innerWidth],
+  );
+
   useEffect(() => {
     const nextAutoSuppressedGroupIds = new Set(autoSuppressedGroupIds);
     let hasSuppressionChanges = false;
@@ -153,13 +267,21 @@ function App() {
 
     for (const [groupId, rule] of autoToggleRulesByGroupId) {
       const currentlySuppressed = autoSuppressedGroupIds.has(groupId);
-      const nextSuppressed = shouldAutoSuppressTimelineLayer(
+      const isAutoToggleEnabled = isTimelineLayerAutoToggleEnabled(
         rule,
-        animated.viewport,
-        innerWidth,
-        TIMELINE_CANVAS_PAD,
-        currentlySuppressed,
+        enabledSetIds,
+        baseEnabledGroupIds,
+        autoToggleVisibleGroupIds,
       );
+      const nextSuppressed = isAutoToggleEnabled
+        ? shouldAutoSuppressTimelineLayer(
+            rule,
+            animated.viewport,
+            innerWidth,
+            TIMELINE_CANVAS_PAD,
+            currentlySuppressed,
+          )
+        : false;
 
       if (nextSuppressed === currentlySuppressed) {
         continue;
@@ -185,51 +307,22 @@ function App() {
       return;
     }
 
-    let cancelled = false;
+    if (hasSuppressionChanges) {
+      setAutoSuppressedGroupIds(nextAutoSuppressedGroupIds);
+    }
 
-    queueMicrotask(() => {
-      if (cancelled) {
-        return;
-      }
-
-      if (hasSuppressionChanges) {
-        setAutoSuppressedGroupIds(nextAutoSuppressedGroupIds);
-      }
-
-      if (shouldBumpOverlayVisibilityKey) {
-        setOverlayVisibilityTransitionKey((current) => current + 1);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
+    if (shouldBumpOverlayVisibilityKey) {
+      setOverlayVisibilityTransitionKey((current) => current + 1);
+    }
   }, [
     animated.viewport,
     autoSuppressedGroupIds,
     autoToggleRulesByGroupId,
+    autoToggleVisibleGroupIds,
+    baseEnabledGroupIds,
+    enabledSetIds,
     innerWidth,
     humanEvolutionToggleMode,
-  ]);
-
-  const baseEnabledGroupIds = useMemo(() => {
-    const next = new Set(manualEnabledGroupIds);
-
-    if (humanEvolutionToggleMode === "manual-on") {
-      next.add(HUMAN_EVOLUTION_GROUP_ID);
-    } else if (humanEvolutionToggleMode === "manual-off") {
-      next.delete(HUMAN_EVOLUTION_GROUP_ID);
-    } else if (defaultEnabledGroupIds.has(HUMAN_EVOLUTION_GROUP_ID)) {
-      next.add(HUMAN_EVOLUTION_GROUP_ID);
-    } else {
-      next.delete(HUMAN_EVOLUTION_GROUP_ID);
-    }
-
-    return next;
-  }, [
-    defaultEnabledGroupIds,
-    humanEvolutionToggleMode,
-    manualEnabledGroupIds,
   ]);
 
   const renderEnabledGroupIds = useMemo(() => {

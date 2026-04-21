@@ -1688,7 +1688,7 @@ export const ERA_SOURCES = {
       'Wikipedia contributors, "Preclassic Maya." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Preclassic_Maya",
     notes:
-      "Used for the Preclassic Maya span through 250 CE and for public-facing context on the rise of settled villages, early cities, and emerging kingship and writing.",
+      "Used for the Preclassic Maya page's Late Preclassic (400 BC-100 AD) and Terminal Preclassic (100 AD-250 AD) sections, including its framing of the rise of the first Maya states, early monarchy, and the earliest known Maya writing around 300 BC.",
   },
   maliEmpireWikipedia: {
     shortTitle: "Wikipedia: Mali Empire",

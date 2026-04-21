@@ -84,11 +84,24 @@ export type TimelineLayerAutoToggleRule =
       thresholdYear: number;
       hideCoverage?: number;
       showCoverage?: number;
+      onlyWhenAnySetEnabled?: TimelineSetId[];
+      onlyWhenAnyGroupEnabled?: string[];
+      onlyWhenAnyGroupVisible?: string[];
     }
   | {
       kind: "max-visible-span";
       hideAtOrBelowYears: number;
       showAboveYears?: number;
+      onlyWhenAnySetEnabled?: TimelineSetId[];
+      onlyWhenAnyGroupEnabled?: string[];
+      onlyWhenAnyGroupVisible?: string[];
+    }
+  | {
+      kind: "viewport-start-after-year";
+      thresholdYear: number;
+      onlyWhenAnySetEnabled?: TimelineSetId[];
+      onlyWhenAnyGroupEnabled?: string[];
+      onlyWhenAnyGroupVisible?: string[];
     };
 
 export type TimelineDecorationContentType = "markers" | "overlays" | "mixed";

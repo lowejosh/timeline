@@ -1,47 +1,42 @@
 import { describe, expect, it } from "vitest";
+import { TIMELINE_DECORATION_GROUPS_BY_ID } from "../../data/timelineDecorations";
 import {
-  HUMAN_EVOLUTION_AUTO_TOGGLE_RULE,
+  isTimelineLayerAutoToggleEnabled,
   shouldAutoSuppressCivilizations,
   shouldAutoSuppressDeepTimeLife,
   shouldAutoSuppressHumanEvolution,
   shouldAutoSuppressTimelineLayer,
 } from "../timelineLayerAutoToggle";
+import { bce } from "../../data/timelineDateBuilders";
 import { getTimelineYearFromYearsAgo } from "../timelineYears";
 import { getViewportForRange } from "../viewport";
 
 const WIDTH = 1200;
 const PAD = 120;
+const HUMAN_EVOLUTION_AUTO_TOGGLE_RULE =
+  TIMELINE_DECORATION_GROUPS_BY_ID["human-evolution"].autoToggleRule!;
+const DEEP_TIME_LIFE_AUTO_TOGGLE_RULE =
+  TIMELINE_DECORATION_GROUPS_BY_ID["deep-time-life"].autoToggleRule!;
 
 describe("timeline layer auto toggle", () => {
-  it("suppresses human evolution when the viewport is fully inside recent history", () => {
+  it("suppresses human evolution once the viewport has drilled past the first civilizations", () => {
+    const viewport = getViewportForRange(bce(3_000), 2026, WIDTH, 0);
+
+    expect(shouldAutoSuppressHumanEvolution(viewport, WIDTH, PAD, false)).toBe(
+      true,
+    );
+  });
+
+  it("keeps human evolution enabled while pre-civilization time is still in view", () => {
     const viewport = getViewportForRange(-8_000, 2026, WIDTH, 0);
 
     expect(shouldAutoSuppressHumanEvolution(viewport, WIDTH, PAD, false)).toBe(
-      true,
-    );
-  });
-
-  it("keeps human evolution enabled when deeper prehistory still occupies much of the view", () => {
-    const viewport = getViewportForRange(-30_000, 2026, WIDTH, 0);
-
-    expect(shouldAutoSuppressHumanEvolution(viewport, WIDTH, PAD, false)).toBe(
       false,
     );
   });
 
-  it("uses hysteresis near the threshold so the toggle does not flap", () => {
-    const viewport = getViewportForRange(-15_000, 2026, WIDTH, 0);
-
-    expect(shouldAutoSuppressHumanEvolution(viewport, WIDTH, PAD, false)).toBe(
-      false,
-    );
-    expect(shouldAutoSuppressHumanEvolution(viewport, WIDTH, PAD, true)).toBe(
-      true,
-    );
-  });
-
-  it("supports reusable coverage-based rules for auto-suppressed layers", () => {
-    const viewport = getViewportForRange(-15_000, 2026, WIDTH, 0);
+  it("supports viewport-start handoff rules for drill-past suppression", () => {
+    const viewport = getViewportForRange(bce(3_000), 2026, WIDTH, 0);
 
     expect(
       shouldAutoSuppressTimelineLayer(
@@ -51,14 +46,85 @@ describe("timeline layer auto toggle", () => {
         PAD,
         false,
       ),
-    ).toBe(false);
+    ).toBe(true);
+  });
+
+  it("only enables deep time life auto-hide when the human set is enabled", () => {
     expect(
-      shouldAutoSuppressTimelineLayer(
+      isTimelineLayerAutoToggleEnabled(
+        DEEP_TIME_LIFE_AUTO_TOGGLE_RULE,
+        new Set(["earth"]),
+        new Set(["deep-time-life"]),
+        new Set(["human-evolution"]),
+      ),
+    ).toBe(false);
+
+    expect(
+      isTimelineLayerAutoToggleEnabled(
+        DEEP_TIME_LIFE_AUTO_TOGGLE_RULE,
+        new Set(["earth", "human"]),
+        new Set(["deep-time-life"]),
+        new Set(["human-evolution"]),
+      ),
+    ).toBe(true);
+  });
+
+  it("keeps deep time life auto-hide disabled until human evolution is actually visible", () => {
+    expect(
+      isTimelineLayerAutoToggleEnabled(
+        DEEP_TIME_LIFE_AUTO_TOGGLE_RULE,
+        new Set(["earth", "human"]),
+        new Set(["deep-time-life", "human-evolution"]),
+        new Set(["deep-time-life"]),
+      ),
+    ).toBe(false);
+
+    expect(
+      isTimelineLayerAutoToggleEnabled(
+        DEEP_TIME_LIFE_AUTO_TOGGLE_RULE,
+        new Set(["earth", "human"]),
+        new Set(["deep-time-life", "human-evolution"]),
+        new Set(["human-evolution"]),
+      ),
+    ).toBe(true);
+  });
+
+  it("only enables human evolution auto-hide when civilizations are enabled", () => {
+    expect(
+      isTimelineLayerAutoToggleEnabled(
         HUMAN_EVOLUTION_AUTO_TOGGLE_RULE,
-        viewport,
-        WIDTH,
-        PAD,
-        true,
+        new Set(["human"]),
+        new Set(["human-evolution"]),
+        new Set(["human-evolution"]),
+      ),
+    ).toBe(false);
+
+    expect(
+      isTimelineLayerAutoToggleEnabled(
+        HUMAN_EVOLUTION_AUTO_TOGGLE_RULE,
+        new Set(["human"]),
+        new Set(["human-evolution", "civilizations"]),
+        new Set(["civilizations"]),
+      ),
+    ).toBe(true);
+  });
+
+  it("keeps human evolution auto-hide disabled until civilizations are actually visible", () => {
+    expect(
+      isTimelineLayerAutoToggleEnabled(
+        HUMAN_EVOLUTION_AUTO_TOGGLE_RULE,
+        new Set(["human"]),
+        new Set(["human-evolution", "civilizations"]),
+        new Set(["human-evolution"]),
+      ),
+    ).toBe(false);
+
+    expect(
+      isTimelineLayerAutoToggleEnabled(
+        HUMAN_EVOLUTION_AUTO_TOGGLE_RULE,
+        new Set(["human"]),
+        new Set(["human-evolution", "civilizations"]),
+        new Set(["civilizations"]),
       ),
     ).toBe(true);
   });
@@ -123,43 +189,15 @@ describe("timeline layer auto toggle", () => {
     );
   });
 
-  it("suppresses deep time life once the viewport is mostly inside recent mammal and human time", () => {
+  it("suppresses deep time life once the viewport has drilled fully into human evolution time", () => {
     const viewport = getViewportForRange(
-      getTimelineYearFromYearsAgo(12_000_000),
+      getTimelineYearFromYearsAgo(6_000_000),
       2026,
       WIDTH,
       0,
     );
 
     expect(shouldAutoSuppressDeepTimeLife(viewport, WIDTH, PAD, false)).toBe(
-      true,
-    );
-  });
-
-  it("uses hysteresis for deep time life near the recent handoff so the toggle does not flap", () => {
-    const viewport = Array.from({ length: 80 }, (_, index) =>
-      getViewportForRange(
-        getTimelineYearFromYearsAgo(14_500_000 + index * 50_000),
-        2026,
-        WIDTH,
-        0,
-      ),
-    ).find(
-      (candidate) =>
-        !shouldAutoSuppressDeepTimeLife(candidate, WIDTH, PAD, false) &&
-        shouldAutoSuppressDeepTimeLife(candidate, WIDTH, PAD, true),
-    );
-
-    expect(viewport).toBeDefined();
-
-    if (!viewport) {
-      return;
-    }
-
-    expect(shouldAutoSuppressDeepTimeLife(viewport, WIDTH, PAD, false)).toBe(
-      false,
-    );
-    expect(shouldAutoSuppressDeepTimeLife(viewport, WIDTH, PAD, true)).toBe(
       true,
     );
   });

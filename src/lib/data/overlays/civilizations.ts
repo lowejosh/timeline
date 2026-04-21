@@ -386,21 +386,20 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
 
 const MAYA_SUB_BANDS: TimelineOverlayBand[] = [
   {
-    id: "preclassic-maya",
-    label: "Preclassic Maya",
-    shortLabel: "Preclassic",
+    id: "late-preclassic-maya",
+    label: "Late Preclassic Maya",
+    shortLabel: "Late Preclassic",
     description:
-      "Era when settled villages grew into the first Maya cities, with early kingship, monumental building, and the emergence of writing.",
-    startYear: bce(2_000),
+      "Era when the first Maya states rose, with monumental centers, early kingship, and the earliest known Maya writing appearing before the Classic florescence.",
+    startYear: bce(400),
     endYear: ce(250),
     regionalScopeLabel: "Mesoamerica",
-    approximateStart: true,
     color: "rgb(172, 136, 100)",
     subGroup: "mesoamerica",
     sourceRefs: [
       {
         sourceId: "preclassicMayaWikipedia",
-        note: "Uses the Preclassic Maya span through 250 CE and the page's broad public-facing framing of early cities, monuments, and the rise of Maya rulership and writing.",
+        note: "Uses the page's Late Preclassic (400 BC-100 AD) and Terminal Preclassic (100 AD-250 AD) sections to form one continuous late-preclassic band, along with its framing of the rise of the first Maya states, early monarchy, and the earliest known Maya writing around 300 BC.",
       },
     ],
   },
@@ -559,11 +558,10 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     label: "Maya",
     shortLabel: "Maya",
     description:
-      "Mesoamerican civilization of cities and courts, renowned for hieroglyphic writing, astronomy, and durable regional traditions that outlasted the fall of any one center.",
-    startYear: bce(2_000),
+      "Mesoamerican tradition of Maya kingdoms and city-states, renowned for hieroglyphic writing, astronomy, and durable regional traditions that outlasted the fall of any one center.",
+    startYear: bce(400),
     endYear: ce(1697),
     regionalScopeLabel: "Mesoamerica",
-    approximateStart: true,
     color: "rgb(148, 118, 94)",
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 79,
@@ -571,8 +569,12 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     children: MAYA_SUB_BANDS,
     sourceRefs: [
       {
-        sourceId: "mayaCivilizationWikipedia",
-        note: "Uses the broad Maya civilization span from pre-classical development to the Spanish conquest of the last independent Maya polity in 1697.",
+        sourceId: "preclassicMayaWikipedia",
+        note: "Uses the Preclassic Maya page's Late Preclassic opening at 400 BC as the cleaned-up visible starting point for this Maya overlay family, so the band begins with the rise of Maya states rather than the much earlier sedentary formative phase.",
+      },
+      {
+        sourceId: "historyOfMayaCivilizationWikipedia",
+        note: "Uses the history page's Contact-era framing through the fall of the last independent Maya city in 1697, while clipping the visible parent band to late-preclassic onward for at-a-glance readability.",
       },
     ],
   },

@@ -20,7 +20,7 @@ import {
   filterMarkersBySets,
   filterOverlaysBySets,
 } from "../timelineSets";
-import { bce, yearsAgo } from "../timelineDateBuilders";
+import { bce, ce, yearsAgo } from "../timelineDateBuilders";
 import type { TimelineOverlayBand } from "../timelineTypes";
 
 function flattenOverlayBands(
@@ -616,7 +616,6 @@ describe("root timeline display data", () => {
       "mesopotamia",
       "indus-valley-civilization",
       "ancient-egypt",
-      "maya-civilization",
       "hittite-empire",
       "mycenaean-greece",
       "chinese-civilization",
@@ -624,6 +623,7 @@ describe("root timeline display data", () => {
       "carthage",
       "achaemenid-persia",
       "roman-republic",
+      "maya-civilization",
       "roman-empire",
       "sasanian-empire",
       "byzantine-empire",
@@ -696,7 +696,11 @@ describe("root timeline display data", () => {
       TIMELINE_DISPLAY.overlays
         .find((band) => band.id === "maya-civilization")
         ?.children?.map((band) => band.id),
-    ).toEqual(["preclassic-maya", "classic-maya", "postclassic-maya"]);
+    ).toEqual([
+      "late-preclassic-maya",
+      "classic-maya",
+      "postclassic-maya",
+    ]);
 
     const mesopotamiaChildren = TIMELINE_DISPLAY.overlays.find(
       (band) => band.id === "mesopotamia",
@@ -757,8 +761,9 @@ describe("root timeline display data", () => {
 
     expect(maya).toMatchObject({
       label: "Maya",
+      startYear: bce(400),
+      endYear: ce(1697),
       regionalScopeLabel: "Mesoamerica",
-      approximateStart: true,
       subGroup: "mesoamerica",
     });
 

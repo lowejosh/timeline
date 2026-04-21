@@ -1,8 +1,5 @@
-import {
-  CIVILIZATIONS_AUTO_TOGGLE_RULE,
-  DEEP_TIME_LIFE_AUTO_TOGGLE_RULE,
-  HUMAN_EVOLUTION_AUTO_TOGGLE_RULE,
-} from "../time/timelineLayerAutoToggle";
+import { getTimelineYearFromYearsAgo } from "../time/timelineYears";
+import { bce } from "./timelineDateBuilders";
 import {
   COSMIC_MILESTONES_GROUP_ID,
   COSMIC_SET_CORE_MARKER_IDS,
@@ -65,6 +62,8 @@ const DEEP_TIME_LIFE_GROUP_ID = DEEP_TIME_LIFE_CATEGORY_ID;
 const HUMAN_EVOLUTION_GROUP_ID = HUMAN_EVOLUTION_CATEGORY_ID;
 const CULTURES_GROUP_ID = CULTURES_CATEGORY_ID;
 const CIVILIZATIONS_GROUP_ID = CIVILIZATIONS_CATEGORY_ID;
+const DEFAULT_HIDE_RECENT_COVERAGE = 0.82;
+const DEFAULT_SHOW_RECENT_COVERAGE = 0.68;
 
 export const TIMELINE_DECORATION_CATEGORIES: TimelineDecorationCategory[] = [
   {
@@ -139,7 +138,12 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
       "Major life-history overlays and milestone markers across deep time.",
     contentType: "mixed",
     order: 0,
-    autoToggleRule: DEEP_TIME_LIFE_AUTO_TOGGLE_RULE,
+    autoToggleRule: {
+      kind: "viewport-start-after-year",
+      thresholdYear: getTimelineYearFromYearsAgo(7_000_000),
+      onlyWhenAnySetEnabled: ["human"],
+      onlyWhenAnyGroupVisible: [HUMAN_EVOLUTION_GROUP_ID],
+    },
   },
   {
     id: HUMAN_HISTORY_GROUP_ID,
@@ -156,7 +160,12 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     description: "Branching hominin overlays and major evolutionary markers.",
     contentType: "mixed",
     order: 0,
-    autoToggleRule: HUMAN_EVOLUTION_AUTO_TOGGLE_RULE,
+    autoToggleRule: {
+      kind: "viewport-start-after-year",
+      thresholdYear: bce(4_000),
+      onlyWhenAnyGroupEnabled: [CIVILIZATIONS_GROUP_ID],
+      onlyWhenAnyGroupVisible: [CIVILIZATIONS_GROUP_ID],
+    },
   },
   {
     id: CULTURES_GROUP_ID,
@@ -174,7 +183,12 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     description: "Ancient through early-modern civilization overlays.",
     contentType: "overlays",
     order: 0,
-    autoToggleRule: CIVILIZATIONS_AUTO_TOGGLE_RULE,
+    autoToggleRule: {
+      kind: "coverage-after-year",
+      thresholdYear: 1_800,
+      hideCoverage: DEFAULT_HIDE_RECENT_COVERAGE,
+      showCoverage: DEFAULT_SHOW_RECENT_COVERAGE,
+    },
   },
 ];
 
