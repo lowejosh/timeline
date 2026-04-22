@@ -374,7 +374,7 @@ export function resolveTimelineOverlayTracks(
   enabledGroupIds?: ReadonlySet<string> | null,
 ): ResolvedTimelineOverlayBand[] {
   const innerWidth = Math.max(width - pad * 2, 1);
-  const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
+  const [visibleStart] = getVisibleRange(viewport, innerWidth);
   const enabledOverlays = overlays.filter((overlay) =>
     isDecorationGroupEnabled(overlay, enabledGroupIds),
   );
@@ -387,10 +387,6 @@ export function resolveTimelineOverlayTracks(
   const visibleOverlays: ResolvedTimelineOverlayBand[] = [];
 
   for (const { band, laneIndex } of assigned) {
-    if (band.startYear > visibleEnd) {
-      break;
-    }
-
     if (
       !isTimelineDecorationVisibleAtZoom(band, viewport.zoom) ||
       band.endYear < visibleStart

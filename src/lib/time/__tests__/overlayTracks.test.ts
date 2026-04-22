@@ -440,7 +440,6 @@ describe("timeline overlay tracks", () => {
       "mesopotamia",
       "indus-valley-civilization",
       "ancient-egypt",
-      "maya-civilization",
       "chinese-civilization",
       "hittite-empire",
       "mycenaean-greece",
@@ -448,6 +447,7 @@ describe("timeline overlay tracks", () => {
       "carthage",
       "achaemenid-persia",
       "roman-republic",
+      "maya-civilization",
       "roman-empire",
     ]);
     expect(new Set(resolved.map((band) => band.laneIndex)).size).toBe(7);
@@ -529,7 +529,7 @@ describe("timeline overlay tracks", () => {
     );
 
     expect(mayaBand).toMatchObject({
-      startYear: -2000,
+      startYear: -400,
       endYear: 1697,
       regionalScopeLabel: "Mesoamerica",
       subGroup: "mesoamerica",
@@ -683,5 +683,30 @@ describe("timeline overlay tracks", () => {
     expect(homoSapiens?.laneIndex).toBeLessThan(
       sahelanthropus?.laneIndex ?? 0,
     );
+  });
+
+  it("does not let the Homo sapiens lane bias hide older visible hominins when sapiens has just moved off-screen", () => {
+    const width = 1200;
+    const pad = 120;
+    const viewport = {
+      centerYear: -471_887.411,
+      zoom: 17.109783,
+    };
+
+    const resolved = resolveTimelineOverlayTracks(
+      HUMAN_EVOLUTION_OVERLAYS,
+      viewport,
+      width,
+      pad,
+    );
+
+    expect(resolved.find((band) => band.band.id === "homo-sapiens")).toBeUndefined();
+    expect(
+      resolved.find((band) => band.band.id === "homo-heidelbergensis"),
+    ).toBeDefined();
+    expect(
+      resolved.find((band) => band.band.id === "homo-neanderthalensis"),
+    ).toBeDefined();
+    expect(resolved.length).toBeGreaterThan(0);
   });
 });

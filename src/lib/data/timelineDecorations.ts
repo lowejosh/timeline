@@ -1,5 +1,3 @@
-import { getTimelineYearFromYearsAgo } from "../time/timelineYears";
-import { bce } from "./timelineDateBuilders";
 import {
   COSMIC_MILESTONES_GROUP_ID,
   COSMIC_SET_CORE_MARKER_IDS,
@@ -138,12 +136,6 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
       "Major life-history overlays and milestone markers across deep time.",
     contentType: "mixed",
     order: 0,
-    autoToggleRule: {
-      kind: "viewport-start-after-year",
-      thresholdYear: getTimelineYearFromYearsAgo(7_000_000),
-      onlyWhenAnySetEnabled: ["human"],
-      onlyWhenAnyGroupVisible: [HUMAN_EVOLUTION_GROUP_ID],
-    },
   },
   {
     id: HUMAN_HISTORY_GROUP_ID,
@@ -160,12 +152,6 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     description: "Branching hominin overlays and major evolutionary markers.",
     contentType: "mixed",
     order: 0,
-    autoToggleRule: {
-      kind: "viewport-start-after-year",
-      thresholdYear: bce(4_000),
-      onlyWhenAnyGroupEnabled: [CIVILIZATIONS_GROUP_ID],
-      onlyWhenAnyGroupVisible: [CIVILIZATIONS_GROUP_ID],
-    },
   },
   {
     id: CULTURES_GROUP_ID,

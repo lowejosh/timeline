@@ -95,13 +95,6 @@ export type TimelineLayerAutoToggleRule =
       onlyWhenAnySetEnabled?: TimelineSetId[];
       onlyWhenAnyGroupEnabled?: string[];
       onlyWhenAnyGroupVisible?: string[];
-    }
-  | {
-      kind: "viewport-start-after-year";
-      thresholdYear: number;
-      onlyWhenAnySetEnabled?: TimelineSetId[];
-      onlyWhenAnyGroupEnabled?: string[];
-      onlyWhenAnyGroupVisible?: string[];
     };
 
 export type TimelineDecorationContentType = "markers" | "overlays" | "mixed";

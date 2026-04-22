@@ -122,7 +122,7 @@ type TimelineCanvasProps = {
   markers: TimelineMarker[];
   overlayBands: TimelineOverlayBand[];
   enabledGroupIds: ReadonlySet<string>;
-  overlayVisibilityTransitionKey: number;
+  overlayVisibilityTransitionKey: string;
   parentEra: Era | null;
   isAnimating: boolean;
   onViewportChange: (

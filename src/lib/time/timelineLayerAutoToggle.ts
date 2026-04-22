@@ -1,23 +1,11 @@
 import type { TimelineLayerAutoToggleRule } from "../data/timelineTypes";
-import { bce } from "../data/timelineDateBuilders";
 import { TIMELINE_DECORATION_GROUPS_BY_ID } from "../data/timelineDecorations";
-import { getTimelineYearFromYearsAgo } from "./timelineYears";
 import { getVisibleRange, type TimelineViewport } from "./viewport";
 
-export const HUMAN_EVOLUTION_AUTO_HIDE_YEAR = bce(4_000);
 export const CIVILIZATIONS_AUTO_HIDE_YEAR = 1_800;
-export const DEEP_TIME_LIFE_AUTO_HIDE_YEAR = getTimelineYearFromYearsAgo(7_000_000);
-const DEFAULT_HIDE_RECENT_COVERAGE = 0.82;
-const DEFAULT_SHOW_RECENT_COVERAGE = 0.68;
-
-export const HUMAN_EVOLUTION_AUTO_TOGGLE_RULE =
-  TIMELINE_DECORATION_GROUPS_BY_ID["human-evolution"].autoToggleRule!;
 
 export const CIVILIZATIONS_AUTO_TOGGLE_RULE =
   TIMELINE_DECORATION_GROUPS_BY_ID.civilizations.autoToggleRule!;
-
-export const DEEP_TIME_LIFE_AUTO_TOGGLE_RULE =
-  TIMELINE_DECORATION_GROUPS_BY_ID["deep-time-life"].autoToggleRule!;
 
 export function isTimelineLayerAutoToggleEnabled(
   rule: TimelineLayerAutoToggleRule,
@@ -99,8 +87,8 @@ export function shouldAutoSuppressTimelineLayer(
       );
       const thresholdCoverage = postThresholdSpan / visibleSpan;
       const threshold = currentlySuppressed
-        ? (rule.showCoverage ?? DEFAULT_SHOW_RECENT_COVERAGE)
-        : (rule.hideCoverage ?? DEFAULT_HIDE_RECENT_COVERAGE);
+        ? (rule.showCoverage ?? 0.68)
+        : (rule.hideCoverage ?? 0.82);
 
       return thresholdCoverage >= threshold;
     }
@@ -112,25 +100,7 @@ export function shouldAutoSuppressTimelineLayer(
 
       return visibleSpan <= threshold;
     }
-    case "viewport-start-after-year": {
-      return visibleStart >= rule.thresholdYear;
-    }
   }
-}
-
-export function shouldAutoSuppressHumanEvolution(
-  viewport: TimelineViewport,
-  width: number,
-  pad: number,
-  currentlySuppressed: boolean,
-) {
-  return shouldAutoSuppressTimelineLayer(
-    HUMAN_EVOLUTION_AUTO_TOGGLE_RULE,
-    viewport,
-    width,
-    pad,
-    currentlySuppressed,
-  );
 }
 
 export function shouldAutoSuppressCivilizations(
@@ -141,21 +111,6 @@ export function shouldAutoSuppressCivilizations(
 ) {
   return shouldAutoSuppressTimelineLayer(
     CIVILIZATIONS_AUTO_TOGGLE_RULE,
-    viewport,
-    width,
-    pad,
-    currentlySuppressed,
-  );
-}
-
-export function shouldAutoSuppressDeepTimeLife(
-  viewport: TimelineViewport,
-  width: number,
-  pad: number,
-  currentlySuppressed: boolean,
-) {
-  return shouldAutoSuppressTimelineLayer(
-    DEEP_TIME_LIFE_AUTO_TOGGLE_RULE,
     viewport,
     width,
     pad,
