@@ -9,9 +9,6 @@ import {
 import { isDecorationGroupEnabled, isTimelineDecorationVisibleAtZoom } from "./queries/visibility";
 import { getAssignedOverlayLanes } from "./layout/laneAssignment";
 
-export { isTimelineDecorationVisibleAtZoom } from "./queries/visibility";
-export { getVisibleTimelineMarkers } from "./queries/markers";
-
 export type ResolvedTimelineOverlayBand = {
   band: TimelineOverlayBand;
   laneIndex: number;

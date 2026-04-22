@@ -8,26 +8,13 @@ import {
   type PointerEvent,
 } from "react";
 import {
-  formatTimelineElapsedAxisLabel,
-  formatTimelineElapsedAxisLabelLines,
-  getDominantTimelineDateReference,
-  formatTimelineYear,
-} from "../../lib/rendering/bands";
-import {
   compareEraPriorityAscending,
   type Era,
   type TimelineMarker,
   type TimelineOverlayBand,
 } from "../../lib/domain/eras";
 import {
-  getEraTooltipContent,
-  getMarkerTooltipContent,
-  getOverlayTooltipContent,
-  type TimelineTooltipContent,
-} from "../../lib/app/tooltipModel";
-import {
   EARLY_UNIVERSE_END_YEAR,
-  EARLY_UNIVERSE_CHILD_ERA_ORDER,
   EARLY_UNIVERSE_START_YEAR,
 } from "../../lib/domain/eraTrees/cosmic";
 import {
@@ -37,7 +24,6 @@ import {
   getViewportCenterYear,
   getZoomAnchorForCanvasX,
   getVisibleRangePrecise,
-  type PreciseTimelineYear,
   screenToWorldPrecise,
   splitTimelineYear,
   subtractPreciseTimelineYears,
@@ -47,7 +33,6 @@ import {
   screenToWorld,
   toApproximateTimelineYear,
   worldToScreen,
-  worldPreciseToScreen,
   zoomAtPosition,
   type TimelineViewport,
 } from "../../lib/core/viewport";
@@ -55,54 +40,23 @@ import {
   getInteractiveDescendantEras,
   getPreviewFocusChain,
   resolveTimelineEraLayersFromOpacityMap,
-  shouldHideOverlappedEraLabel,
 } from "../../lib/rendering/childLayers";
 import {
-  getVisibleTimelineMarkers,
   resolveTimelineOverlayTracks,
   type ResolvedTimelineOverlayBand,
 } from "../../lib/rendering/overlayTracks";
-import {
-  getExpandedOverlayPanelBounds,
-  resolveExpandedOverlayLayout,
-} from "../../lib/rendering/expandedOverlayLayout";
-import {
-  resolveOverlayLabelHoverBounds,
-  resolveTextHoverBounds,
-} from "../../lib/rendering/overlayLabelHover";
+import { getVisibleTimelineMarkers } from "../../lib/rendering/queries/markers";
+import { resolveExpandedOverlayLayout } from "../../lib/rendering/expandedOverlayLayout";
 import {
   shouldPrioritizeTooltipRetention,
   shouldRetainTooltipAtPoint,
 } from "../../lib/rendering/tooltipRetention";
 import {
-  getVisibleMarkerPositions,
-  type MarkerTextMeasureInput,
-  resolveMarkerRenderStates,
-} from "../../lib/rendering/markerGlyphs";
-import {
   resolveAxisTickRenderStates,
   type AxisTickRenderState,
 } from "../../lib/rendering/axisTickStates";
-import {
-  isAnimatedContextBandLabelStateActive,
-  resolveAnimatedContextBandLabelLayers,
-  resolveContextBandLabelVariant,
-  resolveContextBandRenderState,
-  stepAnimatedContextBandLabelState,
-  syncAnimatedContextBandLabelState,
-  type AnimatedContextBandLabelState,
-} from "../../lib/rendering/contextBands";
+import type { AnimatedContextBandLabelState } from "../../lib/rendering/contextBands";
 import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
-import {
-  drawOverlayGroupIcon,
-  resolveOverlayGroupIconLayout,
-} from "../../lib/rendering/overlayGroupIcons";
-import { clamp01, smoothstep01 } from "../../lib/core/easing";
-import {
-  parseColor,
-  toCssColor,
-  withAlpha,
-} from "../../lib/rendering/canvas/colors";
 import {
   DEFAULT_TIMELINE_THEME,
   readTimelineCanvasTheme,
@@ -122,17 +76,6 @@ import {
   type TimelineVerboseStats,
 } from "../../lib/rendering/canvas/perf";
 import {
-  EARLY_UNIVERSE_BAND_EXPANSION_IDS,
-  EARLY_UNIVERSE_COMPACT_LABEL_FADE_WIDTH_PX,
-  EARLY_UNIVERSE_COMPACT_LABEL_MIN_WIDTH_PX,
-  EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX,
-  EARLY_UNIVERSE_DETAIL_STRIP_LABELS,
-  EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_MIN_CANVAS_HEIGHT_PX,
-  EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_RESERVED_HEIGHT_PX,
-  EARLY_UNIVERSE_EXPANDED_LABEL_FADE_WIDTH_PX,
-  EARLY_UNIVERSE_EXPANDED_LABEL_MIN_WIDTH_PX,
-  EARLY_UNIVERSE_INLINE_LABELS,
-  FORCED_PRIMORDIAL_LABEL_IDS,
   PRIMORDIAL_DETAIL_STRIP_FADE_DURATION_MS,
   PRIMORDIAL_SYNTHETIC_DETAIL_MAX_ZOOM_WINDOW,
   resolveEraScreenSpanMap,
@@ -140,44 +83,13 @@ import {
   type PrimordialDetailStripSegment,
 } from "../../lib/rendering/canvas/primordial";
 import {
-  type AxisLabelCandidate,
-  getAllowedAxisLabelSteps,
-  getCalendarAxisLabelText,
-  getCalendarEdgeAxisLabelText,
-  getPreferredAxisEdgeLabelStep,
-  getPrimaryAxisLabelStepFromResolvedLabels,
-  getTickScaleProgress,
-  measureAxisLabelWidth,
-  resolveAxisLabelCandidates,
-  resolveAxisLabelCandidatesWithFallback,
-  resolveAxisTickYear,
-} from "../../lib/rendering/canvas/axisLabels";
-import {
-  getEraBackdropResetAlpha,
-  getEraBandAlphaMultiplier,
-  getEraInlineLabelVisibility,
-  getExpandedOverlayChildRevealProgress,
-  getExpandedOverlayChromeRailRevealProgress,
-  getExpandedOverlayChromeStemRevealProgress,
-  getExpandedOverlayLabelRevealProgress,
-} from "../../lib/rendering/canvas/eraAnimation";
-import {
   compareOverlayBands,
   findEraAtYear,
   getExpandedOverlayPanelHeight,
   getOverlayLaneY,
   getTimelineLayout,
-  resolveExpandedOverlayConnectorGeometry,
   resolveExpandedOverlayDetails,
 } from "../../lib/rendering/canvas/overlayLayout";
-import {
-  clipCanvasOutsideOcclusionRects,
-  drawPaperOverlayBand,
-  getOverlayLabelPaint,
-  pushCanvasOcclusionRect,
-  resolveOverlayBandLabelInsets,
-  type CanvasOcclusionRect,
-} from "../../lib/rendering/canvas/drawing";
 import {
   isEquivalentHoveredTooltip,
   type HoveredTooltipState,
@@ -189,6 +101,17 @@ import { useEraChildAnimation } from "../../hooks/useEraChildAnimation";
 import { useOverlayBandAnimation } from "../../hooks/useOverlayBandAnimation";
 import { useAxisTickAnimation } from "../../hooks/useAxisTickAnimation";
 import { useExpandedOverlayAnimation } from "../../hooks/useExpandedOverlayAnimation";
+import { drawBackground } from "../../lib/rendering/canvas/draw/drawBackground";
+import { drawEras } from "../../lib/rendering/canvas/draw/drawEras";
+import { drawOverlays } from "../../lib/rendering/canvas/draw/drawOverlays";
+import { drawAxis } from "../../lib/rendering/canvas/draw/drawAxis";
+import { drawMarkers } from "../../lib/rendering/canvas/draw/drawMarkers";
+import { drawNowIndicator } from "../../lib/rendering/canvas/draw/drawNowIndicator";
+import type {
+  CanvasDrawContext,
+  HoverRegion,
+  OverlayInteractionRegion,
+} from "../../lib/rendering/canvas/draw/drawContext";
 
 type TimelineCanvasProps = {
   width: number;
@@ -222,29 +145,6 @@ type DragState = {
   startY: number;
   lastX: number;
   moved: boolean;
-};
-
-type HoverRegion = {
-  id: string;
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-  anchorX: number;
-  anchorY: number;
-  anchorMode?: "fixed" | "follow-x";
-  placement: "above" | "below";
-  tooltip: TimelineTooltipContent;
-};
-
-type OverlayInteractionRegion = {
-  id: string;
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-  role: "parent" | "child" | "panel";
-  parentId?: string;
 };
 
 type TimelineCanvasScene = {
@@ -690,7 +590,6 @@ export function TimelineCanvas({
         sceneOverlayLaneCount,
       );
       const layout = getTimelineLayout(sceneHeight, animatedOverlayLaneCount);
-      const axisY = layout.axisY;
       const overlayBottomY = getOverlayLaneY(layout, 0);
       const resolvedOverlayLayout = resolveExpandedOverlayLayout(
         sceneResolvedOverlayBands.map((overlay) => ({
@@ -722,12 +621,6 @@ export function TimelineCanvas({
           compareEraPriorityAscending(left.era, right.era) ||
           left.depth - right.depth,
       );
-      const overlayLabelAnimationStates = overlayLabelAnimationRef.current;
-      const activeOverlayLabelKeys = new Set<string>();
-      let hasActiveOverlayLabelAnimation = false;
-      const hoverRegions: HoverRegion[] = [];
-      const overlayInteractionRegions: OverlayInteractionRegion[] = [];
-      const overlayOcclusionRects: CanvasOcclusionRect[] = [];
       const resolvedAxisTickStates = [...axisTickAnimationRef.current.values()]
         .filter(
           (tick) => tick.visibleProgress > 0.01 || tick.labelOpacity > 0.01,
@@ -814,6 +707,8 @@ export function TimelineCanvas({
 
       const toX = (year: number) =>
         pad + worldToScreen(year, sceneViewport, innerWidth);
+      const fromX = (px: number) =>
+        screenToWorldPrecise(px - pad, sceneViewport, innerWidth);
 
       const background = context.createLinearGradient(0, 0, 0, sceneHeight);
       background.addColorStop(0, paper);
@@ -823,1748 +718,83 @@ export function TimelineCanvas({
       context.fillRect(0, 0, sceneWidth, sceneHeight);
       markPerf("setupMs");
 
-      const parentTintColor = sceneParentEra
-        ? parseColor(sceneParentEra.color)
-        : null;
-
-      if (parentTintColor && parentTintColor.a > 0.001) {
-        context.fillStyle = toCssColor(
-          withAlpha(parentTintColor, PARENT_ERA_TINT_ALPHA),
-        );
-        context.fillRect(pad, 0, innerWidth, sceneHeight);
-      }
-
-      const renderEra = (layer: (typeof visibleEraLayers)[number]) => {
-        const { era, opacity } = layer;
-
-        if (opacity < 0.01) return;
-
-        const screenSpan = eraScreenSpanById.get(era.id);
-        const x0 = screenSpan?.x0 ?? toX(era.startYear);
-        const x1 = screenSpan?.x1 ?? toX(era.endYear);
-        const eraWidth = x1 - x0;
-        const renderState = resolveContextBandRenderState({
-          x0,
-          x1,
-          minX: pad,
-          maxX: sceneWidth - pad,
-          devicePixelRatio,
-        });
-
-        if (!renderState) return;
-
-        context.save();
-        const backdropResetAlpha =
-          getEraBackdropResetAlpha(layer.depth, opacity) *
-          renderState.alphaMultiplier;
-
-        if (backdropResetAlpha > 0.001) {
-          context.globalAlpha = backdropResetAlpha;
-          context.fillStyle = background;
-          context.fillRect(
-            renderState.renderLeft,
-            0,
-            renderState.renderWidth,
-            sceneHeight,
-          );
-        }
-        context.globalAlpha =
-          opacity *
-          ERA_BAND_ALPHA *
-          getEraBandAlphaMultiplier(era, layer.depth) *
-          renderState.alphaMultiplier;
-        context.fillStyle = era.color;
-        context.fillRect(
-          renderState.renderLeft,
-          0,
-          renderState.renderWidth,
-          sceneHeight,
-        );
-        context.restore();
-
-        const shouldHideInlineLabel = breadcrumbChainIds.has(era.id);
-        const isPrimordialEra = EARLY_UNIVERSE_BAND_EXPANSION_IDS.has(era.id);
-        const visibleEraWidth = Math.max(
-          Math.min(x1, sceneWidth - pad) - Math.max(x0, pad),
-          0,
-        );
-        const allowsNormalPrimordialLabelBypass =
-          FORCED_PRIMORDIAL_LABEL_IDS.has(era.id) && visibleEraWidth >= 44;
-        const usesForcedPrimordialLabel =
-          allowPrimordialSyntheticDetail &&
-          FORCED_PRIMORDIAL_LABEL_IDS.has(era.id) &&
-          visibleEraWidth < 44;
-        const usesExpandedPrimordialLabel =
-          allowPrimordialSyntheticDetail &&
-          screenSpan?.usesVisualExpansion === true;
-        const usesCompactPrimordialLabel =
-          allowPrimordialSyntheticDetail &&
-          isPrimordialEra &&
-          !usesExpandedPrimordialLabel &&
-          eraWidth < 60;
-        const labelText =
-          usesExpandedPrimordialLabel || usesCompactPrimordialLabel
-            ? (EARLY_UNIVERSE_INLINE_LABELS[era.id] ?? era.name)
-            : era.name;
-        const labelMinWidth = usesForcedPrimordialLabel
-          ? 8
-          : usesExpandedPrimordialLabel
-            ? EARLY_UNIVERSE_EXPANDED_LABEL_MIN_WIDTH_PX
-            : usesCompactPrimordialLabel
-              ? EARLY_UNIVERSE_COMPACT_LABEL_MIN_WIDTH_PX
-              : 60;
-        const labelFadeWidth = usesForcedPrimordialLabel
-          ? 18
-          : usesExpandedPrimordialLabel
-            ? EARLY_UNIVERSE_EXPANDED_LABEL_FADE_WIDTH_PX
-            : usesCompactPrimordialLabel
-              ? EARLY_UNIVERSE_COMPACT_LABEL_FADE_WIDTH_PX
-              : 120;
-        const labelFont = usesForcedPrimordialLabel
-          ? "9px var(--font-sans)"
-          : usesExpandedPrimordialLabel || usesCompactPrimordialLabel
-            ? "10px var(--font-sans)"
-            : "11px var(--font-sans)";
-
-        if (
-          visibleEraWidth > labelMinWidth &&
-          (!shouldHideInlineLabel || allowsNormalPrimordialLabelBypass)
-        ) {
-          const labelX =
-            Math.max(x0, pad) / 2 + Math.min(x1, sceneWidth - pad) / 2;
-          const labelBaselineY = axisY - 44;
-          const labelVisibility = getEraInlineLabelVisibility(
-            layer.childOpacity,
-          );
-          const labelAlpha =
-            Math.min((visibleEraWidth - labelMinWidth) / labelFadeWidth, 1) *
-            labelVisibility *
-            (usesForcedPrimordialLabel
-              ? 0.68
-              : 0.28 + Math.min(opacity, 1) * 0.22);
-
-          context.save();
-          context.font = labelFont;
-          const labelMetrics = context.measureText(labelText);
-          context.restore();
-
-          const shouldHideForPriorityOverlap = shouldHideOverlappedEraLabel(
-            layer,
-            visibleEraLayers,
-            sceneViewport,
-            sceneWidth,
-            PAD,
-            labelMetrics.width,
-          );
-
-          if (
-            shouldHideForPriorityOverlap &&
-            !screenSpan?.usesVisualExpansion &&
-            !usesCompactPrimordialLabel &&
-            !usesForcedPrimordialLabel &&
-            !allowsNormalPrimordialLabelBypass
-          ) {
-            return;
-          }
-
-          context.save();
-          context.globalAlpha = labelAlpha;
-          context.font = labelFont;
-          context.fillStyle = labelColor;
-          context.textAlign = "center";
-          context.textBaseline = "bottom";
-          context.fillText(labelText, labelX, labelBaselineY);
-          context.restore();
-
-          if (labelAlpha > 0.01) {
-            const labelTop =
-              labelBaselineY -
-              Math.max(labelMetrics.actualBoundingBoxAscent, 8);
-            const labelBottom =
-              labelBaselineY +
-              Math.max(labelMetrics.actualBoundingBoxDescent, 2);
-            const hoverBounds = resolveTextHoverBounds({
-              centerX: labelX,
-              labelWidth: labelMetrics.width,
-              boxTop: labelTop,
-              boxBottom: labelBottom,
-              paddingX: 8,
-              paddingY: 4,
-            });
-
-            hoverRegions.push({
-              id: `era:${era.id}`,
-              left: hoverBounds.left,
-              right: hoverBounds.right,
-              top: hoverBounds.top,
-              bottom: hoverBounds.bottom,
-              anchorX: labelX,
-              anchorY: labelTop - 2,
-              anchorMode: "fixed",
-              placement: "above",
-              tooltip: getEraTooltipContent(era),
-            });
-          }
-        }
-      };
-
-      const drawAnimatedOverlayLabel = ({
-        key,
-        fullLabel,
-        shortLabel,
-        renderX,
-        renderWidth,
-        labelLeftInset = 0,
-        labelRightInset = 0,
-        y,
-        fillStyle,
-        alpha,
-        hoverId,
-        tooltip,
-      }: {
-        key: string;
-        fullLabel: string;
-        shortLabel: string;
-        renderX: number;
-        renderWidth: number;
-        labelLeftInset?: number;
-        labelRightInset?: number;
-        y: number;
-        fillStyle: string;
-        alpha: number;
-        hoverId?: string;
-        tooltip?: TimelineTooltipContent;
-      }) => {
-        const contentLeft = renderX + labelLeftInset;
-        const contentRight = renderX + renderWidth - labelRightInset;
-        const contentWidth = Math.max(contentRight - contentLeft, 0);
-
-        context.font = "11px var(--font-sans)";
-        const fullLabelWidth = context.measureText(fullLabel).width;
-        const hasDistinctShortLabel = shortLabel !== fullLabel;
-        const shortLabelWidth = !hasDistinctShortLabel
-          ? fullLabelWidth
-          : context.measureText(shortLabel).width;
-        const existingState = overlayLabelAnimationStates.get(key);
-        const steppedExistingState = existingState
-          ? stepAnimatedContextBandLabelState(existingState, drawNow)
-          : undefined;
-        const currentVariant = steppedExistingState?.toVariant ?? "hidden";
-        const nextVariant = resolveContextBandLabelVariant({
-          availableWidth: contentWidth,
-          fullLabelWidth,
-          shortLabelWidth,
-          currentVariant,
-          hasDistinctShortLabel,
-        });
-        const nextState = syncAnimatedContextBandLabelState({
-          existing: steppedExistingState,
-          nextVariant,
-          now: drawNow,
-          duration: CONTEXT_BAND_LABEL_TRANSITION_DURATION_MS,
-          hasInitialized: overlayLabelAnimationInitializedRef.current,
-        });
-        const layers = resolveAnimatedContextBandLabelLayers(nextState, drawNow)
-          .map((layer) => ({
-            ...layer,
-            text: layer.variant === "full" ? fullLabel : shortLabel,
-            width: layer.variant === "full" ? fullLabelWidth : shortLabelWidth,
-          }))
-          .filter((layer) => layer.opacity > 0.01);
-
-        overlayLabelAnimationStates.set(key, nextState);
-        activeOverlayLabelKeys.add(key);
-
-        if (isAnimatedContextBandLabelStateActive(nextState, drawNow)) {
-          hasActiveOverlayLabelAnimation = true;
-        }
-
-        const dominantLayer = layers.reduce<{
-          variant: "short" | "full";
-          opacity: number;
-          text: string;
-          width: number;
-        } | null>(
-          (best, layer) =>
-            !best || layer.opacity > best.opacity ? layer : best,
-          null,
-        );
-
-        if (dominantLayer && hoverId && tooltip) {
-          const hoverBounds = resolveOverlayLabelHoverBounds({
-            centerX: contentLeft + contentWidth / 2,
-            labelWidth: dominantLayer.width,
-            bandLeft: contentLeft,
-            bandRight: contentRight,
-            bandTop: y,
-            bandBottom: y + OVERLAY_LANE_HEIGHT,
-          });
-
-          hoverRegions.push({
-            id: hoverId,
-            left: hoverBounds.left,
-            right: hoverBounds.right,
-            top: hoverBounds.top,
-            bottom: hoverBounds.bottom,
-            anchorX: contentLeft + contentWidth / 2,
-            anchorY: y + 2,
-            anchorMode: "follow-x",
-            placement: "above",
-            tooltip,
-          });
-        }
-
-        for (const layer of layers) {
-          context.save();
-          context.fillStyle = fillStyle;
-          context.globalAlpha = alpha * layer.opacity;
-          context.textAlign = "center";
-          context.textBaseline = "middle";
-          context.fillText(
-            layer.text,
-            contentLeft + contentWidth / 2,
-            y + OVERLAY_LANE_HEIGHT / 2,
-          );
-          context.restore();
-        }
-      };
-
-      const drawAnimatedOverlayDisclosureIndicator = ({
-        centerX,
-        centerY,
-        strokeStyle,
-        alpha,
-        progress,
-      }: {
-        centerX: number;
-        centerY: number;
-        strokeStyle: string;
-        alpha: number;
-        progress: number;
-      }) => {
-        const easedProgress = smoothstep01(progress);
-
-        context.save();
-        context.translate(centerX, centerY);
-        context.rotate(Math.PI * easedProgress);
-        context.strokeStyle = strokeStyle;
-        context.globalAlpha = alpha;
-        context.lineWidth = 1.4;
-        context.lineCap = "round";
-        context.lineJoin = "round";
-        context.beginPath();
-        context.moveTo(-3.5, -1.5);
-        context.lineTo(0, 1.5);
-        context.lineTo(3.5, -1.5);
-        context.stroke();
-        context.restore();
-      };
-
-      for (const layer of paintOrderedEraLayers) {
-        renderEra(layer);
-      }
-
-      if (
-        renderedPrimordialDetailStripSegments.length > 0 &&
-        primordialDetailStripOpacity > 0.01
-      ) {
-        const stripPanelPaddingTop = 14;
-        const stripPanelPaddingBottom = 6;
-        const overviewReservedHeight =
-          sceneHeight >=
-          EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_MIN_CANVAS_HEIGHT_PX
-            ? EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_RESERVED_HEIGHT_PX
-            : 0;
-        const stripPanelTop =
-          sceneHeight -
-          overviewReservedHeight -
-          (EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX +
-            stripPanelPaddingTop +
-            stripPanelPaddingBottom);
-        const stripPanelHeight =
-          EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX +
-          stripPanelPaddingTop +
-          stripPanelPaddingBottom;
-        const stripBottomY =
-          stripPanelTop + stripPanelHeight - stripPanelPaddingBottom;
-        const stripTopY = stripBottomY - EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX;
-        const stripLabelBaselineY = stripTopY - 3;
-
-        for (const segment of renderedPrimordialDetailStripSegments) {
-          const segmentWidth = segment.x1 - segment.x0;
-          const labelText =
-            EARLY_UNIVERSE_DETAIL_STRIP_LABELS[segment.era.id] ??
-            EARLY_UNIVERSE_INLINE_LABELS[segment.era.id] ??
-            segment.era.name;
-
-          context.save();
-          context.globalAlpha = 0.92 * primordialDetailStripOpacity;
-          context.fillStyle = segment.era.color;
-          context.fillRect(
-            segment.x0,
-            stripTopY,
-            segmentWidth,
-            EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX,
-          );
-          context.strokeStyle = lineSoft;
-          context.globalAlpha = 0.55 * primordialDetailStripOpacity;
-          context.strokeRect(
-            segment.x0 + 0.5,
-            stripTopY + 0.5,
-            Math.max(segmentWidth - 1, 0),
-            Math.max(EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX - 1, 0),
-          );
-          context.restore();
-
-          context.save();
-          context.font = "8px var(--font-sans)";
-          const labelWidth = context.measureText(labelText).width;
-          context.restore();
-
-          if (labelWidth + 6 <= segmentWidth) {
-            context.save();
-            context.globalAlpha = 0.82 * primordialDetailStripOpacity;
-            context.font = "8px var(--font-sans)";
-            context.fillStyle = labelColor;
-            context.textAlign = "center";
-            context.textBaseline = "bottom";
-            context.fillText(
-              labelText,
-              segment.x0 + segmentWidth / 2,
-              stripLabelBaselineY,
-            );
-            context.restore();
-          }
-
-          if (primordialDetailStripOpacity >= 0.35) {
-            hoverRegions.push({
-              id: `era:detail-strip:${segment.era.id}`,
-              left: segment.x0,
-              right: segment.x1,
-              top: stripPanelTop,
-              bottom: stripBottomY + 4,
-              anchorX: segment.x0 + segmentWidth / 2,
-              anchorY: stripTopY - 2,
-              anchorMode: "fixed",
-              placement: "above",
-              tooltip: getEraTooltipContent(segment.era),
-            });
-          }
-        }
-      }
-      markPerf("eraMs");
-
-      if (animatedOverlayBands.length > 0) {
-        for (const overlayState of animatedOverlayBands) {
-          const overlay = overlayState.overlay;
-          const bandWidth = overlay.renderWidth;
-          const isVisibleOverlay = visibleOverlayIds.has(overlay.band.id);
-          const canExpandParent = canExpandOverlayParent(
-            bandWidth,
-            overlay.band.children?.length ?? 0,
-          );
-          const expandedShift = isVisibleOverlay
-            ? (resolvedOverlayLayout.yById.get(overlay.band.id) ??
-                getOverlayLaneY(layout, overlay.laneIndex)) -
-              getOverlayLaneY(layout, overlay.laneIndex)
-            : 0;
-          const motionOffset =
-            overlayState.targetOpacity > overlayState.currentOpacity
-              ? (1 - overlayState.currentOpacity) * OVERLAY_BAND_ENTER_SLIDE_PX
-              : -(1 - overlayState.currentOpacity) * OVERLAY_BAND_EXIT_SLIDE_PX;
-          const y = overlayState.currentY + expandedShift + motionOffset;
-
-          if (isVisibleOverlay && canExpandParent) {
-            overlayInteractionRegions.push({
-              id: overlay.band.id,
-              left: overlay.renderX,
-              right: overlay.renderX + bandWidth,
-              top: y - 4,
-              bottom: y + OVERLAY_LANE_HEIGHT + 4,
-              role: "parent",
-            });
-          }
-
-          pushCanvasOcclusionRect(overlayOcclusionRects, {
-            left: overlay.renderX,
-            right: overlay.renderX + bandWidth,
-            top: y,
-            bottom: y + OVERLAY_LANE_HEIGHT,
-          });
-
-          context.save();
-          const overlayBandOpacity = OVERLAY_BAND_ALPHA;
-          const overlayLabelPaint = getOverlayLabelPaint(
-            overlay.band.color,
-            overlayBandOpacity,
-            labelColor,
-            paper,
-          );
-
-          drawPaperOverlayBand({
-            context,
-            x: overlay.renderX,
-            y,
-            width: bandWidth,
-            height: OVERLAY_LANE_HEIGHT,
-            bandColor: overlay.band.color,
-            alpha:
-              overlayBandOpacity *
-              overlay.renderAlphaMultiplier *
-              overlayState.currentOpacity,
-            borderStyle: lineSoft,
-            drawBorder: !overlay.isHairline,
-          });
-
-          const iconLayout = resolveOverlayGroupIconLayout({
-            groupId: overlay.band.groupId,
-            bandLeft: overlay.renderX,
-            bandTop: y,
-            bandWidth,
-            bandHeight: OVERLAY_LANE_HEIGHT,
-          });
-          const labelInsets = resolveOverlayBandLabelInsets({
-            iconReservedWidth: iconLayout?.reservedWidth ?? 0,
-            hasDisclosure: isVisibleOverlay && canExpandParent,
-          });
-
-          if (iconLayout) {
-            drawOverlayGroupIcon({
-              context,
-              layout: iconLayout,
-              strokeStyle: overlayLabelPaint.fillStyle,
-              alpha:
-                OVERLAY_GROUP_ICON_PARENT_ALPHA * overlayState.currentOpacity,
-            });
-          }
-
-          const fullLabel = overlay.band.label;
-          const shortLabel = overlay.band.shortLabel ?? fullLabel;
-          drawAnimatedOverlayLabel({
-            key: `overlay:${overlay.band.id}`,
-            fullLabel,
-            shortLabel,
-            renderX: overlay.renderX,
-            renderWidth: bandWidth,
-            labelLeftInset: labelInsets.left,
-            labelRightInset: labelInsets.right,
-            y,
-            fillStyle: overlayLabelPaint.fillStyle,
-            alpha: 0.82 * overlayState.currentOpacity,
-            hoverId: isVisibleOverlay ? overlay.band.id : undefined,
-            tooltip: isVisibleOverlay
-              ? getOverlayTooltipContent(overlay.band)
-              : undefined,
-          });
-
-          if (isVisibleOverlay && canExpandParent) {
-            const indicatorOpacity = clamp01((bandWidth - 26) / 18);
-
-            if (indicatorOpacity > 0.01) {
-              const indicatorCenterX = overlay.renderX + bandWidth - 10;
-              const indicatorCenterY = y + OVERLAY_LANE_HEIGHT / 2;
-              const indicatorProgress =
-                expandedOverlayProgressByIdRef.current.get(overlay.band.id) ??
-                0;
-
-              drawAnimatedOverlayDisclosureIndicator({
-                centerX: indicatorCenterX,
-                centerY: indicatorCenterY,
-                strokeStyle: overlayLabelPaint.fillStyle,
-                alpha: 0.74 * indicatorOpacity,
-                progress: indicatorProgress,
-              });
-            }
-          }
-
-          context.restore();
-        }
-      }
-
-      for (const {
-        detail: expandedOverlayDetail,
-        progress: expandedOverlayProgress,
-        animatedHeight: expandedOverlayAnimatedHeight,
-      } of expandedOverlayExpansionStates) {
-        if (expandedOverlayAnimatedHeight <= 0.5) {
-          continue;
-        }
-
-        const panelHeight = expandedOverlayAnimatedHeight;
-        const parentY =
-          resolvedOverlayLayout.yById.get(
-            expandedOverlayDetail.parent.band.id,
-          ) ?? getOverlayLaneY(layout, expandedOverlayDetail.parent.laneIndex);
-        const { panelTop } = getExpandedOverlayPanelBounds(
-          parentY,
-          panelHeight,
-          OVERLAY_LANE_HEIGHT,
-        );
-        const panelLeft = expandedOverlayDetail.parent.renderX;
-        const panelRight = panelLeft + expandedOverlayDetail.panelWidth;
-        const panelInnerLeft = panelLeft;
-        const panelInnerRight = panelRight;
-        const parentCenterX = panelLeft + expandedOverlayDetail.panelWidth / 2;
-        const parentColor = parseColor(
-          expandedOverlayDetail.parent.band.color,
-        ) ?? {
-          r: 180,
-          g: 120,
-          b: 70,
-          a: 1,
-        };
-        const connectorStroke = toCssColor(
-          withAlpha(parentColor, EXPANDED_OVERLAY_CONNECTOR_ALPHA),
-        );
-        const childBorder = toCssColor(
-          withAlpha(parentColor, EXPANDED_OVERLAY_CHILD_BORDER_ALPHA),
-        );
-        const connectorGeometry = resolveExpandedOverlayConnectorGeometry(
-          expandedOverlayDetail.children,
-          panelLeft,
-          panelRight,
-          parentCenterX,
-          parentY + OVERLAY_LANE_HEIGHT,
-          panelTop,
-        );
-        const chromeStemReveal = getExpandedOverlayChromeStemRevealProgress(
-          expandedOverlayProgress,
-        );
-        const chromeRailReveal = getExpandedOverlayChromeRailRevealProgress(
-          expandedOverlayProgress,
-        );
-        const revealedStemBottom =
-          connectorGeometry.stemTop +
-          (connectorGeometry.stemBottom - connectorGeometry.stemTop) *
-            chromeStemReveal;
-        const revealedRailLeft =
-          connectorGeometry.stemX +
-          (connectorGeometry.railLeft - connectorGeometry.stemX) *
-            chromeRailReveal;
-        const revealedRailRight =
-          connectorGeometry.stemX +
-          (connectorGeometry.railRight - connectorGeometry.stemX) *
-            chromeRailReveal;
-
-        overlayInteractionRegions.push({
-          id: expandedOverlayDetail.parent.band.id,
-          left: connectorGeometry.railLeft - 6,
-          right: connectorGeometry.railRight + 6,
-          top: parentY + OVERLAY_LANE_HEIGHT - 4,
-          bottom: panelTop + EXPANDED_OVERLAY_TOP_PADDING + 6,
-          role: "panel",
-          parentId: expandedOverlayDetail.parent.band.id,
-        });
-
-        context.save();
-        clipCanvasOutsideOcclusionRects(
-          context,
-          width,
-          height,
-          overlayOcclusionRects,
-        );
-        context.strokeStyle = connectorStroke;
-        context.lineWidth = EXPANDED_OVERLAY_CONNECTOR_LINE_WIDTH;
-        context.lineCap = "round";
-
-        if (chromeStemReveal > 0.01) {
-          context.globalAlpha = chromeStemReveal;
-          context.beginPath();
-          context.moveTo(connectorGeometry.stemX, connectorGeometry.stemTop);
-          context.lineTo(connectorGeometry.stemX, revealedStemBottom);
-          context.stroke();
-        }
-
-        if (chromeRailReveal > 0.01) {
-          context.globalAlpha = chromeRailReveal;
-          context.beginPath();
-          context.moveTo(revealedRailLeft, connectorGeometry.railY);
-          context.lineTo(revealedRailRight, connectorGeometry.railY);
-          context.stroke();
-        }
-
-        context.restore();
-
-        for (const child of expandedOverlayDetail.children) {
-          const clippedX0 = Math.max(child.x0, panelInnerLeft);
-          const clippedX1 = Math.min(child.x1, panelInnerRight);
-          const clippedWidth = Math.max(clippedX1 - clippedX0, 0);
-
-          if (clippedWidth < MIN_VISIBLE_OVERLAY_CHILD_WIDTH) {
-            continue;
-          }
-
-          const renderWidth = clippedWidth;
-          const renderX = clippedX0;
-          const childY =
-            panelTop +
-            EXPANDED_OVERLAY_TOP_PADDING +
-            child.laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP);
-          const childReveal = getExpandedOverlayChildRevealProgress(
-            expandedOverlayProgress,
-            child.laneIndex,
-          );
-
-          if (childReveal <= 0.01) {
-            continue;
-          }
-
-          const childLabelReveal = getExpandedOverlayLabelRevealProgress(
-            expandedOverlayProgress,
-            child.laneIndex,
-          );
-          const childRenderY =
-            childY - (1 - childReveal) * EXPANDED_OVERLAY_CHILD_SLIDE_PX;
-          const childConnectorX = renderX + renderWidth / 2;
-          const childBandOpacity = OVERLAY_BAND_ALPHA;
-          const childLabelPaint = getOverlayLabelPaint(
-            child.band.color,
-            childBandOpacity,
-            labelColor,
-            paper,
-          );
-
-          pushCanvasOcclusionRect(overlayOcclusionRects, {
-            left: renderX,
-            right: renderX + renderWidth,
-            top: childRenderY,
-            bottom: childRenderY + OVERLAY_LANE_HEIGHT,
-          });
-
-          if (childReveal >= EXPANDED_OVERLAY_INTERACTION_REVEAL_THRESHOLD) {
-            overlayInteractionRegions.push({
-              id: child.band.id,
-              left: renderX,
-              right: renderX + renderWidth,
-              top: childRenderY - 3,
-              bottom: childRenderY + OVERLAY_LANE_HEIGHT + 3,
-              role: "child",
-              parentId: expandedOverlayDetail.parent.band.id,
-            });
-          }
-
-          context.save();
-          clipCanvasOutsideOcclusionRects(
-            context,
-            width,
-            height,
-            overlayOcclusionRects,
-          );
-          context.strokeStyle = connectorStroke;
-          context.lineWidth = 1;
-          context.lineCap = "round";
-          context.globalAlpha = childReveal;
-          context.beginPath();
-          context.moveTo(childConnectorX, connectorGeometry.railY);
-          context.lineTo(
-            childConnectorX,
-            connectorGeometry.railY +
-              (childRenderY - connectorGeometry.railY) * childReveal,
-          );
-          context.stroke();
-          context.restore();
-
-          context.save();
-          drawPaperOverlayBand({
-            context,
-            x: renderX,
-            y: childRenderY,
-            width: renderWidth,
-            height: OVERLAY_LANE_HEIGHT,
-            bandColor: child.band.color,
-            alpha: childBandOpacity * childReveal,
-            borderStyle: childBorder,
-            drawBorder: true,
-          });
-
-          const childIconLayout = resolveOverlayGroupIconLayout({
-            groupId: child.band.groupId,
-            bandLeft: renderX,
-            bandTop: childRenderY,
-            bandWidth: renderWidth,
-            bandHeight: OVERLAY_LANE_HEIGHT,
-          });
-          const childLabelInsets = resolveOverlayBandLabelInsets({
-            iconReservedWidth: childIconLayout?.reservedWidth ?? 0,
-          });
-
-          if (childIconLayout) {
-            drawOverlayGroupIcon({
-              context,
-              layout: childIconLayout,
-              strokeStyle: childLabelPaint.fillStyle,
-              alpha: OVERLAY_GROUP_ICON_CHILD_ALPHA * childReveal,
-            });
-          }
-
-          const fullLabel = child.band.label;
-          const shortLabel = child.band.shortLabel ?? fullLabel;
-
-          if (childLabelReveal > 0.01) {
-            drawAnimatedOverlayLabel({
-              key: `overlay:${child.band.id}`,
-              fullLabel,
-              shortLabel,
-              renderX,
-              renderWidth,
-              labelLeftInset: childLabelInsets.left,
-              labelRightInset: childLabelInsets.right,
-              y: childRenderY,
-              fillStyle: childLabelPaint.fillStyle,
-              alpha: 0.8 * childReveal * childLabelReveal,
-              hoverId: child.band.id,
-              tooltip: getOverlayTooltipContent(child.band),
-            });
-          }
-
-          context.restore();
-        }
-      }
-
-      markPerf("overlayMs");
-
-      {
-        const rootLabel = breadcrumbChain[0]?.name ?? sceneActiveEra.name;
-        const trailLabel = breadcrumbChain
-          .slice(1)
-          .map((era) => era.name)
-          .join(" • ");
-        const trailText = trailLabel ? ` • ${trailLabel}` : "";
-        const breadcrumbFont =
-          breadcrumbChain.length > 1
-            ? "600 14px var(--font-sans)"
-            : "500 13px var(--font-sans)";
-        context.save();
-        context.font = breadcrumbFont;
-        context.fillStyle = labelColor;
-        context.textAlign = "left";
-        context.textBaseline = "top";
-        const rootWidth = context.measureText(rootLabel).width;
-        const trailWidth = trailText ? context.measureText(trailText).width : 0;
-        const startX = sceneWidth / 2 - (rootWidth + trailWidth) / 2;
-
-        context.globalAlpha = breadcrumbChain.length > 1 ? 0.9 : 0.76;
-        context.fillText(rootLabel, startX, layout.breadcrumbY);
-
-        if (trailText) {
-          context.globalAlpha = 0.8;
-          context.fillText(trailText, startX + rootWidth, layout.breadcrumbY);
-        }
-
-        context.restore();
-      }
-
-      context.strokeStyle = line;
-      context.lineWidth = 1.5;
-      context.beginPath();
-      context.moveTo(pad, axisY);
-      context.lineTo(sceneWidth - pad, axisY);
-      context.stroke();
-
-      const fromX = (px: number) =>
-        screenToWorldPrecise(px - pad, sceneViewport, innerWidth);
-      const edgeLeftPreciseYear = fromX(pad);
-      const edgeRightPreciseYear = fromX(sceneWidth - pad);
-      const edgeLeftYear = toApproximateTimelineYear(edgeLeftPreciseYear);
-      const edgeRightYear = toApproximateTimelineYear(edgeRightPreciseYear);
-      const edgeLeftSnapToleranceYears = Math.max(
-        Math.abs(
-          subtractPreciseTimelineYears(
-            fromX(pad + EDGE_AXIS_LABEL_SNAP_TOLERANCE_PX),
-            edgeLeftPreciseYear,
-          ),
-        ),
-        1e-18,
-      );
-      const edgeLeftX = pad;
-      const edgeRightX = sceneWidth - pad;
-      const edgeLabelStep = (() => {
-        const preferredStep = getPreferredAxisEdgeLabelStep(
-          resolvedAxisTickStates,
-        );
-
-        if (preferredStep !== undefined) {
-          return preferredStep;
-        }
-
-        const visibleSpan = Math.max(
-          Math.abs(
-            subtractPreciseTimelineYears(
-              edgeRightPreciseYear,
-              edgeLeftPreciseYear,
-            ),
-          ),
-          1e-18,
-        );
-        const approximateMajorCount = Math.max(2, Math.floor(innerWidth / 280));
-
-        return Math.max(visibleSpan / approximateMajorCount, 1e-18);
-      })();
-      const fineGrainedAxisMode =
-        edgeLabelStep < 1
-          ? (() => {
-              const dominantReference = getDominantTimelineDateReference(
-                edgeLeftPreciseYear,
-                edgeRightPreciseYear,
-              );
-
-              if (dominantReference !== null) {
-                return dominantReference === "elapsed" ? "elapsed" : "calendar";
-              }
-
-              return null;
-            })()
-          : null;
-      const visibleSpan = Math.max(
-        Math.abs(
-          subtractPreciseTimelineYears(
-            edgeRightPreciseYear,
-            edgeLeftPreciseYear,
-          ),
-        ),
-        1e-18,
-      );
-      const earlyUniverseOverlapStart = Math.max(
-        edgeLeftYear,
-        EARLY_UNIVERSE_START_YEAR,
-      );
-      const earlyUniverseOverlapEnd = Math.min(
-        edgeRightYear,
-        EARLY_UNIVERSE_END_YEAR,
-      );
-      const earlyUniverseOverlap = Math.max(
-        0,
-        earlyUniverseOverlapEnd - earlyUniverseOverlapStart,
-      );
-      const startsAtBigBang =
-        comparePreciseTimelineYears(
-          edgeLeftPreciseYear,
-          splitTimelineYear(TIMELINE_MIN_YEAR),
-        ) === 0;
-      const viewportFullyInEarlyUniverse =
-        edgeLeftPreciseYear.wholeYear >=
-          Math.floor(EARLY_UNIVERSE_START_YEAR) &&
-        edgeRightPreciseYear.wholeYear <= Math.ceil(EARLY_UNIVERSE_END_YEAR);
-      const isFullyZoomedOut =
-        sceneViewport.zoom <= getMinZoomForWidth(innerWidth) + 0.001;
-      const useBigBangElapsedLabels =
-        !isFullyZoomedOut &&
-        (startsAtBigBang ||
-          viewportFullyInEarlyUniverse ||
-          earlyUniverseOverlap / visibleSpan >= 0.75);
-      const [debugVisibleStart, debugVisibleEnd] = getVisibleRangePrecise(
-        sceneViewport,
+      const cx: CanvasDrawContext = {
+        context,
+        sceneWidth,
+        sceneHeight,
+        pad,
         innerWidth,
-      );
-      const debugEarlyUniverseOverlapStart = Math.max(
-        toApproximateTimelineYear(debugVisibleStart),
-        EARLY_UNIVERSE_START_YEAR,
-      );
-      const debugEarlyUniverseOverlapEnd = Math.min(
-        toApproximateTimelineYear(debugVisibleEnd),
-        EARLY_UNIVERSE_END_YEAR,
-      );
-      const debugFloatOverlapRatio =
-        Math.max(
-          0,
-          debugEarlyUniverseOverlapEnd - debugEarlyUniverseOverlapStart,
-        ) / visibleSpan;
-      const visiblePrimordialLayerIds = visibleEraLayers
-        .filter((layer) => EARLY_UNIVERSE_BAND_EXPANSION_IDS.has(layer.era.id))
-        .map((layer) => layer.era.id);
-      const primordialSpanDebug = EARLY_UNIVERSE_CHILD_ERA_ORDER.map(
-        (eraId) => {
-          const span = eraScreenSpanById.get(eraId);
-
-          return {
-            id: eraId,
-            width: span ? Number((span.x1 - span.x0).toFixed(2)) : null,
-            expanded: span?.usesVisualExpansion === true,
-          };
-        },
-      );
-      const primordialDetailStripDebug = primordialDetailStripSegments.map(
-        (segment) => ({
-          id: segment.era.id,
-          width: Number((segment.x1 - segment.x0).toFixed(2)),
-        }),
-      );
-      const renderedPrimordialDetailStripDebug =
-        renderedPrimordialDetailStripSegments.map((segment) => ({
-          id: segment.era.id,
-          width: Number((segment.x1 - segment.x0).toFixed(2)),
-        }));
-      const primordialDebugActive =
-        allowPrimordialSyntheticDetail ||
-        viewportFullyInEarlyUniverse ||
-        sceneViewport.zoom >= sceneMaxZoom - 0.01;
-
-      if (primordialDebugActive) {
-        const debugSnapshot = {
-          activeEraId: sceneActiveEra.id,
-          breadcrumbIds: breadcrumbChain.map((era) => era.id),
-          zoom: Number(sceneViewport.zoom.toFixed(6)),
-          sceneMaxZoom: Number(sceneMaxZoom.toFixed(6)),
-          zoomDeltaToMax: Number(
-            (sceneMaxZoom - sceneViewport.zoom).toFixed(6),
-          ),
-          allowPrimordialSyntheticDetail,
-          startsAtBigBang,
-          viewportFullyInEarlyUniverse,
-          useBigBangElapsedLabels,
-          edgeLabelStep,
-          fineGrainedAxisMode,
-          visibleSpanYears: Number(visibleSpan.toExponential(6)),
-          floatOverlapRatio: Number(debugFloatOverlapRatio.toFixed(6)),
-          visibleStart: {
-            wholeYear: debugVisibleStart.wholeYear,
-            fraction: Number(debugVisibleStart.fraction.toFixed(12)),
-          },
-          visibleEnd: {
-            wholeYear: debugVisibleEnd.wholeYear,
-            fraction: Number(debugVisibleEnd.fraction.toFixed(12)),
-          },
-          visiblePrimordialLayerIds,
-          primordialSpanDebug,
-          primordialDetailStripDebug,
-          renderedPrimordialDetailStripDebug,
-          primordialDetailStripOpacity: Number(
-            primordialDetailStripOpacity.toFixed(3),
-          ),
-          axisTickSteps: [
-            ...new Set(resolvedAxisTickStates.map((tick) => tick.step)),
-          ]
-            .slice(0, 8)
-            .map((step) => Number(step.toExponential(6))),
-        };
-        const nextSignature = JSON.stringify(debugSnapshot);
-
-        if (primordialDebugSignatureRef.current !== nextSignature) {
-          primordialDebugSignatureRef.current = nextSignature;
-          console.info("[timeline primordial debug]", debugSnapshot);
-        }
-      } else if (primordialDebugSignatureRef.current !== null) {
-        primordialDebugSignatureRef.current = null;
-      }
-      const useSubYearAxis = fineGrainedAxisMode !== null;
-      const useCalendarSubYearAxis = fineGrainedAxisMode === "calendar";
-      const useElapsedSubYearAxis = fineGrainedAxisMode === "elapsed";
-      const formatAxisLabel = (
-        year: number | PreciseTimelineYear,
-        step: number,
-      ) =>
-        useBigBangElapsedLabels
-          ? formatTimelineElapsedAxisLabel(year, step, "after-big-bang")
-          : formatTimelineYear(year, step, { mode: "axis" });
-      const formatElapsedAxisLabel = (
-        year: number | PreciseTimelineYear,
-        step: number,
-        options?: {
-          snapToReferenceStartWithinYears?: number;
-        },
-      ) =>
-        formatTimelineElapsedAxisLabelLines(
-          year,
-          step,
-          useBigBangElapsedLabels ? "after-big-bang" : "ago",
-          options,
-        );
-
-      if (resolvedAxisTickStates.length > 0) {
-        context.save();
-        context.lineWidth = 1;
-        const majorExtraAbove = axisY - 10 - layout.majorTickTop;
-        const majorExtraBelow = axisY + 28 - (axisY + 10);
-
-        for (const tick of resolvedAxisTickStates) {
-          const x =
-            pad +
-            (tick.wholeYear !== undefined && tick.yearFraction !== undefined
-              ? worldPreciseToScreen(
-                  {
-                    wholeYear: tick.wholeYear,
-                    fraction: tick.yearFraction,
-                  },
-                  sceneViewport,
-                  innerWidth,
-                )
-              : worldToScreen(tick.year, sceneViewport, innerWidth));
-
-          if (x < pad - 32 || x > sceneWidth - pad + 32) continue;
-
-          const edgeFade = Math.min(
-            Math.max(0, (x - pad) / 60),
-            Math.max(0, (sceneWidth - pad - x) / 60),
-            1,
-          );
-
-          if (edgeFade <= 0.01) {
-            continue;
-          }
-
-          const distToMin = Math.abs(x - edgeLeftX);
-          const distToMax = Math.abs(x - edgeRightX);
-          const distToBound = Math.min(distToMin, distToMax);
-          const boundaryFade =
-            distToBound < 40 ? Math.max(0, (distToBound - 4) / 36) : 1;
-          const scaleProgress = getTickScaleProgress(tick.pixelsPerStep);
-          const emphasisProgress = Math.max(
-            tick.majorProgress * 0.92,
-            tick.labelOpacity * 0.7,
-          );
-          const baseFade =
-            edgeFade * (1 - emphasisProgress + emphasisProgress * boundaryFade);
-          const overlayFade = edgeFade * boundaryFade;
-          const baseMinorExtent = 2.4 + 10.4 * Math.pow(scaleProgress, 0.88);
-          const minorExtent =
-            baseMinorExtent * (0.42 + tick.visibleProgress * 0.58);
-          const top = axisY - minorExtent - majorExtraAbove * emphasisProgress;
-          const bottom =
-            axisY + minorExtent + majorExtraBelow * emphasisProgress;
-
-          if (baseFade > 0.01) {
-            context.strokeStyle = lineSoft;
-            const minorOpacity =
-              0.16 +
-              0.24 * Math.pow(scaleProgress, 0.82) +
-              tick.visibleProgress * 0.08;
-            context.globalAlpha =
-              (minorOpacity + emphasisProgress * 0.08) * baseFade;
-            context.beginPath();
-            context.moveTo(x, top);
-            context.lineTo(x, bottom);
-            context.stroke();
-          }
-
-          if (emphasisProgress > 0.01 && overlayFade > 0.01) {
-            context.strokeStyle = line;
-            context.globalAlpha =
-              (0.3 + tick.labelOpacity * 0.24) * emphasisProgress * overlayFade;
-            context.beginPath();
-            context.moveTo(x, top);
-            context.lineTo(x, bottom);
-            context.stroke();
-          }
-        }
-
-        context.restore();
-      }
-
-      const edgeTickData = [
-        { year: edgeLeftPreciseYear, x: pad, align: "left" as const },
-        {
-          year: edgeRightPreciseYear,
-          x: sceneWidth - pad,
-          align: "right" as const,
-        },
-      ];
-
-      for (const { year, x, align } of edgeTickData) {
-        context.save();
-        context.globalAlpha = 1;
-        context.strokeStyle = line;
-        context.lineWidth = 1.5;
-        context.beginPath();
-        context.moveTo(x, layout.majorTickTop);
-        context.lineTo(x, axisY + 28);
-        context.stroke();
-
-        context.fillStyle = labelColor;
-        context.textAlign = align;
-        context.textBaseline = "top";
-
-        if (useCalendarSubYearAxis) {
-          const edgeLabel = getCalendarEdgeAxisLabelText(year, edgeLabelStep);
-
-          context.globalAlpha = 0.9;
-          context.font = SUBYEAR_PRIMARY_FONT;
-          context.fillText(edgeLabel.text, x, layout.dateLabelY);
-          context.globalAlpha = 0.72;
-          context.font = SUBYEAR_SECONDARY_FONT;
-          context.fillText(edgeLabel.secondaryText, x, layout.yearLabelY);
-        } else if (useElapsedSubYearAxis) {
-          const edgeLabel = formatElapsedAxisLabel(
-            year,
-            edgeLabelStep,
-            x === pad
-              ? {
-                  snapToReferenceStartWithinYears: edgeLeftSnapToleranceYears,
-                }
-              : undefined,
-          );
-
-          if (!edgeLabel) {
-            context.restore();
-            continue;
-          }
-
-          if (edgeLabel.secondaryText) {
-            context.globalAlpha = 0.9;
-            context.font = SUBYEAR_PRIMARY_FONT;
-            context.fillText(edgeLabel.primaryText, x, layout.dateLabelY);
-            context.globalAlpha = 0.72;
-            context.font = SUBYEAR_SECONDARY_FONT;
-            context.fillText(edgeLabel.secondaryText, x, layout.yearLabelY);
-          } else {
-            context.globalAlpha = 0.86;
-            context.font = SUBYEAR_PRIMARY_FONT;
-            context.fillText(edgeLabel.primaryText, x, layout.yearLabelY);
-          }
-        } else {
-          context.globalAlpha = 1;
-          context.font = "11px var(--font-sans)";
-          context.fillText(
-            formatAxisLabel(year, edgeLabelStep),
-            x,
-            layout.yearLabelY,
-          );
-        }
-
-        context.restore();
-      }
-
-      const edgeLabelLeftX = pad;
-      const edgeLabelRightX = sceneWidth - pad;
-      context.fillStyle = labelColor;
-      context.textAlign = "center";
-      context.textBaseline = "top";
-
-      const axisLabelCandidates: AxisLabelCandidate[] = [];
-      const yearBoundaryCandidates: AxisLabelCandidate[] = [];
-
-      for (const tick of resolvedAxisTickStates) {
-        if (tick.labelOpacity <= 0.01) {
-          continue;
-        }
-
-        const tickYear = resolveAxisTickYear(tick);
-
-        const resolvedX =
-          pad +
-          (tick.wholeYear !== undefined && tick.yearFraction !== undefined
-            ? worldPreciseToScreen(
-                {
-                  wholeYear: tick.wholeYear,
-                  fraction: tick.yearFraction,
-                },
-                sceneViewport,
-                innerWidth,
-              )
-            : worldToScreen(tick.year, sceneViewport, innerWidth));
-
-        if (resolvedX < pad - 80 || resolvedX > sceneWidth - pad + 80) continue;
-
-        if (useSubYearAxis && tick.labelStep >= 1) {
-          continue;
-        }
-
-        const calendarLabel = useCalendarSubYearAxis
-          ? getCalendarAxisLabelText(tickYear, tick.labelStep)
-          : null;
-        const elapsedLabel = useElapsedSubYearAxis
-          ? formatElapsedAxisLabel(tickYear, tick.labelStep)
-          : null;
-        const labelText = calendarLabel
-          ? calendarLabel.text
-          : (elapsedLabel?.primaryText ??
-            formatAxisLabel(tickYear, tick.labelStep));
-        const secondaryText =
-          calendarLabel?.secondaryText ?? elapsedLabel?.secondaryText;
-
-        if (!labelText) {
-          continue;
-        }
-
-        const labelWidth = secondaryText
-          ? measureAxisLabelWidth(
-              context,
-              labelText,
-              SUBYEAR_PRIMARY_FONT,
-              secondaryText,
-              SUBYEAR_SECONDARY_FONT,
-            )
-          : (() => {
-              context.font = useCalendarSubYearAxis
-                ? SUBYEAR_PRIMARY_FONT
-                : "13px var(--font-sans)";
-
-              return context.measureText(labelText).width;
-            })();
-
-        const distToMin = Math.abs(resolvedX - edgeLabelLeftX);
-        const distToMax = Math.abs(resolvedX - edgeLabelRightX);
-        const distToBoundary = Math.min(distToMin, distToMax);
-        const boundaryFade =
-          distToBoundary < 100 ? Math.max(0, (distToBoundary - 20) / 80) : 1;
-        const labelEdgeFade = Math.min(
-          Math.max(0, (resolvedX - pad) / 60),
-          Math.max(0, (sceneWidth - pad - resolvedX) / 60),
-          1,
-        );
-        const labelAlpha = tick.labelOpacity * boundaryFade * labelEdgeFade;
-
-        if (labelAlpha > 0.01) {
-          axisLabelCandidates.push({
-            x: resolvedX,
-            text: labelText,
-            secondaryText,
-            width: labelWidth,
-            alpha: labelAlpha,
-            step: tick.labelStep,
-            pixelsPerStep: tick.pixelsPerStep,
-          });
-        }
-      }
-
-      const {
-        allowedSteps: allowedLabelSteps,
-        primaryStep: primaryAllowedStep,
-      } = getAllowedAxisLabelSteps(axisLabelCandidates, useSubYearAxis, {
-        preferredStep: preferredAxisLabelStepRef.current,
-      });
-
-      const primaryEdgeLabelEntries = [
-        {
-          x: pad,
-          ...(() => {
-            if (useCalendarSubYearAxis) {
-              return getCalendarEdgeAxisLabelText(
-                edgeLeftPreciseYear,
-                edgeLabelStep,
-              );
-            }
-
-            if (useElapsedSubYearAxis) {
-              const edgeLabel = formatElapsedAxisLabel(
-                edgeLeftPreciseYear,
-                edgeLabelStep,
-                {
-                  snapToReferenceStartWithinYears: edgeLeftSnapToleranceYears,
-                },
-              );
-
-              return {
-                text: edgeLabel?.primaryText ?? "",
-                secondaryText: edgeLabel?.secondaryText,
-              };
-            }
-
-            return {
-              text: formatAxisLabel(edgeLeftYear, edgeLabelStep),
-              secondaryText: undefined,
-            };
-          })(),
-          align: "left" as const,
-        },
-        {
-          x: sceneWidth - pad,
-          ...(() => {
-            if (useCalendarSubYearAxis) {
-              return getCalendarEdgeAxisLabelText(
-                edgeRightPreciseYear,
-                edgeLabelStep,
-              );
-            }
-
-            if (useElapsedSubYearAxis) {
-              const edgeLabel = formatElapsedAxisLabel(
-                edgeRightPreciseYear,
-                edgeLabelStep,
-              );
-
-              return {
-                text: edgeLabel?.primaryText ?? "",
-                secondaryText: edgeLabel?.secondaryText,
-              };
-            }
-
-            return {
-              text: formatAxisLabel(edgeRightYear, edgeLabelStep),
-              secondaryText: undefined,
-            };
-          })(),
-          align: "right" as const,
-        },
-      ];
-      const primaryOccupiedBounds: Array<{ left: number; right: number }> = [];
-
-      for (const edgeLabel of primaryEdgeLabelEntries) {
-        const labelWidth = edgeLabel.secondaryText
-          ? measureAxisLabelWidth(
-              context,
-              edgeLabel.text,
-              SUBYEAR_PRIMARY_FONT,
-              edgeLabel.secondaryText,
-              SUBYEAR_SECONDARY_FONT,
-            )
-          : (() => {
-              context.font = useCalendarSubYearAxis
-                ? SUBYEAR_PRIMARY_FONT
-                : "13px var(--font-sans)";
-
-              return context.measureText(edgeLabel.text).width;
-            })();
-        const left =
-          edgeLabel.align === "left"
-            ? edgeLabel.x - AXIS_LABEL_OCCUPIED_PADDING
-            : edgeLabel.x - labelWidth - AXIS_LABEL_OCCUPIED_PADDING;
-        const right =
-          edgeLabel.align === "left"
-            ? edgeLabel.x + labelWidth + AXIS_LABEL_OCCUPIED_PADDING
-            : edgeLabel.x + AXIS_LABEL_OCCUPIED_PADDING;
-
-        primaryOccupiedBounds.push({ left, right });
-      }
-
-      const resolvedAxisLabels = resolveAxisLabelCandidatesWithFallback(
-        axisLabelCandidates.filter(
-          (candidate) =>
-            allowedLabelSteps.size === 0 ||
-            allowedLabelSteps.has(candidate.step),
-        ),
-        primaryOccupiedBounds,
-        {
-          dedupeByTextOnly: useSubYearAxis,
-          relaxedSpacing: useSubYearAxis,
-          centerX: sceneWidth / 2,
-        },
-      );
-
-      preferredAxisLabelStepRef.current =
-        getPrimaryAxisLabelStepFromResolvedLabels(
-          resolvedAxisLabels,
-          primaryAllowedStep,
-        );
-
-      for (const label of resolvedAxisLabels.sort(
-        (left, right) => left.x - right.x,
-      )) {
-        context.save();
-        context.globalAlpha = label.alpha;
-
-        if (useCalendarSubYearAxis) {
-          context.font = SUBYEAR_PRIMARY_FONT;
-          context.fillText(label.text, label.x, layout.dateLabelY);
-
-          if (label.secondaryText) {
-            context.font = SUBYEAR_SECONDARY_FONT;
-            context.fillText(label.secondaryText, label.x, layout.yearLabelY);
-          }
-        } else if (useElapsedSubYearAxis) {
-          if (label.secondaryText) {
-            context.font = SUBYEAR_PRIMARY_FONT;
-            context.fillText(label.text, label.x, layout.dateLabelY);
-            context.font = SUBYEAR_SECONDARY_FONT;
-            context.fillText(label.secondaryText, label.x, layout.yearLabelY);
-          } else {
-            context.font = SUBYEAR_PRIMARY_FONT;
-            context.fillText(label.text, label.x, layout.yearLabelY);
-          }
-        } else {
-          context.font = "13px var(--font-sans)";
-          context.fillText(label.text, label.x, layout.yearLabelY);
-        }
-
-        context.restore();
-      }
-
-      if (useCalendarSubYearAxis && edgeLabelStep >= CALENDAR_DAY_STEP) {
-        context.font = "11px var(--font-sans)";
-
-        const firstVisibleYear = Math.ceil(edgeLeftYear);
-        const lastVisibleYear = Math.floor(edgeRightYear);
-
-        for (let year = firstVisibleYear; year <= lastVisibleYear; year += 1) {
-          if (year === 0) {
-            continue;
-          }
-
-          const x = toX(year);
-
-          if (x < pad - 80 || x > sceneWidth - pad + 80) {
-            continue;
-          }
-
-          const labelText = formatTimelineYear(year, 1);
-          const labelWidth = context.measureText(labelText).width;
-          const boundaryFade =
-            Math.min(
-              Math.max(0, (x - pad) / 60),
-              Math.max(0, (sceneWidth - pad - x) / 60),
-              1,
-            ) *
-            (Math.min(Math.abs(x - edgeLeftX), Math.abs(x - edgeRightX)) < 100
-              ? Math.max(
-                  0,
-                  (Math.min(Math.abs(x - edgeLeftX), Math.abs(x - edgeRightX)) -
-                    20) /
-                    80,
-                )
-              : 1);
-
-          if (boundaryFade <= 0.01) {
-            continue;
-          }
-
-          yearBoundaryCandidates.push({
-            x,
-            text: labelText,
-            width: labelWidth,
-            alpha: 0.7 * boundaryFade,
-            step: 1,
-            pixelsPerStep: Math.abs(toX(year === -1 ? 1 : year + 1) - x),
-          });
-        }
-
-        const yearEdgeLabelEntries = [
-          {
-            x: pad,
-            text: formatTimelineYear(edgeLeftYear, 1),
-            align: "left" as const,
-          },
-          {
-            x: sceneWidth - pad,
-            text: formatTimelineYear(edgeRightYear, 1),
-            align: "right" as const,
-          },
-        ];
-        const yearOccupiedBounds: Array<{ left: number; right: number }> = [];
-
-        for (const edgeLabel of yearEdgeLabelEntries) {
-          const labelWidth = context.measureText(edgeLabel.text).width;
-          const left =
-            edgeLabel.align === "left"
-              ? edgeLabel.x - AXIS_LABEL_OCCUPIED_PADDING
-              : edgeLabel.x - labelWidth - AXIS_LABEL_OCCUPIED_PADDING;
-          const right =
-            edgeLabel.align === "left"
-              ? edgeLabel.x + labelWidth + AXIS_LABEL_OCCUPIED_PADDING
-              : edgeLabel.x + AXIS_LABEL_OCCUPIED_PADDING;
-
-          yearOccupiedBounds.push({ left, right });
-        }
-
-        const resolvedYearLabels = resolveAxisLabelCandidates(
-          yearBoundaryCandidates,
-          yearOccupiedBounds,
-          { dedupeByTextOnly: true },
-        );
-
-        for (const label of resolvedYearLabels.sort(
-          (left, right) => left.x - right.x,
-        )) {
-          context.save();
-          context.globalAlpha = label.alpha;
-          context.font = "11px var(--font-sans)";
-          context.fillText(label.text, label.x, layout.yearLabelY);
-          context.restore();
-        }
-      }
-
-      markPerf("axisMs");
-
-      const visibleMarkerPositions = getVisibleMarkerPositions(
+        devicePixelRatio,
+        sceneViewport,
+        layout,
+        background,
+        paper,
+        line,
+        lineSoft,
+        labelColor,
+        drawNow,
+        sceneActiveEra,
+        sceneActiveChain,
+        sceneParentEra,
         sceneVisibleMarkers,
-        sceneWidth,
-        pad,
+        sceneResolvedOverlayBands,
+        visibleEraLayers,
+        paintOrderedEraLayers,
+        eraScreenSpanById,
+        breadcrumbChain,
+        breadcrumbChainIds,
+        visibleOverlayIds,
+        animatedOverlayBands,
+        animatedOverlayLaneCount,
+        resolvedOverlayLayout,
+        expandedOverlayExpansionStates,
+        resolvedAxisTickStates,
+        primordialDetailStripSegments,
+        renderedPrimordialDetailStripSegments,
+        primordialDetailStripOpacity,
+        allowPrimordialSyntheticDetail,
+        sceneMaxZoom,
+        overlayLabelAnimationRef,
+        overlayLabelAnimationInitializedRef,
+        markerPriorityBoostRef,
+        expandedOverlayProgressByIdRef,
+        hoverRegions: [],
+        overlayInteractionRegions: [],
+        overlayOcclusionRects: [],
+        activeOverlayLabelKeys: new Set(),
+        frameFlags: {
+          hasActiveOverlayLabelAnimation: false,
+          hasActivePrimordialDetailStripAnimation,
+        },
         toX,
-      );
-      const measureMarkerText = (
-        _marker: TimelineMarker,
-        { fullLabel, shortLabel, dateLabel }: MarkerTextMeasureInput,
-      ) => {
-        context.font = "12px var(--font-sans)";
-        const fullLabelWidth = context.measureText(fullLabel).width;
-        const shortLabelWidth =
-          shortLabel === fullLabel
-            ? fullLabelWidth
-            : context.measureText(shortLabel).width;
-        context.font = "10px var(--font-sans)";
-
-        return {
-          fullLabelWidth,
-          shortLabelWidth,
-          dateLabelWidth: context.measureText(dateLabel).width,
-        };
+        fromX,
+        markPerf,
+        isViewportInteractionActive,
+        preferredAxisLabelStepRef,
+        primordialDebugSignatureRef,
       };
-      const baseMarkerRenderStates = resolveMarkerRenderStates(
-        visibleMarkerPositions,
-        sceneWidth,
-        pad,
-        measureMarkerText,
-      );
-      const activeMarkerBoosts = [...markerPriorityBoostRef.current.entries()]
-        .filter(([, state]) => state.current > 0.001)
-        .sort((left, right) => right[1].current - left[1].current);
-      const resolvedMarkerStates = (() => {
-        if (activeMarkerBoosts.length === 0) {
-          return baseMarkerRenderStates;
-        }
 
-        const finalStatesById = new Map(
-          baseMarkerRenderStates.map((state) => [
-            state.marker.id,
-            { ...state },
-          ]),
-        );
-
-        for (const [boostedMarkerId, boostState] of activeMarkerBoosts) {
-          const boostedStates = resolveMarkerRenderStates(
-            visibleMarkerPositions,
-            sceneWidth,
-            pad,
-            measureMarkerText,
-            { highlightedMarkerId: boostedMarkerId },
-          );
-
-          for (const boostedState of boostedStates) {
-            const currentState = finalStatesById.get(boostedState.marker.id);
-
-            if (!currentState) {
-              continue;
-            }
-
-            currentState.labelOpacity +=
-              (boostedState.labelOpacity - currentState.labelOpacity) *
-              boostState.current;
-            currentState.stemProgress +=
-              (boostedState.stemProgress - currentState.stemProgress) *
-              boostState.current;
-            currentState.intrinsicLabelOpacity +=
-              (boostedState.intrinsicLabelOpacity -
-                currentState.intrinsicLabelOpacity) *
-              boostState.current;
-            currentState.revealProgress +=
-              (boostedState.revealProgress - currentState.revealProgress) *
-              boostState.current;
-            currentState.timingProgress +=
-              (boostedState.timingProgress - currentState.timingProgress) *
-              boostState.current;
-            currentState.dotProgress +=
-              (boostedState.dotProgress - currentState.dotProgress) *
-              boostState.current;
-          }
-        }
-
-        return baseMarkerRenderStates.map(
-          (state) => finalStatesById.get(state.marker.id) ?? state,
-        );
-      })();
-      for (const {
-        marker,
-        x,
-        dotProgress,
-        stemProgress,
-      } of resolvedMarkerStates) {
-        const markerDotColor = marker.color ?? line;
-        const stemStartY = axisY + 2;
-        const stemY =
-          stemStartY + (layout.markerStemBottom - stemStartY) * stemProgress;
-
-        context.save();
-        context.strokeStyle = line;
-        context.globalAlpha = 0.18 + stemProgress * 0.72;
-        context.lineWidth = 1.5;
-
-        if (stemProgress > 0.001) {
-          context.beginPath();
-          context.moveTo(x, stemStartY);
-          context.lineTo(x, stemY);
-          context.stroke();
-        }
-
-        const dotRadius = dotProgress > 0.01 ? 0.9 + 1.7 * dotProgress : 0;
-
-        if (dotRadius > 0.001) {
-          context.fillStyle = markerDotColor;
-          context.globalAlpha = 1;
-          context.beginPath();
-          context.arc(x, axisY, dotRadius, 0, Math.PI * 2);
-          context.fill();
-        }
-
-        context.restore();
-      }
-
-      for (const {
-        x,
-        label,
-        dateLabel,
-        labelOpacity,
-      } of resolvedMarkerStates) {
-        if (labelOpacity <= 0.01) {
-          continue;
-        }
-
-        context.save();
-        context.font = "12px var(--font-sans)";
-        context.fillStyle = labelColor;
-        context.globalAlpha = 0.78 * labelOpacity;
-        context.textAlign = "center";
-        context.textBaseline = "top";
-        context.fillText(label, x, layout.markerLabelY);
-        context.font = "10px var(--font-sans)";
-        context.globalAlpha = 0.62 * labelOpacity;
-        context.fillText(dateLabel, x, layout.markerDateY);
-        context.restore();
-      }
-
-      for (const state of resolvedMarkerStates) {
-        const markerHoverHalfWidth =
-          state.labelOpacity > 0.01
-            ? Math.max(14, Math.min(state.width * 0.22, 26))
-            : 12;
-        const markerHoverBottom =
-          state.labelOpacity > 0.01 ? layout.markerDateY + 20 : axisY + 18;
-
-        hoverRegions.push({
-          id: state.marker.id,
-          left: state.x - markerHoverHalfWidth,
-          right: state.x + markerHoverHalfWidth,
-          top: layout.majorTickTop - 10,
-          bottom: markerHoverBottom,
-          anchorX: state.x,
-          anchorY: axisY - 14,
-          anchorMode: "fixed",
-          placement: "above",
-          tooltip: getMarkerTooltipContent(state.marker),
-        });
-      }
-
+      drawBackground(cx);
+      drawEras(cx);
+      markPerf("eraMs");
+      drawOverlays(cx);
+      markPerf("overlayMs");
+      drawAxis(cx);
+      markPerf("axisMs");
+      const resolvedMarkerStates = drawMarkers(cx);
       markPerf("markerMs");
+      drawNowIndicator(cx);
 
-      const rawNowX = toX(TIMELINE_MAX_YEAR);
-      const nowX =
-        edgeRightYear === TIMELINE_MAX_YEAR ? sceneWidth - pad : rawNowX;
-
-      if (nowX >= pad - 20 && nowX <= sceneWidth - pad + 20) {
-        context.save();
-        context.strokeStyle = "rgba(180, 80, 40, 0.5)";
-        context.lineWidth = 2;
-        context.setLineDash([4, 4]);
-        context.beginPath();
-        context.moveTo(nowX, layout.nowTop);
-        context.lineTo(nowX, axisY + 40);
-        context.stroke();
-        context.setLineDash([]);
-        context.fillStyle = "rgba(180, 80, 40, 0.7)";
-        context.font = "10px var(--font-sans)";
-        context.textAlign = "center";
-        context.textBaseline = "bottom";
-        context.fillText("now", nowX, layout.nowTop - 4);
-        context.restore();
-      }
-
-      for (const key of [...overlayLabelAnimationStates.keys()]) {
-        if (!activeOverlayLabelKeys.has(key)) {
-          overlayLabelAnimationStates.delete(key);
+      for (const key of [...overlayLabelAnimationRef.current.keys()]) {
+        if (!cx.activeOverlayLabelKeys.has(key)) {
+          overlayLabelAnimationRef.current.delete(key);
         }
       }
 
       overlayLabelAnimationInitializedRef.current = true;
 
-      hoverRegionsRef.current = hoverRegions;
-      overlayInteractionRegionsRef.current = overlayInteractionRegions;
+      hoverRegionsRef.current = cx.hoverRegions;
+      overlayInteractionRegionsRef.current = cx.overlayInteractionRegions;
 
       if (lastPointerRef.current && !dragStateRef.current) {
         const currentTooltip = hoveredTooltipRef.current;
@@ -2646,8 +876,8 @@ export function TimelineCanvas({
       }
 
       if (
-        (hasActiveOverlayLabelAnimation ||
-          hasActivePrimordialDetailStripAnimation) &&
+        (cx.frameFlags.hasActiveOverlayLabelAnimation ||
+          cx.frameFlags.hasActivePrimordialDetailStripAnimation) &&
         !drawFrameRef.current
       ) {
         drawFrameRef.current = requestAnimationFrame(() => {

@@ -6,14 +6,7 @@ import {
   AXIS_TICK_LABEL_FADE_IN_SMOOTHING_MS,
   AXIS_TICK_LABEL_FADE_OUT_SMOOTHING_MS,
 } from "../lib/rendering/canvas/constants";
-
-export type AnimatedAxisTickState = AxisTickRenderState & {
-  key: string;
-  targetVisibleProgress: number;
-  targetMajorProgress: number;
-  targetLabelOpacity: number;
-  targetGenerationAlpha: number;
-};
+import type { AnimatedAxisTickState } from "../lib/rendering/animation/axisTickState";
 
 export function useAxisTickAnimation(
   axisTickTargets: AxisTickRenderState[],

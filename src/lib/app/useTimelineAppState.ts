@@ -44,7 +44,7 @@ import {
   worldToScreen,
   type TimelineViewport,
 } from "../core/viewport";
-import { isTimelineDecorationVisibleAtZoom } from "../rendering/overlayTracks";
+import { isTimelineDecorationVisibleAtZoom } from "../rendering/queries/visibility";
 import type {
   TimelineMarker,
   TimelineOverlayBand,
