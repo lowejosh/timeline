@@ -11,7 +11,7 @@ import type {
   TimelineSidebarSetState,
 } from "../../lib/app/sidebarModel";
 import type { TimelineSetId } from "../../lib/core/timelineTypes";
-import { OverlayGroupIconSvg } from "../timeline/OverlayGroupIconSvg";
+import { OverlayGroupIconSvg } from "../canvas/OverlayGroupIconSvg";
 
 type TimelineSidebarProps = {
   sets: TimelineSidebarSetState[];
@@ -168,7 +168,9 @@ export function TimelineSidebar({
   const setIds = useMemo(() => sets.map((set) => set.id), [sets]);
   const orderSignature = useMemo(() => setIds.join("|"), [setIds]);
 
-  dragStateRef.current = dragState;
+  useEffect(() => {
+    dragStateRef.current = dragState;
+  }, [dragState]);
 
   const measureSetLayout = () => {
     const tree = treeRef.current;

@@ -1,12 +1,13 @@
-import type {
-  TimelineOverlayBand,
-} from "../core/timelineTypes";
+import type { TimelineOverlayBand } from "../core/timelineTypes";
 import {
   getVisibleRange,
   worldToScreen,
   type TimelineViewport,
 } from "../core/viewport";
-import { isDecorationGroupEnabled, isTimelineDecorationVisibleAtZoom } from "./queries/visibility";
+import {
+  isDecorationGroupEnabled,
+  isTimelineDecorationVisibleAtZoom,
+} from "./queries/visibility";
 import { getAssignedOverlayLanes } from "./layout/laneAssignment";
 
 export type ResolvedTimelineOverlayBand = {

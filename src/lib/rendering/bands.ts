@@ -292,25 +292,25 @@ export function getDominantTimelineDateReference(
 
 function splitElapsedDuration(totalYears: number): TimelineElapsedDuration {
   let years = Math.max(0, Math.floor(totalYears + ELAPSED_ZERO_EPSILON));
-  let remainingYears = Math.max(totalYears - years, 0);
-  let daysFloat = remainingYears * AVERAGE_DAYS_PER_YEAR;
+  const remainingYears = Math.max(totalYears - years, 0);
+  const daysFloat = remainingYears * AVERAGE_DAYS_PER_YEAR;
   let days = Math.max(0, Math.floor(daysFloat + ELAPSED_ZERO_EPSILON));
-  let remainingDays = Math.max(daysFloat - days, 0);
-  let hoursFloat = remainingDays * HOURS_PER_DAY;
+  const remainingDays = Math.max(daysFloat - days, 0);
+  const hoursFloat = remainingDays * HOURS_PER_DAY;
   let hours = Math.max(0, Math.floor(hoursFloat + ELAPSED_ZERO_EPSILON));
-  let remainingHours = Math.max(hoursFloat - hours, 0);
-  let minutesFloat = remainingHours * MINUTES_PER_HOUR;
+  const remainingHours = Math.max(hoursFloat - hours, 0);
+  const minutesFloat = remainingHours * MINUTES_PER_HOUR;
   let minutes = Math.max(0, Math.floor(minutesFloat + ELAPSED_ZERO_EPSILON));
-  let remainingMinutes = Math.max(minutesFloat - minutes, 0);
-  let secondsFloat = remainingMinutes * SECONDS_PER_MINUTE;
+  const remainingMinutes = Math.max(minutesFloat - minutes, 0);
+  const secondsFloat = remainingMinutes * SECONDS_PER_MINUTE;
   let seconds = Math.max(0, Math.floor(secondsFloat + ELAPSED_ZERO_EPSILON));
-  let remainingSeconds = Math.max(secondsFloat - seconds, 0);
-  let millisecondsFloat = remainingSeconds * MILLISECONDS_PER_SECOND;
+  const remainingSeconds = Math.max(secondsFloat - seconds, 0);
+  const millisecondsFloat = remainingSeconds * MILLISECONDS_PER_SECOND;
   let milliseconds = Math.max(
     0,
     Math.floor(millisecondsFloat + ELAPSED_ZERO_EPSILON),
   );
-  let remainingMilliseconds = Math.max(millisecondsFloat - milliseconds, 0);
+  const remainingMilliseconds = Math.max(millisecondsFloat - milliseconds, 0);
   let microseconds = Math.max(
     0,
     Math.round(remainingMilliseconds * MICROSECONDS_PER_MILLISECOND),
@@ -358,25 +358,25 @@ function splitElapsedDuration(totalYears: number): TimelineElapsedDuration {
 }
 
 function splitElapsedFractionalYear(fractionalYears: number) {
-  let remainingYears = Math.max(fractionalYears, 0);
-  let daysFloat = remainingYears * AVERAGE_DAYS_PER_YEAR;
+  const remainingYears = Math.max(fractionalYears, 0);
+  const daysFloat = remainingYears * AVERAGE_DAYS_PER_YEAR;
   let days = Math.max(0, Math.floor(daysFloat + ELAPSED_ZERO_EPSILON));
-  let remainingDays = Math.max(daysFloat - days, 0);
-  let hoursFloat = remainingDays * HOURS_PER_DAY;
+  const remainingDays = Math.max(daysFloat - days, 0);
+  const hoursFloat = remainingDays * HOURS_PER_DAY;
   let hours = Math.max(0, Math.floor(hoursFloat + ELAPSED_ZERO_EPSILON));
-  let remainingHours = Math.max(hoursFloat - hours, 0);
-  let minutesFloat = remainingHours * MINUTES_PER_HOUR;
+  const remainingHours = Math.max(hoursFloat - hours, 0);
+  const minutesFloat = remainingHours * MINUTES_PER_HOUR;
   let minutes = Math.max(0, Math.floor(minutesFloat + ELAPSED_ZERO_EPSILON));
-  let remainingMinutes = Math.max(minutesFloat - minutes, 0);
-  let secondsFloat = remainingMinutes * SECONDS_PER_MINUTE;
+  const remainingMinutes = Math.max(minutesFloat - minutes, 0);
+  const secondsFloat = remainingMinutes * SECONDS_PER_MINUTE;
   let seconds = Math.max(0, Math.floor(secondsFloat + ELAPSED_ZERO_EPSILON));
-  let remainingSeconds = Math.max(secondsFloat - seconds, 0);
-  let millisecondsFloat = remainingSeconds * MILLISECONDS_PER_SECOND;
+  const remainingSeconds = Math.max(secondsFloat - seconds, 0);
+  const millisecondsFloat = remainingSeconds * MILLISECONDS_PER_SECOND;
   let milliseconds = Math.max(
     0,
     Math.floor(millisecondsFloat + ELAPSED_ZERO_EPSILON),
   );
-  let remainingMilliseconds = Math.max(millisecondsFloat - milliseconds, 0);
+  const remainingMilliseconds = Math.max(millisecondsFloat - milliseconds, 0);
   let microseconds = Math.max(
     0,
     Math.round(remainingMilliseconds * MICROSECONDS_PER_MILLISECOND),

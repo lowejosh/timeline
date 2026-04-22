@@ -8,8 +8,14 @@ import type { AnimatedAxisTickState } from "../../animation/axisTickState";
 import type { MarkerPriorityBoostState } from "../../animation/markerPriorityBoost";
 import type { AnimatedContextBandLabelState } from "../../contextBands";
 import type { ExpandedOverlayLayoutResult } from "../../expandedOverlayLayout";
-import type { TimelineCanvasLayout, ExpandedOverlayDetail } from "../overlayLayout";
-import type { EraScreenSpan, PrimordialDetailStripSegment } from "../primordial";
+import type {
+  TimelineCanvasLayout,
+  ExpandedOverlayDetail,
+} from "../overlayLayout";
+import type {
+  EraScreenSpan,
+  PrimordialDetailStripSegment,
+} from "../primordial";
 import type { CanvasOcclusionRect } from "../drawing";
 import type { TimelinePerfBreakdown } from "../perf";
 import type { TimelineTooltipContent } from "../../../app/tooltipModel";
@@ -100,7 +106,9 @@ export type CanvasDrawContext = {
   sceneMaxZoom: number;
 
   // Animation refs (mutable)
-  overlayLabelAnimationRef: RefObject<Map<string, AnimatedContextBandLabelState>>;
+  overlayLabelAnimationRef: RefObject<
+    Map<string, AnimatedContextBandLabelState>
+  >;
   overlayLabelAnimationInitializedRef: RefObject<boolean>;
   markerPriorityBoostRef: RefObject<Map<string, MarkerPriorityBoostState>>;
   expandedOverlayProgressByIdRef: RefObject<Map<string, number>>;

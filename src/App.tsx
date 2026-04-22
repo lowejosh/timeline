@@ -1,8 +1,8 @@
-import { TimelineCanvas } from "./components/timeline/TimelineCanvas";
+import { TimelineCanvas } from "./components/canvas/TimelineCanvas";
 import { TIMELINE_CANVAS_PAD } from "./lib/rendering/layout/padding";
-import { TimelineDisclaimer } from "./components/chrome/TimelineDisclaimer";
-import { TimelineSidebar } from "./components/chrome/TimelineSidebar";
-import { TimelineOverviewRulerStack } from "./components/timeline/TimelineOverviewRulerStack";
+import { TimelineDisclaimer } from "./components/TimelineDisclaimer";
+import { TimelineSidebar } from "./components/sidebar/TimelineSidebar";
+import { TimelineOverviewRulerStack } from "./components/overview/TimelineOverviewRulerStack";
 import {
   TIMELINE_APP_LAYOUT,
   useTimelineAppState,

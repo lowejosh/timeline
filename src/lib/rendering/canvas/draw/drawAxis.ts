@@ -36,9 +36,7 @@ import {
   SUBYEAR_PRIMARY_FONT,
   SUBYEAR_SECONDARY_FONT,
 } from "../constants";
-import {
-  EARLY_UNIVERSE_BAND_EXPANSION_IDS,
-} from "../primordial";
+import { EARLY_UNIVERSE_BAND_EXPANSION_IDS } from "../primordial";
 import {
   EARLY_UNIVERSE_CHILD_ERA_ORDER,
   EARLY_UNIVERSE_END_YEAR,
@@ -211,10 +209,8 @@ export function drawAxis(cx: CanvasDrawContext): void {
     EARLY_UNIVERSE_END_YEAR,
   );
   const debugFloatOverlapRatio =
-    Math.max(
-      0,
-      debugEarlyUniverseOverlapEnd - debugEarlyUniverseOverlapStart,
-    ) / visibleSpan;
+    Math.max(0, debugEarlyUniverseOverlapEnd - debugEarlyUniverseOverlapStart) /
+    visibleSpan;
   const visiblePrimordialLayerIds = visibleEraLayers
     .filter((layer) => EARLY_UNIVERSE_BAND_EXPANSION_IDS.has(layer.era.id))
     .map((layer) => layer.era.id);
@@ -354,8 +350,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
       const minorExtent =
         baseMinorExtent * (0.42 + tick.visibleProgress * 0.58);
       const top = axisY - minorExtent - majorExtraAbove * emphasisProgress;
-      const bottom =
-        axisY + minorExtent + majorExtraBelow * emphasisProgress;
+      const bottom = axisY + minorExtent + majorExtraBelow * emphasisProgress;
 
       if (baseFade > 0.01) {
         context.strokeStyle = lineSoft;
@@ -493,7 +488,8 @@ export function drawAxis(cx: CanvasDrawContext): void {
       : null;
     const labelText = calendarLabel
       ? calendarLabel.text
-      : (elapsedLabel?.primaryText ?? formatAxisLabel(tickYear, tick.labelStep));
+      : (elapsedLabel?.primaryText ??
+        formatAxisLabel(tickYear, tick.labelStep));
     const secondaryText =
       calendarLabel?.secondaryText ?? elapsedLabel?.secondaryText;
 
@@ -550,7 +546,10 @@ export function drawAxis(cx: CanvasDrawContext): void {
       x: pad,
       ...(() => {
         if (useCalendarSubYearAxis) {
-          return getCalendarEdgeAxisLabelText(edgeLeftPreciseYear, edgeLabelStep);
+          return getCalendarEdgeAxisLabelText(
+            edgeLeftPreciseYear,
+            edgeLabelStep,
+          );
         }
 
         if (useElapsedSubYearAxis) {
@@ -636,8 +635,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
   const resolvedAxisLabels = resolveAxisLabelCandidatesWithFallback(
     axisLabelCandidates.filter(
       (candidate) =>
-        allowedLabelSteps.size === 0 ||
-        allowedLabelSteps.has(candidate.step),
+        allowedLabelSteps.size === 0 || allowedLabelSteps.has(candidate.step),
     ),
     primaryOccupiedBounds,
     {
@@ -652,7 +650,9 @@ export function drawAxis(cx: CanvasDrawContext): void {
     primaryAllowedStep,
   );
 
-  for (const label of resolvedAxisLabels.sort((left, right) => left.x - right.x)) {
+  for (const label of resolvedAxisLabels.sort(
+    (left, right) => left.x - right.x,
+  )) {
     context.save();
     context.globalAlpha = label.alpha;
 

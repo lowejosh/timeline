@@ -8,8 +8,7 @@ export function drawNowIndicator(cx: CanvasDrawContext): void {
   const { context, toX, fromX, pad, sceneWidth, layout } = cx;
   const edgeRightYear = toApproximateTimelineYear(fromX(sceneWidth - pad));
   const rawNowX = toX(TIMELINE_MAX_YEAR);
-  const nowX =
-    edgeRightYear === TIMELINE_MAX_YEAR ? sceneWidth - pad : rawNowX;
+  const nowX = edgeRightYear === TIMELINE_MAX_YEAR ? sceneWidth - pad : rawNowX;
 
   if (nowX >= pad - 20 && nowX <= sceneWidth - pad + 20) {
     context.save();

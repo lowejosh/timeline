@@ -1,7 +1,5 @@
 import { shouldHideOverlappedEraLabel } from "../../childLayers";
-import {
-  resolveContextBandRenderState,
-} from "../../contextBands";
+import { resolveContextBandRenderState } from "../../contextBands";
 import { resolveTextHoverBounds } from "../../overlayLabelHover";
 import { getEraTooltipContent } from "../../../app/tooltipModel";
 import {
@@ -108,8 +106,7 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     FORCED_PRIMORDIAL_LABEL_IDS.has(era.id) &&
     visibleEraWidth < 44;
   const usesExpandedPrimordialLabel =
-    allowPrimordialSyntheticDetail &&
-    screenSpan?.usesVisualExpansion === true;
+    allowPrimordialSyntheticDetail && screenSpan?.usesVisualExpansion === true;
   const usesCompactPrimordialLabel =
     allowPrimordialSyntheticDetail &&
     isPrimordialEra &&
@@ -143,16 +140,13 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     visibleEraWidth > labelMinWidth &&
     (!shouldHideInlineLabel || allowsNormalPrimordialLabelBypass)
   ) {
-    const labelX =
-      Math.max(x0, pad) / 2 + Math.min(x1, sceneWidth - pad) / 2;
+    const labelX = Math.max(x0, pad) / 2 + Math.min(x1, sceneWidth - pad) / 2;
     const labelBaselineY = axisY - 44;
     const labelVisibility = getEraInlineLabelVisibility(layer.childOpacity);
     const labelAlpha =
       Math.min((visibleEraWidth - labelMinWidth) / labelFadeWidth, 1) *
       labelVisibility *
-      (usesForcedPrimordialLabel
-        ? 0.68
-        : 0.28 + Math.min(opacity, 1) * 0.22);
+      (usesForcedPrimordialLabel ? 0.68 : 0.28 + Math.min(opacity, 1) * 0.22);
 
     context.save();
     context.font = labelFont;
@@ -224,7 +218,6 @@ export function drawEras(cx: CanvasDrawContext): void {
     renderedPrimordialDetailStripSegments,
     primordialDetailStripOpacity,
     sceneHeight,
-    sceneWidth,
     lineSoft,
     labelColor,
     hoverRegions,
@@ -241,8 +234,7 @@ export function drawEras(cx: CanvasDrawContext): void {
     const stripPanelPaddingTop = 14;
     const stripPanelPaddingBottom = 6;
     const overviewReservedHeight =
-      sceneHeight >=
-      EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_MIN_CANVAS_HEIGHT_PX
+      sceneHeight >= EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_MIN_CANVAS_HEIGHT_PX
         ? EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_RESERVED_HEIGHT_PX
         : 0;
     const stripPanelTop =

@@ -26,7 +26,6 @@ import {
   getExpandedOverlayLabelRevealProgress,
 } from "../eraAnimation";
 import {
-  getExpandedOverlayPanelHeight,
   getOverlayLaneY,
   resolveExpandedOverlayConnectorGeometry,
 } from "../overlayLayout";
@@ -147,8 +146,7 @@ function drawAnimatedOverlayLabel(
     text: string;
     width: number;
   } | null>(
-    (best, layer) =>
-      !best || layer.opacity > best.opacity ? layer : best,
+    (best, layer) => (!best || layer.opacity > best.opacity ? layer : best),
     null,
   );
 
@@ -383,9 +381,8 @@ export function drawOverlays(cx: CanvasDrawContext): void {
 
     const panelHeight = expandedOverlayAnimatedHeight;
     const parentY =
-      resolvedOverlayLayout.yById.get(
-        expandedOverlayDetail.parent.band.id,
-      ) ?? getOverlayLaneY(layout, expandedOverlayDetail.parent.laneIndex);
+      resolvedOverlayLayout.yById.get(expandedOverlayDetail.parent.band.id) ??
+      getOverlayLaneY(layout, expandedOverlayDetail.parent.laneIndex);
     const { panelTop } = getExpandedOverlayPanelBounds(
       parentY,
       panelHeight,
@@ -396,9 +393,7 @@ export function drawOverlays(cx: CanvasDrawContext): void {
     const panelInnerLeft = panelLeft;
     const panelInnerRight = panelRight;
     const parentCenterX = panelLeft + expandedOverlayDetail.panelWidth / 2;
-    const parentColor = parseColor(
-      expandedOverlayDetail.parent.band.color,
-    ) ?? {
+    const parentColor = parseColor(expandedOverlayDetail.parent.band.color) ?? {
       r: 180,
       g: 120,
       b: 70,
@@ -430,8 +425,7 @@ export function drawOverlays(cx: CanvasDrawContext): void {
         chromeStemReveal;
     const revealedRailLeft =
       connectorGeometry.stemX +
-      (connectorGeometry.railLeft - connectorGeometry.stemX) *
-        chromeRailReveal;
+      (connectorGeometry.railLeft - connectorGeometry.stemX) * chromeRailReveal;
     const revealedRailRight =
       connectorGeometry.stemX +
       (connectorGeometry.railRight - connectorGeometry.stemX) *

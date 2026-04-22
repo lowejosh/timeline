@@ -98,7 +98,8 @@ export function resolveTimelineSidebarTree(
       continue;
     }
 
-    const existing = countsByGroupId.get(overlay.groupId) ?? createEmptyCounts();
+    const existing =
+      countsByGroupId.get(overlay.groupId) ?? createEmptyCounts();
     existing.overlayCount += 1;
     countsByGroupId.set(overlay.groupId, existing);
   }
@@ -143,14 +144,11 @@ export function resolveTimelineSidebarTree(
         })
         .filter((child): child is TimelineSidebarChildState => child !== null);
 
-      const totals = children.reduce(
-        (aggregate, child) => {
-          aggregate.markerCount += child.markerCount;
-          aggregate.overlayCount += child.overlayCount;
-          return aggregate;
-        },
-        createEmptyCounts(),
-      );
+      const totals = children.reduce((aggregate, child) => {
+        aggregate.markerCount += child.markerCount;
+        aggregate.overlayCount += child.overlayCount;
+        return aggregate;
+      }, createEmptyCounts());
 
       return {
         id: set.id,
