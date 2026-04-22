@@ -6,7 +6,7 @@ import {
   zoomAtPosition,
   type TimelineScaleMode,
   type TimelineViewport,
-} from "../lib/time/viewport";
+} from "../lib/core/viewport";
 
 type AnimationTarget = {
   centerYear: number;

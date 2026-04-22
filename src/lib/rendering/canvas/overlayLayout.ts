@@ -1,0 +1,305 @@
+import {
+  compareEraPriorityDescending,
+  type Era,
+  type TimelineOverlayBand,
+} from "../../domain/eras";
+import { getEffectiveTimelinePriority } from "../../catalog/timelineSets";
+import {
+  getVisibleRange,
+  type TimelineViewport,
+  worldToScreen,
+} from "../../core/viewport";
+import type { ResolvedTimelineOverlayBand } from "../overlayTracks";
+import {
+  EXPANDED_OVERLAY_BOTTOM_PADDING,
+  EXPANDED_OVERLAY_TOP_PADDING,
+  MIN_VISIBLE_OVERLAY_CHILD_WIDTH,
+  OVERLAY_LANE_GAP,
+  OVERLAY_LANE_HEIGHT,
+  OVERLAY_PANEL_GAP,
+} from "./constants";
+
+export type TimelineCanvasLayout = {
+  breadcrumbY: number;
+  overlayTop: number;
+  overlayHeight: number;
+  overlayBottom: number;
+  axisY: number;
+  markerStemBottom: number;
+  markerLabelY: number;
+  markerDateY: number;
+  majorTickTop: number;
+  dateLabelY: number;
+  yearLabelY: number;
+  nowTop: number;
+};
+
+export type ExpandedOverlayChild = {
+  band: TimelineOverlayBand;
+  laneIndex: number;
+  x0: number;
+  x1: number;
+};
+
+export type ExpandedOverlayDetail = {
+  parent: ResolvedTimelineOverlayBand;
+  children: ExpandedOverlayChild[];
+  laneCount: number;
+  panelWidth: number;
+  headerText: string;
+};
+
+export type NestedOverlayLaneAssignment = {
+  assigned: Array<{
+    band: TimelineOverlayBand;
+    laneIndex: number;
+  }>;
+  laneCount: number;
+};
+
+export type ExpandedOverlayConnectorGeometry = {
+  stemX: number;
+  stemTop: number;
+  stemBottom: number;
+  railLeft: number;
+  railRight: number;
+  railY: number;
+};
+
+export function findEraAtYear(eras: Era[], year: number): Era | undefined {
+  return eras
+    .filter((era) => year >= era.startYear && year <= era.endYear)
+    .sort(compareEraPriorityDescending)[0];
+}
+
+export function getTimelineLayout(
+  height: number,
+  overlayLaneCount: number,
+): TimelineCanvasLayout {
+  const overlayHeight =
+    overlayLaneCount > 0
+      ? overlayLaneCount * OVERLAY_LANE_HEIGHT +
+        Math.max(overlayLaneCount - 1, 0) * OVERLAY_LANE_GAP
+      : 0;
+  const axisY = Math.max(
+    128 + overlayHeight,
+    Math.min(height * 0.62, height - 96),
+  );
+  const majorTickTop = axisY - 28;
+  const overlayTop =
+    overlayLaneCount > 0
+      ? Math.max(44, majorTickTop - OVERLAY_PANEL_GAP - overlayHeight)
+      : majorTickTop;
+  const overlayBottom = overlayTop + overlayHeight;
+
+  return {
+    breadcrumbY: 14,
+    overlayTop,
+    overlayHeight,
+    overlayBottom,
+    axisY,
+    markerStemBottom: axisY + 14,
+    markerLabelY: axisY + 18,
+    markerDateY: axisY + 34,
+    majorTickTop,
+    dateLabelY: axisY + 50,
+    yearLabelY: axisY + 68,
+    nowTop: majorTickTop - 18,
+  };
+}
+
+export function getOverlayLaneY(
+  layout: TimelineCanvasLayout,
+  laneIndex: number,
+) {
+  return (
+    layout.overlayBottom -
+    OVERLAY_LANE_HEIGHT -
+    laneIndex * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP)
+  );
+}
+
+export function getExpandedOverlayPanelHeight(
+  detail: ExpandedOverlayDetail | null,
+) {
+  if (!detail) {
+    return 0;
+  }
+
+  return (
+    EXPANDED_OVERLAY_TOP_PADDING +
+    EXPANDED_OVERLAY_BOTTOM_PADDING +
+    detail.laneCount * OVERLAY_LANE_HEIGHT +
+    Math.max(detail.laneCount - 1, 0) * OVERLAY_LANE_GAP
+  );
+}
+
+export function compareOverlayBands(
+  left: TimelineOverlayBand,
+  right: TimelineOverlayBand,
+) {
+  return (
+    left.startYear - right.startYear ||
+    left.endYear - right.endYear ||
+    getEffectiveTimelinePriority(right) - getEffectiveTimelinePriority(left) ||
+    left.id.localeCompare(right.id)
+  );
+}
+
+const nestedOverlayLaneAssignmentCache = new WeakMap<
+  TimelineOverlayBand[],
+  NestedOverlayLaneAssignment
+>();
+
+export function assignNestedOverlayLanes(
+  overlays: TimelineOverlayBand[],
+): NestedOverlayLaneAssignment {
+  const cached = nestedOverlayLaneAssignmentCache.get(overlays);
+
+  if (cached) {
+    return cached;
+  }
+
+  const laneEndYears: number[] = [];
+  const assigned = [...overlays].sort(compareOverlayBands).map((band) => {
+    let laneIndex = laneEndYears.findIndex(
+      (laneEndYear) => band.startYear >= laneEndYear,
+    );
+
+    if (laneIndex === -1) {
+      laneIndex = laneEndYears.length;
+      laneEndYears.push(band.endYear);
+    } else {
+      laneEndYears[laneIndex] = band.endYear;
+    }
+
+    return {
+      band,
+      laneIndex,
+    };
+  });
+
+  const computed = {
+    assigned,
+    laneCount: Math.max(laneEndYears.length, 1),
+  };
+
+  nestedOverlayLaneAssignmentCache.set(overlays, computed);
+  return computed;
+}
+
+export function resolveExpandedOverlayDetail(
+  expandedOverlayId: string | null,
+  resolvedOverlayBands: ResolvedTimelineOverlayBand[],
+  viewport: TimelineViewport,
+  width: number,
+  pad: number,
+): ExpandedOverlayDetail | null {
+  if (!expandedOverlayId || width <= pad * 2) {
+    return null;
+  }
+
+  const parent = resolvedOverlayBands.find(
+    ({ band }) =>
+      band.id === expandedOverlayId && (band.children?.length ?? 0) > 0,
+  );
+
+  if (!parent?.band.children?.length) {
+    return null;
+  }
+
+  const innerWidth = width - pad * 2;
+  const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
+  const { assigned, laneCount } = assignNestedOverlayLanes(
+    parent.band.children,
+  );
+  const children = assigned
+    .filter(
+      ({ band }) =>
+        band.endYear >= visibleStart && band.startYear <= visibleEnd,
+    )
+    .map(({ band, laneIndex }) => ({
+      band,
+      laneIndex,
+      x0: pad + worldToScreen(band.startYear, viewport, innerWidth),
+      x1: pad + worldToScreen(band.endYear, viewport, innerWidth),
+    }));
+
+  if (children.length === 0) {
+    return null;
+  }
+
+  const panelWidth = Math.min(Math.max(parent.renderWidth, 1), width - pad * 2);
+
+  return {
+    parent,
+    children,
+    laneCount,
+    panelWidth,
+    headerText: `${parent.band.label} · major polities`,
+  };
+}
+
+export function resolveExpandedOverlayDetails(
+  expandedOverlayIds: readonly string[],
+  resolvedOverlayBands: ResolvedTimelineOverlayBand[],
+  viewport: TimelineViewport,
+  width: number,
+  pad: number,
+) {
+  return expandedOverlayIds
+    .map((expandedOverlayId) =>
+      resolveExpandedOverlayDetail(
+        expandedOverlayId,
+        resolvedOverlayBands,
+        viewport,
+        width,
+        pad,
+      ),
+    )
+    .filter((detail): detail is ExpandedOverlayDetail => detail !== null);
+}
+
+export function resolveExpandedOverlayConnectorGeometry(
+  children: ExpandedOverlayChild[],
+  panelLeft: number,
+  panelRight: number,
+  parentCenterX: number,
+  parentBandBottom: number,
+  panelTop: number,
+): ExpandedOverlayConnectorGeometry {
+  let childConnectorLeft = Number.POSITIVE_INFINITY;
+  let childConnectorRight = Number.NEGATIVE_INFINITY;
+
+  for (const child of children) {
+    const clippedLeft = Math.max(child.x0, panelLeft);
+    const clippedRight = Math.min(child.x1, panelRight);
+
+    if (clippedRight - clippedLeft < MIN_VISIBLE_OVERLAY_CHILD_WIDTH) {
+      continue;
+    }
+
+    const childConnectorX = clippedLeft + (clippedRight - clippedLeft) / 2;
+    childConnectorLeft = Math.min(childConnectorLeft, childConnectorX);
+    childConnectorRight = Math.max(childConnectorRight, childConnectorX);
+  }
+
+  const railY = panelTop + Math.max(3, EXPANDED_OVERLAY_TOP_PADDING * 0.45);
+  const fallbackLeft = Math.max(panelLeft, parentCenterX - 12);
+  const fallbackRight = Math.min(panelRight, parentCenterX + 12);
+  const railLeft = Number.isFinite(childConnectorLeft)
+    ? Math.min(childConnectorLeft, parentCenterX)
+    : fallbackLeft;
+  const railRight = Number.isFinite(childConnectorRight)
+    ? Math.max(childConnectorRight, parentCenterX)
+    : fallbackRight;
+
+  return {
+    stemX: Math.min(Math.max(parentCenterX, railLeft), railRight),
+    stemTop: parentBandBottom,
+    stemBottom: railY,
+    railLeft,
+    railRight,
+    railY,
+  };
+}

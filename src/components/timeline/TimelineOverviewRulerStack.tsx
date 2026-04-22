@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { type Era } from "../../lib/data/eras";
+import { type Era } from "../../lib/domain/eras";
 import {
   formatOverviewRulerPercentageLabel,
   formatOverviewRulerSpanLabel,
@@ -11,13 +11,13 @@ import {
   type OverviewRulerDomain,
   type OverviewRulerTier,
   type ResolveOverviewRulerTiersOptions,
-} from "../../lib/time/overviewRuler";
+} from "../../lib/rendering/overviewRuler";
 import {
   getVisibleRange,
   getVisibleRangePrecise,
   subtractPreciseTimelineYears,
   type TimelineViewport,
-} from "../../lib/time/viewport";
+} from "../../lib/core/viewport";
 import { TimelineOverviewRuler } from "./TimelineOverviewRuler";
 import "./TimelineOverviewRulerStack.css";
 

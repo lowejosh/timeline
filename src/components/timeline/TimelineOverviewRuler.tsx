@@ -5,14 +5,14 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
-import { type Era } from "../../lib/data/eras";
+import { type Era } from "../../lib/domain/eras";
 import {
   getOverviewRulerYearsPerPixel,
   mapOverviewRulerXToYear,
   resolveOverviewRulerBandRect,
   resolveOverviewRulerSpotlight,
   type OverviewRulerDomain,
-} from "../../lib/time/overviewRuler";
+} from "../../lib/rendering/overviewRuler";
 import {
   normalizeViewport,
   panByPixels,
@@ -20,7 +20,7 @@ import {
   TIMELINE_MAX_YEAR,
   TIMELINE_MIN_YEAR,
   type TimelineViewport,
-} from "../../lib/time/viewport";
+} from "../../lib/core/viewport";
 import "./TimelineOverviewRuler.css";
 
 type TimelineOverviewRulerProps = {

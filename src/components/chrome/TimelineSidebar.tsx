@@ -9,8 +9,8 @@ import {
 import type {
   TimelineSidebarChildState,
   TimelineSidebarSetState,
-} from "../../lib/data/timelineSidebar";
-import type { TimelineSetId } from "../../lib/data/timelineTypes";
+} from "../../lib/app/sidebarModel";
+import type { TimelineSetId } from "../../lib/core/timelineTypes";
 import { OverlayGroupIconSvg } from "../timeline/OverlayGroupIconSvg";
 
 type TimelineSidebarProps = {

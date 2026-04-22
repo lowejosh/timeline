@@ -1,7 +1,7 @@
 import {
   resolveOverlayGroupIconId,
   type OverlayGroupIconId,
-} from "./overlayGroupIcons";
+} from "../../lib/rendering/overlayGroupIcons";
 
 function renderIcon(iconId: OverlayGroupIconId) {
   switch (iconId) {
