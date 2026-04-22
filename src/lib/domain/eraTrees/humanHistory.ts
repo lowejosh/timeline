@@ -84,10 +84,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Long era of mobile hunter-gatherers, stone tools, and the first known art.",
     scheme: "archaeological",
-    sourceIds: [
-      "khanPaleolithicCulture",
-      "smithsonianHumanOrigins"
-    ],
+    sourceIds: ["khanPaleolithicCulture", "smithsonianHumanOrigins"],
   },
   {
     id: "epipaleolithic",
@@ -115,10 +112,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Farming villages, domesticated plants and animals, and more permanent settlement reshape daily life.",
     scheme: "archaeological",
-    sourceIds: [
-      "periodo",
-      "khanNeolithicRevolution"
-    ],
+    sourceIds: ["periodo", "khanNeolithicRevolution"],
     children: [
       {
         id: "pre-pottery-neolithic-a",
@@ -190,10 +184,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Cities, kingdoms, bronze metallurgy, and long-distance trade tie the ancient Near East into a shared world.",
     scheme: "archaeological",
-    sourceIds: [
-      "britannicaBronzeAge",
-      "britannicaMiddleEast"
-    ],
+    sourceIds: ["britannicaBronzeAge", "britannicaMiddleEast"],
     children: [
       {
         id: "early-bronze-age",
@@ -253,7 +244,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     sourceIds: [
       "britannicaIronAge",
       "britannicaMetallurgy",
-      "historyPersianEmpire"
+      "historyPersianEmpire",
     ],
     children: [
       {
@@ -268,10 +259,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Transition phase when ironworking spreads quickly but smiths still labor to turn bloom iron into reliable tools and blades.",
         scheme: "archaeological",
-        sourceIds: [
-          "britannicaIronAge",
-          "britannicaMetallurgy"
-        ],
+        sourceIds: ["britannicaIronAge", "britannicaMetallurgy"],
       },
       {
         id: "middle-iron-age",
@@ -285,10 +273,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Ironworking becomes more dependable and widespread, supplying tougher farm tools, fittings, and more common weapons.",
         scheme: "archaeological",
-        sourceIds: [
-          "britannicaMetallurgy",
-          "britannicaIronAge"
-        ],
+        sourceIds: ["britannicaMetallurgy", "britannicaIronAge"],
       },
       {
         id: "late-iron-age",
@@ -301,10 +286,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "By this final phase, iron tools and weapons are established parts of everyday production rather than a newer experiment.",
         scheme: "archaeological",
-        sourceIds: [
-          "britannicaMetallurgy",
-          "historyPersianEmpire"
-        ],
+        sourceIds: ["britannicaMetallurgy", "historyPersianEmpire"],
       },
     ],
   },
@@ -322,17 +304,14 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   {
     id: "post-classical-history",
     name: "Post-classical History",
+    alternateName: "Middle Ages",
     startYear: ce(500),
     endYear: ce(1500),
     color: HUMAN_HISTORY_COLORS.postClassicalHistory,
     description:
       "Major religions, caravan routes, and maritime trade bind Afro-Eurasia more tightly.",
     scheme: "world-history",
-    sourceIds: [
-      "historyIslam",
-      "khanSongChina",
-      "britannicaMongolEmpire"
-    ],
+    sourceIds: ["historyIslam", "khanSongChina", "britannicaMongolEmpire"],
   },
   {
     id: "early-modern-period",
@@ -346,7 +325,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     sourceIds: [
       "historyPrintingPress",
       "historyChristopherColumbus",
-      "historyOttomanEmpire"
+      "historyOttomanEmpire",
     ],
     children: [
       {
@@ -359,10 +338,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Oceanic voyages, imperial rivalry, and transatlantic exchange pull distant regions into one connected world.",
         scheme: "world-history",
-        sourceIds: [
-          "historyChristopherColumbus",
-          "historyFerdinandMagellan"
-        ],
+        sourceIds: ["historyChristopherColumbus", "historyFerdinandMagellan"],
       },
       {
         id: "general-crisis",
@@ -387,10 +363,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Reason, experiment, and print debate challenge inherited authority in science, politics, and religion.",
         scheme: "world-history",
-        sourceIds: [
-          "historyEnlightenment",
-          "britannicaEncyclopedie"
-        ],
+        sourceIds: ["historyEnlightenment", "britannicaEncyclopedie"],
       },
     ],
   },
@@ -406,7 +379,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     sourceIds: [
       "historyIndustrialRevolution",
       "historyMeijiRestoration",
-      "historyWorldWarOne"
+      "historyWorldWarOne",
     ],
     children: [
       {
@@ -432,10 +405,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Revolutions, reforms, and more assertive states push industrial societies toward national politics and wider expansion.",
         scheme: "world-history",
-        sourceIds: [
-          "historyIndustrialRevolution",
-          "historyMeijiRestoration"
-        ],
+        sourceIds: ["historyIndustrialRevolution", "historyMeijiRestoration"],
       },
       {
         id: "high-industrialization-and-empire",
@@ -449,7 +419,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         scheme: "world-history",
         sourceIds: [
           "historyIndustrialRevolution",
-          "britannicaScrambleForAfrica"
+          "britannicaScrambleForAfrica",
         ],
       },
       {
@@ -464,7 +434,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         sourceIds: [
           "historyWorldWarOne",
           "historyGreatDepression",
-          "historyWorldWarTwo"
+          "historyWorldWarTwo",
         ],
       },
     ],
@@ -478,11 +448,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Post-1945 world of decolonization, superpower rivalry, and rapidly networked global life.",
     scheme: "world-history",
-    sourceIds: [
-      "unDecolonization",
-      "britannicaColdWar",
-      "natGeoGlobalization"
-    ],
+    sourceIds: ["unDecolonization", "britannicaColdWar", "natGeoGlobalization"],
     children: [
       {
         id: "postwar-order",
@@ -496,7 +462,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         sourceIds: [
           "unHistoryUnitedNations",
           "historyMarshallPlan",
-          "britannicaColdWar"
+          "britannicaColdWar",
         ],
       },
       {
@@ -508,10 +474,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Independence movements redraw the map while proxy wars, ideology, and nuclear rivalry shape a divided world.",
         scheme: "world-history",
-        sourceIds: [
-          "unDecolonization",
-          "britannicaColdWar"
-        ],
+        sourceIds: ["unDecolonization", "britannicaColdWar"],
       },
       {
         id: "digital-age",
@@ -525,7 +488,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         sourceIds: [
           "natGeoGlobalization",
           "cernBirthWeb",
-          "openAiIntroducingChatGpt"
+          "openAiIntroducingChatGpt",
         ],
         children: [
           {
@@ -538,10 +501,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
             description:
               "The web escapes the lab and becomes a public medium for pages, portals, search, and early online communities.",
             scheme: "world-history",
-            sourceIds: [
-              "cernShortHistoryWeb",
-              "cernBirthWeb"
-            ],
+            sourceIds: ["cernShortHistoryWeb", "cernBirthWeb"],
           },
           {
             id: "mobile-computing-era",
@@ -577,10 +537,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
             description:
               "Generative AI and increasingly autonomous software move into mainstream writing, coding, search, and office work.",
             scheme: "world-history",
-            sourceIds: [
-              "openAiIntroducingChatGpt",
-              "oecdAiWipsProgram"
-            ],
+            sourceIds: ["openAiIntroducingChatGpt", "oecdAiWipsProgram"],
           },
         ],
       },

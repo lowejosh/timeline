@@ -81,6 +81,7 @@ export function getEraChildOpacityTarget(
   pad: number,
   isAnimating: boolean,
   currentTarget = 0,
+  isZoomingIn = false,
 ) {
   if ((era.children?.length ?? 0) === 0) return 0;
 
@@ -96,11 +97,15 @@ export function getEraChildOpacityTarget(
     ? ACTIVE_LAYER_TRIGGER_OUT
     : PREVIEW_LAYER_TRIGGER_OUT;
 
-  if (currentTarget >= 0.5) {
-    return fillRatio >= triggerOut ? 1 : 0;
+  // only limit our fade in if we're zooming in to stop jumping content around
+  if (isZoomingIn) {
+    if (currentTarget >= 0.5) {
+      return fillRatio >= triggerOut ? 1 : 0;
+    }
+    return fillRatio >= triggerIn ? 1 : 0;
+  } else {
+    return currentTarget >= 0.5 && fillRatio >= triggerOut ? 1 : 0;
   }
-
-  return fillRatio >= triggerIn ? 1 : 0;
 }
 
 export function resolveTimelineEraLayersFromOpacityMap(
@@ -113,23 +118,30 @@ export function resolveTimelineEraLayersFromOpacityMap(
   inheritedOpacity = 1,
   depth = 0,
 ): ResolvedTimelineEraLayer[] {
-  const currentLevel = [...eras].sort(compareEraPriorityAscending).map((era) => {
-    const visibleFillRatio = getVisibleEraFillRatio(era, viewport, width, pad);
-    const isActive = era.id === activeEraId;
-    const childOpacity =
-      (era.children?.length ?? 0) === 0
-        ? 0
-        : clamp01(childOpacityById.get(era.id) ?? 0);
+  const currentLevel = [...eras]
+    .sort(compareEraPriorityAscending)
+    .map((era) => {
+      const visibleFillRatio = getVisibleEraFillRatio(
+        era,
+        viewport,
+        width,
+        pad,
+      );
+      const isActive = era.id === activeEraId;
+      const childOpacity =
+        (era.children?.length ?? 0) === 0
+          ? 0
+          : clamp01(childOpacityById.get(era.id) ?? 0);
 
-    return {
-      era,
-      depth,
-      isActive,
-      visibleFillRatio,
-      childOpacity,
-      opacity: inheritedOpacity,
-    };
-  });
+      return {
+        era,
+        depth,
+        isActive,
+        visibleFillRatio,
+        childOpacity,
+        opacity: inheritedOpacity,
+      };
+    });
 
   const descendants = currentLevel.flatMap((layer) => {
     if (layer.childOpacity <= 0.01 || !layer.era.children?.length) {
@@ -161,27 +173,34 @@ export function resolveTimelineEraLayers(
   inheritedOpacity = 1,
   depth = 0,
 ): ResolvedTimelineEraLayer[] {
-  const currentLevel = [...eras].sort(compareEraPriorityAscending).map((era) => {
-    const visibleFillRatio = getVisibleEraFillRatio(era, viewport, width, pad);
-    const isActive = era.id === activeEraId;
-    const childOpacity = getEraChildOpacity(
-      era,
-      activeEraId,
-      viewport,
-      width,
-      pad,
-      isAnimating,
-    );
+  const currentLevel = [...eras]
+    .sort(compareEraPriorityAscending)
+    .map((era) => {
+      const visibleFillRatio = getVisibleEraFillRatio(
+        era,
+        viewport,
+        width,
+        pad,
+      );
+      const isActive = era.id === activeEraId;
+      const childOpacity = getEraChildOpacity(
+        era,
+        activeEraId,
+        viewport,
+        width,
+        pad,
+        isAnimating,
+      );
 
-    return {
-      era,
-      depth,
-      isActive,
-      visibleFillRatio,
-      childOpacity,
-      opacity: inheritedOpacity,
-    };
-  });
+      return {
+        era,
+        depth,
+        isActive,
+        visibleFillRatio,
+        childOpacity,
+        opacity: inheritedOpacity,
+      };
+    });
 
   const descendants = currentLevel.flatMap((layer) => {
     if (layer.childOpacity <= 0.01 || !layer.era.children?.length) {
@@ -231,8 +250,10 @@ export function shouldHideOverlappedEraLabel(
   }
 
   const innerWidth = width - pad * 2;
-  const targetX0 = pad + worldToScreen(targetLayer.era.startYear, viewport, innerWidth);
-  const targetX1 = pad + worldToScreen(targetLayer.era.endYear, viewport, innerWidth);
+  const targetX0 =
+    pad + worldToScreen(targetLayer.era.startYear, viewport, innerWidth);
+  const targetX1 =
+    pad + worldToScreen(targetLayer.era.endYear, viewport, innerWidth);
   const targetLeft = Math.max(Math.min(targetX0, targetX1), pad);
   const targetRight = Math.min(Math.max(targetX0, targetX1), width - pad);
 

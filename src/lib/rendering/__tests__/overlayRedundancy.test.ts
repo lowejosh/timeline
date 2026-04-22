@@ -20,7 +20,6 @@ describe("overlay redundancy", () => {
     expect(HOMO_SAPIENS_RULE).toMatchObject({
       kind: "max-visible-span",
       hideAtOrBelowYears: 25_000,
-      onlyWhenAnyGroupVisible: ["civilizations"],
     });
     expect(AGE_OF_MAMMALS_RULE).toMatchObject({
       kind: "max-visible-span",

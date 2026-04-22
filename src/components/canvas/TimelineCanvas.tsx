@@ -522,6 +522,7 @@ export function TimelineCanvas({
       const line = themeRef.current.line;
       const lineSoft = themeRef.current.lineSoft;
       const labelColor = themeRef.current.labelColor;
+      const fontSans = themeRef.current.fontSans;
       const perfMode = perfModeRef.current;
       const perfEnabled = perfMode !== "off";
       const verbosePerfEnabled = perfMode === "verbose";
@@ -711,6 +712,7 @@ export function TimelineCanvas({
         line,
         lineSoft,
         labelColor,
+        fontSans,
         drawNow,
         sceneActiveEra,
         sceneActiveChain,

@@ -101,6 +101,7 @@ describe("timeline child layers", () => {
         pad,
         false,
         0,
+        true,
       ),
     ).toBe(1);
 
@@ -113,6 +114,7 @@ describe("timeline child layers", () => {
         pad,
         false,
         1,
+        true,
       ),
     ).toBe(0);
   });

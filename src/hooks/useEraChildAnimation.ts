@@ -26,11 +26,13 @@ export function useEraChildAnimation(
   const animationRef = useRef<Map<string, AnimatedEraChildState>>(new Map());
   const frameRef = useRef(0);
   const initializedRef = useRef(false);
+  const lastZoomRef = useRef(viewport.zoom);
 
   useEffect(() => {
     const animationStates = animationRef.current;
     const activeIds = new Set<string>();
     const now = performance.now();
+    const isZoomingIn = viewport.zoom > lastZoomRef.current;
 
     const visit = (eras: Era[]) => {
       for (const era of eras) {
@@ -44,6 +46,7 @@ export function useEraChildAnimation(
             PAD,
             isAnimating,
             animationStates.get(era.id)?.target ?? 0,
+            isZoomingIn,
           );
           const nextState = syncAnimatedEraChildState({
             existing: animationStates.get(era.id),
@@ -78,6 +81,7 @@ export function useEraChildAnimation(
     }
 
     initializedRef.current = true;
+    lastZoomRef.current = viewport.zoom;
 
     const hasPendingAnimation = [...animationStates.values()].some(
       (state) => Math.abs(state.target - state.current) > 0.001,

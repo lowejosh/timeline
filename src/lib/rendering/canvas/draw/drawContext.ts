@@ -76,6 +76,7 @@ export type CanvasDrawContext = {
   line: string;
   lineSoft: string;
   labelColor: string;
+  fontSans: string;
 
   // Frame time
   drawNow: number;

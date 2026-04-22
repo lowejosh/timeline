@@ -329,7 +329,6 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     autoToggleRule: {
       kind: "max-visible-span",
       hideAtOrBelowYears: 25_000,
-      onlyWhenAnyGroupVisible: ["civilizations"],
     },
     sourceIds: ["smithsonianHomoSapiens"],
   },

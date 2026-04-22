@@ -46,6 +46,7 @@ export type Era = TimelineRegionalScope &
   TimelineApproximateRange & {
     id: string;
     name: string;
+    alternateName?: string;
     startYear: number;
     endYear: number;
     exactStartTime?: TimelineExactTimestamp;

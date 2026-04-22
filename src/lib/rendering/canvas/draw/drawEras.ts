@@ -37,6 +37,7 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     breadcrumbChainIds,
     allowPrimordialSyntheticDetail,
     labelColor,
+    fontSans,
     layout,
     hoverRegions,
     visibleEraLayers,
@@ -112,10 +113,13 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     isPrimordialEra &&
     !usesExpandedPrimordialLabel &&
     eraWidth < 60;
-  const labelText =
+  const baseLabelText =
     usesExpandedPrimordialLabel || usesCompactPrimordialLabel
       ? (EARLY_UNIVERSE_INLINE_LABELS[era.id] ?? era.name)
       : era.name;
+  const labelText = era.alternateName
+    ? `${baseLabelText}\n${era.alternateName}`
+    : baseLabelText;
   const labelMinWidth = usesForcedPrimordialLabel
     ? 8
     : usesExpandedPrimordialLabel
@@ -150,7 +154,13 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
 
     context.save();
     context.font = labelFont;
-    const labelMetrics = context.measureText(labelText);
+    const lines = labelText.split('\n');
+    let maxWidth = 0;
+    for (const line of lines) {
+      const metrics = context.measureText(line);
+      maxWidth = Math.max(maxWidth, metrics.width);
+    }
+    const labelMetrics = { width: maxWidth, actualBoundingBoxAscent: 10, actualBoundingBoxDescent: 4 }; // approximate
     context.restore();
 
     const shouldHideForPriorityOverlap = shouldHideOverlappedEraLabel(
@@ -178,14 +188,23 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     context.fillStyle = labelColor;
     context.textAlign = "center";
     context.textBaseline = "bottom";
-    context.fillText(labelText, labelX, labelBaselineY);
+
+    const lineHeight = 12; // approximate line height
+    let currentY = labelBaselineY;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (i === 1) { // alternate name
+        context.font = `italic 9px ${fontSans}`;
+      }
+      context.fillText(line, labelX, currentY);
+      currentY += lineHeight;
+    }
     context.restore();
 
     if (labelAlpha > 0.01) {
-      const labelTop =
-        labelBaselineY - Math.max(labelMetrics.actualBoundingBoxAscent, 8);
-      const labelBottom =
-        labelBaselineY + Math.max(labelMetrics.actualBoundingBoxDescent, 2);
+      const totalHeight = lines.length * 12;
+      const labelTop = labelBaselineY - totalHeight + 4;
+      const labelBottom = labelBaselineY + 2;
       const hoverBounds = resolveTextHoverBounds({
         centerX: labelX,
         labelWidth: labelMetrics.width,

@@ -4,6 +4,7 @@ export type TimelineCanvasTheme = {
   line: string;
   lineSoft: string;
   labelColor: string;
+  fontSans: string;
 };
 
 export const DEFAULT_TIMELINE_THEME: TimelineCanvasTheme = {
@@ -12,6 +13,7 @@ export const DEFAULT_TIMELINE_THEME: TimelineCanvasTheme = {
   line: "rgba(74, 57, 43, 0.9)",
   lineSoft: "rgba(74, 57, 43, 0.24)",
   labelColor: "rgba(53, 39, 29, 0.92)",
+  fontSans: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif",
 };
 
 export function readTimelineCanvasTheme(): TimelineCanvasTheme {
@@ -37,5 +39,8 @@ export function readTimelineCanvasTheme(): TimelineCanvasTheme {
     labelColor:
       styles.getPropertyValue("--timeline-label").trim() ||
       DEFAULT_TIMELINE_THEME.labelColor,
+    fontSans:
+      styles.getPropertyValue("--font-sans").trim() ||
+      DEFAULT_TIMELINE_THEME.fontSans,
   };
 }
