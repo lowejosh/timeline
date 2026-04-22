@@ -284,12 +284,21 @@ function App() {
   const autoHiddenOverlayIds = useMemo(
     () =>
       getAutoHiddenOverlayIds(
+        filterOverlaysBySets(TIMELINE_DISPLAY.overlays, enabledSetIds),
         animated.viewport,
         innerWidth,
         TIMELINE_CANVAS_PAD,
+        enabledSetIds,
+        baseEnabledGroupIds,
         autoToggleVisibleGroupIds,
       ),
-    [animated.viewport, autoToggleVisibleGroupIds, innerWidth],
+    [
+      animated.viewport,
+      autoToggleVisibleGroupIds,
+      baseEnabledGroupIds,
+      enabledSetIds,
+      innerWidth,
+    ],
   );
   const autoHiddenOverlaySignature = useMemo(
     () => Array.from(autoHiddenOverlayIds).sort().join("|"),

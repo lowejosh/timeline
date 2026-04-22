@@ -270,6 +270,11 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(169, 122, 92)",
     minZoom: 0,
     priority: 88,
+    autoToggleRule: {
+      kind: "max-visible-span",
+      hideAtOrBelowYears: 10_500_000,
+      onlyWhenAnyGroupVisible: ["human-evolution"],
+    },
     sourceRefs: [
       {
         sourceId: "gutenbergHistoricalGeologyMiller1922",

@@ -147,6 +147,7 @@ export type TimelineOverlayBand = TimelineDecorationBase &
     exactStartTime?: TimelineExactTimestamp;
     exactEndTime?: TimelineExactTimestamp;
     color: string;
+    autoToggleRule?: TimelineLayerAutoToggleRule;
     children?: TimelineOverlayBand[];
   };
 
