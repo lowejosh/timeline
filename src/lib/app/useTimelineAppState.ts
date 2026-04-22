@@ -191,6 +191,7 @@ export function useTimelineAppState() {
 
   const [activeEraId, setActiveEraId] = useState(ROOT_ERA.id);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isCosmicCalendarMode, setIsCosmicCalendarMode] = useState(false);
   const [overlayVisibilityTransitionSeed, setOverlayVisibilityTransitionSeed] =
     useState(0);
   const defaultEnabledGroupIds = useMemo(
@@ -692,6 +693,8 @@ export function useTimelineAppState() {
     // sidebar
     isSidebarOpen,
     setIsSidebarOpen,
+    isCosmicCalendarMode,
+    setIsCosmicCalendarMode,
     sidebarTree,
     expandedSetIds,
 

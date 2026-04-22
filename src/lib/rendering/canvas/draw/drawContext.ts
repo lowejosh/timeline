@@ -132,4 +132,7 @@ export type CanvasDrawContext = {
   isViewportInteractionActive: boolean;
   preferredAxisLabelStepRef: RefObject<number | undefined>;
   primordialDebugSignatureRef: RefObject<string | null>;
+
+  // Display modes
+  isCosmicCalendarMode: boolean;
 };

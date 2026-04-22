@@ -1,6 +1,7 @@
 import { TimelineCanvas } from "./components/canvas/TimelineCanvas";
 import { TIMELINE_CANVAS_PAD } from "./lib/rendering/layout/padding";
 import { TimelineDisclaimer } from "./components/TimelineDisclaimer";
+import { TimelineSettings } from "./components/TimelineSettings";
 import { TimelineSidebar } from "./components/sidebar/TimelineSidebar";
 import { TimelineOverviewRulerStack } from "./components/overview/TimelineOverviewRulerStack";
 import {
@@ -18,6 +19,12 @@ function App() {
       data-sidebar-open={app.isSidebarOpen ? "true" : "false"}
     >
       <TimelineDisclaimer />
+      <TimelineSettings
+        isCosmicCalendarMode={app.isCosmicCalendarMode}
+        onToggleCosmicCalendarMode={() =>
+          app.setIsCosmicCalendarMode((current) => !current)
+        }
+      />
       <button
         aria-controls="timeline-layers-panel"
         aria-expanded={app.isSidebarOpen}
@@ -66,6 +73,7 @@ function App() {
                   app.overlayVisibilityTransitionKey
                 }
                 parentEra={app.parentEra}
+                isCosmicCalendarMode={app.isCosmicCalendarMode}
                 isAnimating={app.animated.isAnimating}
                 onViewportChange={app.handleViewportChange}
                 onAnimateZoom={app.handleZoom}

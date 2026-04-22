@@ -4,6 +4,7 @@ import {
   formatTimelineYear,
   getDominantTimelineDateReference,
 } from "../../bands";
+import { formatCosmicCalendarLabel } from "../cosmicCalendar";
 import {
   comparePreciseTimelineYears,
   getMinZoomForWidth,
@@ -286,13 +287,16 @@ export function drawAxis(cx: CanvasDrawContext): void {
   }
 
   // --- Axis label formatters ---
-  const useSubYearAxis = fineGrainedAxisMode !== null;
-  const useCalendarSubYearAxis = fineGrainedAxisMode === "calendar";
-  const useElapsedSubYearAxis = fineGrainedAxisMode === "elapsed";
+  const isCosmicCalendar = cx.isCosmicCalendarMode;
+  const useSubYearAxis = !isCosmicCalendar && fineGrainedAxisMode !== null;
+  const useCalendarSubYearAxis = !isCosmicCalendar && fineGrainedAxisMode === "calendar";
+  const useElapsedSubYearAxis = !isCosmicCalendar && fineGrainedAxisMode === "elapsed";
   const formatAxisLabel = (year: number | PreciseTimelineYear, step: number) =>
-    useBigBangElapsedLabels
-      ? formatTimelineElapsedAxisLabel(year, step, "after-big-bang")
-      : formatTimelineYear(year, step, { mode: "axis" });
+    isCosmicCalendar
+      ? formatCosmicCalendarLabel(year, step)
+      : useBigBangElapsedLabels
+        ? formatTimelineElapsedAxisLabel(year, step, "after-big-bang")
+        : formatTimelineYear(year, step, { mode: "axis" });
   const formatElapsedAxisLabel = (
     year: number | PreciseTimelineYear,
     step: number,

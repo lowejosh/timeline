@@ -127,6 +127,7 @@ type TimelineCanvasProps = {
   enabledGroupIds: ReadonlySet<string>;
   overlayVisibilityTransitionKey: string;
   parentEra: Era | null;
+  isCosmicCalendarMode: boolean;
   isAnimating: boolean;
   onViewportChange: (
     updater: (current: TimelineViewport) => TimelineViewport,
@@ -198,6 +199,7 @@ export function TimelineCanvas({
   enabledGroupIds,
   overlayVisibilityTransitionKey,
   parentEra,
+  isCosmicCalendarMode,
   isAnimating,
   onViewportChange,
   onAnimateZoom,
@@ -753,6 +755,7 @@ export function TimelineCanvas({
         isViewportInteractionActive,
         preferredAxisLabelStepRef,
         primordialDebugSignatureRef,
+        isCosmicCalendarMode,
       };
 
       drawBackground(cx);
@@ -870,6 +873,7 @@ export function TimelineCanvas({
     [
       commitHoveredTooltip,
       height,
+      isCosmicCalendarMode,
       isViewportInteractionActive,
       resolveHoveredTooltipForCanvasDraw,
       width,
