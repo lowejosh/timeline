@@ -17,15 +17,9 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(214, 166, 112)",
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "urukPeriodWikipedia",
-        note: "Uses the page's explicit Uruk period range of c. 4000–3100 BC and its direct framing of this phase as the period of the appearance of cities and the state in Mesopotamia.",
-      },
-      {
-        sourceId: "metUrukFirstCity",
-        note: "The Met says that by around 3200 B.C. Uruk was a true city, which anchors the later, clearly urban part of this broader Uruk-period band.",
-      },
+    sourceIds: [
+      "urukPeriodWikipedia",
+      "metUrukFirstCity"
     ],
   },
   {
@@ -39,12 +33,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Southern Mesopotamia",
     color: "rgb(208, 160, 108)",
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "jemdetNasrPeriodWikipedia",
-        note: "Uses the page's direct 3100–2900 BC dating and its statement that the Jemdet Nasr culture develops out of the Uruk period and continues into Early Dynastic I.",
-      },
-    ],
+    sourceIds: ["jemdetNasrPeriodWikipedia"],
   },
   {
     id: "sumerian-city-states",
@@ -59,12 +48,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(202, 156, 105)",
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "metEarlyDynasticSculpture",
-        note: "The Met directly dates the Early Dynastic period in Mesopotamia to ca. 2900–2350 B.C. and says this was the phase when city life remained centered on the gods while city rulers grew in importance.",
-      },
-    ],
+    sourceIds: ["metEarlyDynasticSculpture"],
   },
   {
     id: "akkadian-empire",
@@ -79,12 +63,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(190, 120, 92)",
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "metAkkadianPeriod",
-        note: "The Met explicitly names the Akkadian period as ca. 2350–2150 B.C. and says Akkad's Semitic monarchs united the rival Sumerian cities by conquest.",
-      },
-    ],
+    sourceIds: ["metAkkadianPeriod"],
   },
   {
     id: "ur-iii-empire",
@@ -99,15 +78,9 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(182, 144, 101)",
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "metUrZiggurat",
-        note: "The Met says that around 2100 B.C. southern Mesopotamian cities came under the control of Ur-Nammu, ruler of Ur, who built major temples including the ziggurat at Ur.",
-      },
-      {
-        sourceId: "metIsinLarsaOldBabylonian",
-        note: "The Met explicitly dates the Ur III state to ca. 2112–2004 B.C., before its collapse and the rise of city-based dynasties in southern Mesopotamia.",
-      },
+    sourceIds: [
+      "metUrZiggurat",
+      "metIsinLarsaOldBabylonian"
     ],
   },
   {
@@ -122,12 +95,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     color: "rgb(168, 132, 88)",
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "metIsinLarsaOldBabylonian",
-        note: "The Met explicitly dates the Old Babylonian period to ca. 1894–1595 B.C. and says Hammurabi transformed Babylon from a city of little importance into the political capital of Mesopotamia.",
-      },
-    ],
+    sourceIds: ["metIsinLarsaOldBabylonian"],
   },
   {
     id: "kassite-babylonia",
@@ -142,12 +110,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(154, 126, 96)",
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "metMiddleBabylonianKassite",
-        note: "The Met titles this phase 'The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.)' and says Kassite rule was so long lasting that it was virtually synonymous with the Middle Babylonian period.",
-      },
-    ],
+    sourceIds: ["metMiddleBabylonianKassite"],
   },
   {
     id: "middle-assyrian-empire",
@@ -161,12 +124,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     color: "rgb(141, 118, 138)",
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "metAssyria",
-        note: "The Met says Assyria revived under Ashur-uballit I (1365–1330 B.C.), reached its greatest extent in the Middle Assyrian period under Tukulti-Ninurta I, and under Tiglath-pileser I (1114–1076 B.C.) campaigned as far as the Mediterranean.",
-      },
-    ],
+    sourceIds: ["metAssyria"],
   },
   {
     id: "neo-assyrian-empire",
@@ -179,12 +137,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Northern Mesopotamia",
     color: "rgb(129, 106, 154)",
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "worldHistoryNeoAssyrianEmpire",
-        note: "World History Encyclopedia explicitly dates the Neo-Assyrian Empire to 912–612 BCE and describes it as the final stage of Assyrian power, stretching across Mesopotamia, the Levant, Egypt, Anatolia, and parts of Persia and Arabia.",
-      },
-    ],
+    sourceIds: ["worldHistoryNeoAssyrianEmpire"],
   },
   {
     id: "neo-babylonian-empire",
@@ -197,12 +150,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Babylonia",
     color: "rgb(153, 114, 172)",
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "metBabylon",
-        note: "The Met gives Nabopolassar's reign as 625–605 B.C., describes him and Nebuchadnezzar II as ruling most of the former Assyrian empire, and dates Cyrus II's conquest of Babylon to 539 B.C.",
-      },
-    ],
+    sourceIds: ["metBabylon"],
   },
 ];
 
@@ -219,12 +167,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     color: "rgb(146, 118, 88)",
     subGroup: "east-asia",
-    sourceRefs: [
-      {
-        sourceId: "shangDynastyWikipedia",
-        note: "Uses the conventional c. 1600–1046 BCE Shang span for a broad early-dynastic band rather than the narrower late-Shang-only Yin Xu site chronology.",
-      },
-    ],
+    sourceIds: ["shangDynastyWikipedia"],
   },
   {
     id: "zhou-china",
@@ -238,12 +181,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     color: "rgb(124, 136, 91)",
     subGroup: "east-asia",
-    sourceRefs: [
-      {
-        sourceId: "zhouDynastyWikipedia",
-        note: "Uses the conventional c. 1046–256 BCE Zhou span and the page's broad framing of the Mandate of Heaven and classical Chinese philosophical traditions.",
-      },
-    ],
+    sourceIds: ["zhouDynastyWikipedia"],
   },
   {
     id: "qin-dynasty",
@@ -256,12 +194,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "China",
     color: "rgb(93, 126, 112)",
     subGroup: "east-asia",
-    sourceRefs: [
-      {
-        sourceId: "qinDynastyWikipedia",
-        note: "Uses the Qin dynasty's 221–206 BCE span and the page's public-facing emphasis on imperial unification and standardization.",
-      },
-    ],
+    sourceIds: ["qinDynastyWikipedia"],
   },
   {
     id: "han-china",
@@ -275,12 +208,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     color: "rgb(72, 132, 108)",
     priority: 80,
     subGroup: "east-asia",
-    sourceRefs: [
-      {
-        sourceId: "britannicaHanDynasty",
-        note: "Uses the standard Han dynasty span of 206 BCE to 220 CE as a concise band for Han-era China.",
-      },
-    ],
+    sourceIds: ["britannicaHanDynasty"],
   },
   {
     id: "tang-dynasty",
@@ -295,12 +223,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
     subGroup: "east-asia",
-    sourceRefs: [
-      {
-        sourceId: "tangDynastyWikipedia",
-        note: "Uses the Tang dynasty's 618–907 span and the page's broad public-facing framing of Tang China as a cultural and administrative high point.",
-      },
-    ],
+    sourceIds: ["tangDynastyWikipedia"],
   },
   {
     id: "song-china",
@@ -315,12 +238,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 74,
     subGroup: "east-asia",
-    sourceRefs: [
-      {
-        sourceId: "khanSongChina",
-        note: "Uses the standard Song dynasty span of 960–1279 highlighted by Khan Academy's 'Prosperity in Song China' lesson.",
-      },
-    ],
+    sourceIds: ["khanSongChina"],
   },
   {
     id: "yuan-dynasty",
@@ -335,12 +253,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 73,
     subGroup: "east-asia",
-    sourceRefs: [
-      {
-        sourceId: "yuanDynastyWikipedia",
-        note: "Uses the Yuan dynasty's 1271–1368 span and the page's broad public-facing framing of Mongol rule over China.",
-      },
-    ],
+    sourceIds: ["yuanDynastyWikipedia"],
   },
   {
     id: "ming-dynasty",
@@ -355,12 +268,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 72,
     subGroup: "east-asia",
-    sourceRefs: [
-      {
-        sourceId: "historyMingDynasty",
-        note: "Uses the standard Ming dynasty span from the dynasty's founding in 1368 to the Qing takeover in 1644.",
-      },
-    ],
+    sourceIds: ["historyMingDynasty"],
   },
   {
     id: "qing-dynasty",
@@ -375,12 +283,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 71,
     subGroup: "east-asia",
-    sourceRefs: [
-      {
-        sourceId: "qingDynastyWikipedia",
-        note: "Uses the Qing dynasty's 1644–1912 span and the page's broad public-facing framing of Qing rule as the last imperial dynasty of China.",
-      },
-    ],
+    sourceIds: ["qingDynastyWikipedia"],
   },
 ];
 
@@ -396,12 +299,7 @@ const MAYA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Mesoamerica",
     color: "rgb(172, 136, 100)",
     subGroup: "mesoamerica",
-    sourceRefs: [
-      {
-        sourceId: "preclassicMayaWikipedia",
-        note: "Uses the page's Late Preclassic (400 BC-100 AD) and Terminal Preclassic (100 AD-250 AD) sections to form one continuous late-preclassic band, along with its framing of the rise of the first Maya states, early monarchy, and the earliest known Maya writing around 300 BC.",
-      },
-    ],
+    sourceIds: ["preclassicMayaWikipedia"],
   },
   {
     id: "classic-maya",
@@ -414,12 +312,7 @@ const MAYA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Mesoamerica",
     color: "rgb(137, 109, 88)",
     subGroup: "mesoamerica",
-    sourceRefs: [
-      {
-        sourceId: "historyOfMayaCivilizationWikipedia",
-        note: "Uses the history page's broader Classic framing through the Terminal Classic, keeping one public-facing band from 250 to 950 CE.",
-      },
-    ],
+    sourceIds: ["historyOfMayaCivilizationWikipedia"],
   },
   {
     id: "postclassic-maya",
@@ -432,12 +325,7 @@ const MAYA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Mesoamerica",
     color: "rgb(118, 94, 78)",
     subGroup: "mesoamerica",
-    sourceRefs: [
-      {
-        sourceId: "historyOfMayaCivilizationWikipedia",
-        note: "Uses the history page's Postclassic and Contact-era sections for a continuous late Maya band from 950 CE to the fall of Nojpetén in 1697.",
-      },
-    ],
+    sourceIds: ["historyOfMayaCivilizationWikipedia"],
   },
 ];
 
@@ -456,15 +344,9 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     priority: 95,
     subGroup: "near-east",
     children: MESOPOTAMIA_SUB_BANDS,
-    sourceRefs: [
-      {
-        sourceId: "britannicaSumer",
-        note: "Britannica directly calls Sumer the site of the earliest known civilization and says it was first settled between 4500 and 4000 BCE by the Ubaidians; the app uses 4000 BCE as the latest explicit opening date in that source for this parent Mesopotamian civilization band.",
-      },
-      {
-        sourceId: "metBabylon",
-        note: "The Met explicitly dates the Neo-Babylonian empire's end to 539 B.C., when Cyrus II of Persia conquered Babylon, which provides the parent band's endpoint here.",
-      },
+    sourceIds: [
+      "britannicaSumer",
+      "metBabylon"
     ],
   },
   {
@@ -482,12 +364,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 90,
     subGroup: "south-asia",
-    sourceRefs: [
-      {
-        sourceId: "britannicaIndusCivilization",
-        note: "Uses the broad Harappan-era span commonly summarized in world-history overviews.",
-      },
-    ],
+    sourceIds: ["britannicaIndusCivilization"],
   },
   {
     id: "ancient-egypt",
@@ -502,12 +379,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 92,
     subGroup: "nile-valley",
-    sourceRefs: [
-      {
-        sourceId: "britannicaAncientEgypt",
-        note: "Uses the conventional span from early dynastic unification to the Roman annexation of Egypt.",
-      },
-    ],
+    sourceIds: ["britannicaAncientEgypt"],
   },
   {
     id: "hittite-empire",
@@ -524,12 +396,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 89,
     subGroup: "mediterranean",
-    sourceRefs: [
-      {
-        sourceId: "britannicaHittiteEmpire",
-        note: "Britannica summarizes the Hittite Empire as c. 1650–1180 BCE, which the app uses directly for this Bronze Age overlay.",
-      },
-    ],
+    sourceIds: ["britannicaHittiteEmpire"],
   },
   {
     id: "mycenaean-greece",
@@ -546,12 +413,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 88,
     subGroup: "mediterranean",
-    sourceRefs: [
-      {
-        sourceId: "unescoMycenaeTiryns",
-        note: "UNESCO says Mycenaean civilization spread around the Mediterranean between 1600 and 1100 BCE; the app uses that broad span for a clean Late Bronze Age Greek band.",
-      },
-    ],
+    sourceIds: ["unescoMycenaeTiryns"],
   },
   {
     id: "maya-civilization",
@@ -567,15 +429,9 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     priority: 79,
     subGroup: "mesoamerica",
     children: MAYA_SUB_BANDS,
-    sourceRefs: [
-      {
-        sourceId: "preclassicMayaWikipedia",
-        note: "Uses the Preclassic Maya page's Late Preclassic opening at 400 BC as the cleaned-up visible starting point for this Maya overlay family, so the band begins with the rise of Maya states rather than the much earlier sedentary formative phase.",
-      },
-      {
-        sourceId: "historyOfMayaCivilizationWikipedia",
-        note: "Uses the history page's Contact-era framing through the fall of the last independent Maya city in 1697, while clipping the visible parent band to late-preclassic onward for at-a-glance readability.",
-      },
+    sourceIds: [
+      "preclassicMayaWikipedia",
+      "historyOfMayaCivilizationWikipedia"
     ],
   },
   {
@@ -591,12 +447,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 88,
     subGroup: "mediterranean",
-    sourceRefs: [
-      {
-        sourceId: "britannicaAncientGreece",
-        note: "Uses Britannica's broad framing from the end of Mycenaean civilization around 1200 BCE to the death of Alexander the Great in 323 BCE.",
-      },
-    ],
+    sourceIds: ["britannicaAncientGreece"],
   },
   {
     id: "carthage",
@@ -612,12 +463,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 87,
     subGroup: "mediterranean",
-    sourceRefs: [
-      {
-        sourceId: "britannicaCarthage",
-        note: "Uses Britannica's traditional 814 BCE foundation date for Carthage and its explicit 146 BCE destruction by Rome, along with the page's framing of Carthage as a thriving port and trading centre that became a major Mediterranean power and rival to Rome.",
-      },
-    ],
+    sourceIds: ["britannicaCarthage"],
   },
   {
     id: "achaemenid-persia",
@@ -632,12 +478,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 86,
     subGroup: "iranian-world",
-    sourceRefs: [
-      {
-        sourceId: "historyPersianEmpire",
-        note: "Uses the rise of Cyrus the Great in 550 BCE through Alexander's conquest in 330 BCE for a clean Achaemenid-era band.",
-      },
-    ],
+    sourceIds: ["historyPersianEmpire"],
   },
   {
     id: "roman-republic",
@@ -651,15 +492,9 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 84,
     subGroup: "mediterranean",
-    sourceRefs: [
-      {
-        sourceId: "historyAncientRome",
-        note: "Uses the standard Roman Republic span from the overthrow of the monarchy in 509 BCE to Augustus' settlement in 27 BCE.",
-      },
-      {
-        sourceId: "khanRomanRepublic",
-        note: "Supports the conventional 509 BCE republican starting point used in world-history surveys.",
-      },
+    sourceIds: [
+      "historyAncientRome",
+      "khanRomanRepublic"
     ],
   },
   {
@@ -677,12 +512,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     priority: 87,
     subGroup: "east-asia",
     children: CHINESE_CIVILIZATION_SUB_BANDS,
-    sourceRefs: [
-      {
-        sourceId: "historyOfChinaWikipedia",
-        note: "Broad parent overlay spanning the conventional Shang beginning of dynastic China through the Qing dynasty's end in 1912.",
-      },
-    ],
+    sourceIds: ["historyOfChinaWikipedia"],
   },
   {
     id: "roman-empire",
@@ -696,15 +526,9 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 78,
     subGroup: "mediterranean",
-    sourceRefs: [
-      {
-        sourceId: "historyAncientRome",
-        note: "Uses Augustus' accession in 27 BCE and the fall of the western empire in 476 CE for a compact public-timeline band; eastern Roman continuity continues beyond this endpoint.",
-      },
-      {
-        sourceId: "khanRomanEmpire",
-        note: "Supports the conventional imperial start in 27 BCE under Augustus.",
-      },
+    sourceIds: [
+      "historyAncientRome",
+      "khanRomanEmpire"
     ],
   },
 ];
@@ -723,12 +547,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 79,
     subGroup: "iranian-world",
-    sourceRefs: [
-      {
-        sourceId: "sasanianEmpireWikipedia",
-        note: "Uses the standard Sasanian span from Ardashir I's rise in 224 CE to the empire's fall in 651 CE.",
-      },
-    ],
+    sourceIds: ["sasanianEmpireWikipedia"],
   },
   {
     id: "byzantine-empire",
@@ -743,15 +562,9 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
     subGroup: "mediterranean",
-    sourceRefs: [
-      {
-        sourceId: "metByzantium",
-        note: "Uses the conventional Byzantine span from Constantine's refounding of Constantinople in 330 CE to the Ottoman conquest in 1453.",
-      },
-      {
-        sourceId: "historyByzantineEmpire",
-        note: "Supports the 1453 endpoint used for the overlay's eastern Roman / Byzantine continuity band.",
-      },
+    sourceIds: [
+      "metByzantium",
+      "historyByzantineEmpire"
     ],
   },
   {
@@ -767,12 +580,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 75,
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "khanGoldenAgeOfIslam",
-        note: "Uses Khan Academy's Abbasid-era framing and 750–1258 political span for a clean post-classical caliphal band.",
-      },
-    ],
+    sourceIds: ["khanGoldenAgeOfIslam"],
   },
   {
     id: "holy-roman-empire",
@@ -787,12 +595,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 74,
     subGroup: "central-europe",
-    sourceRefs: [
-      {
-        sourceId: "holyRomanEmpireWikipedia",
-        note: "Uses the conventional span from Otto I's imperial coronation in 962 to Francis II's dissolution of the empire in 1806.",
-      },
-    ],
+    sourceIds: ["holyRomanEmpireWikipedia"],
   },
   {
     id: "mongol-empire",
@@ -807,15 +610,9 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 78,
     subGroup: "steppe",
-    sourceRefs: [
-      {
-        sourceId: "britannicaMongolEmpire",
-        note: "Uses Britannica's broad 1206–1368 Mongol Empire span, from Temujin's election as Genghis Khan to the end of Mongol Yuan rule in China under the Ming.",
-      },
-      {
-        sourceId: "historyGenghisKhan",
-        note: "Supports the 1206 starting point, when Temujin was proclaimed Chinggis Khan after unifying the Mongol steppe tribes.",
-      },
+    sourceIds: [
+      "britannicaMongolEmpire",
+      "historyGenghisKhan"
     ],
   },
   {
@@ -833,12 +630,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 73,
     subGroup: "west-africa",
-    sourceRefs: [
-      {
-        sourceId: "maliEmpireWikipedia",
-        note: "Uses the broad Mali Empire span from Sundiata's rise in the 13th century through the empire's long decline into the early 17th century.",
-      },
-    ],
+    sourceIds: ["maliEmpireWikipedia"],
   },
   {
     id: "ottoman-empire",
@@ -853,12 +645,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 77,
     subGroup: "mediterranean",
-    sourceRefs: [
-      {
-        sourceId: "historyOttomanEmpire",
-        note: "Uses the Ottoman state's conventional 1299 origin, but clips the display band at 1800 so this overlay family stays bounded to the app's early-modern window; the polity continued until 1922.",
-      },
-    ],
+    sourceIds: ["historyOttomanEmpire"],
   },
   {
     id: "aztec-empire",
@@ -873,12 +660,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 71,
     subGroup: "mesoamerica",
-    sourceRefs: [
-      {
-        sourceId: "historyAztecs",
-        note: "Uses the 1428 Triple Alliance as a concise imperial starting point and 1521 as the fall of Tenochtitlan.",
-      },
-    ],
+    sourceIds: ["historyAztecs"],
   },
   {
     id: "inca-empire",
@@ -893,12 +675,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 70,
     subGroup: "andes",
-    sourceRefs: [
-      {
-        sourceId: "historyInca",
-        note: "Uses Pachacuti's mid-15th-century imperial expansion as the clean starting point and the fall of Vilcabamba in 1572 as the endpoint.",
-      },
-    ],
+    sourceIds: ["historyInca"],
   },
 ];
 

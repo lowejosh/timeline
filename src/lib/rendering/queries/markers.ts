@@ -1,8 +1,5 @@
 import type { TimelineMarker } from "../../core/timelineTypes";
-import {
-  getVisibleRange,
-  type TimelineViewport,
-} from "../../core/viewport";
+import { getVisibleRange, type TimelineViewport } from "../../core/viewport";
 import {
   isDecorationGroupEnabled,
   isTimelineDecorationVisibleAtZoom,
@@ -118,9 +115,6 @@ export function getVisibleTimelineMarkers(
         marker.year <= visibleEnd,
     )
     .sort((left, right) =>
-      compareDecorations(
-        markerAsDecoration(left),
-        markerAsDecoration(right),
-      ),
+      compareDecorations(markerAsDecoration(left), markerAsDecoration(right)),
     );
 }

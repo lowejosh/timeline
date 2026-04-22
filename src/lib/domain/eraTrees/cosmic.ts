@@ -43,10 +43,6 @@ const LEPTON_END = minutesAfterBB(3);
 const BBN_END = minutesAfterBB(20);
 const PHOTON_END = afterBigBang(240_000);
 
-const bigBangTimelineSource = {
-  sourceId: "physicsOfUniverseBigBangTimeline" as const,
-};
-
 const afterBigBangExact = (
   timestamp: Omit<
     Parameters<typeof createExactElapsedTimestamp>[0],
@@ -71,12 +67,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     description:
       "All four fundamental forces are unified. The observable universe spans one Planck length at over 10³² °C, the hottest moment in existence.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        ...bigBangTimelineSource,
-        note: "Planck Epoch from zero to approximately 10⁻⁴³ seconds; four forces unified, universe spans 10⁻³⁵ meters at Planck Temperature.",
-      },
-    ],
+    sourceIds: ["physicsOfUniverseBigBangTimeline"],
   },
   {
     id: "grand-unification-epoch",
@@ -90,12 +81,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     description:
       "Gravity separates first. The earliest elementary particles and antiparticles begin to appear.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        ...bigBangTimelineSource,
-        note: "Grand Unification Epoch from 10⁻⁴³ to 10⁻³⁶ seconds; gravity separates, elementary particles created.",
-      },
-    ],
+    sourceIds: ["physicsOfUniverseBigBangTimeline"],
   },
   {
     id: "inflationary-epoch",
@@ -109,12 +95,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     description:
       "Space itself expands by at least a factor of 10²⁶ in a fraction of a second, stretching the universe from subatomic to roughly grapefruit-sized.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        ...bigBangTimelineSource,
-        note: "Inflationary Epoch from 10⁻³⁶ to 10⁻³² seconds; triggered by separation of strong nuclear force, universe expands by factor of 10²⁶.",
-      },
-    ],
+    sourceIds: ["physicsOfUniverseBigBangTimeline"],
   },
   {
     id: "electroweak-epoch",
@@ -128,12 +109,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     description:
       "With the strong force now separate, particle interactions create W and Z bosons and the Higgs boson, slowing particles down and giving them mass.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        ...bigBangTimelineSource,
-        note: "Electroweak Epoch from 10⁻³⁶ to 10⁻¹² seconds; strong nuclear force separates, Higgs field gives particles mass. Sequenced here after inflation for non-overlapping display.",
-      },
-    ],
+    sourceIds: ["physicsOfUniverseBigBangTimeline"],
   },
   {
     id: "quark-epoch",
@@ -151,12 +127,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     description:
       "Quarks, electrons, and neutrinos fill the cooling universe below 10 quadrillion degrees. A tiny surplus of quarks over antiquarks survives, becoming the seed of all future matter.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        ...bigBangTimelineSource,
-        note: "Quark Epoch from 10⁻¹² to 10⁻⁶ seconds; quarks and antiquarks annihilate, a surplus of about one quark per billion pairs persists (baryogenesis).",
-      },
-    ],
+    sourceIds: ["physicsOfUniverseBigBangTimeline"],
   },
   {
     id: "hadron-epoch",
@@ -178,12 +149,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     description:
       "Quarks bind into protons and neutrons at roughly a trillion degrees. Neutrinos decouple and begin streaming freely through space.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        ...bigBangTimelineSource,
-        note: "Hadron Epoch from 10⁻⁶ to 1 second; quarks combine into hadrons (protons and neutrons), neutrinos decouple.",
-      },
-    ],
+    sourceIds: ["physicsOfUniverseBigBangTimeline"],
   },
   {
     id: "lepton-epoch",
@@ -205,12 +171,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     description:
       "Electrons and positrons dominate, annihilating in pairs and releasing bursts of photons. A small excess of electrons survives.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        ...bigBangTimelineSource,
-        note: "Lepton Epoch from 1 second to 3 minutes; leptons and antileptons dominate, most annihilate into photons.",
-      },
-    ],
+    sourceIds: ["physicsOfUniverseBigBangTimeline"],
   },
   {
     id: "big-bang-nucleosynthesis",
@@ -232,12 +193,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     description:
       "Protons and neutrons fuse into hydrogen, helium, and traces of lithium in the first bout of nuclear fusion, before the universe cools too far for it to continue.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        ...bigBangTimelineSource,
-        note: "Nucleosynthesis from 3 to 20 minutes; protons and neutrons fuse into hydrogen, helium, and lithium nuclei.",
-      },
-    ],
+    sourceIds: ["physicsOfUniverseBigBangTimeline"],
   },
   {
     id: "photon-epoch",
@@ -259,12 +215,7 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     description:
       "A hot, opaque plasma of atomic nuclei and electrons fills the expanding universe, with photons scattering endlessly off charged particles.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        ...bigBangTimelineSource,
-        note: "Photon Epoch (Radiation Domination) from 3 minutes to 240,000 years; universe filled with hot opaque plasma, photon energy dominates. Displayed here from 20 minutes onward (after nucleosynthesis) for non-overlapping layout.",
-      },
-    ],
+    sourceIds: ["physicsOfUniverseBigBangTimeline"],
   },
   {
     id: "recombination",
@@ -286,15 +237,9 @@ const EARLY_UNIVERSE_CHILDREN: EraDefinition[] = [
     description:
       "As electrons settle into the first neutral atoms, the cosmic fog clears. By around 380,000 years after the Big Bang, the universe becomes transparent and the oldest light we observe today as the cosmic microwave background can travel freely.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        sourceId: "nasaUniverseOverview",
-        note: "NASA says recombination occurred around 380,000 years after the Big Bang, when atomic nuclei captured electrons, the cosmic fog cleared, and the glow we still detect as the cosmic microwave background began traveling freely.",
-      },
-      {
-        sourceId: "nasaLambdaCosmology",
-        note: "NASA LAMBDA uses recombination as the transition where electrons and baryons form mostly neutral atoms, photons decouple from baryons, and the density pattern preserved in the CMB becomes frozen in.",
-      },
+    sourceIds: [
+      "nasaUniverseOverview",
+      "nasaLambdaCosmology"
     ],
   },
 ];
@@ -311,15 +256,9 @@ export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Neutral hydrogen fills a starless universe after recombination, before the first stars light up space.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        sourceId: "nasaLambdaCosmology",
-        note: "NASA LAMBDA describes the post-recombination neutral universe as the Dark Ages, before the first stars switch on and begin reionizing the intergalactic medium.",
-      },
-      {
-        sourceId: "nasaUniverseOverview",
-        note: "NASA says the universe remained dark for the next 200 million years after recombination because no stars yet existed to shine.",
-      },
+    sourceIds: [
+      "nasaLambdaCosmology",
+      "nasaUniverseOverview"
     ],
   },
   {
@@ -332,15 +271,9 @@ export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "The first stars and young galaxies ignite, flooding space with ultraviolet light that reionizes cosmic gas.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        sourceId: "nasaUniverseOverview",
-        note: "NASA says the first stars formed after the dark ages and that by the time the universe was 1 billion years old, stars and galaxies had reionized nearly all the gas.",
-      },
-      {
-        sourceId: "nasaLambdaCosmology",
-        note: "NASA LAMBDA ties cosmic dawn to the first radiation sources and describes their light as reionizing the intergalactic medium across this interval.",
-      },
+    sourceIds: [
+      "nasaUniverseOverview",
+      "nasaLambdaCosmology"
     ],
   },
   {
@@ -353,12 +286,7 @@ export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Galaxies keep growing into groups, clusters, and the large-scale cosmic web.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        sourceId: "nasaUniverseOverview",
-        note: "On NASA's Cosmic History overview, the visible infographic places 'Galaxies & Dark Matter' at about 400 million years and 'Dark Energy' at 10 billion years, framing this interval as the long era of galaxy building before accelerating expansion dominates.",
-      },
-    ],
+    sourceIds: ["nasaUniverseOverview"],
   },
   {
     id: "dark-energy-acceleration",
@@ -370,11 +298,6 @@ export const COSMIC_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Cosmic expansion speeds up as dark energy stretches space ever faster while galaxies continue drifting apart.",
     scheme: "cosmic",
-    sourceRefs: [
-      {
-        sourceId: "nasaUniverseOverview",
-        note: "The History of the Universe infographic on NASA's Cosmic History overview places 'Dark Energy' at 10 billion years and describes this stage as the point where expansion accelerates.",
-      },
-    ],
+    sourceIds: ["nasaUniverseOverview"],
   },
 ];

@@ -11,12 +11,7 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 17,
     priority: 83,
-    sourceRefs: [
-      {
-        sourceId: "smithsonianHomoSapiens",
-        note: "The Smithsonian's Homo sapiens overview says our species evolved in Africa around 300,000 years ago; the app uses c. 300,000 BCE as the species-level anchor for the emergence of modern humans.",
-      },
-    ],
+    sourceIds: ["smithsonianHomoSapiens"],
   },
   {
     id: "ground-ocher-markings-appear-in-africa",
@@ -27,12 +22,7 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 17,
     priority: 75,
-    sourceRefs: [
-      {
-        sourceId: "metPrehistoricArt",
-        note: "The Met's prehistoric-art introduction says the first human artistic representations, markings with ground red ocher, seem to have occurred about 100,000 B.C. in African rock art; the app uses that date as a cautious early-symbolic-expression anchor.",
-      },
-    ],
+    sourceIds: ["metPrehistoricArt"],
   },
   {
     id: "chauvet-cave-figurative-art",
@@ -43,15 +33,9 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 77,
-    sourceRefs: [
-      {
-        sourceId: "unescoChauvet",
-        note: "UNESCO dates Chauvet Cave's earliest-known figurative drawings to roughly 30,000–32,000 BP; the app uses c. 30,000 BCE as a clean public-facing anchor for this exceptionally early cave art.",
-      },
-      {
-        sourceId: "metChauvet",
-        note: "The Met's Chauvet essay says most of the cave's images belong to a first phase between 30,000 and 32,000 BP, reinforcing the app's c. 30,000 BCE anchor.",
-      },
+    sourceIds: [
+      "unescoChauvet",
+      "metChauvet"
     ],
   },
   {
@@ -63,11 +47,6 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 74,
-    sourceRefs: [
-      {
-        sourceId: "khanPaleolithicCulture",
-        note: "Khan Academy directly identifies the Venus of Dolní Věstonice as a Paleolithic figurine dated to 29,000–25,000 BCE; the app uses c. 27,000 BCE as a midpoint anchor for this iconic portable sculpture.",
-      },
-    ],
+    sourceIds: ["khanPaleolithicCulture"],
   },
 ];

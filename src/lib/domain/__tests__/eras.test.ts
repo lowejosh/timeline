@@ -66,8 +66,8 @@ describe("era data", () => {
 
   it("only references known sources", () => {
     walkEraTree(ROOT_ERA, (era) => {
-      for (const reference of era.sourceRefs ?? []) {
-        expect(ERA_SOURCES[reference.sourceId]).toBeDefined();
+      for (const sourceId of era.sourceIds ?? []) {
+        expect(ERA_SOURCES[sourceId]).toBeDefined();
       }
     });
   });
@@ -78,16 +78,16 @@ describe("era data", () => {
         return;
       }
 
-      expect((era.sourceRefs ?? []).length).toBeGreaterThan(0);
+      expect((era.sourceIds ?? []).length).toBeGreaterThan(0);
 
-      const hasLinkedSource = (era.sourceRefs ?? []).some((reference) => {
-        const source = ERA_SOURCES[reference.sourceId];
+      const hasLinkedSource = (era.sourceIds ?? []).some((sourceId) => {
+        const source = ERA_SOURCES[sourceId];
 
         return "url" in source && Boolean(source.url);
       });
 
-      const hasIntentionalUnsourcedTag = (era.sourceRefs ?? []).some(
-        (reference) => reference.sourceId === "trustMeBro",
+      const hasIntentionalUnsourcedTag = (era.sourceIds ?? []).some(
+        (sourceId) => sourceId === "trustMeBro",
       );
 
       expect(hasLinkedSource || hasIntentionalUnsourcedTag).toBe(true);
@@ -102,7 +102,7 @@ describe("era data", () => {
 
     const paleolithic = findEraById(ROOT_ERA, "paleolithic");
 
-    expect(paleolithic?.sourceRefs?.length).toBeGreaterThan(0);
+    expect(paleolithic?.sourceIds?.length).toBeGreaterThan(0);
     expect(neolithic?.name).toBe("Neolithic");
     expect(ppnb?.name).toBe("Pre-Pottery Neolithic B");
   });

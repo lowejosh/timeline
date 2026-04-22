@@ -1,20 +1,12 @@
 import type { EraDefinition } from "../../core/timelineTypes";
 import { yearsAgo } from "../timelineDateBuilders";
 
-function chartRef(note?: string): EraDefinition["sourceRefs"] {
-  return note
-    ? [{ sourceId: "icsChart2024", note }]
-    : [{ sourceId: "icsChart2024" }];
+function chartRef(): EraDefinition["sourceIds"] {
+  return ["icsChart2024"];
 }
 
-function chartAndGuideRefs(
-  guideNote: string,
-  chartNote?: string,
-): EraDefinition["sourceRefs"] {
-  return [
-    ...(chartRef(chartNote) ?? []),
-    { sourceId: "ucmpGeologicTimeScaleGuide", note: guideNote },
-  ];
+function chartAndGuideRefs(): EraDefinition["sourceIds"] {
+  return ["icsChart2024", "ucmpGeologicTimeScaleGuide"];
 }
 
 function icsColor(red: number, green: number, blue: number): string {
@@ -43,7 +35,7 @@ const CAMBRIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(521_000_000),
     color: icsHex("#8CB06C"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "cambrian-series-2",
@@ -52,7 +44,7 @@ const CAMBRIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(506_500_000),
     color: icsHex("#99C078"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "miaolingian",
@@ -61,7 +53,7 @@ const CAMBRIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(497_000_000),
     color: icsHex("#A6CF86"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "furongian",
@@ -70,7 +62,7 @@ const CAMBRIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(486_850_000),
     color: icsHex("#B3E095"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -82,7 +74,7 @@ const ORDOVICIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(471_300_000),
     color: icsHex("#1A9D6F"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "middle-ordovician",
@@ -91,7 +83,7 @@ const ORDOVICIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(458_200_000),
     color: icsHex("#4DB47E"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "upper-ordovician",
@@ -100,7 +92,7 @@ const ORDOVICIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(443_100_000),
     color: icsHex("#7FCA93"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -112,7 +104,7 @@ const SILURIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(432_900_000),
     color: icsHex("#99D7B3"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "wenlock",
@@ -121,7 +113,7 @@ const SILURIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(426_700_000),
     color: icsHex("#B3E1C2"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "ludlow",
@@ -130,7 +122,7 @@ const SILURIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(422_700_000),
     color: icsHex("#BFE6CF"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "pridoli",
@@ -139,7 +131,7 @@ const SILURIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(419_620_000),
     color: icsHex("#E6F5E1"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -151,7 +143,7 @@ const DEVONIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(393_470_000),
     color: icsHex("#E5AC4D"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "middle-devonian",
@@ -160,7 +152,7 @@ const DEVONIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(382_310_000),
     color: icsHex("#F1C868"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "upper-devonian",
@@ -169,7 +161,7 @@ const DEVONIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(358_860_000),
     color: icsHex("#F1E19D"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -181,7 +173,7 @@ const CARBONIFEROUS_SERIES: EraDefinition[] = [
     endYear: yearsAgo(346_700_000),
     color: icsHex("#80AB6C"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "middle-mississippian",
@@ -190,7 +182,7 @@ const CARBONIFEROUS_SERIES: EraDefinition[] = [
     endYear: yearsAgo(330_300_000),
     color: icsHex("#99B46C"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "upper-mississippian",
@@ -199,7 +191,7 @@ const CARBONIFEROUS_SERIES: EraDefinition[] = [
     endYear: yearsAgo(323_400_000),
     color: icsHex("#B3BE6C"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "lower-pennsylvanian",
@@ -208,7 +200,7 @@ const CARBONIFEROUS_SERIES: EraDefinition[] = [
     endYear: yearsAgo(315_200_000),
     color: icsHex("#8CBEB4"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "middle-pennsylvanian",
@@ -217,7 +209,7 @@ const CARBONIFEROUS_SERIES: EraDefinition[] = [
     endYear: yearsAgo(307_000_000),
     color: icsHex("#A6C7B7"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "upper-pennsylvanian",
@@ -226,7 +218,7 @@ const CARBONIFEROUS_SERIES: EraDefinition[] = [
     endYear: yearsAgo(298_900_000),
     color: icsHex("#BFD0BA"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -238,7 +230,7 @@ const PERMIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(274_400_000),
     color: icsHex("#EF5845"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "guadalupian",
@@ -247,7 +239,7 @@ const PERMIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(259_510_000),
     color: icsHex("#FB745C"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "lopingian",
@@ -256,7 +248,7 @@ const PERMIAN_SERIES: EraDefinition[] = [
     endYear: yearsAgo(251_902_000),
     color: icsHex("#FBA794"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -268,7 +260,7 @@ const TRIASSIC_SERIES: EraDefinition[] = [
     endYear: yearsAgo(246_700_000),
     color: icsHex("#983999"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "middle-triassic",
@@ -277,7 +269,7 @@ const TRIASSIC_SERIES: EraDefinition[] = [
     endYear: yearsAgo(237_000_000),
     color: icsHex("#B168B1"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "upper-triassic",
@@ -286,7 +278,7 @@ const TRIASSIC_SERIES: EraDefinition[] = [
     endYear: yearsAgo(201_400_000),
     color: icsHex("#BD8CC3"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -298,7 +290,7 @@ const JURASSIC_SERIES: EraDefinition[] = [
     endYear: yearsAgo(174_700_000),
     color: icsHex("#42AED0"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "middle-jurassic",
@@ -307,7 +299,7 @@ const JURASSIC_SERIES: EraDefinition[] = [
     endYear: yearsAgo(161_500_000),
     color: icsHex("#80CFD8"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "upper-jurassic",
@@ -316,7 +308,7 @@ const JURASSIC_SERIES: EraDefinition[] = [
     endYear: yearsAgo(143_100_000),
     color: icsHex("#B3E3EE"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -328,7 +320,7 @@ const CRETACEOUS_SERIES: EraDefinition[] = [
     endYear: yearsAgo(100_500_000),
     color: icsHex("#8CCD57"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "upper-cretaceous",
@@ -337,7 +329,7 @@ const CRETACEOUS_SERIES: EraDefinition[] = [
     endYear: yearsAgo(66_000_000),
     color: icsHex("#A6D84A"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -349,7 +341,7 @@ const PALEOGENE_SERIES: EraDefinition[] = [
     endYear: yearsAgo(56_000_000),
     color: icsHex("#FDA75F"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "eocene",
@@ -358,7 +350,7 @@ const PALEOGENE_SERIES: EraDefinition[] = [
     endYear: yearsAgo(33_900_000),
     color: icsHex("#FDB46C"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "oligocene",
@@ -367,7 +359,7 @@ const PALEOGENE_SERIES: EraDefinition[] = [
     endYear: yearsAgo(23_040_000),
     color: icsHex("#FEC07A"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -379,7 +371,7 @@ const NEOGENE_SERIES: EraDefinition[] = [
     endYear: yearsAgo(5_333_000),
     color: icsHex("#FFFF00"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "pliocene",
@@ -388,7 +380,7 @@ const NEOGENE_SERIES: EraDefinition[] = [
     endYear: yearsAgo(2_580_000),
     color: icsHex("#FFFF99"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -400,7 +392,7 @@ const QUATERNARY_SERIES: EraDefinition[] = [
     endYear: yearsAgo(11_700),
     color: icsHex("#FFEFAF"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "holocene",
@@ -409,7 +401,7 @@ const QUATERNARY_SERIES: EraDefinition[] = [
     endYear: yearsAgo(0),
     color: icsHex("#FEEBD2"),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
 ];
 
@@ -421,7 +413,7 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     endYear: yearsAgo(2_300_000_000),
     color: icsColor(247, 79, 124),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "rhyacian",
@@ -430,7 +422,7 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     endYear: yearsAgo(2_050_000_000),
     color: icsColor(247, 91, 137),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "orosirian",
@@ -439,7 +431,7 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     endYear: yearsAgo(1_800_000_000),
     color: icsColor(247, 104, 152),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "statherian",
@@ -448,7 +440,7 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     endYear: yearsAgo(1_600_000_000),
     color: icsColor(248, 117, 167),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "calymmian",
@@ -457,7 +449,7 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     endYear: yearsAgo(1_400_000_000),
     color: icsColor(253, 192, 122),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "ectasian",
@@ -466,7 +458,7 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     endYear: yearsAgo(1_200_000_000),
     color: icsColor(253, 204, 138),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "stenian",
@@ -475,7 +467,7 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     endYear: yearsAgo(1_000_000_000),
     color: icsColor(254, 217, 154),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "tonian",
@@ -484,7 +476,7 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     endYear: yearsAgo(720_000_000),
     color: icsColor(254, 191, 78),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "cryogenian",
@@ -493,7 +485,7 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     endYear: yearsAgo(635_000_000),
     color: icsColor(254, 204, 92),
     scheme: "chronostratigraphic",
-    sourceRefs: chartRef(),
+    sourceIds: chartRef(),
   },
   {
     id: "ediacaran",
@@ -504,9 +496,7 @@ const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
     description:
       "Soft-bodied animals, colonial algae, and early sponges become conspicuous as multicellular life expands.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP's geologic time-scale guide describes the late Proterozoic as the interval when multicelled organisms, colonial algae, sponges, and soft-bodied invertebrates appear.",
-    ),
+    sourceIds: chartAndGuideRefs(),
   },
 ];
 
@@ -520,9 +510,7 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     description:
       "Major animal groups rise in the seas, with trilobites abundant and no terrestrial life yet known.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP summarizes the Cambrian as the rise of all major animal groups, abundant metazoan life in the seas, trilobite dominance, and no known terrestrial life.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: CAMBRIAN_SERIES,
   },
   {
@@ -534,9 +522,7 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     description:
       "Marine life diversifies strongly while the first land plants, primitive fungi, and seaweeds appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP's guide characterizes the Ordovician by extensive marine diversification together with the first land plants, primitive fungi, and seaweeds.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: ORDOVICIAN_SERIES,
   },
   {
@@ -548,9 +534,7 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     description:
       "Large reefs, jawed fish, vascular plants, and some of the first land arthropods appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP highlights the Silurian for large reef development, jawed fish, vascular plants, and some of the earliest evidence of spiders, scorpions, centipedes, and related arthropods on land.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: SILURIAN_SERIES,
   },
   {
@@ -562,9 +546,7 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     description:
       "Fishes radiate dramatically as the first amphibians, forests, and many land plants spread.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP summarizes the Devonian as the interval when fish radiate strongly and the first amphibians, horsetails, ferns, and forests appear.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: DEVONIAN_SERIES,
   },
   {
@@ -576,9 +558,7 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     description:
       "Coal-swamp forests spread while many seas teem with crinoids and bryozoans and the first reptiles appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP's guide describes the Carboniferous as a coal-swamp world with crinoids and bryozoans common in the seas, abundant winged insects, and the first reptiles appearing.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: CARBONIFEROUS_SERIES,
   },
   {
@@ -590,9 +570,7 @@ const PALEOZOIC_SYSTEMS: EraDefinition[] = [
     description:
       "Gymnosperms and amphibians dominate many landscapes before the period ends in catastrophic extinction.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP characterizes the Permian by gymnosperms, amphibians, and expanding insect groups, ending with the largest extinction of the Phanerozoic.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: PERMIAN_SERIES,
   },
 ];
@@ -607,9 +585,7 @@ const MESOZOIC_SYSTEMS: EraDefinition[] = [
     description:
       "Reptiles diversify after the great dying, with the first mammals, dinosaurs, and true flies appearing.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP's guide describes the Triassic as the interval of the first mammals, dinosaurs, and true flies after end-Permian recovery.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: TRIASSIC_SERIES,
   },
   {
@@ -621,9 +597,7 @@ const MESOZOIC_SYSTEMS: EraDefinition[] = [
     description:
       "Dinosaurs and gymnosperms dominate while birds and many marine reptiles appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP summarizes the Jurassic as a dinosaur- and gymnosperm-dominated world in which birds, marine reptiles, ammonites, and belemnites are prominent.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: JURASSIC_SERIES,
   },
   {
@@ -635,9 +609,7 @@ const MESOZOIC_SYSTEMS: EraDefinition[] = [
     description:
       "Flowering plants spread widely while dinosaurs remain dominant until the end-Cretaceous extinction.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP's guide characterizes the Cretaceous by dinosaurs, marine reptiles, ammonites, and the rise of flowering plants before the period's terminal extinction.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: CRETACEOUS_SERIES,
   },
 ];
@@ -652,9 +624,7 @@ const CENOZOIC_PERIODS: EraDefinition[] = [
     description:
       "Early placental mammals diversify rapidly as primates, modern birds, whales, and grasses appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP's Paleocene, Eocene, and Oligocene summaries together describe the Paleogene as a time of early placental-mammal diversification, first primates and modern birds, primitive whales, grasses, and increasingly modern mammal faunas.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: PALEOGENE_SERIES,
   },
   {
@@ -666,9 +636,7 @@ const CENOZOIC_PERIODS: EraDefinition[] = [
     description:
       "Grasslands spread, many modern mammal groups flourish, and the first hominids appear.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP's Miocene and Pliocene summaries describe the Neogene as an interval of expanding grasslands, diverse modern mammals, and the first hominids.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: NEOGENE_SERIES,
   },
   {
@@ -680,9 +648,7 @@ const CENOZOIC_PERIODS: EraDefinition[] = [
     description:
       "Modern humans appear, repeated glaciations reshape ecosystems, and agriculture and civilization rise late in the period.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP's Pleistocene and Holocene summaries describe the Quaternary as the age of modern humans, major glaciations, and eventually agriculture and civilization.",
-    ),
+    sourceIds: chartAndGuideRefs(),
     children: QUATERNARY_SERIES,
   },
 ];
@@ -697,9 +663,7 @@ export const GEOLOGICAL_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Earth's crust cools and solidifies, but no life is yet known from this interval.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP's guide describes the Hadean as the interval when Earth's crust cooled and solidified and no life is known.",
-    ),
+    sourceIds: chartAndGuideRefs(),
   },
   {
     id: "archean",
@@ -710,9 +674,7 @@ export const GEOLOGICAL_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Earth's earliest known life appears, largely microbial, while photosynthesis begins the long oxygenation of the atmosphere.",
     scheme: "chronostratigraphic",
-    sourceRefs: chartAndGuideRefs(
-      "UCMP's guide characterizes the Archean as the time of earliest anaerobic prokaryotic life and the beginning of oxygen rise through photosynthetic organisms.",
-    ),
+    sourceIds: chartAndGuideRefs(),
   },
   ...PROTEROZOIC_SUBDIVISIONS,
   ...PALEOZOIC_SYSTEMS,

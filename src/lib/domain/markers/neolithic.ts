@@ -13,12 +13,7 @@ export const NEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 74,
-    sourceRefs: [
-      {
-        sourceId: "britannicaMehrgarh",
-        note: "Britannica describes Mehrgarh as a Neolithic settlement from roughly 8000–5000 BCE with domesticated animals, wheat and barley cultivation, and permanent mud-brick homes; the app uses c. 8000 BCE as its earliest-farming-community anchor in South Asia.",
-      },
-    ],
+    sourceIds: ["britannicaMehrgarh"],
   },
   {
     id: "jiahu-bone-flutes-and-village-life",
@@ -31,11 +26,6 @@ export const NEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 73,
-    sourceRefs: [
-      {
-        sourceId: "metJiahu",
-        note: "The Met dates Jiahu to ca. 7000–5700 B.C. and describes houses, kilns, pottery, tools, and bone flutes there as evidence of a flourishing complex Neolithic society; the app uses c. 7000 BCE as the marker anchor.",
-      },
-    ],
+    sourceIds: ["metJiahu"],
   },
 ];

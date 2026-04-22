@@ -15,15 +15,9 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(154, 120, 88)",
     priority: 76,
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "natufianCultureWikipedia",
-        note: "Uses the page's primary 15,000–11,500 BP framing for a broad public-facing Natufian band, so this overlay is expressed with yearsAgo(...) rather than BCE dates.",
-      },
-      {
-        sourceId: "metPrehistoricArt",
-        note: "Supports a museum-grade framing of Natufian communities at ʿAin Mallaha / Eynan as settled hunter-gatherers near the transition to agriculture.",
-      },
+    sourceIds: [
+      "natufianCultureWikipedia",
+      "metPrehistoricArt"
     ],
   },
   {
@@ -39,12 +33,7 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(162, 130, 92)",
     priority: 75,
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "khiamianCultureWikipedia",
-        note: "Uses the page's explicit c. 9700–8650 BC Khiamian span and its emphasis on El Khiam points, early ground-level houses, and experimental cultivation before fully established farming villages.",
-      },
-    ],
+    sourceIds: ["khiamianCultureWikipedia"],
   },
   {
     id: "mureybetian-culture",
@@ -59,12 +48,7 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(149, 123, 96)",
     priority: 75,
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "mureybetWikipedia",
-        note: "Uses the page's explicit 9300–8600 BC Mureybetian span and its description of rectangular buildings, storage spaces, cereal cultivation, and communal structures in the Middle Euphrates.",
-      },
-    ],
+    sourceIds: ["mureybetWikipedia"],
   },
   {
     id: "cayonu-tepesi",
@@ -79,12 +63,7 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(145, 117, 91)",
     priority: 75,
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "cayonuWikipedia",
-        note: "Uses the page's explicit c. 8630–6800 BC range for Çayönü Tepesi and its public-facing emphasis on Upper Mesopotamian architecture, cereal cultivation, and early pig domestication.",
-      },
-    ],
+    sourceIds: ["cayonuWikipedia"],
   },
   {
     id: "nevali-cori",
@@ -99,12 +78,7 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(143, 116, 94)",
     priority: 75,
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "nevaliCoriWikipedia",
-        note: "Uses the page's explicit 8400–8100 BC Nevalı Çori range and its description of channeled-house architecture, cult buildings with monolithic pillars, and very early monumental sculpture.",
-      },
-    ],
+    sourceIds: ["nevaliCoriWikipedia"],
   },
   {
     id: "halaf-culture",
@@ -119,12 +93,7 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(139, 114, 92)",
     priority: 74,
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "halafCultureWikipedia",
-        note: "Uses the conventional c. 6,100–5,100 BCE Halaf range and its role as a northern village tradition that transitions into Ubaid-linked material culture.",
-      },
-    ],
+    sourceIds: ["halafCultureWikipedia"],
   },
   {
     id: "samarra-culture",
@@ -139,12 +108,7 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(136, 118, 90)",
     priority: 75,
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "samarraCultureWikipedia",
-        note: "Uses the page's explicit c. 5500–4800 BCE Samarra range and its emphasis on fine painted pottery, irrigation at Tell es-Sawwan, and Samarran culture as a precursor to Ubaid Mesopotamia.",
-      },
-    ],
+    sourceIds: ["samarraCultureWikipedia"],
   },
   {
     id: "ubaid-period",
@@ -159,11 +123,6 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(134, 126, 98)",
     priority: 75,
     subGroup: "near-east",
-    sourceRefs: [
-      {
-        sourceId: "ubaidPeriodWikipedia",
-        note: "Uses the page's explicit southern-Mesopotamian span of about 5500–3800 BC and its statement that the Ubaid is succeeded there by the Uruk period.",
-      },
-    ],
+    sourceIds: ["ubaidPeriodWikipedia"],
   },
 ];

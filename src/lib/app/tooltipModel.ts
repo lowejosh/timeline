@@ -7,12 +7,11 @@ import {
   formatTimelineExactRange,
   formatTimelineExactTimestamp,
 } from "../core/exactTimestamp";
-import { ERA_SOURCES } from "../domain/eraSources";
+import { ERA_SOURCES, type EraSourceId } from "../domain/eraSources";
 import type {
   Era,
   TimelineMarker,
   TimelineOverlayBand,
-  TimelineSourceRef,
 } from "../core/timelineTypes";
 
 export type TimelineTooltipSource = {
@@ -36,20 +35,20 @@ export type TimelineTooltipContent = {
 
 const EXPLICIT_RANGE_SEPARATORS = [" — ", " to "] as const;
 
-function resolveTooltipSources(sourceRefs?: TimelineSourceRef[]) {
+function resolveTooltipSources(sourceIds?: EraSourceId[]) {
   const seen = new Set<string>();
 
-  return (sourceRefs ?? []).flatMap((sourceRef) => {
-    if (seen.has(sourceRef.sourceId)) {
+  return (sourceIds ?? []).flatMap((sourceId) => {
+    if (seen.has(sourceId)) {
       return [];
     }
 
-    seen.add(sourceRef.sourceId);
-    const source = ERA_SOURCES[sourceRef.sourceId];
+    seen.add(sourceId);
+    const source = ERA_SOURCES[sourceId];
 
     return [
       {
-        id: sourceRef.sourceId,
+        id: sourceId,
         shortTitle: source.shortTitle,
         title: source.title,
         organization: source.organization,
@@ -102,7 +101,7 @@ export function getMarkerTooltipContent(
     ),
     regionalScopeLabel: marker.regionalScopeLabel,
     description: marker.description,
-    sources: resolveTooltipSources(marker.sourceRefs),
+    sources: resolveTooltipSources(marker.sourceIds),
   };
 }
 
@@ -123,7 +122,7 @@ export function getOverlayTooltipContent(
           }),
     regionalScopeLabel: overlay.regionalScopeLabel,
     description: overlay.description,
-    sources: resolveTooltipSources(overlay.sourceRefs),
+    sources: resolveTooltipSources(overlay.sourceIds),
   };
 }
 
@@ -147,6 +146,6 @@ export function getEraTooltipContent(era: Era): TimelineTooltipContent {
             }),
     regionalScopeLabel: era.regionalScopeLabel,
     description: era.description,
-    sources: resolveTooltipSources(era.sourceRefs),
+    sources: resolveTooltipSources(era.sourceIds),
   };
 }

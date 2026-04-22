@@ -195,12 +195,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 69,
-    sourceRefs: [
-      {
-        sourceId: "unescoGobekliTepe",
-        note: "UNESCO dates Göbekli Tepe's monumental Pre-Pottery Neolithic structures to 9600–8200 BCE; the app uses c. 9600 BCE as a clean anchor for very early monumental ritual architecture.",
-      },
-    ],
+    sourceIds: ["unescoGobekliTepe"],
   },
   {
     id: "agriculture-emerges-in-southwest-asia",
@@ -213,15 +208,9 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 81,
-    sourceRefs: [
-      {
-        sourceId: "originsOfAgricultureInWestAsiaWikipedia",
-        note: "The page explicitly says agriculture in West Asia can be traced back to between 10,000 and 8,000 BC; the marker now uses the opening date named by the source instead of an inferred midpoint.",
-      },
-      {
-        sourceId: "prePotteryNeolithicAWikipedia",
-        note: "PPNA is dated to c. 10,000–8,800 BCE in the Levant and Upper Mesopotamia and is explicitly characterized by crop cultivation and granaries, reinforcing 10,000 BCE as an early public-facing anchor for this marker.",
-      },
+    sourceIds: [
+      "originsOfAgricultureInWestAsiaWikipedia",
+      "prePotteryNeolithicAWikipedia"
     ],
   },
   {
@@ -235,12 +224,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 68,
-    sourceRefs: [
-      {
-        sourceId: "unescoCatalhoyuk",
-        note: "UNESCO dates the eastern mound's Neolithic occupation to 7400–6200 BCE and treats the site as a key witness to early settled agricultural life; the app uses its initial occupation as the marker year.",
-      },
-    ],
+    sourceIds: ["unescoCatalhoyuk"],
   },
   {
     id: "jericho-ritual-community",
@@ -253,12 +237,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 67,
-    sourceRefs: [
-      {
-        sourceId: "khanNeolithicRevolution",
-        note: "Khan Academy highlights Jericho plastered skulls around 7200 BCE in Pre-Pottery Neolithic B, making it a useful marker for ritual and settled community life in the Neolithic Levant.",
-      },
-    ],
+    sourceIds: ["khanNeolithicRevolution"],
   },
   {
     id: "stonehenge-begins",
@@ -271,15 +250,9 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 66,
-    sourceRefs: [
-      {
-        sourceId: "unescoStonehenge",
-        note: "UNESCO dates the broader Stonehenge and Avebury ceremonial landscape to roughly 3700–1600 BCE; the app uses c. 3000 BCE as a familiar late-Neolithic anchor for the beginning of Stonehenge's monument-building phases.",
-      },
-      {
-        sourceId: "khanNeolithicRevolution",
-        note: "Khan Academy describes Stonehenge as dating to approximately 3000 BCE, supporting its use here as an iconic marker for the start of Stonehenge's construction history.",
-      },
+    sourceIds: [
+      "unescoStonehenge",
+      "khanNeolithicRevolution"
     ],
   },
   {
@@ -293,15 +266,9 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 78,
-    sourceRefs: [
-      {
-        sourceId: "britannicaBronzeAge",
-        note: "Britannica treats the Bronze Age's end as regionally variable; the app uses c. 1200 BCE as a conventional eastern Mediterranean collapse marker rather than a single-day event.",
-      },
-      {
-        sourceId: "britannicaAncientGreece",
-        note: "Britannica dates ancient Greek civilization from the end of Mycenaean civilization around 1200 BCE, which anchors this marker to the standard late-Bronze / early-Iron Age transition used here.",
-      },
+    sourceIds: [
+      "britannicaBronzeAge",
+      "britannicaAncientGreece"
     ],
   },
   {
@@ -313,15 +280,9 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: bce(27),
     minZoom: 18,
     priority: 83,
-    sourceRefs: [
-      {
-        sourceId: "historyAncientRome",
-        note: "HISTORY dates Octavian's assumption of the title Augustus to 27 BCE, the conventional beginning of the Roman Empire.",
-      },
-      {
-        sourceId: "khanRomanEmpire",
-        note: "Supports the conventional 27 BCE imperial starting point under Augustus used by the app.",
-      },
+    sourceIds: [
+      "historyAncientRome",
+      "khanRomanEmpire"
     ],
   },
   {
@@ -333,12 +294,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(476),
     minZoom: 18,
     priority: 81,
-    sourceRefs: [
-      {
-        sourceId: "historyAncientRome",
-        note: "HISTORY dates the deposition of Romulus Augustulus by Odovacar to 476 CE, the standard public-history endpoint for the western Roman Empire.",
-      },
-    ],
+    sourceIds: ["historyAncientRome"],
   },
   {
     id: "hijra",
@@ -349,12 +305,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(622),
     minZoom: 18,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "historyIslam",
-        note: "HISTORY dates Muhammad's migration from Mecca to Medina to 622 CE and identifies that journey, the Hijra, as the beginning of the Islamic calendar.",
-      },
-    ],
+    sourceIds: ["historyIslam"],
   },
   {
     id: "charlemagne-crowned-emperor",
@@ -365,12 +316,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(800),
     minZoom: 18,
     priority: 81,
-    sourceRefs: [
-      {
-        sourceId: "historyCharlemagne",
-        note: "HISTORY dates Charlemagne's coronation by Pope Leo III to December 25, 800 and frames it as the start of his rule as Holy Roman Emperor.",
-      },
-    ],
+    sourceIds: ["historyCharlemagne"],
   },
   {
     id: "genghis-khan-proclaimed",
@@ -381,12 +327,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1206),
     minZoom: 18,
     priority: 83,
-    sourceRefs: [
-      {
-        sourceId: "historyGenghisKhan",
-        note: "HISTORY says Temujin was proclaimed Chinggis Khan in 1206 after unifying the Mongol steppe tribes, a clean threshold into the Mongol imperial era.",
-      },
-    ],
+    sourceIds: ["historyGenghisKhan"],
   },
   {
     id: "black-death",
@@ -397,12 +338,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1347),
     minZoom: 18,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "historyBlackDeath",
-        note: "HISTORY anchors the Black Death's arrival in Europe to 1347, when plague ships reached Messina.",
-      },
-    ],
+    sourceIds: ["historyBlackDeath"],
   },
   {
     id: "fall-of-constantinople",
@@ -413,12 +349,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1453),
     minZoom: 18,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "historyByzantineEmpire",
-        note: "HISTORY dates the Ottoman capture of Constantinople to May 29, 1453; the app uses 1453 as the year marker.",
-      },
-    ],
+    sourceIds: ["historyByzantineEmpire"],
   },
   {
     id: "gutenberg-press",
@@ -429,12 +360,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1450),
     minZoom: 20,
     priority: 72,
-    sourceRefs: [
-      {
-        sourceId: "historyPrintingPress",
-        note: "HISTORY says Gutenberg had a printing machine perfected and commercially ready by 1450; the app uses that year as the marker anchor.",
-      },
-    ],
+    sourceIds: ["historyPrintingPress"],
   },
   {
     id: "columbian-exchange-begins",
@@ -445,12 +371,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1492),
     minZoom: 18,
     priority: 84,
-    sourceRefs: [
-      {
-        sourceId: "historyChristopherColumbus",
-        note: "HISTORY dates Columbus's first Atlantic voyage and Caribbean landfall to 1492; the app uses that canonical year as a shorthand marker for the beginning of sustained transatlantic exchange.",
-      },
-    ],
+    sourceIds: ["historyChristopherColumbus"],
   },
   {
     id: "protestant-reformation",
@@ -461,12 +382,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1517),
     minZoom: 18,
     priority: 85,
-    sourceRefs: [
-      {
-        sourceId: "historyReformation",
-        note: "HISTORY says historians usually date the start of the Protestant Reformation to Luther's 1517 publication of the 95 Theses.",
-      },
-    ],
+    sourceIds: ["historyReformation"],
   },
   {
     id: "fall-of-tenochtitlan",
@@ -478,12 +394,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Mesoamerica",
     minZoom: 18,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "historyAztecs",
-        note: "HISTORY's Aztecs overview gives the empire a concise 1428-1521 span ending with the Spanish conquest of Tenochtitlan, which the app uses as the clean public-facing marker year.",
-      },
-    ],
+    sourceIds: ["historyAztecs"],
   },
   {
     id: "magellan-expedition-circumnavigates-globe",
@@ -494,12 +405,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1522),
     minZoom: 18,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "historyFerdinandMagellan",
-        note: "HISTORY says only the Victoria completed the voyage around the world and arrived back in Seville in September 1522, which the app uses as the clean public-facing circumnavigation marker.",
-      },
-    ],
+    sourceIds: ["historyFerdinandMagellan"],
   },
   {
     id: "jamestown-founded",
@@ -511,12 +417,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "British North America",
     minZoom: 18,
     priority: 79,
-    sourceRefs: [
-      {
-        sourceId: "historyJamestown",
-        note: "HISTORY says that on May 14, 1607 members of the Virginia Company founded Jamestown as the first permanent English settlement in North America.",
-      },
-    ],
+    sourceIds: ["historyJamestown"],
   },
   {
     id: "thirty-years-war-begins",
@@ -528,12 +429,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Central Europe",
     minZoom: 18,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "historyThirtyYearsWar",
-        note: "HISTORY says the Defenestration of Prague in 1618 marked the beginning of open revolt and the start of the Thirty Years' War.",
-      },
-    ],
+    sourceIds: ["historyThirtyYearsWar"],
   },
   {
     id: "english-civil-wars-begin",
@@ -545,12 +441,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "British Isles",
     minZoom: 18,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "historyEnglishCivilWars",
-        note: "HISTORY says the First English Civil War broke out in earnest in August 1642 and frames the wider conflict as civil wars fought between 1642 and 1651 across England, Scotland, and Ireland.",
-      },
-    ],
+    sourceIds: ["historyEnglishCivilWars"],
   },
   {
     id: "peace-of-westphalia",
@@ -562,12 +453,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Europe",
     minZoom: 18,
     priority: 81,
-    sourceRefs: [
-      {
-        sourceId: "historyThirtyYearsWar",
-        note: "HISTORY says that over the course of 1648 the various parties signed the Peace of Westphalia, effectively ending the Thirty Years' War.",
-      },
-    ],
+    sourceIds: ["historyThirtyYearsWar"],
   },
   {
     id: "siege-of-vienna-broken",
@@ -579,12 +465,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Central Europe",
     minZoom: 18,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "britannicaSiegeOfVienna",
-        note: "Britannica dates the siege to July 17 to September 12, 1683, says it ended in Ottoman defeat by a combined force led by John III Sobieski, and calls the lifting of the siege the beginning of the end of Ottoman domination in eastern Europe.",
-      },
-    ],
+    sourceIds: ["britannicaSiegeOfVienna"],
   },
   {
     id: "encyclopedie-begins-publication",
@@ -596,12 +477,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "France",
     minZoom: 18,
     priority: 79,
-    sourceRefs: [
-      {
-        sourceId: "britannicaEncyclopedie",
-        note: "Britannica says seventeen volumes of the Encyclopédie's text were published between 1751 and 1765; the app uses the 1751 opening as a concise marker for one of the Enlightenment's signature publications.",
-      },
-    ],
+    sourceIds: ["britannicaEncyclopedie"],
   },
   {
     id: "american-independence-declared",
@@ -612,12 +488,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1776),
     minZoom: 20,
     priority: 75,
-    sourceRefs: [
-      {
-        sourceId: "historyAmericanRevolution",
-        note: "HISTORY places the Declaration of Independence on July 4, 1776; the app uses that year as a concise American Revolution marker.",
-      },
-    ],
+    sourceIds: ["historyAmericanRevolution"],
   },
   {
     id: "french-revolution",
@@ -628,12 +499,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1789),
     minZoom: 18,
     priority: 86,
-    sourceRefs: [
-      {
-        sourceId: "historyFrenchRevolution",
-        note: "HISTORY identifies 1789 as the beginning of the French Revolution and treats the storming of the Bastille that year as its symbolic start.",
-      },
-    ],
+    sourceIds: ["historyFrenchRevolution"],
   },
   {
     id: "watt-steam-engine",
@@ -645,12 +511,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 20,
     priority: 78,
-    sourceRefs: [
-      {
-        sourceId: "historyIndustrialRevolution",
-        note: "HISTORY says that in the 1760s James Watt began improving a Newcomen steam engine with a separate condenser, a change that made it far more efficient and helped steam power spread across British industries; the app uses c. 1760 as a concise public-facing anchor for Watt's steam-engine breakthrough.",
-      },
-    ],
+    sourceIds: ["historyIndustrialRevolution"],
   },
   {
     id: "steam-railway-opens",
@@ -661,12 +522,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1830),
     minZoom: 20,
     priority: 79,
-    sourceRefs: [
-      {
-        sourceId: "historyIndustrialRevolution",
-        note: "HISTORY says that in 1830 steam-powered locomotives started transporting freight and passengers between Manchester and Liverpool; the app uses that year as a clean early-railway marker.",
-      },
-    ],
+    sourceIds: ["historyIndustrialRevolution"],
   },
   {
     id: "first-telegraph-message",
@@ -679,12 +535,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "May 24, 1844",
     minZoom: 20,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "historyTelegraph",
-        note: 'HISTORY says that on May 24, 1844 Morse sent the first telegraph message, "What hath God wrought!", from Washington, D.C., to Baltimore, Maryland.',
-      },
-    ],
+    sourceIds: ["historyTelegraph"],
   },
   {
     id: "revolutions-of-1848",
@@ -696,12 +547,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Europe",
     minZoom: 18,
     priority: 83,
-    sourceRefs: [
-      {
-        sourceId: "britannicaRevolutionsOf1848",
-        note: "Britannica describes the Revolutions of 1848 as a series of republican revolts against European monarchies, beginning in Sicily and spreading to France, Germany, Italy, and the Austrian Empire; the app uses 1848 as the clean shorthand year for that continent-wide revolutionary wave.",
-      },
-    ],
+    sourceIds: ["britannicaRevolutionsOf1848"],
   },
   {
     id: "kingdom-of-italy-established",
@@ -713,12 +559,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Italy",
     minZoom: 18,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "britannicaRisorgimento",
-        note: "Britannica says the Risorgimento was the 19th-century movement for Italian unification that culminated in the establishment of the Kingdom of Italy in 1861; the app uses that year as the principal state-formation marker.",
-      },
-    ],
+    sourceIds: ["britannicaRisorgimento"],
   },
   {
     id: "meiji-restoration",
@@ -730,12 +571,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Japan",
     minZoom: 18,
     priority: 84,
-    sourceRefs: [
-      {
-        sourceId: "historyMeijiRestoration",
-        note: "HISTORY says the Meiji Restoration of 1868 toppled the long-reigning Tokugawa shoguns and propelled Japan into the modern era; the app uses 1868 as the movement's canonical threshold year.",
-      },
-    ],
+    sourceIds: ["historyMeijiRestoration"],
   },
   {
     id: "german-empire-founded",
@@ -747,12 +583,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Germany",
     minZoom: 18,
     priority: 84,
-    sourceRefs: [
-      {
-        sourceId: "britannicaGermanEmpire",
-        note: "Britannica says the German Empire was founded on January 18, 1871, in the wake of Prussia's successful wars; the app uses 1871 as the clean marker year for German unification under imperial rule.",
-      },
-    ],
+    sourceIds: ["britannicaGermanEmpire"],
   },
   {
     id: "telephone-patented",
@@ -763,12 +594,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1876),
     minZoom: 20,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "britannicaTelephone",
-        note: "Britannica says the modern telephone refers to electrical devices derived from Bell's inventions and notes that within 20 years of the 1876 Bell patent the instrument had taken on the functional design that would endure for more than a century.",
-      },
-    ],
+    sourceIds: ["britannicaTelephone"],
   },
   {
     id: "practical-light-bulb",
@@ -779,12 +605,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1879),
     minZoom: 20,
     priority: 85,
-    sourceRefs: [
-      {
-        sourceId: "energyHistoryLightBulb",
-        note: "The U.S. Department of Energy says Edison patented the incandescent light bulb in 1879 and that by October 1879 his team had produced a carbonized-filament bulb that could last for 14.5 hours.",
-      },
-    ],
+    sourceIds: ["energyHistoryLightBulb"],
   },
   {
     id: "first-automobile-patent",
@@ -797,12 +618,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Jan 29, 1886",
     minZoom: 20,
     priority: 81,
-    sourceRefs: [
-      {
-        sourceId: "mercedesFirstAutomobile",
-        note: 'Mercedes-Benz says that on January 29, 1886 Carl Benz applied for a patent for his "vehicle powered by a gas engine" and that patent number 37435 may be regarded as the birth certificate of the automobile.',
-      },
-    ],
+    sourceIds: ["mercedesFirstAutomobile"],
   },
   {
     id: "marconi-wireless-signals",
@@ -813,12 +629,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1895),
     minZoom: 20,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "nobelMarconiBiographical",
-        note: "The Nobel Prize biography says that in 1895 Marconi succeeded in sending wireless signals over a distance of one and a half miles at his father's estate, a clean early-radio milestone.",
-      },
-    ],
+    sourceIds: ["nobelMarconiBiographical"],
   },
   {
     id: "wright-brothers-first-flight",
@@ -831,12 +642,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Dec 17, 1903",
     minZoom: 20,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "historyWrightBrothers",
-        note: "HISTORY says that on December 17, 1903 the Wright brothers succeeded in flying the first free, controlled flight of a power-driven, heavier-than-air plane.",
-      },
-    ],
+    sourceIds: ["historyWrightBrothers"],
   },
   {
     id: "berlin-conference-opens",
@@ -848,12 +654,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Africa",
     minZoom: 18,
     priority: 84,
-    sourceRefs: [
-      {
-        sourceId: "britannicaScrambleForAfrica",
-        note: "Britannica's Scramble for Africa article says Bismarck's proposal led to the Berlin Conference held from November 15, 1884, to February 26, 1885, and that the conference formalized claims and accelerated the pace of colonization; the app uses the conference opening in 1884 as a clean marker anchor.",
-      },
-    ],
+    sourceIds: ["britannicaScrambleForAfrica"],
   },
   {
     id: "titanic-sinks",
@@ -866,12 +667,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Apr 15, 1912",
     minZoom: 20,
     priority: 77,
-    sourceRefs: [
-      {
-        sourceId: "britannicaTitanic",
-        note: "Britannica dates Titanic's sinking to April 15, 1912 in the North Atlantic and standard ship histories place the final sinking at about 2:20 a.m.; the app uses that UTC instant as the marker anchor.",
-      },
-    ],
+    sourceIds: ["britannicaTitanic"],
   },
   {
     id: "world-war-i",
@@ -882,12 +678,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1914),
     minZoom: 18,
     priority: 88,
-    sourceRefs: [
-      {
-        sourceId: "historyWorldWarOne",
-        note: "HISTORY dates the beginning of World War I to 1914, after the assassination of Archduke Franz Ferdinand escalated into general war.",
-      },
-    ],
+    sourceIds: ["historyWorldWarOne"],
   },
   {
     id: "russian-revolution",
@@ -898,12 +689,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1917),
     minZoom: 18,
     priority: 87,
-    sourceRefs: [
-      {
-        sourceId: "historyRussianRevolution",
-        note: "HISTORY identifies 1917 as the key date of the Russian Revolution, encompassing both the February and October revolutions.",
-      },
-    ],
+    sourceIds: ["historyRussianRevolution"],
   },
   {
     id: "great-depression-begins",
@@ -914,12 +700,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1929),
     minZoom: 20,
     priority: 84,
-    sourceRefs: [
-      {
-        sourceId: "historyGreatDepression",
-        note: "HISTORY says the Great Depression lasted from 1929 until the beginning of World War II in 1939 and that the stock market crash in October 1929 triggered a crisis in the international economy.",
-      },
-    ],
+    sourceIds: ["historyGreatDepression"],
   },
   {
     id: "world-war-ii",
@@ -930,12 +711,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1939),
     minZoom: 18,
     priority: 90,
-    sourceRefs: [
-      {
-        sourceId: "historyWorldWarTwo",
-        note: "HISTORY dates the start of World War II to 1939, when Nazi Germany invaded Poland.",
-      },
-    ],
+    sourceIds: ["historyWorldWarTwo"],
   },
   {
     id: "united-nations-founded",
@@ -948,12 +724,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Oct 24, 1945",
     minZoom: 20,
     priority: 83,
-    sourceRefs: [
-      {
-        sourceId: "unHistoryUnitedNations",
-        note: "The UN says it officially began on 24 October 1945, after the Charter had been ratified by the major powers and a majority of other signatories.",
-      },
-    ],
+    sourceIds: ["unHistoryUnitedNations"],
   },
   {
     id: "udhr-proclaimed",
@@ -966,12 +737,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Dec 10, 1948",
     minZoom: 20,
     priority: 78,
-    sourceRefs: [
-      {
-        sourceId: "unUniversalDeclarationHumanRights",
-        note: "The UN says the General Assembly proclaimed the UDHR in Paris on 10 December 1948 as a common standard of achievement for all peoples and all nations.",
-      },
-    ],
+    sourceIds: ["unUniversalDeclarationHumanRights"],
   },
   {
     id: "nato-founded",
@@ -984,12 +750,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Apr 4, 1949",
     minZoom: 20,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "natoFoundingTreaty",
-        note: "NATO says 12 countries signed the North Atlantic Treaty in Washington, D.C., on 4 April 1949 and that collective defence is at the heart of the Treaty.",
-      },
-    ],
+    sourceIds: ["natoFoundingTreaty"],
   },
   {
     id: "un-decolonization-declaration",
@@ -1002,15 +763,9 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Dec 14, 1960",
     minZoom: 20,
     priority: 79,
-    sourceRefs: [
-      {
-        sourceId: "unAntiColonialismDay",
-        note: "The UN's anti-colonialism observance page identifies 14 December as the anniversary of Resolution 1514 (XV), the Declaration on the Granting of Independence to Colonial Countries and Peoples.",
-      },
-      {
-        sourceId: "unDecolonization",
-        note: "The UN calls the 1960 declaration a landmark in the decolonization process and links it to the acceleration of independence movements.",
-      },
+    sourceIds: [
+      "unAntiColonialismDay",
+      "unDecolonization"
     ],
   },
   {
@@ -1024,12 +779,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Apr 12, 1961",
     minZoom: 20,
     priority: 81,
-    sourceRefs: [
-      {
-        sourceId: "britannicaYuriGagarin",
-        note: "Britannica says Gagarin's Vostok 1 spacecraft was launched on April 12, 1961, when he became the first man to travel into space and orbit Earth.",
-      },
-    ],
+    sourceIds: ["britannicaYuriGagarin"],
   },
   {
     id: "cuban-missile-crisis-resolved",
@@ -1042,12 +792,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Oct 28, 1962",
     minZoom: 20,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "historyStateCubanMissileCrisis",
-        note: "The State Department says Khrushchev issued a public statement on October 28, 1962, that Soviet missiles would be dismantled and removed from Cuba.",
-      },
-    ],
+    sourceIds: ["historyStateCubanMissileCrisis"],
   },
   {
     id: "apollo-11-moon-landing",
@@ -1058,12 +803,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1969),
     minZoom: 20,
     priority: 83,
-    sourceRefs: [
-      {
-        sourceId: "historyMoonLanding",
-        note: "HISTORY dates the Apollo 11 moon landing to July 20, 1969, when Armstrong and Aldrin became the first humans to land on the Moon.",
-      },
-    ],
+    sourceIds: ["historyMoonLanding"],
   },
   {
     id: "fall-of-saigon",
@@ -1074,12 +814,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1975),
     minZoom: 20,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "britannicaVietnamWar",
-        note: "Britannica says that in 1975 South Vietnam fell to a full-scale invasion by the North, which the app uses as the canonical Fall of Saigon year marker.",
-      },
-    ],
+    sourceIds: ["britannicaVietnamWar"],
   },
   {
     id: "iranian-revolution",
@@ -1094,12 +829,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Feb 11, 1979",
     minZoom: 20,
     priority: 83,
-    sourceRefs: [
-      {
-        sourceId: "britannicaIranianRevolution",
-        note: "Britannica says the Iranian monarchy was toppled on 11 February 1979 and that the revolution led to the establishment of an Islamic republic.",
-      },
-    ],
+    sourceIds: ["britannicaIranianRevolution"],
   },
   {
     id: "smallpox-eradicated",
@@ -1110,12 +840,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1980),
     minZoom: 20,
     priority: 81,
-    sourceRefs: [
-      {
-        sourceId: "whoSmallpoxEradication",
-        note: "WHO says the 33rd World Health Assembly issued its official declaration in May 1980 that the world and all its peoples had won freedom from smallpox.",
-      },
-    ],
+    sourceIds: ["whoSmallpoxEradication"],
   },
   {
     id: "chernobyl-disaster",
@@ -1128,12 +853,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Apr 26, 1986",
     minZoom: 20,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "iaeaChernobylFaq",
-        note: "The IAEA says that on 26 April 1986 reactor number four at Chernobyl went out of control during a test, leading to an explosion and fire that released large amounts of radiation into the atmosphere.",
-      },
-    ],
+    sourceIds: ["iaeaChernobylFaq"],
   },
   {
     id: "berlin-wall-falls",
@@ -1146,12 +866,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Nov 9, 1989",
     minZoom: 20,
     priority: 83,
-    sourceRefs: [
-      {
-        sourceId: "historyStateFallCommunism",
-        note: "The State Department dates the fall of the Berlin Wall to November 9, 1989 and frames it as the most visible symbol of the Cold War's collapse.",
-      },
-    ],
+    sourceIds: ["historyStateFallCommunism"],
   },
   {
     id: "soviet-union-dissolves",
@@ -1164,12 +879,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Dec 31, 1991",
     minZoom: 20,
     priority: 85,
-    sourceRefs: [
-      {
-        sourceId: "britannicaSovietCollapse",
-        note: "Britannica states that the Soviet Union dissolved on December 31, 1991, making it a clean endpoint for the Cold War world order.",
-      },
-    ],
+    sourceIds: ["britannicaSovietCollapse"],
   },
   {
     id: "www-software-released",
@@ -1181,12 +891,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 20,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "cernShortHistoryWeb",
-        note: "CERN says Berners-Lee released his WWW software in 1991, that it became available to CERN colleagues in March 1991, and that he announced it on Internet newsgroups in August 1991.",
-      },
-    ],
+    sourceIds: ["cernShortHistoryWeb"],
   },
   {
     id: "world-wide-web-opened",
@@ -1199,12 +904,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Apr 30, 1993",
     minZoom: 20,
     priority: 81,
-    sourceRefs: [
-      {
-        sourceId: "cernBirthWeb",
-        note: "CERN says that on April 30, 1993 it placed the World Wide Web software in the public domain, allowing the web to spread globally.",
-      },
-    ],
+    sourceIds: ["cernBirthWeb"],
   },
   {
     id: "september-11-attacks",
@@ -1217,12 +917,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Sep 11, 2001",
     minZoom: 20,
     priority: 86,
-    sourceRefs: [
-      {
-        sourceId: "historySeptember11Attacks",
-        note: "HISTORY says the September 11 attacks occurred on September 11, 2001, when al Qaeda-linked hijackers seized four airliners and attacked targets in the United States.",
-      },
-    ],
+    sourceIds: ["historySeptember11Attacks"],
   },
   {
     id: "iphone-introduced",
@@ -1235,12 +930,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Jan 9, 2007",
     minZoom: 20,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "appleIPhoneIntroduction",
-        note: "Apple introduced iPhone on 9 January 2007 as a mobile phone, widescreen iPod, and breakthrough Internet communications device in one handheld product.",
-      },
-    ],
+    sourceIds: ["appleIPhoneIntroduction"],
   },
   {
     id: "lehman-brothers-bankruptcy",
@@ -1253,12 +943,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Sep 15, 2008",
     minZoom: 20,
     priority: 83,
-    sourceRefs: [
-      {
-        sourceId: "investopediaLehmanCollapse",
-        note: "Investopedia dates Lehman's bankruptcy filing to September 15, 2008 and describes it as a pivotal moment in the financial crisis driven by heavy exposure to subprime mortgages and complex securities.",
-      },
-    ],
+    sourceIds: ["investopediaLehmanCollapse"],
   },
   {
     id: "higgs-boson-announced",
@@ -1271,12 +956,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Jul 4, 2012",
     minZoom: 20,
     priority: 81,
-    sourceRefs: [
-      {
-        sourceId: "cernHiggsBoson2012",
-        note: "CERN announced on 4 July 2012 that ATLAS and CMS had observed a new particle in the 125-126 GeV mass region, consistent with the long-sought Higgs boson.",
-      },
-    ],
+    sourceIds: ["cernHiggsBoson2012"],
   },
   {
     id: "paris-agreement-adopted",
@@ -1289,12 +969,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Dec 12, 2015",
     minZoom: 20,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "unParisAgreement",
-        note: "The UN says world leaders reached the Paris Agreement on 12 December 2015 at COP21 in Paris.",
-      },
-    ],
+    sourceIds: ["unParisAgreement"],
   },
   {
     id: "covid-19-pandemic-declared",
@@ -1307,12 +982,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Mar 11, 2020",
     minZoom: 20,
     priority: 84,
-    sourceRefs: [
-      {
-        sourceId: "whoCovid19Pandemic",
-        note: "WHO says it characterized the COVID-19 outbreak as a pandemic on March 11, 2020.",
-      },
-    ],
+    sourceIds: ["whoCovid19Pandemic"],
   },
   {
     id: "chatgpt-introduced",
@@ -1325,11 +995,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Nov 30, 2022",
     minZoom: 20,
     priority: 82,
-    sourceRefs: [
-      {
-        sourceId: "openAiIntroducingChatGpt",
-        note: 'OpenAI published "Introducing ChatGPT" on 30 November 2022 and presented it as a research-preview conversational model available for public use and feedback.',
-      },
-    ],
+    sourceIds: ["openAiIntroducingChatGpt"],
   },
 ];

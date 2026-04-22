@@ -13,15 +13,9 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 70,
-    sourceRefs: [
-      {
-        sourceId: "chogaMamiWikipedia",
-        note: "The page explicitly says Choga Mami shows the first canal irrigation in operation around 6000 BCE; the marker now uses that source-stated date and site rather than a later inferred threshold.",
-      },
-      {
-        sourceId: "originsOfAgricultureInWestAsiaWikipedia",
-        note: "The page says irrigation is only attested with certainty at the end of the Neolithic in central Mesopotamia at Choga Mami, c. 5900 BC, and that it spread in the 6th millennium BC on a modest scale.",
-      },
+    sourceIds: [
+      "chogaMamiWikipedia",
+      "originsOfAgricultureInWestAsiaWikipedia"
     ],
   },
   {
@@ -33,12 +27,7 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 76,
-    sourceRefs: [
-      {
-        sourceId: "britannicaWheel",
-        note: "Britannica says a Sumerian Erech pictograph dated about 3500 BC shows a sledge equipped with wheels; the app uses c. 3500 BCE as a clean marker for wheeled transport in Sumer.",
-      },
-    ],
+    sourceIds: ["britannicaWheel"],
   },
   // {
   //   id: "uruk-becomes-the-first-city",
@@ -49,15 +38,6 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
   //   approximate: true,
   //   minZoom: 19,
   //   priority: 82,
-  //   sourceRefs: [
-  //     {
-  //       sourceId: "metUrukFirstCity",
-  //       note: "The Met's Uruk essay says that by around 3200 B.C. Uruk was the largest settlement in southern Mesopotamia, if not the world, and a true city; the app uses c. 3200 BCE as its urban threshold marker.",
-  //     },
-  //     {
-  //       sourceId: "britannicaErech",
-  //       note: "Britannica says urban life in the Erech–Jamdat Nasr period (c. 3500–2900 BCE) is more fully illustrated at Uruk than at any other Mesopotamian city, supporting this marker's Uruk-centered urbanization framing.",
-  //     },
-  //   ],
+  //   sourceIds: ["metUrukFirstCity", "britannicaErech"],
   // },
 ];

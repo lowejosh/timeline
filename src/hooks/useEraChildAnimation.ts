@@ -1,9 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { Era } from "../lib/domain/eras";
 import type { TimelineViewport } from "../lib/core/viewport";
-import {
-  getEraChildOpacityTarget,
-} from "../lib/rendering/childLayers";
+import { getEraChildOpacityTarget } from "../lib/rendering/childLayers";
 import {
   syncAnimatedEraChildState,
   type AnimatedEraChildState,

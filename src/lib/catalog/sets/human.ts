@@ -1,7 +1,4 @@
-import type {
-  EraFamilyId,
-  TimelineSetId,
-} from "../../core/timelineTypes";
+import type { EraFamilyId, TimelineSetId } from "../../core/timelineTypes";
 import { TIMELINE_DECORATION_CATEGORY_IDS } from "../categories";
 
 /**

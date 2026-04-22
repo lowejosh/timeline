@@ -14,7 +14,6 @@ import type {
   RootTimelineData,
   TimelineEraFamilyConfig,
   TimelineSetId,
-  TimelineSourceRef,
 } from "../core/timelineTypes";
 
 export type {
@@ -30,8 +29,6 @@ export type {
   TimelineSetId,
 } from "../core/timelineTypes";
 export { TIMELINE_DISPLAY } from "../catalog/decorations";
-
-export type EraSourceRef = TimelineSourceRef;
 
 /** Find an era by id anywhere in the tree */
 export function findEraById(era: Era, id: string): Era | undefined {
@@ -302,12 +299,7 @@ export const ROOT_ERA: Era = materializeEra({
   endYear: CURRENT_YEAR,
   color: "rgba(0, 0, 0, 0)",
   scheme: "app-canonical",
-  sourceRefs: [
-    {
-      sourceId: "nasaUniverseOverview",
-      note: "Universe age rounded to 13.8 billion years ago.",
-    },
-  ],
+  sourceIds: ["nasaUniverseOverview"],
   children: [
     COSMIC_FAMILY_ROOT_DEFINITION,
     GEOLOGICAL_FAMILY_ROOT_DEFINITION,

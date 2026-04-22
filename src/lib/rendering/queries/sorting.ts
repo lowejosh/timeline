@@ -11,7 +11,10 @@ type DecorationLike =
     })
   | TimelineOverlayBand;
 
-export function compareDecorations(left: DecorationLike, right: DecorationLike) {
+export function compareDecorations(
+  left: DecorationLike,
+  right: DecorationLike,
+) {
   return (
     left.startYear - right.startYear ||
     left.endYear - right.endYear ||

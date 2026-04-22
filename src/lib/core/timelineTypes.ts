@@ -1,11 +1,6 @@
 import type { EraSourceId } from "../domain/eraSources";
 import type { TimelineExactTimestamp } from "./exactTimestamp";
 
-export type TimelineSourceRef = {
-  sourceId: EraSourceId;
-  note?: string;
-};
-
 export type TimelineRegionalScope = {
   regionalScopeLabel?: string;
 };
@@ -64,7 +59,7 @@ export type Era = TimelineRegionalScope &
     priority?: number;
     setPriorityBoost?: number;
     isFamilyRoot?: boolean;
-    sourceRefs?: TimelineSourceRef[];
+    sourceIds?: EraSourceId[];
     children?: Era[];
   };
 
@@ -128,7 +123,7 @@ type TimelineDecorationBase = TimelineZoomVisibility &
     groupId?: string;
     setId?: TimelineSetId;
     subGroup?: string;
-    sourceRefs?: TimelineSourceRef[];
+    sourceIds?: EraSourceId[];
   };
 
 export type TimelineMarker = TimelineDecorationBase &

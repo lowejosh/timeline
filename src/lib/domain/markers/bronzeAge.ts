@@ -13,15 +13,9 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 79,
-    sourceRefs: [
-      {
-        sourceId: "britannicaMesopotamia",
-        note: "Britannica places Mesopotamia's writing threshold in the late 4th millennium BCE; the app uses c. 3200 BCE as a clean public-facing anchor for the emergence of cuneiform.",
-      },
-      {
-        sourceId: "britannicaBabylonia",
-        note: "Britannica credits the Sumerians with the first system of writing, cuneiform, supporting this marker's broad Sumerian-Mesopotamian framing.",
-      },
+    sourceIds: [
+      "britannicaMesopotamia",
+      "britannicaBabylonia"
     ],
   },
   {
@@ -35,12 +29,7 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 83,
-    sourceRefs: [
-      {
-        sourceId: "worldHistoryGreatPyramidGiza",
-        note: "World History Encyclopedia uses the familiar c. 2560 BCE completion date for Khufu's pyramid, which the app uses here as a single marker year.",
-      },
-    ],
+    sourceIds: ["worldHistoryGreatPyramidGiza"],
   },
   {
     id: "sargon-of-akkad-builds-an-empire",
@@ -53,12 +42,7 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 80,
-    sourceRefs: [
-      {
-        sourceId: "britannicaAkkad",
-        note: "Britannica says Sargon founded Agade about 2300 BCE, united the region's city-states, and extended rule across much of Mesopotamia; the app uses c. 2300 BCE as a clean imperial threshold.",
-      },
-    ],
+    sourceIds: ["britannicaAkkad"],
   },
   {
     id: "hammurabi-promulgates-his-laws",
@@ -71,15 +55,9 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 81,
-    sourceRefs: [
-      {
-        sourceId: "britannicaHammurabi",
-        note: "Britannica dates Hammurabi's reign to c. 1792–1750 BCE and identifies his surviving laws as his best-known legacy; the app uses c. 1750 BCE as a concise end-of-reign marker for that legal monument.",
-      },
-      {
-        sourceId: "britannicaBabylonia",
-        note: "Britannica says Hammurabi forged Babylon into a great empire and promulgated his famous code of law, supporting this marker's Babylonian framing.",
-      },
+    sourceIds: [
+      "britannicaHammurabi",
+      "britannicaBabylonia"
     ],
   },
   {
@@ -93,11 +71,6 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 77,
-    sourceRefs: [
-      {
-        sourceId: "unescoYinXu",
-        note: "UNESCO dates Yin Xu to around 1300 BCE and identifies its oracle bones as the earliest known mature Chinese writing, which the app uses as this marker's anchor.",
-      },
-    ],
+    sourceIds: ["unescoYinXu"],
   },
 ];

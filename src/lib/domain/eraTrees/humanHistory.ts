@@ -84,12 +84,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Long era of mobile hunter-gatherers, stone tools, and the first known art.",
     scheme: "archaeological",
-    sourceRefs: [
-      {
-        sourceId: "khanPaleolithicCulture",
-        note: "Used here in the broad standard Stone Age sense before the Near Eastern Epipaleolithic transition.",
-      },
-      { sourceId: "smithsonianHumanOrigins" },
+    sourceIds: [
+      "khanPaleolithicCulture",
+      "smithsonianHumanOrigins"
     ],
   },
   {
@@ -104,12 +101,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Warming-climate transition when some hunter-gatherer communities grew more settled and locally rooted.",
     scheme: "archaeological",
-    sourceRefs: [
-      {
-        sourceId: "periodo",
-        note: "Near Eastern archaeology often prefers Epipaleolithic where broader world-history surveys might say Mesolithic.",
-      },
-    ],
+    sourceIds: ["periodo"],
   },
   {
     id: "neolithic",
@@ -123,12 +115,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Farming villages, domesticated plants and animals, and more permanent settlement reshape daily life.",
     scheme: "archaeological",
-    sourceRefs: [
-      { sourceId: "periodo" },
-      {
-        sourceId: "khanNeolithicRevolution",
-        note: "Near Eastern Neolithic examples include Pre-Pottery Neolithic phases such as those attested at Jericho.",
-      },
+    sourceIds: [
+      "periodo",
+      "khanNeolithicRevolution"
     ],
     children: [
       {
@@ -143,7 +132,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Early village phase of cultivation experiments, communal buildings, and life before pottery.",
         scheme: "archaeological",
-        sourceRefs: [{ sourceId: "periodo" }],
+        sourceIds: ["periodo"],
       },
       {
         id: "pre-pottery-neolithic-b",
@@ -157,7 +146,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Larger farming communities with domesticated animals, plastered skulls, and expanding village architecture.",
         scheme: "archaeological",
-        sourceRefs: [{ sourceId: "khanNeolithicRevolution" }],
+        sourceIds: ["khanNeolithicRevolution"],
       },
       {
         id: "pottery-neolithic",
@@ -171,7 +160,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Established farming world of everyday pottery, food storage, and widening local exchange.",
         scheme: "archaeological",
-        sourceRefs: [{ sourceId: "periodo" }],
+        sourceIds: ["periodo"],
       },
     ],
   },
@@ -187,12 +176,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Copper joins stone tools as villages grow more specialized, unequal, and connected.",
     scheme: "archaeological",
-    sourceRefs: [
-      {
-        sourceId: "britannicaBronzeAge",
-        note: "The Chalcolithic or Copper Age is commonly treated as the transition into the Bronze Age in the ancient Near East.",
-      },
-    ],
+    sourceIds: ["britannicaBronzeAge"],
   },
   {
     id: "bronze-age",
@@ -206,9 +190,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Cities, kingdoms, bronze metallurgy, and long-distance trade tie the ancient Near East into a shared world.",
     scheme: "archaeological",
-    sourceRefs: [
-      { sourceId: "britannicaBronzeAge" },
-      { sourceId: "britannicaMiddleEast" },
+    sourceIds: [
+      "britannicaBronzeAge",
+      "britannicaMiddleEast"
     ],
     children: [
       {
@@ -223,7 +207,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "First cities and fortified towns rise as urban life expands across the region.",
         scheme: "archaeological",
-        sourceRefs: [{ sourceId: "britannicaBronzeAge" }],
+        sourceIds: ["britannicaBronzeAge"],
       },
       {
         id: "middle-bronze-age",
@@ -237,7 +221,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Palace kingdoms, chariot warfare, and walled cities define a world of rival courts.",
         scheme: "archaeological",
-        sourceRefs: [{ sourceId: "britannicaBronzeAge" }],
+        sourceIds: ["britannicaBronzeAge"],
       },
       {
         id: "late-bronze-age",
@@ -251,7 +235,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Great-power diplomacy and palace trade link Egypt, Anatolia, Mesopotamia, and the Levant.",
         scheme: "archaeological",
-        sourceRefs: [{ sourceId: "britannicaBronzeAge" }],
+        sourceIds: ["britannicaBronzeAge"],
       },
     ],
   },
@@ -266,13 +250,10 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Era when iron smelting and forging spread widely enough for iron tools and weapons to overtake bronze.",
     scheme: "archaeological",
-    sourceRefs: [
-      { sourceId: "britannicaIronAge" },
-      { sourceId: "britannicaMetallurgy" },
-      {
-        sourceId: "historyPersianEmpire",
-        note: "Used only for the app's 539 BCE handoff out of the Near Eastern Iron Age track and into classical antiquity.",
-      },
+    sourceIds: [
+      "britannicaIronAge",
+      "britannicaMetallurgy",
+      "historyPersianEmpire"
     ],
     children: [
       {
@@ -287,15 +268,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Transition phase when ironworking spreads quickly but smiths still labor to turn bloom iron into reliable tools and blades.",
         scheme: "archaeological",
-        sourceRefs: [
-          {
-            sourceId: "britannicaIronAge",
-            note: "Used for the broad c. 1200 BCE opening of the Iron Age and the rapid spread of iron metallurgy between 1200 and 1000 BCE.",
-          },
-          {
-            sourceId: "britannicaMetallurgy",
-            note: "Used for early iron production as bloom smelting followed by reheating and hammering to make workable wrought iron.",
-          },
+        sourceIds: [
+          "britannicaIronAge",
+          "britannicaMetallurgy"
         ],
       },
       {
@@ -310,15 +285,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Ironworking becomes more dependable and widespread, supplying tougher farm tools, fittings, and more common weapons.",
         scheme: "archaeological",
-        sourceRefs: [
-          {
-            sourceId: "britannicaMetallurgy",
-            note: "Used for repeated forging, annealing, and growing control over carbon content as ironworking techniques improved.",
-          },
-          {
-            sourceId: "britannicaIronAge",
-            note: "Used for the broader Iron Age pattern in which large-scale iron implements changed settlement, agriculture, and warfare.",
-          },
+        sourceIds: [
+          "britannicaMetallurgy",
+          "britannicaIronAge"
         ],
       },
       {
@@ -332,15 +301,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "By this final phase, iron tools and weapons are established parts of everyday production rather than a newer experiment.",
         scheme: "archaeological",
-        sourceRefs: [
-          {
-            sourceId: "britannicaMetallurgy",
-            note: "Used for the mature Iron Age pattern of established forging practice and improved ironworking over time.",
-          },
-          {
-            sourceId: "historyPersianEmpire",
-            note: "Used only for the app's 539 BCE endpoint before the classical-antiquity band begins.",
-          },
+        sourceIds: [
+          "britannicaMetallurgy",
+          "historyPersianEmpire"
         ],
       },
     ],
@@ -354,7 +317,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Greco-Roman age that shaped Mediterranean law, architecture, philosophy, and urban life.",
     scheme: "world-history",
-    sourceRefs: [{ sourceId: "britannicaClassicalAntiquity" }],
+    sourceIds: ["britannicaClassicalAntiquity"],
   },
   {
     id: "post-classical-history",
@@ -365,10 +328,10 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Major religions, caravan routes, and maritime trade bind Afro-Eurasia more tightly.",
     scheme: "world-history",
-    sourceRefs: [
-      { sourceId: "historyIslam" },
-      { sourceId: "khanSongChina" },
-      { sourceId: "britannicaMongolEmpire" },
+    sourceIds: [
+      "historyIslam",
+      "khanSongChina",
+      "britannicaMongolEmpire"
     ],
   },
   {
@@ -380,10 +343,10 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Print culture, oceanic empires, gunpowder states, and global exchange redraw the world.",
     scheme: "world-history",
-    sourceRefs: [
-      { sourceId: "historyPrintingPress" },
-      { sourceId: "historyChristopherColumbus" },
-      { sourceId: "historyOttomanEmpire" },
+    sourceIds: [
+      "historyPrintingPress",
+      "historyChristopherColumbus",
+      "historyOttomanEmpire"
     ],
     children: [
       {
@@ -396,15 +359,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Oceanic voyages, imperial rivalry, and transatlantic exchange pull distant regions into one connected world.",
         scheme: "world-history",
-        sourceRefs: [
-          {
-            sourceId: "historyChristopherColumbus",
-            note: "HISTORY uses Columbus's 1492 Atlantic landfall as a clean public-history threshold for sustained transatlantic contact and colonization, which helps ground the opening centuries of this phase.",
-          },
-          {
-            sourceId: "historyFerdinandMagellan",
-            note: "HISTORY says Magellan's expedition set out in 1519 and that the Victoria returned to Spain in September 1522 after completing the voyage around the world, making it a strong capstone marker for this oceanic era.",
-          },
+        sourceIds: [
+          "historyChristopherColumbus",
+          "historyFerdinandMagellan"
         ],
       },
       {
@@ -418,12 +375,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Dynastic war, rebellion, and fiscal strain shake kingdoms across Europe and beyond.",
         scheme: "world-history",
-        sourceRefs: [
-          {
-            sourceId: "historyThirtyYearsWar",
-            note: "HISTORY calls the Thirty Years' War a 17th-century conflict fought primarily in central Europe from 1618 to 1648, a useful anchor for the wider century of war and instability often grouped as the General Crisis.",
-          },
-        ],
+        sourceIds: ["historyThirtyYearsWar"],
       },
       {
         id: "age-of-enlightenment",
@@ -435,15 +387,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Reason, experiment, and print debate challenge inherited authority in science, politics, and religion.",
         scheme: "world-history",
-        sourceRefs: [
-          {
-            sourceId: "historyEnlightenment",
-            note: "HISTORY describes the Enlightenment as the long 18th century from 1685 to 1815 and specifically identifies an early Enlightenment beginning in 1685, which the app uses as the start of this sub-era while clipping the end to the parent era's 1800 boundary.",
-          },
-          {
-            sourceId: "britannicaEncyclopedie",
-            note: "Britannica calls the Encyclopédie one of the chief works of the philosophes and says its text volumes were published beginning in 1751, making it a strong signature publication inside this era.",
-          },
+        sourceIds: [
+          "historyEnlightenment",
+          "britannicaEncyclopedie"
         ],
       },
     ],
@@ -457,10 +403,10 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Factories, coal, steam transport, and industrial war transform work, cities, and state power.",
     scheme: "world-history",
-    sourceRefs: [
-      { sourceId: "historyIndustrialRevolution" },
-      { sourceId: "historyMeijiRestoration" },
-      { sourceId: "historyWorldWarOne" },
+    sourceIds: [
+      "historyIndustrialRevolution",
+      "historyMeijiRestoration",
+      "historyWorldWarOne"
     ],
     children: [
       {
@@ -473,12 +419,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Factories, coal power, and growing industrial cities begin to reorganize work, class, and everyday life.",
         scheme: "world-history",
-        sourceRefs: [
-          {
-            sourceId: "historyIndustrialRevolution",
-            note: "HISTORY describes the Industrial Revolution as transforming agrarian societies into industrialized and urban ones through factories, steam power, coal, and mechanized production, which fits this early growth phase.",
-          },
-        ],
+        sourceIds: ["historyIndustrialRevolution"],
       },
       {
         id: "nationalism-and-expansion",
@@ -491,15 +432,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Revolutions, reforms, and more assertive states push industrial societies toward national politics and wider expansion.",
         scheme: "world-history",
-        sourceRefs: [
-          {
-            sourceId: "historyIndustrialRevolution",
-            note: "HISTORY ties later industrialization to expanding communication, rail transport, factories, and urban society, which helps ground this mid-19th-century transition into more politically charged industrial states.",
-          },
-          {
-            sourceId: "historyMeijiRestoration",
-            note: "HISTORY says the Meiji Restoration of 1868 toppled the Tokugawa shogunate and propelled Japan into the modern era, a useful state-reform anchor inside this nation-building phase.",
-          },
+        sourceIds: [
+          "historyIndustrialRevolution",
+          "historyMeijiRestoration"
         ],
       },
       {
@@ -512,15 +447,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Heavy industry, new technologies, and imperial expansion bind distant regions more tightly while sharpening great-power rivalry.",
         scheme: "world-history",
-        sourceRefs: [
-          {
-            sourceId: "historyIndustrialRevolution",
-            note: "HISTORY distinguishes a later industrial phase of rapid advances in steel, electric power, and automobiles in the late 19th and early 20th centuries.",
-          },
-          {
-            sourceId: "britannicaScrambleForAfrica",
-            note: "Britannica's Scramble for Africa page frames the late-19th-century imperial partition of Africa and the Berlin Conference's role in accelerating that expansion.",
-          },
+        sourceIds: [
+          "historyIndustrialRevolution",
+          "britannicaScrambleForAfrica"
         ],
       },
       {
@@ -532,19 +461,10 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Global war, economic breakdown, and collapsing empires overturn the old industrial world order.",
         scheme: "world-history",
-        sourceRefs: [
-          {
-            sourceId: "historyWorldWarOne",
-            note: "HISTORY says World War I started in 1914 and brought the fall of major imperial dynasties, making it a clear opening to this crisis era.",
-          },
-          {
-            sourceId: "historyGreatDepression",
-            note: "HISTORY describes the Great Depression as the worst economic crisis in modern history, lasting from 1929 to the beginning of World War II in 1939.",
-          },
-          {
-            sourceId: "historyWorldWarTwo",
-            note: "HISTORY says World War II began with Germany's 1939 invasion of Poland and ended in 1945 after devastating global destruction and political restructuring.",
-          },
+        sourceIds: [
+          "historyWorldWarOne",
+          "historyGreatDepression",
+          "historyWorldWarTwo"
         ],
       },
     ],
@@ -558,10 +478,10 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Post-1945 world of decolonization, superpower rivalry, and rapidly networked global life.",
     scheme: "world-history",
-    sourceRefs: [
-      { sourceId: "unDecolonization" },
-      { sourceId: "britannicaColdWar" },
-      { sourceId: "natGeoGlobalization" },
+    sourceIds: [
+      "unDecolonization",
+      "britannicaColdWar",
+      "natGeoGlobalization"
     ],
     children: [
       {
@@ -573,19 +493,10 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Reconstruction, new international institutions, and nuclear superpowers define the early postwar world.",
         scheme: "world-history",
-        sourceRefs: [
-          {
-            sourceId: "unHistoryUnitedNations",
-            note: "The UN's history page places the San Francisco Conference and UN Charter in 1945, with the organization officially beginning on 24 October 1945 as a clear postwar institutional threshold.",
-          },
-          {
-            sourceId: "historyMarshallPlan",
-            note: "HISTORY describes the Marshall Plan, enacted in 1948, as a program to rebuild Western European cities, industries, and infrastructure after World War II.",
-          },
-          {
-            sourceId: "britannicaColdWar",
-            note: "Britannica says the Cold War emerged after World War II and had solidified by 1947-48, fitting this early postwar era of bloc formation and nuclear superpowers.",
-          },
+        sourceIds: [
+          "unHistoryUnitedNations",
+          "historyMarshallPlan",
+          "britannicaColdWar"
         ],
       },
       {
@@ -597,15 +508,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Independence movements redraw the map while proxy wars, ideology, and nuclear rivalry shape a divided world.",
         scheme: "world-history",
-        sourceRefs: [
-          {
-            sourceId: "unDecolonization",
-            note: "The UN identifies its 1960 Declaration on the Granting of Independence to Colonial Countries and Peoples as a landmark acceleration point in global decolonization.",
-          },
-          {
-            sourceId: "britannicaColdWar",
-            note: "Britannica gives the Cold War a 1947-1991 span and describes the later decades of proxy conflict, detente, renewed tension, and final breakdown through 1991.",
-          },
+        sourceIds: [
+          "unDecolonization",
+          "britannicaColdWar"
         ],
       },
       {
@@ -617,19 +522,10 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "The web, smartphones, data systems, and AI remake communication, work, and everyday life.",
         scheme: "world-history",
-        sourceRefs: [
-          {
-            sourceId: "natGeoGlobalization",
-            note: "National Geographic says globalization went into overdrive with the Information Age, when computer and communications technology redefined what it meant to be connected.",
-          },
-          {
-            sourceId: "cernBirthWeb",
-            note: "CERN dates the Web's invention to 1989 and its public-domain release to 1993, making it a core threshold technology for the modern digital era.",
-          },
-          {
-            sourceId: "openAiIntroducingChatGpt",
-            note: "Used here for the later digital-age turn in which conversational generative AI moved into mainstream public use.",
-          },
+        sourceIds: [
+          "natGeoGlobalization",
+          "cernBirthWeb",
+          "openAiIntroducingChatGpt"
         ],
         children: [
           {
@@ -642,15 +538,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
             description:
               "The web escapes the lab and becomes a public medium for pages, portals, search, and early online communities.",
             scheme: "world-history",
-            sourceRefs: [
-              {
-                sourceId: "cernShortHistoryWeb",
-                note: "CERN says Berners-Lee released the WWW software in 1991, including the line-mode browser, server software, and developer library, then announced it on Internet newsgroups in August 1991.",
-              },
-              {
-                sourceId: "cernBirthWeb",
-                note: "Used for the web's broader early public spread and CERN's 1993 public-domain release that helped it flourish globally.",
-              },
+            sourceIds: [
+              "cernShortHistoryWeb",
+              "cernBirthWeb"
             ],
           },
           {
@@ -663,12 +553,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
             description:
               "Smartphones put full internet access, apps, maps, cameras, and constant connectivity in a pocket.",
             scheme: "world-history",
-            sourceRefs: [
-              {
-                sourceId: "appleIPhoneIntroduction",
-                note: "Apple introduced the iPhone on 9 January 2007 as a phone, widescreen iPod, and Internet communications device in one handheld product, making it a clean threshold for this mobile-first turn.",
-              },
-            ],
+            sourceIds: ["appleIPhoneIntroduction"],
           },
           {
             id: "algorithmic-era",
@@ -680,12 +565,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
             description:
               "Big data, ranking systems, recommendation feeds, and automated targeting increasingly shape what people see, buy, and do online.",
             scheme: "world-history",
-            sourceRefs: [
-              {
-                sourceId: "trustMeBro",
-                note: "Yes, this one is intentionally a personal call, not a citation. Big data, feeds, targeting, ranking, and precision marketing just feel like their own era.",
-              },
-            ],
+            sourceIds: ["trustMeBro"],
           },
           {
             id: "ai-and-automation-era",
@@ -697,15 +577,9 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
             description:
               "Generative AI and increasingly autonomous software move into mainstream writing, coding, search, and office work.",
             scheme: "world-history",
-            sourceRefs: [
-              {
-                sourceId: "openAiIntroducingChatGpt",
-                note: "OpenAI launched ChatGPT as a public research preview on 30 November 2022, a useful public threshold for conversational generative AI becoming mainstream.",
-              },
-              {
-                sourceId: "oecdAiWipsProgram",
-                note: "Used for the OECD's broader framing that AI is changing how work is organised and carried out, complementing or replacing tasks while generating new kinds of work.",
-              },
+            sourceIds: [
+              "openAiIntroducingChatGpt",
+              "oecdAiWipsProgram"
             ],
           },
         ],

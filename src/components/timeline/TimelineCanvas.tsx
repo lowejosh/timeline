@@ -97,11 +97,12 @@ import {
   drawOverlayGroupIcon,
   resolveOverlayGroupIconLayout,
 } from "../../lib/rendering/overlayGroupIcons";
+import { clamp01, smoothstep01 } from "../../lib/core/easing";
 import {
-  clamp01,
-  smoothstep01,
-} from "../../lib/core/easing";
-import { parseColor, toCssColor, withAlpha } from "../../lib/rendering/canvas/colors";
+  parseColor,
+  toCssColor,
+  withAlpha,
+} from "../../lib/rendering/canvas/colors";
 import {
   DEFAULT_TIMELINE_THEME,
   readTimelineCanvasTheme,
@@ -305,46 +306,6 @@ import {
   TOOLTIP_OFFSET,
   VIEWPORT_INTERACTION_SETTLE_MS,
 } from "../../lib/rendering/canvas/constants";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export function TimelineCanvas({
   width,
@@ -2740,7 +2701,6 @@ export function TimelineCanvas({
     markViewportInteraction,
   });
 
-
   function resolveHoveredTooltip(x: number, y: number, pointerType: string) {
     if (pointerType !== "mouse" && pointerType !== "pen") {
       return null;
@@ -2946,7 +2906,10 @@ export function TimelineCanvas({
     overlayVisibilityTransitionKey,
     scheduleRedraw,
   );
-  const axisTickAnimationRef = useAxisTickAnimation(axisTickTargets, scheduleRedraw);
+  const axisTickAnimationRef = useAxisTickAnimation(
+    axisTickTargets,
+    scheduleRedraw,
+  );
   const {
     progressByIdRef: expandedOverlayProgressByIdRef,
     renderedIdsRef: renderedExpandedOverlayIdsRef,
@@ -2998,7 +2961,6 @@ export function TimelineCanvas({
 
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
   }, [height, width]);
-
 
   useEffect(() => {
     const nextSceneDiagnostics: TimelineSceneDiagnosticsSnapshot = {

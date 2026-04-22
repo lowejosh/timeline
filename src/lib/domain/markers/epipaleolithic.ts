@@ -13,11 +13,6 @@ export const EPIPALEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 72,
-    sourceRefs: [
-      {
-        sourceId: "metPrehistoricArt",
-        note: "The Met's prehistoric-art introduction says Eynan/Ain Mallaha in the Levant was occupied around 10,000–8000 B.C. by the Natufian culture of settled hunters and gatherers; the app uses c. 10,000 BCE as a clear Epipaleolithic anchor.",
-      },
-    ],
+    sourceIds: ["metPrehistoricArt"],
   },
 ];

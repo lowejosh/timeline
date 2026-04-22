@@ -20,9 +20,9 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(140, 113, 92)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 95,
-    sourceRefs: [
-      { sourceId: "smithsonianSahelanthropus" },
-      { sourceId: "smithsonianHumanFamilyTree" },
+    sourceIds: [
+      "smithsonianSahelanthropus",
+      "smithsonianHumanFamilyTree"
     ],
   },
   {
@@ -39,7 +39,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(151, 119, 88)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 94,
-    sourceRefs: [{ sourceId: "smithsonianOrrorin" }],
+    sourceIds: ["smithsonianOrrorin"],
   },
   {
     id: "ardipithecus-kadabba",
@@ -55,7 +55,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(160, 125, 92)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 93,
-    sourceRefs: [{ sourceId: "smithsonianArdipithecusKadabba" }],
+    sourceIds: ["smithsonianArdipithecusKadabba"],
   },
   {
     id: "ardipithecus-ramidus",
@@ -71,7 +71,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(169, 132, 96)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 92,
-    sourceRefs: [{ sourceId: "smithsonianArdipithecusRamidus" }],
+    sourceIds: ["smithsonianArdipithecusRamidus"],
   },
   {
     id: "australopithecus-anamensis",
@@ -87,7 +87,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(177, 139, 101)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 91,
-    sourceRefs: [{ sourceId: "smithsonianAustralopithecusAnamensis" }],
+    sourceIds: ["smithsonianAustralopithecusAnamensis"],
   },
   {
     id: "australopithecus-afarensis",
@@ -103,7 +103,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(186, 145, 105)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 90,
-    sourceRefs: [{ sourceId: "smithsonianAustralopithecusAfarensis" }],
+    sourceIds: ["smithsonianAustralopithecusAfarensis"],
   },
   {
     id: "kenyanthropus-platyops",
@@ -119,7 +119,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(168, 120, 84)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 89,
-    sourceRefs: [{ sourceId: "smithsonianKenyanthropusPlatyops" }],
+    sourceIds: ["smithsonianKenyanthropusPlatyops"],
   },
   {
     id: "australopithecus-africanus",
@@ -135,7 +135,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(179, 128, 90)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 88,
-    sourceRefs: [{ sourceId: "smithsonianAustralopithecusAfricanus" }],
+    sourceIds: ["smithsonianAustralopithecusAfricanus"],
   },
   {
     id: "paranthropus-aethiopicus",
@@ -151,7 +151,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(156, 117, 74)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 87,
-    sourceRefs: [{ sourceId: "smithsonianParanthropusAethiopicus" }],
+    sourceIds: ["smithsonianParanthropusAethiopicus"],
   },
   {
     id: "australopithecus-garhi",
@@ -167,7 +167,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(171, 112, 86)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 86,
-    sourceRefs: [{ sourceId: "smithsonianAustralopithecusGarhi" }],
+    sourceIds: ["smithsonianAustralopithecusGarhi"],
   },
   {
     id: "homo-habilis",
@@ -183,7 +183,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(159, 117, 88)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 85,
-    sourceRefs: [{ sourceId: "smithsonianHomoHabilis" }],
+    sourceIds: ["smithsonianHomoHabilis"],
   },
   {
     id: "paranthropus-boisei",
@@ -199,7 +199,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(149, 123, 82)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 84,
-    sourceRefs: [{ sourceId: "smithsonianParanthropusBoisei" }],
+    sourceIds: ["smithsonianParanthropusBoisei"],
   },
   {
     id: "australopithecus-sediba",
@@ -215,7 +215,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(173, 111, 95)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 83,
-    sourceRefs: [{ sourceId: "smithsonianAustralopithecusSediba" }],
+    sourceIds: ["smithsonianAustralopithecusSediba"],
   },
   {
     id: "homo-rudolfensis",
@@ -231,7 +231,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(149, 104, 87)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 82,
-    sourceRefs: [{ sourceId: "smithsonianHomoRudolfensis" }],
+    sourceIds: ["smithsonianHomoRudolfensis"],
   },
   {
     id: "homo-erectus",
@@ -247,7 +247,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(166, 107, 83)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 81,
-    sourceRefs: [{ sourceId: "smithsonianHomoErectus" }],
+    sourceIds: ["smithsonianHomoErectus"],
   },
   {
     id: "paranthropus-robustus",
@@ -263,7 +263,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(159, 118, 90)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 80,
-    sourceRefs: [{ sourceId: "smithsonianParanthropusRobustus" }],
+    sourceIds: ["smithsonianParanthropusRobustus"],
   },
   {
     id: "homo-heidelbergensis",
@@ -279,7 +279,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(141, 116, 100)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 79,
-    sourceRefs: [{ sourceId: "smithsonianHomoHeidelbergensis" }],
+    sourceIds: ["smithsonianHomoHeidelbergensis"],
   },
   {
     id: "homo-neanderthalensis",
@@ -295,7 +295,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(129, 107, 145)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 78,
-    sourceRefs: [{ sourceId: "smithsonianHomoNeanderthalensis" }],
+    sourceIds: ["smithsonianHomoNeanderthalensis"],
   },
   {
     id: "homo-naledi",
@@ -311,7 +311,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(115, 125, 109)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 77,
-    sourceRefs: [{ sourceId: "smithsonianHomoNaledi" }],
+    sourceIds: ["smithsonianHomoNaledi"],
   },
   {
     id: "homo-sapiens",
@@ -331,7 +331,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
       hideAtOrBelowYears: 25_000,
       onlyWhenAnyGroupVisible: ["civilizations"],
     },
-    sourceRefs: [{ sourceId: "smithsonianHomoSapiens" }],
+    sourceIds: ["smithsonianHomoSapiens"],
   },
   {
     id: "homo-floresiensis",
@@ -347,6 +347,6 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(116, 122, 157)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 75,
-    sourceRefs: [{ sourceId: "smithsonianHomoFloresiensis" }],
+    sourceIds: ["smithsonianHomoFloresiensis"],
   },
 ];

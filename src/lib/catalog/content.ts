@@ -122,10 +122,7 @@ function byMarkerOrder(left: TimelineMarker, right: TimelineMarker) {
   );
 }
 
-function byOverlayOrder(
-  left: TimelineOverlayBand,
-  right: TimelineOverlayBand,
-) {
+function byOverlayOrder(left: TimelineOverlayBand, right: TimelineOverlayBand) {
   return (
     left.startYear - right.startYear ||
     left.endYear - right.endYear ||

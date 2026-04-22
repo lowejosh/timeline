@@ -1,6 +1,9 @@
 import { useEffect, useRef } from "react";
 import type { ResolvedTimelineOverlayBand } from "../lib/rendering/overlayTracks";
-import { getOverlayLaneY, getTimelineLayout } from "../lib/rendering/canvas/overlayLayout";
+import {
+  getOverlayLaneY,
+  getTimelineLayout,
+} from "../lib/rendering/canvas/overlayLayout";
 import {
   OVERLAY_BAND_FADE_IN_SMOOTHING_MS,
   OVERLAY_BAND_FADE_OUT_SMOOTHING_MS,
@@ -171,7 +174,8 @@ export function useOverlayBandAnimation(
           : Math.abs(state.targetY - nextY) < 0.2;
 
         if (!settled || !settledY) hasActiveAnimation = true;
-        if (Math.abs(nextOpacity - state.currentOpacity) > 0.0005) didChange = true;
+        if (Math.abs(nextOpacity - state.currentOpacity) > 0.0005)
+          didChange = true;
         if (Math.abs(nextY - state.currentY) > 0.05) didChange = true;
 
         if (state.targetOpacity <= 0.001 && nextOpacity <= 0.003) {
