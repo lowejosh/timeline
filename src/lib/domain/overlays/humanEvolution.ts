@@ -20,10 +20,7 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(140, 113, 92)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 95,
-    sourceIds: [
-      "smithsonianSahelanthropus",
-      "smithsonianHumanFamilyTree"
-    ],
+    sourceIds: ["smithsonianSahelanthropus", "smithsonianHumanFamilyTree"],
   },
   {
     id: "orrorin-tugenensis",

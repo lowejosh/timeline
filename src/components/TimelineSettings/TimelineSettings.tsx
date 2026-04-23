@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
-import "./TimelineSettings.css";
+import { THEME } from "../../lib/ui/theme";
+import "./TimelineSettings.styles.css";
 
 type TimelineSettingsProps = {
   isCosmicCalendarMode: boolean;
@@ -50,7 +51,7 @@ export function TimelineSettings({
 
   return (
     <div
-      className="timeline-settings"
+      className="absolute top-3 right-[52px] z-[4] max-sm:top-[10px] max-sm:right-[50px]"
       data-open={isOpen ? "true" : "false"}
       ref={rootRef}
     >
@@ -58,13 +59,14 @@ export function TimelineSettings({
         aria-controls={panelId}
         aria-expanded={isOpen}
         aria-label={isOpen ? "Hide settings" : "Show settings"}
-        className="timeline-settings__toggle"
+        className="group inline-flex items-center justify-center w-8 h-8 p-0 border rounded-full text-[var(--ink)] backdrop-blur-[14px] cursor-pointer bg-[var(--glass-base)] border-[var(--brown-14)] [box-shadow:0_8px_18px_var(--shadow-8)] [transition:background-color_180ms_ease,box-shadow_180ms_ease,border-color_180ms_ease,transform_180ms_ease] hover:bg-[var(--glass-hover)] hover:border-[var(--brown-20)] hover:[box-shadow:0_10px_22px_var(--shadow-10)] hover:-translate-y-px data-[open=true]:bg-[var(--glass-active)] data-[open=true]:border-[var(--brown-18)] data-[open=true]:[box-shadow:0_10px_22px_var(--shadow-10)] focus-visible:outline-none focus-visible:[box-shadow:0_0_0_2px_var(--focus)]"
+        data-open={isOpen ? "true" : "false"}
         onClick={() => {
           setIsOpen((current) => !current);
         }}
         type="button"
       >
-        <span aria-hidden="true" className="timeline-settings__icon">
+        <span aria-hidden="true" className="inline-flex items-center justify-center w-[0.88rem] h-[0.88rem] text-current [transition:transform_400ms_cubic-bezier(0.22,1,0.36,1)] group-data-[open=true]:rotate-[60deg]">
           <svg
             fill="currentColor"
             fillRule="evenodd"
@@ -82,26 +84,37 @@ export function TimelineSettings({
       <section
         aria-hidden={!isOpen}
         aria-label="Timeline settings"
-        className="timeline-settings__panel"
+        className="settings-panel absolute top-[calc(100%+10px)] right-0 w-[min(18rem,calc(100vw-24px))] py-[0.78rem] px-[0.84rem] border rounded-2xl backdrop-blur-[14px] max-sm:w-[min(17rem,calc(100vw-20px))]"
         data-open={isOpen ? "true" : "false"}
         id={panelId}
+        style={{
+          borderColor: THEME.color.brown[12],
+          background: `linear-gradient(180deg, ${THEME.color.glass.panelHeavyFrom} 0%, ${THEME.color.glass.panelHeavyTo} 100%)`,
+          boxShadow: `0 14px 34px ${THEME.color.shadow[10]}, 0 4px 14px ${THEME.color.shadow[5]}`,
+        }}
       >
-        <div className="timeline-settings__panel-header">
-          <h2 className="timeline-settings__title">Settings</h2>
+        <div className="flex items-center gap-[0.4rem] mb-[0.52rem]">
+          <h2 className="m-0 text-[var(--ink)] text-[0.92rem] leading-[1.05] font-semibold font-display">Settings</h2>
         </div>
 
-        <div className="timeline-settings__item">
-          <label className="timeline-settings__item-label">
+        <div className="settings-item flex items-center justify-between gap-[0.75rem] py-[0.34rem]">
+          <label className="flex flex-col gap-[0.18rem] text-[var(--ink)] text-[0.78rem] leading-[1.3] font-sans">
             Cosmic Calendar
-            <span className="timeline-settings__item-description">
+            <span
+              className="text-[0.68rem] leading-[1.3] font-sans"
+              style={{ color: "rgba(32, 25, 19, 0.56)" }}
+            >
               Compress all of time into a single calendar year.
             </span>
           </label>
           <button
             aria-checked={isCosmicCalendarMode}
-            className="timeline-settings__toggle-switch"
+            className="settings-switch relative flex-shrink-0 w-8 h-[1.12rem] border-0 rounded-full p-0 cursor-pointer"
             onClick={onToggleCosmicCalendarMode}
             role="switch"
+            style={{
+              background: isCosmicCalendarMode ? THEME.color.accent : THEME.color.brown[18],
+            }}
             type="button"
           />
         </div>

@@ -1,3 +1,5 @@
+import { THEME } from "../../ui/theme";
+
 export type TimelineCanvasTheme = {
   paper: string;
   paperDeep: string;
@@ -8,12 +10,12 @@ export type TimelineCanvasTheme = {
 };
 
 export const DEFAULT_TIMELINE_THEME: TimelineCanvasTheme = {
-  paper: "#f7f0e2",
-  paperDeep: "#efe5d4",
-  line: "rgba(74, 57, 43, 0.9)",
-  lineSoft: "rgba(74, 57, 43, 0.24)",
-  labelColor: "rgba(53, 39, 29, 0.92)",
-  fontSans: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif",
+  paper: THEME.color.surface,
+  paperDeep: THEME.color.overviewStrip.to,
+  line: THEME.color.line,
+  lineSoft: THEME.color.lineSoft,
+  labelColor: THEME.color.inkLabel,
+  fontSans: THEME.font.sans,
 };
 
 export function readTimelineCanvasTheme(): TimelineCanvasTheme {

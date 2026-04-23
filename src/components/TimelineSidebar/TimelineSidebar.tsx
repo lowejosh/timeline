@@ -13,8 +13,9 @@ import type {
   TimelineSidebarSetState,
 } from "../../lib/app/sidebarModel";
 import type { TimelineSetId } from "../../lib/core/timelineTypes";
-import { OverlayGroupIconSvg } from "../canvas/OverlayGroupIconSvg";
-import { computeEraObscuredCounts } from "../availableSets/AvailableSetsPage.utils";
+import { OverlayGroupIconSvg } from "../TimelineCanvas/OverlayGroupIconSvg";
+import { computeEraObscuredCounts } from "../AvailableSets/AvailableSetsPage.utils";
+import "./TimelineSidebar.styles.css";
 
 type TimelineSidebarProps = {
   sets: TimelineSidebarSetState[];

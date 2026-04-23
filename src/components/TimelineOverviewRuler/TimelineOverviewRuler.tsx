@@ -1,11 +1,13 @@
 import {
+  Fragment,
+  type CSSProperties,
   useMemo,
   useRef,
   useState,
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
-import { type Era } from "../../lib/domain/eras";
+import { compareEraPriorityAscending, type Era } from "../../lib/domain/eras";
 import {
   getOverviewRulerYearsPerPixel,
   mapOverviewRulerXToYear,
@@ -21,7 +23,7 @@ import {
   TIMELINE_MIN_YEAR,
   type TimelineViewport,
 } from "../../lib/core/viewport";
-import "./TimelineOverviewRuler.css";
+import { THEME } from "../../lib/ui/theme";
 
 type TimelineOverviewRulerProps = {
   width: number;
@@ -110,7 +112,9 @@ export function TimelineOverviewRuler({
   );
   const bandRects = useMemo(
     () =>
-      eras.map((era) => ({
+      [...eras]
+        .sort(compareEraPriorityAscending)
+        .map((era) => ({
         era,
         rect: resolveOverviewRulerBandRect(
           era.startYear,
@@ -233,11 +237,17 @@ export function TimelineOverviewRuler({
   );
   const rightShadeWidth = Math.max(width - pad - rightShadeLeft, 0);
 
+  const spotlightTransition: CSSProperties = isFollowingDrag
+    ? { transition: `left 110ms ${THEME.easing.settle}, width 110ms ${THEME.easing.settle}` }
+    : isSettling
+    ? { transition: `left 180ms ${THEME.easing.spring}, width 180ms ${THEME.easing.spring}` }
+    : {};
+
   return (
-    <div className="timeline-overview-ruler" style={{ height }}>
+    <div className="relative z-0 w-full bg-transparent" style={{ height }}>
       <div
         aria-label="Timeline overview ruler. Click or drag anywhere to recenter and scrub the timeline window."
-        className="timeline-overview-ruler__surface"
+        className="relative w-full h-full overflow-hidden border-0 bg-transparent cursor-pointer touch-none data-[dragging=true]:cursor-grabbing focus-visible:outline-none focus-visible:[box-shadow:inset_0_0_0_2px_var(--focus)]"
         data-dragging={isDragging ? "true" : "false"}
         data-following={isFollowingDrag ? "true" : "false"}
         data-settling={isSettling ? "true" : "false"}
@@ -250,36 +260,48 @@ export function TimelineOverviewRuler({
         tabIndex={0}
       >
         <div
-          className="timeline-overview-ruler__strip"
-          style={{ left: pad, right: pad }}
+          className="absolute top-0 bottom-0"
+          style={{
+            left: pad,
+            right: pad,
+            background: `linear-gradient(180deg, ${THEME.color.surface} 0%, ${THEME.color.overviewStrip.to} 100%)`,
+          }}
         />
         {bandRects.map(({ era, rect }) => (
           rect ? (
-          <div
-            className="timeline-overview-ruler__band"
-            key={era.id}
-            style={{
-              backgroundColor: era.color,
-              left: rect.left,
-              width: rect.width,
-            }}
-          />
+          <Fragment key={era.id}>
+            {/* Backdrop reset — mirrors canvas: fill background at full opacity first,
+                so higher-priority eras replace lower-priority colors rather than blending over them. */}
+            <div
+              className="absolute top-0 bottom-0 pointer-events-none"
+              style={{
+                background: `linear-gradient(180deg, ${THEME.color.overviewStrip.from} 0%, ${THEME.color.overviewStrip.to} 100%)`,
+                left: rect.left,
+                width: rect.width,
+              }}
+            />
+            <div
+              className="absolute top-0 bottom-0 opacity-30 pointer-events-none"
+              style={{
+                backgroundColor: era.color,
+                left: rect.left,
+                width: rect.width,
+              }}
+            />
+          </Fragment>
           ) : null
         ))}
         <div
-          className="timeline-overview-ruler__shade timeline-overview-ruler__shade--left"
-          style={{ left: pad, width: leftShadeWidth }}
+          className="absolute top-0 bottom-0 pointer-events-none"
+          style={{ left: pad, width: leftShadeWidth, background: THEME.color.deepShadow[42], ...spotlightTransition }}
         />
         <div
-          className="timeline-overview-ruler__shade timeline-overview-ruler__shade--right"
-          style={{ left: rightShadeLeft, width: rightShadeWidth }}
+          className="absolute top-0 bottom-0 pointer-events-none"
+          style={{ left: rightShadeLeft, width: rightShadeWidth, background: THEME.color.deepShadow[42], ...spotlightTransition }}
         />
         <div
-          className="timeline-overview-ruler__window"
-          style={{
-            left: spotlight.displayLeft,
-            width: spotlight.displayWidth,
-          }}
+          className="absolute top-0 bottom-0 pointer-events-none"
+          style={{ left: spotlight.displayLeft, width: spotlight.displayWidth, ...spotlightTransition }}
         />
       </div>
     </div>

@@ -49,12 +49,15 @@ export function useEraChildAnimation(
             animationStates.get(era.id)?.target ?? 0,
             isZoomingIn,
           );
-          const fadingOut = nextTarget < (animationStates.get(era.id)?.target ?? 0);
+          const fadingOut =
+            nextTarget < (animationStates.get(era.id)?.target ?? 0);
           const nextState = syncAnimatedEraChildState({
             existing: animationStates.get(era.id),
             nextTarget,
             now,
-            duration: fadingOut ? ERA_CHILD_FADE_OUT_DURATION_MS : ERA_CHILD_FADE_IN_DURATION_MS,
+            duration: fadingOut
+              ? ERA_CHILD_FADE_OUT_DURATION_MS
+              : ERA_CHILD_FADE_IN_DURATION_MS,
             hasInitialized: initializedRef.current,
           });
           animationStates.set(era.id, nextState);

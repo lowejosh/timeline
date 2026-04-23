@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { type Era } from "../../lib/domain/eras";
+import { type Era } from "../../../lib/domain/eras";
 import {
   formatOverviewRulerPercentageLabel,
   formatOverviewRulerSpanLabel,
@@ -11,15 +11,15 @@ import {
   type OverviewRulerDomain,
   type OverviewRulerTier,
   type ResolveOverviewRulerTiersOptions,
-} from "../../lib/rendering/overviewRuler";
+} from "../../../lib/rendering/overviewRuler";
 import {
   getVisibleRange,
   getVisibleRangePrecise,
   subtractPreciseTimelineYears,
   type TimelineViewport,
-} from "../../lib/core/viewport";
-import { TimelineOverviewRuler } from "./TimelineOverviewRuler";
-import "./TimelineOverviewRulerStack.css";
+} from "../../../lib/core/viewport";
+import { TimelineOverviewRuler } from "../TimelineOverviewRuler";
+import { THEME } from "../../../lib/ui/theme";
 
 type TimelineOverviewRulerStackProps = {
   width: number;
@@ -105,8 +105,11 @@ export function TimelineOverviewRulerStack({
 
   return (
     <div
-      className="timeline-overview-ruler-stack"
-      style={{ height: stackHeight }}
+      className="absolute inset-x-0 bottom-0 w-full pointer-events-auto overflow-hidden"
+      style={{
+        height: stackHeight,
+        transition: `height 200ms ${THEME.easing.spring}`,
+      }}
     >
       {tiers.map((tier, index) => {
         const isRoot = index === 0;
@@ -123,20 +126,22 @@ export function TimelineOverviewRulerStack({
 
         return (
           <div
-            className="timeline-overview-ruler-stack__tier"
+            className="absolute left-0 right-0"
             data-root={isRoot ? "true" : "false"}
             key={index}
             style={{
               height: tierHeight,
               top,
+              transition: `top 200ms ${THEME.easing.spring}`,
+              animation: isRoot ? "none" : `timeline-overview-ruler-tier-in 220ms ${THEME.easing.spring}`,
             }}
           >
             <div
               aria-hidden="true"
-              className="timeline-overview-ruler-stack__tier-mag"
+              className="absolute top-0 bottom-0 left-0 z-[1] flex items-center justify-end pr-[0.42rem] pl-[0.28rem] text-right pointer-events-none whitespace-nowrap tabular-nums tracking-[0.01em] text-[0.55rem] leading-none font-medium font-sans text-[rgba(54,41,30,0.42)]"
               style={{ width: pad }}
             >
-              <span className="timeline-overview-ruler-stack__tier-mag-value">
+              <span className="text-[rgba(54,41,30,0.46)]">
                 {tierPercentageLabel}
               </span>
             </div>
@@ -189,10 +194,10 @@ export function TimelineOverviewRulerStack({
             />
             <div
               aria-hidden="true"
-              className="timeline-overview-ruler-stack__tier-label"
+              className="absolute top-0 right-0 bottom-0 z-[1] flex items-center justify-start gap-[0.22rem] pr-[0.28rem] pl-[0.5rem] text-left pointer-events-none whitespace-nowrap tabular-nums tracking-[0.01em] text-[0.56rem] leading-none font-medium font-sans text-[rgba(54,41,30,0.5)] lowercase"
               style={{ width: pad }}
             >
-              <span className="timeline-overview-ruler-stack__tier-label-value">
+              <span className="text-[rgba(54,41,30,0.54)] font-semibold">
                 {tierSpanLabel}
               </span>
             </div>

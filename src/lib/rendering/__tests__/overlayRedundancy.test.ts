@@ -46,12 +46,7 @@ describe("overlay redundancy", () => {
   });
 
   it("keeps homo sapiens visible when the zoom is still broad", () => {
-    const viewport = getViewportForRange(
-      -50_000,
-      2_026,
-      WIDTH,
-      0,
-    );
+    const viewport = getViewportForRange(-50_000, 2_026, WIDTH, 0);
 
     const hiddenIds = getAutoHiddenOverlayIds(
       OVERLAYS,
@@ -84,12 +79,7 @@ describe("overlay redundancy", () => {
   });
 
   it("keeps age of mammals visible at broader deep-time zoom spans", () => {
-    const viewport = getViewportForRange(
-      -25_000_000,
-      2_026,
-      WIDTH,
-      0,
-    );
+    const viewport = getViewportForRange(-25_000_000, 2_026, WIDTH, 0);
 
     const hiddenIds = getAutoHiddenOverlayIds(
       OVERLAYS,

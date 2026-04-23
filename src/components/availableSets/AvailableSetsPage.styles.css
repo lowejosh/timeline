@@ -17,11 +17,11 @@
   width: min(72rem, 100%);
   margin: 0 auto;
   padding: 1rem 1.1rem 1.05rem;
-  border: 1px solid rgba(77, 61, 47, 0.1);
+  border: 1px solid var(--brown-10);
   border-radius: 20px;
   background: rgba(250, 246, 238, 0.78);
   box-shadow:
-    0 12px 32px rgba(44, 31, 20, 0.08),
+    0 12px 32px var(--shadow-8),
     0 2px 10px rgba(44, 31, 20, 0.04);
   backdrop-filter: blur(16px);
 }
@@ -40,7 +40,7 @@
   width: 2rem;
   height: 2rem;
   padding: 0;
-  border: 1px solid rgba(77, 61, 47, 0.14);
+  border: 1px solid var(--brown-14);
   border-radius: 999px;
   background: rgba(255, 252, 246, 0.5);
   color: var(--ink);
@@ -53,7 +53,7 @@
 
 .avsets__back:hover {
   background: rgba(255, 251, 244, 0.72);
-  border-color: rgba(77, 61, 47, 0.2);
+  border-color: var(--brown-20);
   transform: translateX(-1px);
 }
 
@@ -96,7 +96,7 @@
   align-items: center;
   gap: 0.34rem;
   padding: 0.38rem 0.62rem;
-  border: 1px solid rgba(77, 61, 47, 0.1);
+  border: 1px solid var(--brown-10);
   border-radius: 999px;
   background: rgba(255, 252, 246, 0.38);
   color: rgba(77, 61, 47, 0.5);
@@ -132,7 +132,7 @@
 
 .avsets__column--available {
   padding-left: 1.2rem;
-  border-left: 1px solid rgba(77, 61, 47, 0.1);
+  border-left: 1px solid var(--brown-10);
 }
 
 .avsets__column-header {
@@ -188,7 +188,7 @@
 .avsets__search {
   width: 100%;
   padding: 0.44rem 0.72rem 0.44rem 1.95rem;
-  border: 1px solid rgba(77, 61, 47, 0.14);
+  border: 1px solid var(--brown-14);
   border-radius: 999px;
   background: rgba(255, 252, 246, 0.5);
   color: var(--ink);
@@ -219,7 +219,7 @@
 
 .avsets__tag {
   padding: 0.24rem 0.6rem;
-  border: 1px solid rgba(77, 61, 47, 0.14);
+  border: 1px solid var(--brown-14);
   border-radius: 999px;
   background: transparent;
   color: rgba(77, 61, 47, 0.68);
@@ -239,7 +239,7 @@
 }
 
 .avsets__tag[data-active="true"] {
-  background: rgba(77, 61, 47, 0.1);
+  background: var(--brown-10);
   border-color: rgba(77, 61, 47, 0.26);
   color: var(--ink);
 }
@@ -280,7 +280,7 @@
   gap: 0.7rem;
   width: 100%;
   padding: 0.68rem 0.78rem;
-  border: 1px solid rgba(77, 61, 47, 0.08);
+  border: 1px solid var(--brown-8);
   border-radius: 14px;
   background: rgba(255, 251, 244, 0.18);
   cursor: grab;
@@ -294,14 +294,14 @@
 
 .avsets__card:hover {
   background: rgba(255, 251, 244, 0.42);
-  border-color: rgba(77, 61, 47, 0.12);
+  border-color: var(--brown-12);
 }
 
 .avsets__card[data-drag-state="dragging"] {
   cursor: grabbing;
   background: rgba(255, 251, 244, 0.92);
   box-shadow:
-    0 12px 24px rgba(44, 31, 20, 0.12),
+    0 12px 24px var(--shadow-12),
     0 4px 10px rgba(44, 31, 20, 0.06);
 }
 
@@ -387,7 +387,7 @@
   width: 1.85rem;
   height: 1.85rem;
   padding: 0;
-  border: 1px solid rgba(77, 61, 47, 0.14);
+  border: 1px solid var(--brown-14);
   border-radius: 999px;
   background: rgba(255, 252, 246, 0.42);
   color: rgba(77, 61, 47, 0.76);
@@ -401,7 +401,7 @@
 
 .avsets__item-action:hover {
   background: rgba(255, 251, 244, 0.7);
-  border-color: rgba(77, 61, 47, 0.2);
+  border-color: var(--brown-20);
   transform: translateY(-1px);
 }
 
@@ -433,14 +433,14 @@
 }
 
 .avsets__action--cancel {
-  border: 1px solid rgba(77, 61, 47, 0.14);
+  border: 1px solid var(--brown-14);
   background: rgba(255, 252, 246, 0.4);
   color: rgba(77, 61, 47, 0.74);
 }
 
 .avsets__action--cancel:hover {
   background: rgba(255, 251, 244, 0.6);
-  border-color: rgba(77, 61, 47, 0.2);
+  border-color: var(--brown-20);
 }
 
 .avsets__action--save {

@@ -154,13 +154,17 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
 
     context.save();
     context.font = labelFont;
-    const lines = labelText.split('\n');
+    const lines = labelText.split("\n");
     let maxWidth = 0;
     for (const line of lines) {
       const metrics = context.measureText(line);
       maxWidth = Math.max(maxWidth, metrics.width);
     }
-    const labelMetrics = { width: maxWidth, actualBoundingBoxAscent: 10, actualBoundingBoxDescent: 4 }; // approximate
+    const labelMetrics = {
+      width: maxWidth,
+      actualBoundingBoxAscent: 10,
+      actualBoundingBoxDescent: 4,
+    }; // approximate
     context.restore();
 
     const shouldHideForPriorityOverlap = shouldHideOverlappedEraLabel(
@@ -193,7 +197,8 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     let currentY = labelBaselineY;
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (i === 1) { // alternate name
+      if (i === 1) {
+        // alternate name
         context.font = `italic 9px ${fontSans}`;
       }
       context.fillText(line, labelX, currentY);

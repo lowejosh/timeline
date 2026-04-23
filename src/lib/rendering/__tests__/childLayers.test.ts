@@ -254,8 +254,12 @@ describe("timeline child layers", () => {
       false,
     ).filter((layer) => layer.opacity > 0.01);
 
-    const backgroundLayer = layers.find((layer) => layer.era.id === "background");
-    const foregroundLayer = layers.find((layer) => layer.era.id === "foreground");
+    const backgroundLayer = layers.find(
+      (layer) => layer.era.id === "background",
+    );
+    const foregroundLayer = layers.find(
+      (layer) => layer.era.id === "foreground",
+    );
 
     expect(backgroundLayer).toBeDefined();
     expect(foregroundLayer).toBeDefined();
@@ -386,7 +390,9 @@ describe("timeline child layers", () => {
       false,
     ).filter((layer) => layer.opacity > 0.01);
 
-    const backgroundLayer = layers.find((layer) => layer.era.id === "background");
+    const backgroundLayer = layers.find(
+      (layer) => layer.era.id === "background",
+    );
 
     expect(backgroundLayer).toBeDefined();
     expect(

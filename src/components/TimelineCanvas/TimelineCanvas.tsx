@@ -107,6 +107,7 @@ import { drawOverlays } from "../../lib/rendering/canvas/draw/drawOverlays";
 import { drawAxis } from "../../lib/rendering/canvas/draw/drawAxis";
 import { drawMarkers } from "../../lib/rendering/canvas/draw/drawMarkers";
 import { drawNowIndicator } from "../../lib/rendering/canvas/draw/drawNowIndicator";
+import "./TimelineCanvas.styles.css";
 import type {
   CanvasDrawContext,
   HoverRegion,
@@ -1596,14 +1597,14 @@ export function TimelineCanvas({
 
   return (
     <div
-      className="timeline-canvas-shell"
+      className="relative w-full h-full"
       ref={shellRef}
       onPointerLeave={handleShellPointerLeave}
       onPointerMove={handleShellPointerMove}
     >
       <canvas
         aria-label="Interactive timeline canvas"
-        className="timeline-canvas"
+        className="absolute inset-0 w-full h-full block border-0 outline-none touch-none cursor-grab overscroll-none active:cursor-grabbing focus-visible:[box-shadow:inset_0_0_0_2px_var(--focus)]"
         onKeyDown={(event) => {
           if (!width) return;
 

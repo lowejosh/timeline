@@ -16,7 +16,7 @@ import {
   removeItem,
   REORDER_EASING,
 } from "./AvailableSetsPage.utils";
-import "./AvailableSetsPage.css";
+import "./AvailableSetsPage.styles.css";
 
 export function AvailableSetsPage({
   allSets,
