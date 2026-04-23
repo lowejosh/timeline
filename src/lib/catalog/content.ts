@@ -1,5 +1,6 @@
 import { COSMIC_SET_CORE_MARKER_IDS } from "./sets/cosmic";
 import { EARTH_SET_CORE_MARKER_IDS } from "./sets/earth";
+import { PHYSICS_MILESTONES_GROUP_ID } from "./sets/physics";
 import { TIMELINE_DECORATION_CATEGORY_IDS } from "./categories";
 import {
   CHALCOLITHIC_MARKERS,
@@ -12,6 +13,7 @@ import {
   HISTORICAL_TURNING_POINT_MARKERS,
   NEOLITHIC_MARKERS,
   PALEOLITHIC_MARKERS,
+  PHYSICS_HISTORY_MARKERS,
   POST_CLASSICAL_MARKERS,
 } from "../domain/markers";
 import {
@@ -56,6 +58,10 @@ const MARKER_COLLECTIONS: MarkerCollection[] = [
   {
     groupId: TIMELINE_DECORATION_CATEGORY_IDS.deepTimeLife,
     items: DEEP_TIME_LIFE_MARKERS,
+  },
+  {
+    groupId: PHYSICS_MILESTONES_GROUP_ID,
+    items: PHYSICS_HISTORY_MARKERS,
   },
   {
     groupId: TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution,

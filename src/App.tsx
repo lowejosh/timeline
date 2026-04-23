@@ -1,6 +1,5 @@
 import { TimelineCanvas } from "./components/TimelineCanvas";
 import { TIMELINE_CANVAS_PAD } from "./lib/rendering/layout/padding";
-import { TimelineDisclaimer } from "./components/TimelineDisclaimer";
 import { TimelineSettings } from "./components/TimelineSettings";
 import { TimelineSidebar } from "./components/TimelineSidebar";
 import { TimelineOverviewRulerStack } from "./components/TimelineOverviewRuler/TimelineOverviewRulerStack";

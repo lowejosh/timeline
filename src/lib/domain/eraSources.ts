@@ -1828,6 +1828,22 @@ export const ERA_SOURCES = {
     citation:
       'Brivati, Brian (1996). "Introduction." In The Contemporary History Handbook. Manchester University Press.',
   },
+  physicsOfUniverseDates: {
+    shortTitle: "Physics of the Universe: Dates",
+    title: "Important Dates and Discoveries",
+    organization: "The Physics of the Universe",
+    citation:
+      '"Important Dates and Discoveries," The Physics of the Universe.',
+    url: "https://www.physicsoftheuniverse.com/dates.html",
+  },
+  timelineOfFundamentalPhysicsDiscoveriesWikipedia: {
+    shortTitle: "Wikipedia: physics discoveries timeline",
+    title: "Timeline of fundamental physics discoveries",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Timeline of fundamental physics discoveries." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Timeline_of_fundamental_physics_discoveries",
+  },
   physicsOfUniverseBigBangTimeline: {
     shortTitle: "Physics of the Universe: Big Bang Timeline",
     title: "Timeline of the Big Bang",

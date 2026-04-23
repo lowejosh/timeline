@@ -151,6 +151,43 @@ export function AvailableSetsPage({
     ]);
   };
 
+  const renderColumnItems = (
+    sets: TimelineSetAssignmentConfig[],
+    columnId: ColumnId,
+    emptyMessage: string,
+  ): React.ReactNode => {
+    const isCrossColumnTarget =
+      dragState !== null &&
+      dragState.targetColumn === columnId &&
+      dragState.sourceColumn !== columnId;
+
+    const cards = sets.map((set) => renderSetCard(set, columnId));
+
+    if (!isCrossColumnTarget) {
+      return sets.length === 0 ? (
+        <p className="avsets__empty">{emptyMessage}</p>
+      ) : (
+        cards
+      );
+    }
+
+    const insertAt = Math.min(dragState.targetIndex, cards.length);
+    const ghost = (
+      <div
+        key="drag-ghost"
+        aria-hidden="true"
+        className="avsets__drag-ghost"
+        style={
+          {
+            "--ghost-height": `${dragState.draggedHeight}px`,
+          } as React.CSSProperties
+        }
+      />
+    );
+
+    return [...cards.slice(0, insertAt), ghost, ...cards.slice(insertAt)];
+  };
+
   const renderSetCard = (
     set: TimelineSetAssignmentConfig,
     columnId: ColumnId,
@@ -159,12 +196,15 @@ export function AvailableSetsPage({
     const obscuredCount = isEnabled ? (eraObscuredCounts.get(set.id) ?? 0) : 0;
     const timeRange = setTimeRanges.get(set.id) ?? null;
     const isDragged = dragState?.setId === set.id;
+    const isCrossColumnDrag =
+      dragState !== null && dragState.sourceColumn !== dragState.targetColumn;
     const layout = dragState?.layouts[columnId] ?? null;
     const previewTop = previewTopByColumn?.[columnId]?.get(set.id);
     const originalTop = layout?.tops.get(set.id);
     const shiftY =
       dragState &&
       !isDragged &&
+      !isCrossColumnDrag &&
       previewTop !== undefined &&
       originalTop !== undefined
         ? previewTop - originalTop
@@ -314,15 +354,14 @@ export function AvailableSetsPage({
             </header>
             <div
               className="avsets__column-list"
+              data-dragging={dragState ? "true" : "false"}
               ref={enabledColumnRef}
               role="list"
             >
-              {enabledSets.length === 0 ? (
-                <p className="avsets__empty">
-                  Drag sets here to show them in Layers.
-                </p>
-              ) : (
-                enabledSets.map((set) => renderSetCard(set, "enabled"))
+              {renderColumnItems(
+                enabledSets,
+                "enabled",
+                "Drag sets here to show them in Layers.",
               )}
             </div>
           </section>
@@ -397,20 +436,18 @@ export function AvailableSetsPage({
             </header>
             <div
               className="avsets__column-list"
+              data-dragging={dragState ? "true" : "false"}
               ref={availableColumnRef}
               role="list"
             >
-              {visibleAvailableSetIds.length === 0 ? (
-                <p className="avsets__empty">
-                  No available sets match this search or filter.
-                </p>
-              ) : (
+              {renderColumnItems(
                 visibleAvailableSetIds
                   .map((setId) => setsById.get(setId))
                   .filter((set): set is TimelineSetAssignmentConfig =>
                     Boolean(set),
-                  )
-                  .map((set) => renderSetCard(set, "available"))
+                  ),
+                "available",
+                "No available sets match this search or filter.",
               )}
             </div>
           </section>

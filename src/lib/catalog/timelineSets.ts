@@ -16,6 +16,12 @@ import {
   HUMAN_SET_GROUP_IDS,
   HUMAN_SET_ID,
 } from "./sets/human";
+import {
+  PHYSICS_SET_CORE_MARKER_IDS,
+  PHYSICS_SET_FAMILY_IDS,
+  PHYSICS_SET_GROUP_IDS,
+  PHYSICS_SET_ID,
+} from "./sets/physics";
 import type {
   Era,
   EraFamilyId,
@@ -75,6 +81,18 @@ export const TIMELINE_SETS: readonly TimelineSetAssignmentConfig[] = [
     familyIds: [...HUMAN_SET_FAMILY_IDS],
     groupIds: HUMAN_SET_GROUP_IDS,
     coreMarkerIds: HUMAN_SET_CORE_MARKER_IDS,
+  },
+  {
+    id: PHYSICS_SET_ID,
+    label: "History of Physics",
+    description:
+      "Ideas, experiments, and theories from ancient natural philosophy to modern particle physics.",
+    tags: ["physics", "history", "science"],
+    order: 3,
+    defaultEnabled: false,
+    familyIds: [...PHYSICS_SET_FAMILY_IDS],
+    groupIds: PHYSICS_SET_GROUP_IDS,
+    coreMarkerIds: PHYSICS_SET_CORE_MARKER_IDS,
   },
 ];
 

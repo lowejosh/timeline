@@ -36,9 +36,10 @@ describe("era data", () => {
       if (era.id === ROOT_ERA.id) {
         expect(era.children?.[0] && isEraFamilyRoot(era.children[0])).toBe(true);
         expect(era.children?.[1] && isEraFamilyRoot(era.children[1])).toBe(true);
+        expect(era.children?.[2] && isEraFamilyRoot(era.children[2])).toBe(true);
         expect(
           era.children
-            ?.slice(2)
+            ?.slice(3)
             .every(
               (child) =>
                 !isEraFamilyRoot(child) && child.familyId === "human-history",
@@ -67,7 +68,7 @@ describe("era data", () => {
   it("only references known sources", () => {
     walkEraTree(ROOT_ERA, (era) => {
       for (const sourceId of era.sourceIds ?? []) {
-        expect(ERA_SOURCES[sourceId]).toBeDefined();
+        expect(sourceId in ERA_SOURCES).toBe(true);
       }
     });
   });
@@ -81,7 +82,11 @@ describe("era data", () => {
       expect((era.sourceIds ?? []).length).toBeGreaterThan(0);
 
       const hasLinkedSource = (era.sourceIds ?? []).some((sourceId) => {
-        const source = ERA_SOURCES[sourceId];
+        if (!(sourceId in ERA_SOURCES)) {
+          return false;
+        }
+
+        const source = ERA_SOURCES[sourceId as keyof typeof ERA_SOURCES];
 
         return "url" in source && Boolean(source.url);
       });
@@ -177,13 +182,49 @@ describe("era data", () => {
   it("keeps era families directly under the root timeline", () => {
     const rootChildIds = ROOT_ERA.children?.map((era) => era.id) ?? [];
 
-    expect(rootChildIds.slice(0, 2)).toEqual([
+    expect(rootChildIds.slice(0, 3)).toEqual([
       "cosmic-history",
       "geological-history",
+      "physics-history",
     ]);
     expect(rootChildIds).toContain("paleolithic");
     expect(rootChildIds).toContain("contemporary-history");
     expect(rootChildIds).not.toContain("human-history");
+  });
+
+  it("keeps physics ages directly under the physics family root", () => {
+    const physicsChildIds =
+      findEraById(ROOT_ERA, "physics-history")?.children?.map((era) => era.id) ?? [];
+
+    expect(physicsChildIds).toEqual([
+      "physics-ancient-world",
+      "physics-medieval-and-renaissance-world",
+      "physics-early-modern-world",
+      "physics-modern-world",
+      "physics-contemporary-world",
+    ]);
+  });
+
+  it("adds older child bands under ancient and medieval physics ages", () => {
+    const ancientWorld = findEraById(ROOT_ERA, "physics-ancient-world");
+    const medievalWorld = findEraById(
+      ROOT_ERA,
+      "physics-medieval-and-renaissance-world",
+    );
+    const islamicGoldenAge = findEraById(ROOT_ERA, "physics-islamic-golden-age");
+
+    expect(ancientWorld?.children?.map((era) => era.id)).toEqual([
+      "physics-early-astronomical-traditions",
+      "physics-greek-natural-philosophy",
+      "physics-hellenistic-and-roman-science",
+    ]);
+    expect(medievalWorld?.children?.map((era) => era.id)).toEqual([
+      "physics-late-antique-and-early-medieval-inheritance",
+      "physics-islamic-golden-age",
+      "physics-late-medieval-and-renaissance-transition",
+    ]);
+    expect(islamicGoldenAge?.name).toBe("Islamic Golden Age");
+    expect(islamicGoldenAge?.sourceIds).toEqual(["khanGoldenAgeOfIslam"]);
   });
 
   it("keeps geological eras directly under the geological family root", () => {
@@ -326,6 +367,7 @@ describe("era data", () => {
         "dark-energy-acceleration",
         "hadean",
         "quaternary",
+        "physics-modern-world",
         "paleolithic",
         "contemporary-history",
       ]),
@@ -356,5 +398,17 @@ describe("era data", () => {
     expect(holocene?.familyId).toBe("geological");
     expect((quaternary?.priority ?? 0) > (darkEnergyAcceleration?.priority ?? 0)).toBe(true);
     expect((holocene?.priority ?? 0) > (darkEnergyAcceleration?.priority ?? 0)).toBe(true);
+  });
+
+  it("assigns higher priority to physics ages than overlapping human-history eras", () => {
+    const physicsModern = findEraById(ROOT_ERA, "physics-modern-world");
+    const ageOfIndustryAndEmpire = findEraById(
+      ROOT_ERA,
+      "age-of-industry-and-empire",
+    );
+
+    expect(physicsModern?.familyId).toBe("physics-history");
+    expect(ageOfIndustryAndEmpire?.familyId).toBe("human-history");
+    expect((physicsModern?.priority ?? 0) > (ageOfIndustryAndEmpire?.priority ?? 0)).toBe(true);
   });
 });

@@ -1,6 +1,7 @@
 import { COSMIC_ERA_DEFINITIONS } from "./eraTrees/cosmic";
 import { GEOLOGICAL_ERA_DEFINITIONS } from "./eraTrees/geological";
 import { HUMAN_HISTORY_ERA_DEFINITIONS } from "./eraTrees/humanHistory";
+import { PHYSICS_HISTORY_ERA_DEFINITIONS } from "./eraTrees/physicsHistory";
 import { TIMELINE_DISPLAY } from "../catalog/decorations";
 import {
   getEffectiveTimelinePriority,
@@ -168,6 +169,14 @@ export const TIMELINE_ERA_FAMILIES: TimelineEraFamilyConfig[] = [
     priority: 300,
     defaultEnabled: true,
   },
+  {
+    id: "physics-history",
+    label: "History of Physics",
+    description: "Historical ages for major shifts in physical thought and discovery.",
+    order: 3,
+    priority: 350,
+    defaultEnabled: false,
+  },
 ];
 
 const ERA_FAMILY_CONFIG_BY_ID = new Map(
@@ -284,6 +293,22 @@ const GEOLOGICAL_FAMILY_ROOT_DEFINITION: EraDefinition = {
   children: GEOLOGICAL_ERA_DEFINITIONS,
 };
 
+const PHYSICS_FAMILY_ROOT_DEFINITION: EraDefinition = {
+  id: "physics-history",
+  name: "History of Physics",
+  startYear: PHYSICS_HISTORY_ERA_DEFINITIONS[0]?.startYear ?? TIMELINE_MIN_YEAR,
+  endYear:
+    PHYSICS_HISTORY_ERA_DEFINITIONS[
+      PHYSICS_HISTORY_ERA_DEFINITIONS.length - 1
+    ]?.endYear ?? CURRENT_YEAR,
+  color: "rgba(0, 0, 0, 0)",
+  scheme: "history-of-science",
+  familyId: "physics-history",
+  priority: ERA_FAMILY_CONFIG_BY_ID.get("physics-history")?.priority,
+  isFamilyRoot: true,
+  children: PHYSICS_HISTORY_ERA_DEFINITIONS,
+};
+
 const HUMAN_HISTORY_TOP_LEVEL_DEFINITIONS: EraDefinition[] = (
   HUMAN_HISTORY_ERA_DEFINITIONS
 ).map((definition) => ({
@@ -303,6 +328,7 @@ export const ROOT_ERA: Era = materializeEra({
   children: [
     COSMIC_FAMILY_ROOT_DEFINITION,
     GEOLOGICAL_FAMILY_ROOT_DEFINITION,
+    PHYSICS_FAMILY_ROOT_DEFINITION,
     ...HUMAN_HISTORY_TOP_LEVEL_DEFINITIONS,
   ],
 });

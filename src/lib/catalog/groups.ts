@@ -1,8 +1,11 @@
 import { COSMIC_MILESTONES_GROUP_ID } from "./sets/cosmic";
 import { EARTH_MILESTONES_GROUP_ID } from "./sets/earth";
+import { PHYSICS_MILESTONES_GROUP_ID } from "./sets/physics";
 import { TIMELINE_DECORATION_CATEGORY_IDS } from "./categories";
 import type { TimelineDecorationGroup } from "../core/timelineTypes";
 
+const PHYSICS_HISTORY_CATEGORY_ID =
+  TIMELINE_DECORATION_CATEGORY_IDS.physicsHistory;
 const HUMAN_HISTORY_GROUP_ID = TIMELINE_DECORATION_CATEGORY_IDS.humanHistory;
 const DEEP_TIME_LIFE_GROUP_ID = TIMELINE_DECORATION_CATEGORY_IDS.deepTimeLife;
 const HUMAN_EVOLUTION_GROUP_ID =
@@ -33,6 +36,15 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     order: 0,
   },
   {
+    id: PHYSICS_MILESTONES_GROUP_ID,
+    categoryId: PHYSICS_HISTORY_CATEGORY_ID,
+    label: "Physics Milestones",
+    description:
+      "Major discoveries, experiments, and theories across the history of physics.",
+    contentType: "markers",
+    order: 0,
+  },
+  {
     id: DEEP_TIME_LIFE_GROUP_ID,
     categoryId: TIMELINE_DECORATION_CATEGORY_IDS.deepTimeLife,
     label: "Deep Time Life",
@@ -40,6 +52,11 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
       "Major life-history overlays and milestone markers across deep time.",
     contentType: "mixed",
     order: 0,
+    autoToggleRule: {
+      kind: "max-visible-span",
+      hideAtOrBelowYears: 1_000_000,
+      showAboveYears: 2_000_000,
+    },
   },
   {
     id: HUMAN_HISTORY_GROUP_ID,
@@ -56,6 +73,11 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
     description: "Branching hominin overlays and major evolutionary markers.",
     contentType: "mixed",
     order: 0,
+    autoToggleRule: {
+      kind: "max-visible-span",
+      hideAtOrBelowYears: 500_000,
+      showAboveYears: 1_000_000,
+    },
   },
   {
     id: CULTURES_GROUP_ID,

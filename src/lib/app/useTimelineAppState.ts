@@ -57,7 +57,10 @@ const HUMAN_EVOLUTION_GROUP_ID =
 const OVERVIEW_RULER_TIER_HEIGHT = 18;
 const OVERVIEW_RULER_MAX_TIERS = 3;
 const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
+
 const TIMELINE_SET_ORDER_STORAGE_KEY = "timeline:set-order:v1";
+const TIMELINE_ENABLED_SET_IDS_STORAGE_KEY = "timeline:enabled-set-ids:v1";
+const TIMELINE_EXPANDED_SET_IDS_STORAGE_KEY = "timeline:expanded-set-ids:v1";
 
 export const TIMELINE_APP_LAYOUT = {
   overviewRulerTierHeight: OVERVIEW_RULER_TIER_HEIGHT,
@@ -157,22 +160,15 @@ function filterHiddenOverlayBands(
   });
 }
 
+
 function readStoredTimelineSetOrder() {
   if (typeof window === "undefined") {
     return getDefaultTimelineSetOrder();
   }
-
   try {
-    const storedValue = window.localStorage.getItem(
-      TIMELINE_SET_ORDER_STORAGE_KEY,
-    );
-
-    if (!storedValue) {
-      return getDefaultTimelineSetOrder();
-    }
-
+    const storedValue = window.localStorage.getItem(TIMELINE_SET_ORDER_STORAGE_KEY);
+    if (!storedValue) return getDefaultTimelineSetOrder();
     const parsed = JSON.parse(storedValue);
-
     return normalizeTimelineSetOrder(
       Array.isArray(parsed)
         ? parsed.filter((value): value is string => typeof value === "string")
@@ -180,6 +176,36 @@ function readStoredTimelineSetOrder() {
     );
   } catch {
     return getDefaultTimelineSetOrder();
+  }
+}
+
+function readStoredEnabledSetIds(): Set<TimelineSetId> {
+  if (typeof window === "undefined") {
+    return getDefaultEnabledTimelineSetIds();
+  }
+  try {
+    const storedValue = window.localStorage.getItem(TIMELINE_ENABLED_SET_IDS_STORAGE_KEY);
+    if (!storedValue) return getDefaultEnabledTimelineSetIds();
+    const parsed = JSON.parse(storedValue);
+    if (!Array.isArray(parsed)) return getDefaultEnabledTimelineSetIds();
+    return new Set(parsed.filter((id): id is TimelineSetId => typeof id === "string"));
+  } catch {
+    return getDefaultEnabledTimelineSetIds();
+  }
+}
+
+function readStoredExpandedSetIds(): Set<TimelineSetId> {
+  if (typeof window === "undefined") {
+    return new Set();
+  }
+  try {
+    const storedValue = window.localStorage.getItem(TIMELINE_EXPANDED_SET_IDS_STORAGE_KEY);
+    if (!storedValue) return new Set();
+    const parsed = JSON.parse(storedValue);
+    if (!Array.isArray(parsed)) return new Set();
+    return new Set(parsed.filter((id): id is TimelineSetId => typeof id === "string"));
+  } catch {
+    return new Set();
   }
 }
 
@@ -204,19 +230,19 @@ export function useTimelineAppState() {
   const [manualEnabledGroupIds, setManualEnabledGroupIds] = useState<
     Set<string>
   >(() => getDefaultEnabledTimelineGroupIds());
-  const [enabledSetIds, setEnabledSetIds] = useState<Set<TimelineSetId>>(() =>
-    getDefaultEnabledTimelineSetIds(),
+  const [enabledSetIds, setEnabledSetIds] = useState<Set<TimelineSetId>>(
+    () => readStoredEnabledSetIds(),
   );
   // Separate from enabledSetIds (library membership): which collected sets are
   // currently rendering on the timeline. Toggled from the sidebar.
-  const [visibleSetIds, setVisibleSetIds] = useState<Set<TimelineSetId>>(() =>
-    getDefaultEnabledTimelineSetIds(),
+  const [visibleSetIds, setVisibleSetIds] = useState<Set<TimelineSetId>>(
+    () => readStoredEnabledSetIds(),
   );
   const [orderedSetIds, setOrderedSetIds] = useState<TimelineSetId[]>(() =>
     readStoredTimelineSetOrder(),
   );
   const [expandedSetIds, setExpandedSetIds] = useState<Set<TimelineSetId>>(
-    () => new Set(),
+    () => readStoredExpandedSetIds(),
   );
   const [humanEvolutionToggleMode, setHumanEvolutionToggleMode] =
     useState<LayerAutoToggleMode>("auto");
@@ -244,6 +270,7 @@ export function useTimelineAppState() {
     innerWidthRef.current = innerWidth;
   });
 
+
   useEffect(() => {
     try {
       window.localStorage.setItem(
@@ -254,6 +281,28 @@ export function useTimelineAppState() {
       // Ignore storage failures; order still works in memory.
     }
   }, [orderedSetIds]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        TIMELINE_ENABLED_SET_IDS_STORAGE_KEY,
+        JSON.stringify(Array.from(enabledSetIds)),
+      );
+    } catch {
+      // Ignore storage failures; state still works in memory.
+    }
+  }, [enabledSetIds]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        TIMELINE_EXPANDED_SET_IDS_STORAGE_KEY,
+        JSON.stringify(Array.from(expandedSetIds)),
+      );
+    } catch {
+      // Ignore storage failures; state still works in memory.
+    }
+  }, [expandedSetIds]);
 
   const baseEnabledGroupIds = useMemo(() => {
     const next = new Set(manualEnabledGroupIds);

@@ -1,8 +1,16 @@
+import { TIMELINE_MARKERS, TIMELINE_OVERLAYS } from "../../lib/catalog/content";
 import { getRootDisplayErasBySets, ROOT_ERA } from "../../lib/domain/eras";
 import { formatTimelineYear } from "../../lib/rendering/bands";
 import { TIMELINE_MAX_YEAR } from "../../lib/core/timelineYears";
-import type { TimelineSetAssignmentConfig } from "../../lib/catalog/timelineSets";
-import type { Era, TimelineSetId } from "../../lib/core/timelineTypes";
+import {
+  resolveDecorationSetId,
+  type TimelineSetAssignmentConfig,
+} from "../../lib/catalog/timelineSets";
+import type {
+  Era,
+  TimelineOverlayBand,
+  TimelineSetId,
+} from "../../lib/core/timelineTypes";
 import type {
   ColumnId,
   ColumnLayoutSnapshot,
@@ -281,6 +289,45 @@ function getDisplayErasForSet(setId: TimelineSetId): Era[] {
   return getRootDisplayErasBySets(ROOT_ERA, new Set([setId]));
 }
 
+function getDecorationExtentForSet(setId: TimelineSetId) {
+  let startYear = Number.POSITIVE_INFINITY;
+  let endYear = Number.NEGATIVE_INFINITY;
+
+  for (const marker of TIMELINE_MARKERS) {
+    const markerSetId = marker.setId ?? resolveDecorationSetId(marker);
+
+    if (markerSetId !== setId) {
+      continue;
+    }
+
+    startYear = Math.min(startYear, marker.year);
+    endYear = Math.max(endYear, marker.year);
+  }
+
+  const visitOverlays = (overlays: readonly TimelineOverlayBand[]) => {
+    for (const overlay of overlays) {
+      const overlaySetId = overlay.setId ?? resolveDecorationSetId(overlay);
+
+      if (overlaySetId === setId) {
+        startYear = Math.min(startYear, overlay.startYear);
+        endYear = Math.max(endYear, overlay.endYear);
+      }
+
+      if (overlay.children?.length) {
+        visitOverlays(overlay.children);
+      }
+    }
+  };
+
+  visitOverlays(TIMELINE_OVERLAYS);
+
+  if (!Number.isFinite(startYear) || !Number.isFinite(endYear)) {
+    return null;
+  }
+
+  return { startYear, endYear };
+}
+
 /**
  * For each set in `orderedEnabledSetIds`, counts how many of its root display
  * eras are fully time-span-contained within any single era from a
@@ -342,12 +389,19 @@ export function computeSetTimeRanges(
   for (const setId of setIds) {
     const eras = getDisplayErasForSet(setId);
 
-    if (eras.length === 0) {
+    const range =
+      eras.length > 0
+        ? {
+            startYear: Math.min(...eras.map((era) => era.startYear)),
+            endYear: Math.max(...eras.map((era) => era.endYear)),
+          }
+        : getDecorationExtentForSet(setId);
+
+    if (!range) {
       continue;
     }
 
-    const startYear = Math.min(...eras.map((era) => era.startYear));
-    const endYear = Math.max(...eras.map((era) => era.endYear));
+    const { startYear, endYear } = range;
     const span = Math.abs(endYear - startYear);
     const startLabel = formatSetEndpointYear(startYear, span);
     const endLabel = formatSetEndpointYear(endYear, span);

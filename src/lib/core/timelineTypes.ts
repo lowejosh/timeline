@@ -18,11 +18,16 @@ export type EraScheme =
   | "cosmic"
   | "chronostratigraphic"
   | "world-history"
-  | "archaeological";
+  | "archaeological"
+  | "history-of-science";
 
-export type EraFamilyId = "cosmic" | "geological" | "human-history";
+export type EraFamilyId =
+  | "cosmic"
+  | "geological"
+  | "human-history"
+  | "physics-history";
 
-export type TimelineSetId = "cosmic" | "earth" | "human";
+export type TimelineSetId = "cosmic" | "earth" | "human" | "physics";
 
 export type TimelineSetConfig = {
   id: TimelineSetId;

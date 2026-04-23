@@ -255,15 +255,29 @@
   align-content: start;
   gap: 0.45rem;
   padding-top: 1rem;
-  min-height: 18rem;
-  max-height: none;
-  overflow: visible;
+  min-height: 12rem;
+  max-height: 32rem;
+  overflow-y: auto;
+  overflow-x: visible;
   border: none;
   border-radius: 16px;
   background: transparent;
   transition:
     background-color 180ms ease,
     box-shadow 180ms ease;
+}
+
+.avsets__column-list[data-dragging="true"] {
+  overflow: visible;
+  max-height: none;
+}
+
+.avsets__drag-ghost {
+  height: var(--ghost-height);
+  border-radius: 14px;
+  border: 1.5px dashed rgba(77, 61, 47, 0.13);
+  background: rgba(77, 61, 47, 0.025);
+  box-sizing: border-box;
 }
 
 .avsets__empty {

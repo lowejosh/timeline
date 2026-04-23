@@ -35,7 +35,7 @@ export type TimelineTooltipContent = {
 
 const EXPLICIT_RANGE_SEPARATORS = [" — ", " to "] as const;
 
-function resolveTooltipSources(sourceIds?: EraSourceId[]) {
+function resolveTooltipSources(sourceIds?: readonly string[]) {
   const seen = new Set<string>();
 
   return (sourceIds ?? []).flatMap((sourceId) => {
@@ -43,12 +43,17 @@ function resolveTooltipSources(sourceIds?: EraSourceId[]) {
       return [];
     }
 
+    if (!(sourceId in ERA_SOURCES)) {
+      return [];
+    }
+
     seen.add(sourceId);
-    const source = ERA_SOURCES[sourceId];
+    const resolvedSourceId = sourceId as EraSourceId;
+    const source = ERA_SOURCES[resolvedSourceId];
 
     return [
       {
-        id: sourceId,
+        id: resolvedSourceId,
         shortTitle: source.shortTitle,
         title: source.title,
         organization: source.organization,
