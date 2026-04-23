@@ -254,7 +254,7 @@
   align-items: start;
   align-content: start;
   gap: 0.45rem;
-  padding: 0.45rem;
+  padding-top: 1rem;
   min-height: 18rem;
   max-height: none;
   overflow: visible;
