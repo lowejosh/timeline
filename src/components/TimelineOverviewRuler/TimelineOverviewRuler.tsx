@@ -104,7 +104,14 @@ export function TimelineOverviewRuler({
         pad,
         spotlightMinDisplayWidth,
       ),
-    [domain, pad, spotlightEndYear, spotlightMinDisplayWidth, spotlightStartYear, width],
+    [
+      domain,
+      pad,
+      spotlightEndYear,
+      spotlightMinDisplayWidth,
+      spotlightStartYear,
+      width,
+    ],
   );
   const yearsPerPixel = useMemo(
     () => getOverviewRulerYearsPerPixel(domain, width, pad),
@@ -112,9 +119,7 @@ export function TimelineOverviewRuler({
   );
   const bandRects = useMemo(
     () =>
-      [...eras]
-        .sort(compareEraPriorityAscending)
-        .map((era) => ({
+      [...eras].sort(compareEraPriorityAscending).map((era) => ({
         era,
         rect: resolveOverviewRulerBandRect(
           era.startYear,
@@ -238,10 +243,14 @@ export function TimelineOverviewRuler({
   const rightShadeWidth = Math.max(width - pad - rightShadeLeft, 0);
 
   const spotlightTransition: CSSProperties = isFollowingDrag
-    ? { transition: `left 110ms ${THEME.easing.settle}, width 110ms ${THEME.easing.settle}` }
+    ? {
+        transition: `left 110ms ${THEME.easing.settle}, width 110ms ${THEME.easing.settle}`,
+      }
     : isSettling
-    ? { transition: `left 180ms ${THEME.easing.spring}, width 180ms ${THEME.easing.spring}` }
-    : {};
+      ? {
+          transition: `left 180ms ${THEME.easing.spring}, width 180ms ${THEME.easing.spring}`,
+        }
+      : {};
 
   return (
     <div className="relative z-0 w-full bg-transparent" style={{ height }}>
@@ -267,41 +276,55 @@ export function TimelineOverviewRuler({
             background: `linear-gradient(180deg, ${THEME.color.surface} 0%, ${THEME.color.overviewStrip.to} 100%)`,
           }}
         />
-        {bandRects.map(({ era, rect }) => (
+        {bandRects.map(({ era, rect }) =>
           rect ? (
-          <Fragment key={era.id}>
-            {/* Backdrop reset — mirrors canvas: fill background at full opacity first,
+            <Fragment key={era.id}>
+              {/* Backdrop reset — mirrors canvas: fill background at full opacity first,
                 so higher-priority eras replace lower-priority colors rather than blending over them. */}
-            <div
-              className="absolute top-0 bottom-0 pointer-events-none"
-              style={{
-                background: `linear-gradient(180deg, ${THEME.color.overviewStrip.from} 0%, ${THEME.color.overviewStrip.to} 100%)`,
-                left: rect.left,
-                width: rect.width,
-              }}
-            />
-            <div
-              className="absolute top-0 bottom-0 opacity-30 pointer-events-none"
-              style={{
-                backgroundColor: era.color,
-                left: rect.left,
-                width: rect.width,
-              }}
-            />
-          </Fragment>
-          ) : null
-        ))}
+              <div
+                className="absolute top-0 bottom-0 pointer-events-none"
+                style={{
+                  background: `linear-gradient(180deg, ${THEME.color.overviewStrip.from} 0%, ${THEME.color.overviewStrip.to} 100%)`,
+                  left: rect.left,
+                  width: rect.width,
+                }}
+              />
+              <div
+                className="absolute top-0 bottom-0 opacity-30 pointer-events-none"
+                style={{
+                  backgroundColor: era.color,
+                  left: rect.left,
+                  width: rect.width,
+                }}
+              />
+            </Fragment>
+          ) : null,
+        )}
         <div
           className="absolute top-0 bottom-0 pointer-events-none"
-          style={{ left: pad, width: leftShadeWidth, background: THEME.color.deepShadow[42], ...spotlightTransition }}
+          style={{
+            left: pad,
+            width: leftShadeWidth,
+            background: THEME.color.deepShadow[42],
+            ...spotlightTransition,
+          }}
         />
         <div
           className="absolute top-0 bottom-0 pointer-events-none"
-          style={{ left: rightShadeLeft, width: rightShadeWidth, background: THEME.color.deepShadow[42], ...spotlightTransition }}
+          style={{
+            left: rightShadeLeft,
+            width: rightShadeWidth,
+            background: THEME.color.deepShadow[42],
+            ...spotlightTransition,
+          }}
         />
         <div
           className="absolute top-0 bottom-0 pointer-events-none"
-          style={{ left: spotlight.displayLeft, width: spotlight.displayWidth, ...spotlightTransition }}
+          style={{
+            left: spotlight.displayLeft,
+            width: spotlight.displayWidth,
+            ...spotlightTransition,
+          }}
         />
       </div>
     </div>

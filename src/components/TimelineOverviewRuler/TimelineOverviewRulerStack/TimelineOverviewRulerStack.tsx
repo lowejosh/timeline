@@ -65,7 +65,10 @@ export function TimelineOverviewRulerStack({
     [mainInnerWidth, viewport],
   );
   const preciseVisibleSpan = useMemo(() => {
-    const [precStart, precEnd] = getVisibleRangePrecise(viewport, mainInnerWidth);
+    const [precStart, precEnd] = getVisibleRangePrecise(
+      viewport,
+      mainInnerWidth,
+    );
     return Math.abs(subtractPreciseTimelineYears(precEnd, precStart));
   }, [mainInnerWidth, viewport]);
   const addTierThresholdPx = Math.max(
@@ -133,7 +136,9 @@ export function TimelineOverviewRulerStack({
               height: tierHeight,
               top,
               transition: `top 200ms ${THEME.easing.spring}`,
-              animation: isRoot ? "none" : `timeline-overview-ruler-tier-in 220ms ${THEME.easing.spring}`,
+              animation: isRoot
+                ? "none"
+                : `timeline-overview-ruler-tier-in 220ms ${THEME.easing.spring}`,
             }}
           >
             <div

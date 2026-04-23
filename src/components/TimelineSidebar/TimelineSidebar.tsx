@@ -184,7 +184,10 @@ function WarnTooltip({
     const PADDING = 8;
     const centered = anchor.x - width / 2;
     setClampedLeft(
-      Math.max(PADDING, Math.min(centered, window.innerWidth - width - PADDING)),
+      Math.max(
+        PADDING,
+        Math.min(centered, window.innerWidth - width - PADDING),
+      ),
     );
   }, [anchor]);
 

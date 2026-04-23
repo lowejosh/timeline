@@ -58,7 +58,8 @@ export function resolveTimelineSidebarTree(
   viewport: TimelineViewport,
   width: number,
   pad: number,
-  enabledSetIds: ReadonlySet<TimelineSetId>,
+  collectionSetIds: ReadonlySet<TimelineSetId>,
+  visibleSetIds: ReadonlySet<TimelineSetId>,
   enabledGroupIds: ReadonlySet<string>,
   suppressedGroupIds: ReadonlySet<string> = new Set(),
   setOrder: readonly TimelineSetId[] = getDefaultTimelineSetOrder(),
@@ -109,7 +110,7 @@ export function resolveTimelineSidebarTree(
   );
 
   return [...TIMELINE_SETS]
-    .filter((set) => enabledSetIds.has(set.id))
+    .filter((set) => collectionSetIds.has(set.id))
     .sort(
       (left, right) =>
         (orderIndexBySetId.get(left.id) ?? Number.MAX_SAFE_INTEGER) -
@@ -155,7 +156,7 @@ export function resolveTimelineSidebarTree(
         id: set.id,
         label: set.label,
         description: set.description,
-        enabled: enabledSetIds.has(set.id),
+        enabled: visibleSetIds.has(set.id),
         markerCount: totals.markerCount,
         overlayCount: totals.overlayCount,
         relevantItemCount: getRelevantItemCount(totals),

@@ -66,7 +66,10 @@ export function TimelineSettings({
         }}
         type="button"
       >
-        <span aria-hidden="true" className="inline-flex items-center justify-center w-[0.88rem] h-[0.88rem] text-current [transition:transform_400ms_cubic-bezier(0.22,1,0.36,1)] group-data-[open=true]:rotate-[60deg]">
+        <span
+          aria-hidden="true"
+          className="inline-flex items-center justify-center w-[0.88rem] h-[0.88rem] text-current [transition:transform_400ms_cubic-bezier(0.22,1,0.36,1)] group-data-[open=true]:rotate-[60deg]"
+        >
           <svg
             fill="currentColor"
             fillRule="evenodd"
@@ -94,7 +97,9 @@ export function TimelineSettings({
         }}
       >
         <div className="flex items-center gap-[0.4rem] mb-[0.52rem]">
-          <h2 className="m-0 text-[var(--ink)] text-[0.92rem] leading-[1.05] font-semibold font-display">Settings</h2>
+          <h2 className="m-0 text-[var(--ink)] text-[0.92rem] leading-[1.05] font-semibold font-display">
+            Settings
+          </h2>
         </div>
 
         <div className="settings-item flex items-center justify-between gap-[0.75rem] py-[0.34rem]">
@@ -113,7 +118,9 @@ export function TimelineSettings({
             onClick={onToggleCosmicCalendarMode}
             role="switch"
             style={{
-              background: isCosmicCalendarMode ? THEME.color.accent : THEME.color.brown[18],
+              background: isCosmicCalendarMode
+                ? THEME.color.accent
+                : THEME.color.brown[18],
             }}
             type="button"
           />

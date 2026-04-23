@@ -207,6 +207,11 @@ export function useTimelineAppState() {
   const [enabledSetIds, setEnabledSetIds] = useState<Set<TimelineSetId>>(() =>
     getDefaultEnabledTimelineSetIds(),
   );
+  // Separate from enabledSetIds (library membership): which collected sets are
+  // currently rendering on the timeline. Toggled from the sidebar.
+  const [visibleSetIds, setVisibleSetIds] = useState<Set<TimelineSetId>>(() =>
+    getDefaultEnabledTimelineSetIds(),
+  );
   const [orderedSetIds, setOrderedSetIds] = useState<TimelineSetId[]>(() =>
     readStoredTimelineSetOrder(),
   );
@@ -269,24 +274,24 @@ export function useTimelineAppState() {
   const autoToggleVisibleGroupIds = useMemo(
     () =>
       getVisibleTimelineGroupIds(
-        filterMarkersBySets(TIMELINE_DISPLAY.markers, enabledSetIds),
-        filterOverlaysBySets(TIMELINE_DISPLAY.overlays, enabledSetIds),
+        filterMarkersBySets(TIMELINE_DISPLAY.markers, visibleSetIds),
+        filterOverlaysBySets(TIMELINE_DISPLAY.overlays, visibleSetIds),
         animated.viewport,
         innerWidth,
         TIMELINE_CANVAS_PAD,
         baseEnabledGroupIds,
       ),
-    [animated.viewport, baseEnabledGroupIds, enabledSetIds, innerWidth],
+    [animated.viewport, baseEnabledGroupIds, visibleSetIds, innerWidth],
   );
 
   const autoHiddenOverlayIds = useMemo(
     () =>
       getAutoHiddenOverlayIds(
-        filterOverlaysBySets(TIMELINE_DISPLAY.overlays, enabledSetIds),
+        filterOverlaysBySets(TIMELINE_DISPLAY.overlays, visibleSetIds),
         animated.viewport,
         innerWidth,
         TIMELINE_CANVAS_PAD,
-        enabledSetIds,
+        visibleSetIds,
         baseEnabledGroupIds,
         autoToggleVisibleGroupIds,
       ),
@@ -294,7 +299,7 @@ export function useTimelineAppState() {
       animated.viewport,
       autoToggleVisibleGroupIds,
       baseEnabledGroupIds,
-      enabledSetIds,
+      visibleSetIds,
       innerWidth,
     ],
   );
@@ -325,7 +330,7 @@ export function useTimelineAppState() {
       const currentlySuppressed = autoSuppressedGroupIds.has(groupId);
       const isAutoToggleEnabled = isTimelineLayerAutoToggleEnabled(
         rule,
-        enabledSetIds,
+        visibleSetIds,
         baseEnabledGroupIds,
         autoToggleVisibleGroupIds,
       );
@@ -363,7 +368,7 @@ export function useTimelineAppState() {
     autoToggleRulesByGroupId,
     autoToggleVisibleGroupIds,
     baseEnabledGroupIds,
-    enabledSetIds,
+    visibleSetIds,
     innerWidth,
   ]);
 
@@ -400,27 +405,27 @@ export function useTimelineAppState() {
   );
 
   const rootDisplayEras = useMemo(
-    () => getRootDisplayErasBySets(prioritizedRootEra, enabledSetIds),
-    [enabledSetIds, prioritizedRootEra],
+    () => getRootDisplayErasBySets(prioritizedRootEra, visibleSetIds),
+    [visibleSetIds, prioritizedRootEra],
   );
 
   const setFilteredMarkers = useMemo(() => {
     const filteredMarkers = filterMarkersBySets(
       TIMELINE_DISPLAY.markers,
-      enabledSetIds,
+      visibleSetIds,
     );
 
     return applyTimelineSetOrderToMarkers(filteredMarkers, orderedSetIds);
-  }, [enabledSetIds, orderedSetIds]);
+  }, [visibleSetIds, orderedSetIds]);
 
   const setFilteredOverlays = useMemo(() => {
     const filteredOverlays = filterOverlaysBySets(
       TIMELINE_DISPLAY.overlays,
-      enabledSetIds,
+      visibleSetIds,
     );
 
     return applyTimelineSetOrderToOverlays(filteredOverlays, orderedSetIds);
-  }, [enabledSetIds, orderedSetIds]);
+  }, [visibleSetIds, orderedSetIds]);
 
   const visibleFilteredOverlays = useMemo(
     () => filterHiddenOverlayBands(setFilteredOverlays, autoHiddenOverlayIds),
@@ -555,6 +560,7 @@ export function useTimelineAppState() {
         innerWidth,
         TIMELINE_CANVAS_PAD,
         enabledSetIds,
+        visibleSetIds,
         baseEnabledGroupIds,
         sidebarSuppressedGroupIds,
         orderedSetIds,
@@ -563,6 +569,7 @@ export function useTimelineAppState() {
       animated.viewport,
       baseEnabledGroupIds,
       enabledSetIds,
+      visibleSetIds,
       innerWidth,
       orderedSetIds,
       sidebarSuppressedGroupIds,
@@ -609,7 +616,7 @@ export function useTimelineAppState() {
         }
       }
 
-      setEnabledSetIds((current) => {
+      setVisibleSetIds((current) => {
         const next = new Set(current);
 
         if (nextEnabled) {
@@ -671,6 +678,20 @@ export function useTimelineAppState() {
         animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1]);
       }
 
+      // Sync visibleSetIds: remove sets removed from library, add newly
+      // added sets as visible by default. Keep existing visibility choices.
+      const prevEnabledSetIds = enabledSetIds;
+      setVisibleSetIds((currentVisible) => {
+        const next = new Set(currentVisible);
+        for (const id of next) {
+          if (!nextEnabledSetIds.has(id)) next.delete(id);
+        }
+        for (const id of nextEnabledSetIds) {
+          if (!prevEnabledSetIds.has(id)) next.add(id);
+        }
+        return next;
+      });
+
       setEnabledSetIds(new Set(nextEnabledSetIds));
       setOrderedSetIds((current) => {
         const normalizedCurrent = normalizeTimelineSetOrder(current);
@@ -690,7 +711,7 @@ export function useTimelineAppState() {
       setActiveView("timeline");
       setIsSidebarOpen(true);
     },
-    [activeEraId, animated, prioritizedRootEra],
+    [activeEraId, animated, enabledSetIds, prioritizedRootEra],
   );
 
   const handleReorderSets = useCallback((nextOrder: TimelineSetId[]) => {

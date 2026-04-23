@@ -65,7 +65,9 @@ export function TimelineDisclaimer() {
     top: isOpen ? "50%" : "0.28rem",
     width: "0.14rem",
     height: isOpen ? "0.72rem" : "0.54rem",
-    transform: isOpen ? "translate(-50%, -50%) rotate(45deg)" : "translateX(-50%)",
+    transform: isOpen
+      ? "translate(-50%, -50%) rotate(45deg)"
+      : "translateX(-50%)",
   };
 
   const iconSlashStyle: CSSProperties = {
@@ -95,7 +97,10 @@ export function TimelineDisclaimer() {
         }}
         type="button"
       >
-        <span aria-hidden="true" className="relative inline-block w-[0.95rem] h-[0.95rem] text-current">
+        <span
+          aria-hidden="true"
+          className="relative inline-block w-[0.95rem] h-[0.95rem] text-current"
+        >
           <span style={iconDotStyle} />
           <span style={iconStemStyle} />
           <span style={iconSlashStyle} />
@@ -115,7 +120,9 @@ export function TimelineDisclaimer() {
         }}
       >
         <div className="flex items-center gap-[0.4rem] mb-[0.48rem]">
-          <h2 className="m-0 text-[var(--ink)] text-[0.92rem] leading-[1.05] font-semibold font-display">Framing note</h2>
+          <h2 className="m-0 text-[var(--ink)] text-[0.92rem] leading-[1.05] font-semibold font-display">
+            Framing note
+          </h2>
         </div>
 
         <div

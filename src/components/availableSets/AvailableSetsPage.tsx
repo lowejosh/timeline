@@ -218,11 +218,16 @@ export function AvailableSetsPage({
             data-visible={isEnabled && obscuredCount > 0 ? "true" : "false"}
           >
             <div className="avsets__item-era-warning-inner">
-              <svg aria-hidden="true" className="avsets__item-era-warning-icon" viewBox="0 0 12 12">
+              <svg
+                aria-hidden="true"
+                className="avsets__item-era-warning-icon"
+                viewBox="0 0 12 12"
+              >
                 <path d="M6 1.5 11 10.5H1L6 1.5z" />
                 <path d="M6 5v2.5M6 9v.5" strokeLinecap="round" />
               </svg>
-              {obscuredCount} era{obscuredCount !== 1 ? "s" : ""} covered by higher-priority sets
+              {obscuredCount} era{obscuredCount !== 1 ? "s" : ""} covered by
+              higher-priority sets
             </div>
           </div>
           {set.description ? (
