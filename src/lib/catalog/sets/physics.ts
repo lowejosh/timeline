@@ -1,6 +1,7 @@
 import type { EraFamilyId, TimelineSetId } from "../../core/timelineTypes";
 
 export const PHYSICS_MILESTONES_GROUP_ID = "physics-milestones";
+export const PHYSICS_CONTEXT_BANDS_GROUP_ID = "physics-context-bands";
 
 /**
  * History of Physics set — a research-focused collection of milestone markers
@@ -15,4 +16,7 @@ export const PHYSICS_SET_FAMILY_IDS: readonly EraFamilyId[] = [
 
 export const PHYSICS_SET_CORE_MARKER_IDS: ReadonlySet<string> = new Set();
 
-export const PHYSICS_SET_GROUP_IDS: readonly string[] = [PHYSICS_MILESTONES_GROUP_ID];
+export const PHYSICS_SET_GROUP_IDS: readonly string[] = [
+  PHYSICS_MILESTONES_GROUP_ID,
+  PHYSICS_CONTEXT_BANDS_GROUP_ID,
+];

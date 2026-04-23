@@ -1,6 +1,9 @@
 import { COSMIC_SET_CORE_MARKER_IDS } from "./sets/cosmic";
 import { EARTH_SET_CORE_MARKER_IDS } from "./sets/earth";
-import { PHYSICS_MILESTONES_GROUP_ID } from "./sets/physics";
+import {
+  PHYSICS_MILESTONES_GROUP_ID,
+  PHYSICS_CONTEXT_BANDS_GROUP_ID,
+} from "./sets/physics";
 import { TIMELINE_DECORATION_CATEGORY_IDS } from "./categories";
 import {
   CHALCOLITHIC_MARKERS,
@@ -21,6 +24,7 @@ import {
   CULTURE_OVERLAYS,
   DEEP_TIME_LIFE_OVERLAYS,
   HUMAN_EVOLUTION_OVERLAYS,
+  PHYSICS_CONTEXT_OVERLAYS,
 } from "../domain/overlays";
 import type {
   TimelineDisplayConfig,
@@ -117,6 +121,10 @@ const OVERLAY_COLLECTIONS: OverlayCollection[] = [
   {
     groupId: TIMELINE_DECORATION_CATEGORY_IDS.civilizations,
     items: CIVILIZATION_OVERLAYS,
+  },
+  {
+    groupId: PHYSICS_CONTEXT_BANDS_GROUP_ID,
+    items: PHYSICS_CONTEXT_OVERLAYS,
   },
 ];
 

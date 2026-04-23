@@ -752,8 +752,7 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     year: ce(1939),
     minZoom: 18,
     priority: 91,
-    description:
-      "Experiments in Berlin reveal nuclear fission.",
+    description: "Experiments in Berlin reveal nuclear fission.",
     sourceIds: PHYSICS_OF_UNIVERSE_SOURCE_IDS,
   },
   {
@@ -908,7 +907,7 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     minZoom: 20,
     priority: 92,
     description:
-      "ATLAS and CMS report a new particle consistent with the long-sought Higgs boson.",
+      "A new particle is discovered with properties matching the predicted Higgs boson.",
     sourceIds: ["cernHiggsBoson2012"],
   },
   {
@@ -929,8 +928,7 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     year: ce(2019),
     minZoom: 20,
     priority: 90,
-    description:
-      "The first image of a black hole is released.",
+    description: "The first image of a black hole is released.",
     sourceIds: WIKIPEDIA_TIMELINE_SOURCE_IDS,
   },
   {

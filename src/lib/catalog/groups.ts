@@ -1,6 +1,9 @@
 import { COSMIC_MILESTONES_GROUP_ID } from "./sets/cosmic";
 import { EARTH_MILESTONES_GROUP_ID } from "./sets/earth";
-import { PHYSICS_MILESTONES_GROUP_ID } from "./sets/physics";
+import {
+  PHYSICS_MILESTONES_GROUP_ID,
+  PHYSICS_CONTEXT_BANDS_GROUP_ID,
+} from "./sets/physics";
 import { TIMELINE_DECORATION_CATEGORY_IDS } from "./categories";
 import type { TimelineDecorationGroup } from "../core/timelineTypes";
 
@@ -43,6 +46,15 @@ export const TIMELINE_DECORATION_GROUPS: TimelineDecorationGroup[] = [
       "Major discoveries, experiments, and theories across the history of physics.",
     contentType: "markers",
     order: 0,
+  },
+  {
+    id: PHYSICS_CONTEXT_BANDS_GROUP_ID,
+    categoryId: PHYSICS_HISTORY_CATEGORY_ID,
+    label: "Physics Context Bands",
+    description:
+      "Thematic era overlays marking paradigm shifts and intellectual movements across the history of physics.",
+    contentType: "overlays",
+    order: 1,
   },
   {
     id: DEEP_TIME_LIFE_GROUP_ID,

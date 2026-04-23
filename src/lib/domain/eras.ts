@@ -95,7 +95,9 @@ export function getRootDisplayErasBySets(
 ): Era[] {
   return (root.children ?? []).flatMap((child) => {
     if (!isEraFamilyRoot(child)) {
-      const setId = child.familyId ? getSetIdForEraFamily(child.familyId) : null;
+      const setId = child.familyId
+        ? getSetIdForEraFamily(child.familyId)
+        : null;
 
       if (setId && !enabledSetIds.has(setId)) {
         return [];
@@ -132,13 +134,17 @@ export function getNavigableAncestor(root: Era, targetId: string): Era | null {
   return null;
 }
 
-export function getEraFamilyId(root: Era, targetId: string): EraFamilyId | null {
+export function getEraFamilyId(
+  root: Era,
+  targetId: string,
+): EraFamilyId | null {
   const targetEra = findEraById(root, targetId);
 
   return (
     getAncestorChain(root, targetId).find(
       (era) => era.id !== root.id && isEraFamilyRoot(era),
-    )?.familyId ?? (targetEra?.id !== root.id ? targetEra?.familyId ?? null : null)
+    )?.familyId ??
+    (targetEra?.id !== root.id ? (targetEra?.familyId ?? null) : null)
   );
 }
 
@@ -172,7 +178,8 @@ export const TIMELINE_ERA_FAMILIES: TimelineEraFamilyConfig[] = [
   {
     id: "physics-history",
     label: "History of Physics",
-    description: "Historical ages for major shifts in physical thought and discovery.",
+    description:
+      "Historical ages for major shifts in physical thought and discovery.",
     order: 3,
     priority: 350,
     defaultEnabled: false,
@@ -283,8 +290,8 @@ const GEOLOGICAL_FAMILY_ROOT_DEFINITION: EraDefinition = {
   name: "Geological History",
   startYear: GEOLOGICAL_ERA_DEFINITIONS[0]?.startYear ?? TIMELINE_MIN_YEAR,
   endYear:
-    GEOLOGICAL_ERA_DEFINITIONS[GEOLOGICAL_ERA_DEFINITIONS.length - 1]?.endYear ??
-    CURRENT_YEAR,
+    GEOLOGICAL_ERA_DEFINITIONS[GEOLOGICAL_ERA_DEFINITIONS.length - 1]
+      ?.endYear ?? CURRENT_YEAR,
   color: "rgba(0, 0, 0, 0)",
   scheme: "chronostratigraphic",
   familyId: "geological",
@@ -298,9 +305,8 @@ const PHYSICS_FAMILY_ROOT_DEFINITION: EraDefinition = {
   name: "History of Physics",
   startYear: PHYSICS_HISTORY_ERA_DEFINITIONS[0]?.startYear ?? TIMELINE_MIN_YEAR,
   endYear:
-    PHYSICS_HISTORY_ERA_DEFINITIONS[
-      PHYSICS_HISTORY_ERA_DEFINITIONS.length - 1
-    ]?.endYear ?? CURRENT_YEAR,
+    PHYSICS_HISTORY_ERA_DEFINITIONS[PHYSICS_HISTORY_ERA_DEFINITIONS.length - 1]
+      ?.endYear ?? CURRENT_YEAR,
   color: "rgba(0, 0, 0, 0)",
   scheme: "history-of-science",
   familyId: "physics-history",
@@ -309,13 +315,12 @@ const PHYSICS_FAMILY_ROOT_DEFINITION: EraDefinition = {
   children: PHYSICS_HISTORY_ERA_DEFINITIONS,
 };
 
-const HUMAN_HISTORY_TOP_LEVEL_DEFINITIONS: EraDefinition[] = (
-  HUMAN_HISTORY_ERA_DEFINITIONS
-).map((definition) => ({
-  ...definition,
-  familyId: "human-history",
-  priority: ERA_FAMILY_CONFIG_BY_ID.get("human-history")?.priority,
-}));
+const HUMAN_HISTORY_TOP_LEVEL_DEFINITIONS: EraDefinition[] =
+  HUMAN_HISTORY_ERA_DEFINITIONS.map((definition) => ({
+    ...definition,
+    familyId: "human-history",
+    priority: ERA_FAMILY_CONFIG_BY_ID.get("human-history")?.priority,
+  }));
 
 export const ROOT_ERA: Era = materializeEra({
   id: "universe",

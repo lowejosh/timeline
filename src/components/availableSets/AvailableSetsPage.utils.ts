@@ -55,8 +55,7 @@ export function deriveAvailableTags(
   return [
     ...CORE_TAG_ORDER.filter((tag) => seen.has(tag)),
     ...Array.from(tagsById.keys()).filter(
-      (tag) =>
-        !CORE_TAG_ORDER.includes(tag as (typeof CORE_TAG_ORDER)[number]),
+      (tag) => !CORE_TAG_ORDER.includes(tag as (typeof CORE_TAG_ORDER)[number]),
     ),
   ].map((tag) => tagsById.get(tag) ?? tag);
 }
@@ -91,7 +90,11 @@ export function moveItem<T>(
   return next;
 }
 
-export function insertItem<T>(items: readonly T[], index: number, item: T): T[] {
+export function insertItem<T>(
+  items: readonly T[],
+  index: number,
+  item: T,
+): T[] {
   const next = [...items];
 
   next.splice(Math.max(0, Math.min(index, next.length)), 0, item);
@@ -149,8 +152,7 @@ export function getPreviewTopBySetId(
 
   for (const setId of order) {
     result.set(setId, nextTop);
-    const height =
-      layout.heights.get(setId) ?? extraHeights.get(setId) ?? 0;
+    const height = layout.heights.get(setId) ?? extraHeights.get(setId) ?? 0;
 
     nextTop += height + gap;
   }
@@ -250,10 +252,7 @@ export function getProjectedIndex(
 }
 
 /** Returns the column that best contains or is closest to `clientX`. */
-export function getDropColumn(
-  layouts: DragLayouts,
-  clientX: number,
-): ColumnId {
+export function getDropColumn(layouts: DragLayouts, clientX: number): ColumnId {
   const enabledRect = layouts.enabled?.rect;
   const availableRect = layouts.available?.rect;
 

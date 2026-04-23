@@ -48,8 +48,7 @@ export const ERA_SOURCES = {
     shortTitle: "NASA: Sun came late",
     title: "Our Sun Came Late to the Milky Way's Star-Birth Party",
     organization: "NASA / Hubble",
-    citation:
-      'NASA, "Our Sun Came Late to the Milky Way’s Star-Birth Party."',
+    citation: 'NASA, "Our Sun Came Late to the Milky Way’s Star-Birth Party."',
     url: "https://science.nasa.gov/missions/hubble/our-sun-came-late-to-the-milky-ways-star-birth-party/",
   },
   nasaSolarSystemFacts: {
@@ -110,7 +109,7 @@ export const ERA_SOURCES = {
     title: "An Introduction to Historical Geology",
     organization: "Project Gutenberg",
     citation:
-      'Miller, W. J. (1922), An Introduction to Historical Geology. Project Gutenberg eBook #41660.',
+      "Miller, W. J. (1922), An Introduction to Historical Geology. Project Gutenberg eBook #41660.",
     url: "https://www.gutenberg.org/files/41660/41660-h/41660-h.htm",
   },
   smithsonianExtinctionOverTime: {
@@ -1027,7 +1026,8 @@ export const ERA_SOURCES = {
   },
   metMiddleBabylonianKassite: {
     shortTitle: "Met: Kassite period",
-    title: "The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.) in Mesopotamia",
+    title:
+      "The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.) in Mesopotamia",
     organization: "The Metropolitan Museum of Art",
     citation:
       'Knott, Elizabeth. "The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.) in Mesopotamia." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
@@ -1627,7 +1627,8 @@ export const ERA_SOURCES = {
   },
   unAntiColonialismDay: {
     shortTitle: "UN: Anti-Colonialism Day",
-    title: "International Day Against Colonialism in All Its Forms and Manifestations",
+    title:
+      "International Day Against Colonialism in All Its Forms and Manifestations",
     organization: "United Nations",
     citation:
       'United Nations, "International Day Against Colonialism in All Its Forms and Manifestations."',
@@ -1664,7 +1665,8 @@ export const ERA_SOURCES = {
   },
   cernHiggsBoson2012: {
     shortTitle: "CERN: Higgs boson announcement",
-    title: "CERN experiments observe particle consistent with long-sought Higgs boson",
+    title:
+      "CERN experiments observe particle consistent with long-sought Higgs boson",
     organization: "CERN",
     citation:
       'CERN, "CERN experiments observe particle consistent with long-sought Higgs boson."',
@@ -1746,7 +1748,8 @@ export const ERA_SOURCES = {
     shortTitle: "IAEA: Chernobyl FAQs",
     title: "Frequently Asked Chernobyl Questions",
     organization: "International Atomic Energy Agency",
-    citation: 'International Atomic Energy Agency, "Frequently Asked Chernobyl Questions."',
+    citation:
+      'International Atomic Energy Agency, "Frequently Asked Chernobyl Questions."',
     url: "https://www.iaea.org/topics/chornobyl/faqs",
   },
   historySeptember11Attacks: {
@@ -1760,7 +1763,8 @@ export const ERA_SOURCES = {
     shortTitle: "Investopedia: Lehman collapse",
     title: "Lehman Brothers Collapse Explained: Causes and Legacy",
     organization: "Investopedia",
-    citation: 'Liodis, Nick, "Lehman Brothers Collapse Explained: Causes and Legacy." Investopedia.',
+    citation:
+      'Liodis, Nick, "Lehman Brothers Collapse Explained: Causes and Legacy." Investopedia.',
     url: "https://www.investopedia.com/articles/economics/09/lehman-brothers-collapse.asp",
   },
   unParisAgreement: {
@@ -1828,12 +1832,63 @@ export const ERA_SOURCES = {
     citation:
       'Brivati, Brian (1996). "Introduction." In The Contemporary History Handbook. Manchester University Press.',
   },
+  britannicaPhysicalScience: {
+    shortTitle: "Britannica: physical science",
+    title: "physical science",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "physical science."',
+    url: "https://www.britannica.com/science/physical-science",
+  },
+  britannicaScientificRevolution: {
+    shortTitle: "Britannica: Scientific Revolution",
+    title: "Scientific Revolution",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Scientific Revolution."',
+    url: "https://www.britannica.com/event/Scientific-Revolution",
+  },
+  britannicaRelativity: {
+    shortTitle: "Britannica: relativity",
+    title: "relativity",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "relativity."',
+    url: "https://www.britannica.com/science/relativity",
+  },
+  libreTextsFailuresOfClassicalPhysics: {
+    shortTitle: "LibreTexts: failures of classical physics",
+    title: "1.4: Failures of Classical Physics",
+    organization: "LibreTexts / California State University East Bay",
+    citation:
+      'Fleming, Patrick, "1.4: Failures of Classical Physics," Quantum Chemistry with Applications in Spectroscopy, LibreTexts.',
+    url: "https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Quantum_Chemistry_with_Applications_in_Spectroscopy_(Fleming)/01%3A_Foundations_and_Review/1.04%3A_Failures_of_Classical_Physics",
+  },
+  jamesClerkMaxwellWikipedia: {
+    shortTitle: "Wikipedia: James Clerk Maxwell",
+    title: "James Clerk Maxwell",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "James Clerk Maxwell." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/James_Clerk_Maxwell",
+  },
+  iopNuclearPhysics: {
+    shortTitle: "IOP: nuclear physics",
+    title: "100 incredible years of physics – nuclear physics",
+    organization: "Institute of Physics",
+    citation:
+      'Institute of Physics, "100 incredible years of physics – nuclear physics."',
+    url: "https://www.iop.org/about/iop-history/100th-anniversary/100-incredible-years/nuclear-physics",
+  },
+  cernPrecisionEra: {
+    shortTitle: "CERN: precision era",
+    title: "Welcome to the precision era",
+    organization: "CERN",
+    citation: 'CERN, "Welcome to the precision era."',
+    url: "https://home.cern/news/series/lhc-physics-ten/welcome-precision-era",
+  },
   physicsOfUniverseDates: {
     shortTitle: "Physics of the Universe: Dates",
     title: "Important Dates and Discoveries",
     organization: "The Physics of the Universe",
-    citation:
-      '"Important Dates and Discoveries," The Physics of the Universe.',
+    citation: '"Important Dates and Discoveries," The Physics of the Universe.',
     url: "https://www.physicsoftheuniverse.com/dates.html",
   },
   timelineOfFundamentalPhysicsDiscoveriesWikipedia: {
@@ -1848,8 +1903,7 @@ export const ERA_SOURCES = {
     shortTitle: "Physics of the Universe: Big Bang Timeline",
     title: "Timeline of the Big Bang",
     organization: "The Physics of the Universe",
-    citation:
-      '"Timeline of the Big Bang," The Physics of the Universe.',
+    citation: '"Timeline of the Big Bang," The Physics of the Universe.',
     url: "https://www.physicsoftheuniverse.com/topics_bigbang_timeline.html",
   },
 } as const satisfies Record<string, EraSource>;

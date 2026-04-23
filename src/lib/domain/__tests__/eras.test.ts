@@ -34,9 +34,15 @@ describe("era data", () => {
       }
 
       if (era.id === ROOT_ERA.id) {
-        expect(era.children?.[0] && isEraFamilyRoot(era.children[0])).toBe(true);
-        expect(era.children?.[1] && isEraFamilyRoot(era.children[1])).toBe(true);
-        expect(era.children?.[2] && isEraFamilyRoot(era.children[2])).toBe(true);
+        expect(era.children?.[0] && isEraFamilyRoot(era.children[0])).toBe(
+          true,
+        );
+        expect(era.children?.[1] && isEraFamilyRoot(era.children[1])).toBe(
+          true,
+        );
+        expect(era.children?.[2] && isEraFamilyRoot(era.children[2])).toBe(
+          true,
+        );
         expect(
           era.children
             ?.slice(3)
@@ -116,8 +122,9 @@ describe("era data", () => {
     const epipaleolithic = findEraById(ROOT_ERA, "epipaleolithic");
     const neolithic = findEraById(ROOT_ERA, "neolithic");
     const bronzeAge = findEraById(ROOT_ERA, "bronze-age");
-    const lateIronAge = findEraById(ROOT_ERA, "iron-age")
-      ?.children?.find((era) => era.id === "late-iron-age");
+    const lateIronAge = findEraById(ROOT_ERA, "iron-age")?.children?.find(
+      (era) => era.id === "late-iron-age",
+    );
 
     expect(epipaleolithic?.regionalScopeLabel).toBe("Ancient Near East");
     expect(epipaleolithic?.approximateStart).toBe(true);
@@ -194,7 +201,9 @@ describe("era data", () => {
 
   it("keeps physics ages directly under the physics family root", () => {
     const physicsChildIds =
-      findEraById(ROOT_ERA, "physics-history")?.children?.map((era) => era.id) ?? [];
+      findEraById(ROOT_ERA, "physics-history")?.children?.map(
+        (era) => era.id,
+      ) ?? [];
 
     expect(physicsChildIds).toEqual([
       "physics-ancient-world",
@@ -205,33 +214,12 @@ describe("era data", () => {
     ]);
   });
 
-  it("adds older child bands under ancient and medieval physics ages", () => {
-    const ancientWorld = findEraById(ROOT_ERA, "physics-ancient-world");
-    const medievalWorld = findEraById(
-      ROOT_ERA,
-      "physics-medieval-and-renaissance-world",
-    );
-    const islamicGoldenAge = findEraById(ROOT_ERA, "physics-islamic-golden-age");
-
-    expect(ancientWorld?.children?.map((era) => era.id)).toEqual([
-      "physics-early-astronomical-traditions",
-      "physics-greek-natural-philosophy",
-      "physics-hellenistic-and-roman-science",
-    ]);
-    expect(medievalWorld?.children?.map((era) => era.id)).toEqual([
-      "physics-late-antique-and-early-medieval-inheritance",
-      "physics-islamic-golden-age",
-      "physics-late-medieval-and-renaissance-transition",
-    ]);
-    expect(islamicGoldenAge?.name).toBe("Islamic Golden Age");
-    expect(islamicGoldenAge?.sourceIds).toEqual(["khanGoldenAgeOfIslam"]);
-  });
-
   it("keeps geological eras directly under the geological family root", () => {
     const geologicalFamily = findEraById(ROOT_ERA, "geological-history");
     const hadean = findEraById(ROOT_ERA, "hadean");
     const archean = findEraById(ROOT_ERA, "archean");
-    const geologicalChildIds = geologicalFamily?.children?.map((era) => era.id) ?? [];
+    const geologicalChildIds =
+      geologicalFamily?.children?.map((era) => era.id) ?? [];
     const quaternary = findEraById(ROOT_ERA, "quaternary");
 
     expect(hadean?.children).toBeUndefined();
@@ -273,7 +261,8 @@ describe("era data", () => {
 
   it("keeps cosmic phases directly under the cosmic family root", () => {
     const cosmicChildIds =
-      findEraById(ROOT_ERA, "cosmic-history")?.children?.map((era) => era.id) ?? [];
+      findEraById(ROOT_ERA, "cosmic-history")?.children?.map((era) => era.id) ??
+      [];
 
     expect(cosmicChildIds).toEqual([
       "planck-epoch",
@@ -303,7 +292,10 @@ describe("era data", () => {
     const earlyModern = findEraById(ROOT_ERA, "early-modern-period");
     const contemporary = findEraById(ROOT_ERA, "contemporary-history");
     const digitalAge = findEraById(ROOT_ERA, "digital-age");
-    const ageOfIndustryAndEmpire = findEraById(ROOT_ERA, "age-of-industry-and-empire");
+    const ageOfIndustryAndEmpire = findEraById(
+      ROOT_ERA,
+      "age-of-industry-and-empire",
+    );
 
     expect(humanHistoryChildIds).toEqual(
       expect.arrayContaining([
@@ -382,7 +374,9 @@ describe("era data", () => {
     expect(quaternary?.familyId).toBe("geological");
     expect(holocene?.familyId).toBe("geological");
     expect(paleolithic?.familyId).toBe("human-history");
-    expect((paleolithic?.priority ?? 0) > (quaternary?.priority ?? 0)).toBe(true);
+    expect((paleolithic?.priority ?? 0) > (quaternary?.priority ?? 0)).toBe(
+      true,
+    );
   });
 
   it("keeps overlapping geological eras above late cosmic eras", () => {
@@ -396,8 +390,12 @@ describe("era data", () => {
     expect(darkEnergyAcceleration?.familyId).toBe("cosmic");
     expect(quaternary?.familyId).toBe("geological");
     expect(holocene?.familyId).toBe("geological");
-    expect((quaternary?.priority ?? 0) > (darkEnergyAcceleration?.priority ?? 0)).toBe(true);
-    expect((holocene?.priority ?? 0) > (darkEnergyAcceleration?.priority ?? 0)).toBe(true);
+    expect(
+      (quaternary?.priority ?? 0) > (darkEnergyAcceleration?.priority ?? 0),
+    ).toBe(true);
+    expect(
+      (holocene?.priority ?? 0) > (darkEnergyAcceleration?.priority ?? 0),
+    ).toBe(true);
   });
 
   it("assigns higher priority to physics ages than overlapping human-history eras", () => {
@@ -409,6 +407,8 @@ describe("era data", () => {
 
     expect(physicsModern?.familyId).toBe("physics-history");
     expect(ageOfIndustryAndEmpire?.familyId).toBe("human-history");
-    expect((physicsModern?.priority ?? 0) > (ageOfIndustryAndEmpire?.priority ?? 0)).toBe(true);
+    expect(
+      (physicsModern?.priority ?? 0) > (ageOfIndustryAndEmpire?.priority ?? 0),
+    ).toBe(true);
   });
 });
