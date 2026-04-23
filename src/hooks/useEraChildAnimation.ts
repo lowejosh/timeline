@@ -8,7 +8,8 @@ import {
 } from "../lib/rendering/animation/eraChild";
 import { smoothstep01 } from "../lib/core/easing";
 import {
-  ERA_CHILD_TRANSITION_DURATION_MS,
+  ERA_CHILD_FADE_IN_DURATION_MS,
+  ERA_CHILD_FADE_OUT_DURATION_MS,
   PAD,
 } from "../lib/rendering/canvas/constants";
 
@@ -48,11 +49,12 @@ export function useEraChildAnimation(
             animationStates.get(era.id)?.target ?? 0,
             isZoomingIn,
           );
+          const fadingOut = nextTarget < (animationStates.get(era.id)?.target ?? 0);
           const nextState = syncAnimatedEraChildState({
             existing: animationStates.get(era.id),
             nextTarget,
             now,
-            duration: ERA_CHILD_TRANSITION_DURATION_MS,
+            duration: fadingOut ? ERA_CHILD_FADE_OUT_DURATION_MS : ERA_CHILD_FADE_IN_DURATION_MS,
             hasInitialized: initializedRef.current,
           });
           animationStates.set(era.id, nextState);
@@ -75,7 +77,7 @@ export function useEraChildAnimation(
           from: state.current,
           target: 0,
           startTime: now,
-          duration: ERA_CHILD_TRANSITION_DURATION_MS,
+          duration: ERA_CHILD_FADE_OUT_DURATION_MS,
         });
       }
     }
