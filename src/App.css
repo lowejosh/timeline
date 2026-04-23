@@ -65,6 +65,8 @@
 
 .timeline-sidebar {
   position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   width: 100%;
   max-width: none;
@@ -151,24 +153,13 @@
   top: 0.56rem;
 }
 
-.app-shell[data-sidebar-open="true"] .timeline-sidebar-toggle__glyph::before {
-  top: 0.39rem;
-  transform: rotate(45deg);
-  box-shadow: none;
-}
-
-.app-shell[data-sidebar-open="true"] .timeline-sidebar-toggle__glyph::after {
-  top: 0.39rem;
-  transform: rotate(-45deg);
-}
-
 .timeline-sidebar-toggle__label {
   font: 600 0.76rem/1 var(--font-sans);
   letter-spacing: 0.01em;
 }
 
 .timeline-sidebar__inner {
-  max-height: calc(var(--sidebar-max-height) - 16px);
+  flex: 1 1 auto;
   overflow-y: auto;
   padding: 0.64rem 0.62rem 0.18rem;
   scrollbar-width: thin;
@@ -179,7 +170,6 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-bottom: 0.48rem;
   padding: 0 0.14rem;
 }
 
@@ -193,6 +183,15 @@
   flex: none;
   color: rgba(77, 61, 47, 0.52);
   font: 600 0.56rem/1 var(--font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.timeline-sidebar__drag-instruction {
+  margin: 0;
+  padding: 0;
+  color: rgba(77, 61, 47, 0.52);
+  font-size: 0.54rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -244,15 +243,19 @@
 
 .timeline-sidebar__set-row {
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  grid-template-columns: auto 1fr auto;
   gap: 0.42rem;
   align-items: center;
   padding: 0.42rem 0.62rem;
   border-radius: 8px;
-  cursor: pointer;
+  cursor: grab;
   user-select: none;
   transition:
     background-color 150ms ease;
+}
+
+.timeline-sidebar__set-shell[data-drag-state="dragging"] .timeline-sidebar__set-row {
+  cursor: grabbing;
 }
 
 .timeline-sidebar__set-row:hover {
@@ -261,50 +264,6 @@
 
 .timeline-sidebar__set-row[data-expanded="true"] {
   background: rgba(255, 251, 244, 0.14);
-}
-
-.timeline-sidebar__drag-handle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1rem;
-  height: 1.4rem;
-  padding: 0;
-  border: none;
-  border-radius: 0.42rem;
-  background: transparent;
-  color: rgba(77, 61, 47, 0.36);
-  cursor: grab;
-  touch-action: none;
-  transition:
-    color 150ms ease,
-    background-color 150ms ease,
-    transform 150ms ease;
-}
-
-.timeline-sidebar__drag-handle:hover,
-.timeline-sidebar__set-shell[data-drag-state="dragging"] .timeline-sidebar__drag-handle {
-  color: rgba(77, 61, 47, 0.6);
-}
-
-.timeline-sidebar__drag-handle:hover {
-  background: rgba(255, 251, 244, 0.38);
-}
-
-.timeline-sidebar__drag-handle:active,
-.timeline-sidebar__set-shell[data-drag-state="dragging"] .timeline-sidebar__drag-handle {
-  cursor: grabbing;
-}
-
-.timeline-sidebar__drag-handle:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--focus);
-}
-
-.timeline-sidebar__drag-glyph {
-  width: 0.68rem;
-  height: 0.68rem;
-  fill: currentColor;
 }
 
 /* disclosure glyph is now inline in .timeline-sidebar__set-row */
@@ -862,4 +821,135 @@
     max-height: min(calc(100% - 60px), var(--sidebar-max-height));
   }
 
+}
+
+/* ──────────────────────────────────────────────
+   Sidebar footer: "Manage" button
+   ────────────────────────────────────────────── */
+
+.timeline-sidebar__footer {
+  flex: none;
+  padding: 0;
+  border-top: 1px solid rgba(77, 61, 47, 0.09);
+  overflow: hidden;
+}
+
+.timeline-sidebar__manage-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.6rem 0.62rem 0.68rem;
+  border: none;
+  background: transparent;
+  color: rgba(77, 61, 47, 0.74);
+  font: 600 0.72rem/1 var(--font-sans);
+  cursor: pointer;
+}
+
+.timeline-sidebar__set-warn-wrap {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.28rem;
+  line-height: 0;
+}
+
+.timeline-sidebar__set-warn {
+  width: 0.68rem;
+  height: 0.68rem;
+  fill: rgba(155, 90, 10, 0.22);
+  stroke: rgba(155, 90, 10, 0.82);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+@keyframes sidebar-warn-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-100% - 4px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(calc(-100% - 8px));
+  }
+}
+
+.sidebar-warn-tooltip {
+  position: fixed;
+  z-index: 1000;
+  transform: translateY(calc(-100% - 8px));
+  padding: 0.3rem 0.52rem;
+  border-radius: 6px;
+  border: 1px solid rgba(77, 61, 47, 0.12);
+  background: rgba(251, 247, 239, 0.97);
+  box-shadow: 0 4px 14px rgba(44, 31, 20, 0.1);
+  color: var(--ink);
+  font: 500 0.68rem/1.2 var(--font-sans);
+  pointer-events: none;
+  white-space: nowrap;
+  animation: sidebar-warn-tooltip-in 130ms ease forwards;
+}
+
+.timeline-sidebar__manage-btn:hover {
+  background: rgba(255, 251, 244, 0.46);
+  color: var(--ink);
+}
+
+/* ──────────────────────────────────────────────
+   App view stack: slide transition
+   ────────────────────────────────────────────── */
+
+.app-view-stack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-view {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition:
+    transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 280ms ease;
+  will-change: transform, opacity;
+}
+
+/* Timeline view: default (visible), slides out left when sets page is active */
+.app-view--timeline {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.app-shell[data-active-view="available-sets"] .app-view--timeline {
+  transform: translateX(-6%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Available-sets view: starts off right, slides in */
+.app-view--available-sets {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(252, 248, 240, 0.97) 0%, rgba(246, 239, 226, 0.97) 100%);
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+}
+
+.app-shell[data-active-view="available-sets"] .app-view--available-sets {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Also hide the sidebar toggle and sidebar shell when on the sets page */
+.app-shell[data-active-view="available-sets"] .timeline-sidebar-toggle,
+.app-shell[data-active-view="available-sets"] .timeline-sidebar-shell {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
 }

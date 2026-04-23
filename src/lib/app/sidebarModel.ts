@@ -109,6 +109,7 @@ export function resolveTimelineSidebarTree(
   );
 
   return [...TIMELINE_SETS]
+    .filter((set) => enabledSetIds.has(set.id))
     .sort(
       (left, right) =>
         (orderIndexBySetId.get(left.id) ?? Number.MAX_SAFE_INTEGER) -

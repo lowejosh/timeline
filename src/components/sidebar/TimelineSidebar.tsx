@@ -5,13 +5,16 @@ import {
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
 } from "react";
+import { createPortal, flushSync } from "react-dom";
 import type {
   TimelineSidebarChildState,
   TimelineSidebarSetState,
 } from "../../lib/app/sidebarModel";
 import type { TimelineSetId } from "../../lib/core/timelineTypes";
 import { OverlayGroupIconSvg } from "../canvas/OverlayGroupIconSvg";
+import { computeEraObscuredCounts } from "../availableSets/AvailableSetsPage.utils";
 
 type TimelineSidebarProps = {
   sets: TimelineSidebarSetState[];
@@ -24,6 +27,7 @@ type TimelineSidebarProps = {
     groupIds: string[],
     nextEnabled: boolean,
   ) => void;
+  onOpenSetManager: () => void;
 };
 
 type SetLayoutSnapshot = {
@@ -50,7 +54,11 @@ function pluralize(count: number, singular: string, plural = `${singular}s`) {
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
-function moveItem<T>(items: readonly T[], fromIndex: number, toIndex: number): T[] {
+function moveItem<T>(
+  items: readonly T[],
+  fromIndex: number,
+  toIndex: number,
+): T[] {
   const next = [...items];
   const [moved] = next.splice(fromIndex, 1);
 
@@ -59,7 +67,10 @@ function moveItem<T>(items: readonly T[], fromIndex: number, toIndex: number): T
   return next;
 }
 
-function areOrdersEqual(left: readonly TimelineSetId[], right: readonly TimelineSetId[]) {
+function areOrdersEqual(
+  left: readonly TimelineSetId[],
+  right: readonly TimelineSetId[],
+) {
   return (
     left.length === right.length &&
     left.every((setId, index) => setId === right[index])
@@ -151,6 +162,66 @@ function formatChildMeta(child: TimelineSidebarChildState) {
   return parts.join(" · ");
 }
 
+function WarnTooltip({
+  content,
+  children,
+}: {
+  content: string;
+  children: ReactNode;
+}) {
+  const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null);
+  const [clampedLeft, setClampedLeft] = useState<number | null>(null);
+  const wrapRef = useRef<HTMLSpanElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (!anchor || !tooltipRef.current) {
+      setClampedLeft(null);
+      return;
+    }
+    const { width } = tooltipRef.current.getBoundingClientRect();
+    const PADDING = 8;
+    const centered = anchor.x - width / 2;
+    setClampedLeft(
+      Math.max(PADDING, Math.min(centered, window.innerWidth - width - PADDING)),
+    );
+  }, [anchor]);
+
+  return (
+    <>
+      <span
+        className="timeline-sidebar__set-warn-wrap"
+        onMouseEnter={() => {
+          const rect = wrapRef.current?.getBoundingClientRect();
+          if (rect) {
+            setAnchor({ x: rect.left + rect.width / 2, y: rect.top });
+          }
+        }}
+        onMouseLeave={() => setAnchor(null)}
+        ref={wrapRef}
+      >
+        {children}
+      </span>
+      {anchor
+        ? createPortal(
+            <div
+              className="sidebar-warn-tooltip"
+              ref={tooltipRef}
+              style={{
+                left: clampedLeft ?? anchor.x,
+                top: anchor.y,
+                visibility: clampedLeft !== null ? "visible" : "hidden",
+              }}
+            >
+              {content}
+            </div>,
+            document.body,
+          )
+        : null}
+    </>
+  );
+}
+
 export function TimelineSidebar({
   sets,
   expandedSetIds,
@@ -158,15 +229,29 @@ export function TimelineSidebar({
   onToggleSet,
   onToggleSetExpanded,
   onToggleEntry,
+  onOpenSetManager,
 }: TimelineSidebarProps) {
   const treeRef = useRef<HTMLDivElement | null>(null);
   const setShellRefs = useRef(new Map<TimelineSetId, HTMLElement>());
   const previousRectsRef = useRef(new Map<TimelineSetId, DOMRect>());
   const previousOrderSignatureRef = useRef<string | null>(null);
   const dragStateRef = useRef<DragState | null>(null);
+  const dragMovedRef = useRef(false);
+  const collapseOnDragRef = useRef<(() => void) | null>(null);
+  const measureSetLayoutRef = useRef<() => ReturnType<typeof measureSetLayout>>(
+    null as never,
+  );
   const [dragState, setDragState] = useState<DragState | null>(null);
   const setIds = useMemo(() => sets.map((set) => set.id), [sets]);
   const orderSignature = useMemo(() => setIds.join("|"), [setIds]);
+  const orderedEnabledSetIds = useMemo(
+    () => sets.filter((set) => set.enabled).map((set) => set.id),
+    [sets],
+  );
+  const eraObscuredCounts = useMemo(
+    () => computeEraObscuredCounts(orderedEnabledSetIds),
+    [orderedEnabledSetIds],
+  );
 
   useEffect(() => {
     dragStateRef.current = dragState;
@@ -207,6 +292,11 @@ export function TimelineSidebar({
     } satisfies SetLayoutSnapshot;
   };
 
+  // Keep the ref in sync so it can be called from inside useEffect without
+  // violating the exhaustive-deps rule. It uses only refs + setIds (stable
+  // during drag) so the stale-closure risk is negligible.
+  measureSetLayoutRef.current = measureSetLayout;
+
   const previewOrder = useMemo(() => {
     if (!dragState) {
       return setIds;
@@ -244,7 +334,55 @@ export function TimelineSidebar({
 
       event.preventDefault();
 
-      const nextProjectedIndex = getProjectedIndex(currentDragState, event.clientY);
+      if (
+        !dragMovedRef.current &&
+        Math.abs(event.clientY - currentDragState.startClientY) > 4
+      ) {
+        dragMovedRef.current = true;
+
+        if (collapseOnDragRef.current) {
+          flushSync(() => {
+            collapseOnDragRef.current!();
+          });
+          collapseOnDragRef.current = null;
+
+          // Re-measure with collapsed DOM heights and update drag state.
+          const freshLayout = measureSetLayoutRef.current();
+
+          if (freshLayout) {
+            const freshIndex = freshLayout.order.indexOf(
+              currentDragState.setId,
+            );
+
+            if (freshIndex >= 0) {
+              // Compensate startClientY for any layout shift of the dragged
+              // item so the visual position stays continuous.
+              const oldTop =
+                currentDragState.layout.tops.get(currentDragState.setId) ?? 0;
+              const newTop = freshLayout.tops.get(currentDragState.setId) ?? 0;
+
+              const updatedState = {
+                ...currentDragState,
+                startClientY: currentDragState.startClientY + (newTop - oldTop),
+                layout: freshLayout,
+                initialIndex: freshIndex,
+                projectedIndex: freshIndex,
+              };
+
+              // Update the ref synchronously so the next pointermove event
+              // sees the fresh state before React re-renders.
+              dragStateRef.current = updatedState;
+              setDragState(updatedState);
+              return;
+            }
+          }
+        }
+      }
+
+      const nextProjectedIndex = getProjectedIndex(
+        currentDragState,
+        event.clientY,
+      );
 
       setDragState((current) => {
         if (!current || current.pointerId !== event.pointerId) {
@@ -279,6 +417,7 @@ export function TimelineSidebar({
         currentDragState.projectedIndex,
       );
 
+      collapseOnDragRef.current = null;
       setDragState(null);
 
       if (!areOrdersEqual(nextOrder, currentDragState.layout.order)) {
@@ -350,10 +489,14 @@ export function TimelineSidebar({
   });
 
   const handlePointerDown = (
-    event: ReactPointerEvent<HTMLButtonElement>,
+    event: ReactPointerEvent<HTMLElement>,
     setId: TimelineSetId,
   ) => {
     if (event.button !== 0 || sets.length <= 1) {
+      return;
+    }
+
+    if ((event.target as HTMLElement).closest("button, input, label")) {
       return;
     }
 
@@ -376,6 +519,16 @@ export function TimelineSidebar({
       return;
     }
 
+    dragMovedRef.current = false;
+    collapseOnDragRef.current =
+      expandedSetIds.size > 0
+        ? () => {
+            for (const expandedId of expandedSetIds) {
+              onToggleSetExpanded(expandedId, false);
+            }
+          }
+        : null;
+
     setDragState({
       pointerId: event.pointerId,
       setId,
@@ -394,7 +547,10 @@ export function TimelineSidebar({
       return;
     }
 
-    const nextIndex = Math.max(0, Math.min(setIds.length - 1, currentIndex + delta));
+    const nextIndex = Math.max(
+      0,
+      Math.min(setIds.length - 1, currentIndex + delta),
+    );
 
     if (nextIndex === currentIndex) {
       return;
@@ -412,7 +568,9 @@ export function TimelineSidebar({
             {pluralize(sets.length, "set")}
           </span>
         </header>
-
+        <span className="timeline-sidebar__drag-instruction">
+          Drag to reorder
+        </span>
         <div
           className="timeline-sidebar__tree"
           data-dragging={dragState ? "true" : "false"}
@@ -460,6 +618,12 @@ export function TimelineSidebar({
                   <div
                     className="timeline-sidebar__set-row"
                     onClick={() => {
+                      if (dragMovedRef.current) {
+                        // Consume the flag so the next click works normally.
+                        dragMovedRef.current = false;
+                        return;
+                      }
+
                       onToggleSetExpanded(set.id, !expanded);
                     }}
                     role="button"
@@ -471,49 +635,22 @@ export function TimelineSidebar({
                         event.preventDefault();
                         onToggleSetExpanded(set.id, !expanded);
                       }
+
+                      if (event.key === "ArrowUp") {
+                        event.preventDefault();
+                        handleMoveSetByKeyboard(set.id, -1);
+                      }
+
+                      if (event.key === "ArrowDown") {
+                        event.preventDefault();
+                        handleMoveSetByKeyboard(set.id, 1);
+                      }
+                    }}
+                    onPointerDown={(event) => {
+                      handlePointerDown(event, set.id);
                     }}
                     data-expanded={expanded ? "true" : "false"}
                   >
-                    <button
-                      aria-label={`Reorder ${set.label} set`}
-                      className="timeline-sidebar__drag-handle"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                      }}
-                      onKeyDown={(event) => {
-                        if (event.key === "ArrowUp") {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          handleMoveSetByKeyboard(set.id, -1);
-                        }
-
-                        if (event.key === "ArrowDown") {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          handleMoveSetByKeyboard(set.id, 1);
-                        }
-                      }}
-                      onPointerDown={(event) => {
-                        handlePointerDown(event, set.id);
-                      }}
-                      title="Drag to reorder sets"
-                      type="button"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        className="timeline-sidebar__drag-glyph"
-                        viewBox="0 0 12 12"
-                      >
-                        <circle cx="3" cy="3" r="1" />
-                        <circle cx="9" cy="3" r="1" />
-                        <circle cx="3" cy="6" r="1" />
-                        <circle cx="9" cy="6" r="1" />
-                        <circle cx="3" cy="9" r="1" />
-                        <circle cx="9" cy="9" r="1" />
-                      </svg>
-                    </button>
-
                     <label
                       className="timeline-sidebar__toggle timeline-sidebar__toggle--set-checkbox"
                       onClick={(event) => {
@@ -539,6 +676,20 @@ export function TimelineSidebar({
                         title={set.description}
                       >
                         {set.label}
+                        {(eraObscuredCounts.get(set.id) ?? 0) > 0 ? (
+                          <WarnTooltip
+                            content={`${eraObscuredCounts.get(set.id)} era${eraObscuredCounts.get(set.id) !== 1 ? "s" : ""} covered by higher-priority sets`}
+                          >
+                            <svg
+                              aria-hidden="true"
+                              className="timeline-sidebar__set-warn"
+                              viewBox="0 0 12 12"
+                            >
+                              <path d="M6 1.5 11 10.5H1L6 1.5z" />
+                              <path d="M6 5v2.5M6 9v.5" strokeLinecap="round" />
+                            </svg>
+                          </WarnTooltip>
+                        ) : null}
                       </span>
                       <span className="timeline-sidebar__item-meta">
                         {formatSetMeta(set)}
@@ -609,6 +760,16 @@ export function TimelineSidebar({
           })}
         </div>
       </div>
+
+      <footer className="timeline-sidebar__footer">
+        <button
+          className="timeline-sidebar__manage-btn"
+          onClick={onOpenSetManager}
+          type="button"
+        >
+          Add or create more
+        </button>
+      </footer>
     </aside>
   );
 }

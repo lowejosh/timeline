@@ -28,6 +28,7 @@ export type TimelineSetConfig = {
   id: TimelineSetId;
   label: string;
   description?: string;
+  tags?: readonly string[];
   order: number;
   defaultEnabled?: boolean;
   familyIds: EraFamilyId[];

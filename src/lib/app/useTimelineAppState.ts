@@ -189,6 +189,9 @@ export function useTimelineAppState() {
   const innerWidth = Math.max(stageSize.width, 1);
   const animated = useAnimatedViewport(getHomeViewport(1440), innerWidth);
 
+  const [activeView, setActiveView] = useState<"timeline" | "available-sets">(
+    "timeline",
+  );
   const [activeEraId, setActiveEraId] = useState(ROOT_ERA.id);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCosmicCalendarMode, setIsCosmicCalendarMode] = useState(false);
@@ -640,6 +643,56 @@ export function useTimelineAppState() {
     [],
   );
 
+  const handleOpenSetManager = useCallback(() => {
+    setIsSidebarOpen(false);
+    setActiveView("available-sets");
+  }, []);
+
+  const handleCloseSetManager = useCallback(() => {
+    setActiveView("timeline");
+    setIsSidebarOpen(true);
+  }, []);
+
+  const handleApplySets = useCallback(
+    (
+      nextEnabledSetIds: Set<TimelineSetId>,
+      nextOrderedSetIds: TimelineSetId[],
+    ) => {
+      // Mirror the safety logic from handleToggleSet: if the active era belongs
+      // to a set that is being disabled, navigate back to the root.
+      const activeFamilyId = getEraFamilyId(prioritizedRootEra, activeEraId);
+      const activeSetId = activeFamilyId
+        ? getSetIdForEraFamily(activeFamilyId)
+        : null;
+      const normalizedNextOrder = normalizeTimelineSetOrder(nextOrderedSetIds);
+
+      if (activeSetId && !nextEnabledSetIds.has(activeSetId)) {
+        setActiveEraId(ROOT_ERA.id);
+        animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1]);
+      }
+
+      setEnabledSetIds(new Set(nextEnabledSetIds));
+      setOrderedSetIds((current) => {
+        const normalizedCurrent = normalizeTimelineSetOrder(current);
+
+        if (
+          normalizedCurrent.length === normalizedNextOrder.length &&
+          normalizedCurrent.every(
+            (setId, index) => setId === normalizedNextOrder[index],
+          )
+        ) {
+          return current;
+        }
+
+        return normalizedNextOrder;
+      });
+      setOverlayVisibilityTransitionSeed((current) => current + 1);
+      setActiveView("timeline");
+      setIsSidebarOpen(true);
+    },
+    [activeEraId, animated, prioritizedRootEra],
+  );
+
   const handleReorderSets = useCallback((nextOrder: TimelineSetId[]) => {
     setOrderedSetIds((current) => {
       const normalizedCurrent = normalizeTimelineSetOrder(current);
@@ -697,6 +750,11 @@ export function useTimelineAppState() {
     setIsCosmicCalendarMode,
     sidebarTree,
     expandedSetIds,
+    enabledSetIds,
+    orderedSetIds,
+
+    // view
+    activeView,
 
     // handlers
     handleZoom,
@@ -707,5 +765,8 @@ export function useTimelineAppState() {
     handleToggleSet,
     handleToggleSetExpanded,
     handleReorderSets,
+    handleOpenSetManager,
+    handleCloseSetManager,
+    handleApplySets,
   };
 }

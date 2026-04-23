@@ -45,6 +45,7 @@ export const TIMELINE_SETS: readonly TimelineSetAssignmentConfig[] = [
     label: "Cosmic",
     description:
       "Universe-scale history from the Big Bang through the formation of the Solar System.",
+    tags: ["universe", "physics"],
     order: 0,
     defaultEnabled: true,
     familyIds: [...COSMIC_SET_FAMILY_IDS],
@@ -56,6 +57,7 @@ export const TIMELINE_SETS: readonly TimelineSetAssignmentConfig[] = [
     label: "Earth",
     description:
       "Earth-system and deep-time-life history from planetary formation through prehistory.",
+    tags: ["geology", "planet", "life"],
     order: 1,
     defaultEnabled: true,
     familyIds: [...EARTH_SET_FAMILY_IDS],
@@ -67,6 +69,7 @@ export const TIMELINE_SETS: readonly TimelineSetAssignmentConfig[] = [
     label: "Human",
     description:
       "Hominin evolution, archaeological cultures, civilizations, and recorded history.",
+    tags: ["history", "archaeology", "civilization"],
     order: 2,
     defaultEnabled: true,
     familyIds: [...HUMAN_SET_FAMILY_IDS],
@@ -210,7 +213,10 @@ export function applyTimelineSetOrderToEraTree(
   root: Era,
   setOrder: readonly TimelineSetId[],
 ): Era {
-  return applyTimelineSetOrderToEra(root, getTimelineSetPriorityBoosts(setOrder));
+  return applyTimelineSetOrderToEra(
+    root,
+    getTimelineSetPriorityBoosts(setOrder),
+  );
 }
 
 export function getDefaultEnabledTimelineSetIds(): Set<TimelineSetId> {

@@ -4,10 +4,12 @@ import { TimelineDisclaimer } from "./components/TimelineDisclaimer";
 import { TimelineSettings } from "./components/TimelineSettings";
 import { TimelineSidebar } from "./components/sidebar/TimelineSidebar";
 import { TimelineOverviewRulerStack } from "./components/overview/TimelineOverviewRulerStack";
+import { AvailableSetsPage } from "./components/availableSets/AvailableSetsPage";
 import {
   TIMELINE_APP_LAYOUT,
   useTimelineAppState,
 } from "./lib/app/useTimelineAppState";
+import { TIMELINE_SETS } from "./lib/catalog/timelineSets";
 import "./App.css";
 
 function App() {
@@ -17,6 +19,7 @@ function App() {
     <main
       className="app-shell"
       data-sidebar-open={app.isSidebarOpen ? "true" : "false"}
+      data-active-view={app.activeView}
     >
       <TimelineDisclaimer />
       <TimelineSettings
@@ -53,58 +56,74 @@ function App() {
           onToggleSetExpanded={app.handleToggleSetExpanded}
           sets={app.sidebarTree}
           onToggleEntry={app.handleToggleEntry}
+          onOpenSetManager={app.handleOpenSetManager}
         />
       </div>
       <section className="app-stage" ref={app.stageRef}>
-        {app.stageSize.width > 0 && app.stageSize.height > 0 ? (
-          <div className="app-stage__stack">
-            <div className="app-stage__timeline" ref={app.timelineRef}>
-              <TimelineCanvas
-                height={app.mainCanvasHeight}
-                viewport={app.animated.viewport}
-                width={app.stageSize.width}
-                activeEra={app.activeEra}
-                activeChain={app.chain}
-                siblingEras={app.siblingEras}
-                markers={app.setFilteredMarkers}
-                overlayBands={app.visibleFilteredOverlays}
-                enabledGroupIds={app.renderEnabledGroupIds}
-                overlayVisibilityTransitionKey={
-                  app.overlayVisibilityTransitionKey
-                }
-                parentEra={app.parentEra}
-                isCosmicCalendarMode={app.isCosmicCalendarMode}
-                isAnimating={app.animated.isAnimating}
-                onViewportChange={app.handleViewportChange}
-                onAnimateZoom={app.handleZoom}
-                onAnimateToRange={app.animated.animateToRange}
-                onDrillIntoEra={app.handleDrillIntoEra}
-                onNavigateUp={app.handleNavigateUp}
-                onRecordDragSample={app.animated.recordDragSample}
-                onReleaseMomentum={app.animated.releaseMomentum}
-              />
-            </div>
-            {app.isOverviewVisible ? (
-              <div className="app-stage__overview">
-                <TimelineOverviewRulerStack
-                  eras={app.rootDisplayEras}
-                  mainInnerWidth={Math.max(
-                    app.stageSize.width - TIMELINE_CANVAS_PAD * 2,
-                    1,
-                  )}
-                  onViewportChange={app.handleViewportChange}
-                  pad={TIMELINE_CANVAS_PAD}
-                  tierHeight={TIMELINE_APP_LAYOUT.overviewRulerTierHeight}
-                  tierOptions={{
-                    maxTiers: TIMELINE_APP_LAYOUT.overviewRulerMaxTiers,
-                  }}
-                  viewport={app.animated.viewport}
-                  width={app.stageSize.width}
-                />
+        <div className="app-view-stack">
+          <div className="app-view app-view--timeline">
+            {app.stageSize.width > 0 && app.stageSize.height > 0 ? (
+              <div className="app-stage__stack">
+                <div className="app-stage__timeline" ref={app.timelineRef}>
+                  <TimelineCanvas
+                    height={app.mainCanvasHeight}
+                    viewport={app.animated.viewport}
+                    width={app.stageSize.width}
+                    activeEra={app.activeEra}
+                    activeChain={app.chain}
+                    siblingEras={app.siblingEras}
+                    markers={app.setFilteredMarkers}
+                    overlayBands={app.visibleFilteredOverlays}
+                    enabledGroupIds={app.renderEnabledGroupIds}
+                    overlayVisibilityTransitionKey={
+                      app.overlayVisibilityTransitionKey
+                    }
+                    parentEra={app.parentEra}
+                    isCosmicCalendarMode={app.isCosmicCalendarMode}
+                    isAnimating={app.animated.isAnimating}
+                    onViewportChange={app.handleViewportChange}
+                    onAnimateZoom={app.handleZoom}
+                    onAnimateToRange={app.animated.animateToRange}
+                    onDrillIntoEra={app.handleDrillIntoEra}
+                    onNavigateUp={app.handleNavigateUp}
+                    onRecordDragSample={app.animated.recordDragSample}
+                    onReleaseMomentum={app.animated.releaseMomentum}
+                  />
+                </div>
+                {app.isOverviewVisible ? (
+                  <div className="app-stage__overview">
+                    <TimelineOverviewRulerStack
+                      eras={app.rootDisplayEras}
+                      mainInnerWidth={Math.max(
+                        app.stageSize.width - TIMELINE_CANVAS_PAD * 2,
+                        1,
+                      )}
+                      onViewportChange={app.handleViewportChange}
+                      pad={TIMELINE_CANVAS_PAD}
+                      tierHeight={TIMELINE_APP_LAYOUT.overviewRulerTierHeight}
+                      tierOptions={{
+                        maxTiers: TIMELINE_APP_LAYOUT.overviewRulerMaxTiers,
+                      }}
+                      viewport={app.animated.viewport}
+                      width={app.stageSize.width}
+                    />
+                  </div>
+                ) : null}
               </div>
             ) : null}
           </div>
-        ) : null}
+
+          <div className="app-view app-view--available-sets">
+            <AvailableSetsPage
+              allSets={TIMELINE_SETS}
+              enabledSetIds={app.enabledSetIds}
+              orderedSetIds={app.orderedSetIds}
+              isActive={app.activeView === "available-sets"}
+              onApply={app.handleApplySets}
+              onClose={app.handleCloseSetManager}
+            />
+          </div>
+        </div>
       </section>
     </main>
   );
