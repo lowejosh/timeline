@@ -1,38 +1,40 @@
-import type {
-  EraFamilyId,
-  TimelineSetId,
-} from "../../core/timelineTypes";
+import { cosmicSetDocument } from "./cosmicDocument";
+import {
+  normalizeTimelineSetDocument,
+} from "../setSchema";
 
-export const COSMIC_MILESTONES_GROUP_ID = "cosmic-milestones";
+export const COSMIC_SET = normalizeTimelineSetDocument(
+  cosmicSetDocument,
+);
 
-/**
- * Cosmic set — universe-scale history from the Big Bang through the formation
- * of the Solar System. Owns the `cosmic` era family and the pre-Earth portion
- * of the core timeline markers.
- */
-export const COSMIC_SET_ID: TimelineSetId = "cosmic";
+const cosmicMilestonesGroup = COSMIC_SET.groups.find(
+  (group) => group.id === "cosmic-milestones",
+);
 
-export const COSMIC_SET_FAMILY_IDS: readonly EraFamilyId[] = ["cosmic"];
+if (!cosmicMilestonesGroup) {
+  throw new Error("Cosmic set must define the cosmic-milestones group.");
+}
 
-/**
- * Marker IDs from the shared core markers file that belong to the cosmic set
- * (everything from the CMB through the Solar System forming). IDs are listed
- * explicitly so the core markers file does not need to be split.
- */
-export const COSMIC_SET_CORE_MARKER_IDS: ReadonlySet<string> = new Set([
-  "cosmic-microwave-background-released",
-  "first-stars-ignite",
-  "reionization-largely-complete",
-  "milky-way-like-star-birth-peaks",
-  "milky-way-like-spiral-shape-emerges",
-  "solar-system-formation",
-]);
+const cosmicFamily = COSMIC_SET.families.find((family) => family.id === "cosmic");
 
-/**
- * Decoration `groupId`s fully owned by the cosmic set. The milestone markers
- * are grouped into a dedicated marker-only bucket so the user-facing set tree
- * can expose a consistent child-toggle model.
- */
-export const COSMIC_SET_GROUP_IDS: readonly string[] = [
-  COSMIC_MILESTONES_GROUP_ID,
-];
+if (!cosmicFamily) {
+  throw new Error("Cosmic set must define the cosmic era family.");
+}
+
+export const COSMIC_MILESTONES_GROUP_ID = cosmicMilestonesGroup.id;
+export const COSMIC_SET_ID = COSMIC_SET.metadata.id;
+export const COSMIC_SET_CONFIG = COSMIC_SET.metadata;
+export const COSMIC_SET_FAMILY_IDS = COSMIC_SET.metadata.familyIds;
+export const COSMIC_SET_GROUP_IDS = COSMIC_SET.groups.map((group) => group.id);
+export const COSMIC_SET_CORE_MARKER_IDS: ReadonlySet<string> = new Set(
+  COSMIC_SET.markers.map((marker) => marker.id),
+);
+export const COSMIC_SET_CATEGORIES = COSMIC_SET.categories;
+export const COSMIC_SET_GROUP_TREE = COSMIC_SET.groupTree;
+export const COSMIC_SET_GROUPS = COSMIC_SET.groups;
+export const COSMIC_SET_SOURCES = COSMIC_SET.sources;
+export const COSMIC_SET_MARKERS = COSMIC_SET.markers;
+export const COSMIC_SET_OVERLAYS = COSMIC_SET.overlays;
+export const COSMIC_SET_ERA_FAMILIES = COSMIC_SET.families;
+export const COSMIC_FAMILY_ROOT_DEFINITION = cosmicFamily.root;
+export const COSMIC_ERA_DEFINITIONS = cosmicFamily.root.children ?? [];

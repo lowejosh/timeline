@@ -2,9 +2,9 @@ import { TIMELINE_MARKERS, TIMELINE_OVERLAYS } from "../../lib/catalog/content";
 import { getRootDisplayErasBySets, ROOT_ERA } from "../../lib/domain/eras";
 import { formatTimelineYear } from "../../lib/rendering/bands";
 import { TIMELINE_MAX_YEAR } from "../../lib/core/timelineYears";
+import type { TimelineSetDefinition } from "../../lib/catalog/setSchema";
 import {
   resolveDecorationSetId,
-  type TimelineSetAssignmentConfig,
 } from "../../lib/catalog/timelineSets";
 import type {
   Era,
@@ -36,13 +36,13 @@ const EXCLUDED_TAGS = new Set(["universe"]);
 
 /** Derives unique tags from the given sets, in a stable priority order. */
 export function deriveAvailableTags(
-  sets: readonly TimelineSetAssignmentConfig[],
+  sets: readonly TimelineSetDefinition[],
 ): string[] {
   const seen = new Set<string>();
   const tagsById = new Map<string, string>();
 
   for (const set of sets) {
-    for (const tag of set.tags ?? []) {
+    for (const tag of set.metadata.tags ?? []) {
       const normalized = tag.toLowerCase();
 
       if (!seen.has(normalized) && !EXCLUDED_TAGS.has(normalized)) {
@@ -61,7 +61,7 @@ export function deriveAvailableTags(
 }
 
 export function matchesQuery(
-  set: TimelineSetAssignmentConfig,
+  set: TimelineSetDefinition,
   query: string,
 ): boolean {
   const q = query.toLowerCase().trim();
@@ -71,9 +71,9 @@ export function matchesQuery(
   }
 
   return (
-    set.label.toLowerCase().includes(q) ||
-    (set.description?.toLowerCase().includes(q) ?? false) ||
-    (set.tags?.some((tag) => tag.toLowerCase().includes(q)) ?? false)
+    set.metadata.label.toLowerCase().includes(q) ||
+    (set.metadata.description?.toLowerCase().includes(q) ?? false) ||
+    (set.metadata.tags?.some((tag) => tag.toLowerCase().includes(q)) ?? false)
   );
 }
 

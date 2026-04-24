@@ -7,7 +7,7 @@ import {
   formatTimelineExactRange,
   formatTimelineExactTimestamp,
 } from "../core/exactTimestamp";
-import { ERA_SOURCES, type EraSourceId } from "../domain/eraSources";
+import { TIMELINE_SOURCES_BY_ID } from "../catalog/timelineRegistry";
 import type {
   Era,
   TimelineMarker,
@@ -43,17 +43,16 @@ function resolveTooltipSources(sourceIds?: readonly string[]) {
       return [];
     }
 
-    if (!(sourceId in ERA_SOURCES)) {
+    if (!(sourceId in TIMELINE_SOURCES_BY_ID)) {
       return [];
     }
 
     seen.add(sourceId);
-    const resolvedSourceId = sourceId as EraSourceId;
-    const source = ERA_SOURCES[resolvedSourceId];
+    const source = TIMELINE_SOURCES_BY_ID[sourceId];
 
     return [
       {
-        id: resolvedSourceId,
+        id: sourceId,
         shortTitle: source.shortTitle,
         title: source.title,
         organization: source.organization,

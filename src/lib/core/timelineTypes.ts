@@ -21,13 +21,17 @@ export type EraScheme =
   | "archaeological"
   | "history-of-science";
 
-export type EraFamilyId =
-  | "cosmic"
-  | "geological"
-  | "human-history"
-  | "physics-history";
+export type EraFamilyId = string;
 
-export type TimelineSetId = "cosmic" | "earth" | "human" | "physics";
+export type TimelineSetId = string;
+
+export type EraSource = {
+  shortTitle: string;
+  title: string;
+  organization: string;
+  citation: string;
+  url?: string;
+};
 
 export type TimelineSetConfig = {
   id: TimelineSetId;

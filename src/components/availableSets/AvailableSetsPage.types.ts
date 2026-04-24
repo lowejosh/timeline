@@ -1,10 +1,10 @@
-import type { TimelineSetAssignmentConfig } from "../../lib/catalog/timelineSets";
+import type { TimelineSetDefinition } from "../../lib/catalog/setSchema";
 import type { TimelineSetId } from "../../lib/core/timelineTypes";
 
 export type ColumnId = "enabled" | "available";
 
 export type AvailableSetsPageProps = {
-  allSets: readonly TimelineSetAssignmentConfig[];
+  allSets: readonly TimelineSetDefinition[];
   enabledSetIds: ReadonlySet<TimelineSetId>;
   orderedSetIds: readonly TimelineSetId[];
   isActive: boolean;

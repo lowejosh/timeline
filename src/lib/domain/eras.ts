@@ -1,11 +1,8 @@
-import { COSMIC_ERA_DEFINITIONS } from "./eraTrees/cosmic";
-import { GEOLOGICAL_ERA_DEFINITIONS } from "./eraTrees/geological";
-import { HUMAN_HISTORY_ERA_DEFINITIONS } from "./eraTrees/humanHistory";
-import { PHYSICS_HISTORY_ERA_DEFINITIONS } from "./eraTrees/physicsHistory";
 import { TIMELINE_DISPLAY } from "../catalog/decorations";
 import {
   getEffectiveTimelinePriority,
   getSetIdForEraFamily,
+  TIMELINE_SETS,
 } from "../catalog/timelineSets";
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "../core/timelineYears";
 import type {
@@ -150,45 +147,46 @@ export function getEraFamilyId(
 
 const CURRENT_YEAR = TIMELINE_MAX_YEAR;
 
-export const TIMELINE_ERA_FAMILIES: TimelineEraFamilyConfig[] = [
-  {
-    id: "cosmic",
-    label: "Cosmic History",
-    description: "Universe-scale eras before Earth forms.",
-    order: 0,
-    priority: 100,
-    defaultEnabled: true,
-  },
-  {
-    id: "geological",
-    label: "Geological History",
-    description: "Earth-system and chronostratigraphic eras.",
-    order: 1,
-    priority: 200,
-    defaultEnabled: true,
-  },
-  {
-    id: "human-history",
-    label: "Human History",
-    description: "Archaeological and world-history eras.",
-    order: 2,
-    priority: 300,
-    defaultEnabled: true,
-  },
-  {
-    id: "physics-history",
-    label: "History of Physics",
-    description:
-      "Historical ages for major shifts in physical thought and discovery.",
-    order: 3,
-    priority: 350,
-    defaultEnabled: false,
-  },
-];
+function toEraFamilyConfig(
+  family: { root: EraDefinition } & TimelineEraFamilyConfig,
+): TimelineEraFamilyConfig {
+  return {
+    id: family.id,
+    label: family.label,
+    description: family.description,
+    order: family.order,
+    priority: family.priority,
+    defaultEnabled: family.defaultEnabled,
+  };
+}
+
+export const TIMELINE_ERA_FAMILIES: TimelineEraFamilyConfig[] = TIMELINE_SETS
+  .flatMap((set) => set.families.map(toEraFamilyConfig))
+  .sort(
+    (left, right) =>
+      left.order - right.order || left.label.localeCompare(right.label),
+  );
 
 const ERA_FAMILY_CONFIG_BY_ID = new Map(
   TIMELINE_ERA_FAMILIES.map((family) => [family.id, family]),
 );
+
+const FAMILY_ROOT_DEFINITIONS: EraDefinition[] = TIMELINE_SETS.flatMap((set) =>
+  set.families.map((family) => family.root),
+).sort((left, right) => {
+  const leftConfig = left.familyId
+    ? ERA_FAMILY_CONFIG_BY_ID.get(left.familyId)
+    : undefined;
+  const rightConfig = right.familyId
+    ? ERA_FAMILY_CONFIG_BY_ID.get(right.familyId)
+    : undefined;
+
+  return (
+    (leftConfig?.order ?? Number.MAX_SAFE_INTEGER) -
+      (rightConfig?.order ?? Number.MAX_SAFE_INTEGER) ||
+    left.name.localeCompare(right.name)
+  );
+});
 
 function hashString(value: string): number {
   let hash = 2166136261;
@@ -270,58 +268,6 @@ function materializeEra(
   };
 }
 
-const COSMIC_FAMILY_ROOT_DEFINITION: EraDefinition = {
-  id: "cosmic-history",
-  name: "Cosmic History",
-  startYear: COSMIC_ERA_DEFINITIONS[0]?.startYear ?? TIMELINE_MIN_YEAR,
-  endYear:
-    COSMIC_ERA_DEFINITIONS[COSMIC_ERA_DEFINITIONS.length - 1]?.endYear ??
-    CURRENT_YEAR,
-  color: "rgba(0, 0, 0, 0)",
-  scheme: "cosmic",
-  familyId: "cosmic",
-  priority: ERA_FAMILY_CONFIG_BY_ID.get("cosmic")?.priority,
-  isFamilyRoot: true,
-  children: COSMIC_ERA_DEFINITIONS,
-};
-
-const GEOLOGICAL_FAMILY_ROOT_DEFINITION: EraDefinition = {
-  id: "geological-history",
-  name: "Geological History",
-  startYear: GEOLOGICAL_ERA_DEFINITIONS[0]?.startYear ?? TIMELINE_MIN_YEAR,
-  endYear:
-    GEOLOGICAL_ERA_DEFINITIONS[GEOLOGICAL_ERA_DEFINITIONS.length - 1]
-      ?.endYear ?? CURRENT_YEAR,
-  color: "rgba(0, 0, 0, 0)",
-  scheme: "chronostratigraphic",
-  familyId: "geological",
-  priority: ERA_FAMILY_CONFIG_BY_ID.get("geological")?.priority,
-  isFamilyRoot: true,
-  children: GEOLOGICAL_ERA_DEFINITIONS,
-};
-
-const PHYSICS_FAMILY_ROOT_DEFINITION: EraDefinition = {
-  id: "physics-history",
-  name: "History of Physics",
-  startYear: PHYSICS_HISTORY_ERA_DEFINITIONS[0]?.startYear ?? TIMELINE_MIN_YEAR,
-  endYear:
-    PHYSICS_HISTORY_ERA_DEFINITIONS[PHYSICS_HISTORY_ERA_DEFINITIONS.length - 1]
-      ?.endYear ?? CURRENT_YEAR,
-  color: "rgba(0, 0, 0, 0)",
-  scheme: "history-of-science",
-  familyId: "physics-history",
-  priority: ERA_FAMILY_CONFIG_BY_ID.get("physics-history")?.priority,
-  isFamilyRoot: true,
-  children: PHYSICS_HISTORY_ERA_DEFINITIONS,
-};
-
-const HUMAN_HISTORY_TOP_LEVEL_DEFINITIONS: EraDefinition[] =
-  HUMAN_HISTORY_ERA_DEFINITIONS.map((definition) => ({
-    ...definition,
-    familyId: "human-history",
-    priority: ERA_FAMILY_CONFIG_BY_ID.get("human-history")?.priority,
-  }));
-
 export const ROOT_ERA: Era = materializeEra({
   id: "universe",
   name: "Universe",
@@ -330,12 +276,7 @@ export const ROOT_ERA: Era = materializeEra({
   color: "rgba(0, 0, 0, 0)",
   scheme: "app-canonical",
   sourceIds: ["nasaUniverseOverview"],
-  children: [
-    COSMIC_FAMILY_ROOT_DEFINITION,
-    GEOLOGICAL_FAMILY_ROOT_DEFINITION,
-    PHYSICS_FAMILY_ROOT_DEFINITION,
-    ...HUMAN_HISTORY_TOP_LEVEL_DEFINITIONS,
-  ],
+  children: FAMILY_ROOT_DEFINITIONS,
 });
 
 export const ROOT_TIMELINE: RootTimelineData = {

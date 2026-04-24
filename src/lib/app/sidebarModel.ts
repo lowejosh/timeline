@@ -110,18 +110,25 @@ export function resolveTimelineSidebarTree(
   );
 
   return [...TIMELINE_SETS]
-    .filter((set) => collectionSetIds.has(set.id))
+    .filter((set) => collectionSetIds.has(set.metadata.id))
     .sort(
       (left, right) =>
-        (orderIndexBySetId.get(left.id) ?? Number.MAX_SAFE_INTEGER) -
-          (orderIndexBySetId.get(right.id) ?? Number.MAX_SAFE_INTEGER) ||
-        left.order - right.order ||
-        left.label.localeCompare(right.label),
+        (orderIndexBySetId.get(left.metadata.id) ?? Number.MAX_SAFE_INTEGER) -
+          (orderIndexBySetId.get(right.metadata.id) ?? Number.MAX_SAFE_INTEGER) ||
+        left.metadata.order - right.metadata.order ||
+        left.metadata.label.localeCompare(right.metadata.label),
     )
     .map((set) => {
-      const children = set.groupIds
+      const children = [...set.groups]
+        .sort(
+          (left, right) =>
+            left.order - right.order || left.label.localeCompare(right.label),
+        )
         .map<TimelineSidebarChildState | null>((groupId) => {
-          const group = TIMELINE_DECORATION_GROUPS_BY_ID[groupId];
+          const group =
+            typeof groupId === "string"
+              ? TIMELINE_DECORATION_GROUPS_BY_ID[groupId]
+              : groupId;
 
           if (!group) {
             return null;
@@ -153,10 +160,10 @@ export function resolveTimelineSidebarTree(
       }, createEmptyCounts());
 
       return {
-        id: set.id,
-        label: set.label,
-        description: set.description,
-        enabled: visibleSetIds.has(set.id),
+        id: set.metadata.id,
+        label: set.metadata.label,
+        description: set.metadata.description,
+        enabled: visibleSetIds.has(set.metadata.id),
         markerCount: totals.markerCount,
         overlayCount: totals.overlayCount,
         relevantItemCount: getRelevantItemCount(totals),

@@ -1,33 +1,14 @@
-export type EraSource = {
-  shortTitle: string;
-  title: string;
-  organization: string;
-  citation: string;
-  url?: string;
-};
+import { COSMIC_SET_SOURCES } from "../catalog/sets/cosmic";
+import type { EraSource } from "../core/timelineTypes";
 
 export const ERA_SOURCES = {
-    sepNewtonPrincipia: {
+  ...COSMIC_SET_SOURCES,
+  sepNewtonPrincipia: {
       shortTitle: "SEP: Newton's Principia",
       title: "Newton’s Principia",
       organization: "Stanford Encyclopedia of Philosophy",
       citation: 'Smith, G. E. (2023), "Newton’s Principia," SEP. https://plato.stanford.edu/entries/newton-principia/',
       url: "https://plato.stanford.edu/entries/newton-principia/",
-    },
-  nasaUniverseOverview: {
-    shortTitle: "NASA: Cosmic History",
-    title: "Universe: Cosmic History",
-    organization: "NASA",
-    citation: 'NASA, "Universe: Cosmic History," Science Mission Directorate.',
-    url: "https://science.nasa.gov/universe/overview/",
-  },
-  nasaLambdaCosmology: {
-    shortTitle: "NASA LAMBDA: Cosmology timeline",
-    title: "ΛCDM Model of Cosmology",
-    organization: "NASA Goddard Space Flight Center",
-    citation:
-      'NASA LAMBDA Archive / WMAP Science Team, "ΛCDM Model of Cosmology."',
-    url: "https://lambda.gsfc.nasa.gov/education/graphic_history/univ_evol.html",
   },
   nasaStarBasics: {
     shortTitle: "NASA: Star Basics",
@@ -35,35 +16,6 @@ export const ERA_SOURCES = {
     organization: "NASA",
     citation: 'NASA, "Star Basics," Science Mission Directorate.',
     url: "https://science.nasa.gov/universe/stars/",
-  },
-  nasaGalaxyBasics: {
-    shortTitle: "NASA: Galaxy Basics",
-    title: "Galaxy Basics",
-    organization: "NASA",
-    citation: 'NASA, "Galaxy Basics," Science Mission Directorate.',
-    url: "https://science.nasa.gov/universe/galaxies/",
-  },
-  nasaMilkyWayGrowth: {
-    shortTitle: "NASA: Milky Way-like growth",
-    title: "The Growth of Milky Way-Like Galaxies Over Time",
-    organization: "NASA / Hubble",
-    citation:
-      'NASA, ESA, C. Papovich et al., "The Growth of Milky Way-Like Galaxies Over Time."',
-    url: "https://science.nasa.gov/asset/hubble/the-growth-of-milky-way-like-galaxies-over-time/",
-  },
-  nasaSunLateToMilkyWayParty: {
-    shortTitle: "NASA: Sun came late",
-    title: "Our Sun Came Late to the Milky Way's Star-Birth Party",
-    organization: "NASA / Hubble",
-    citation: 'NASA, "Our Sun Came Late to the Milky Way’s Star-Birth Party."',
-    url: "https://science.nasa.gov/missions/hubble/our-sun-came-late-to-the-milky-ways-star-birth-party/",
-  },
-  nasaSolarSystemFacts: {
-    shortTitle: "NASA: Solar System Facts",
-    title: "Solar System Facts",
-    organization: "NASA",
-    citation: 'NASA, "Solar System Facts," Science Mission Directorate.',
-    url: "https://science.nasa.gov/solar-system/solar-system-facts/",
   },
   usgsAgeOfEarth: {
     shortTitle: "USGS: Age of Earth",

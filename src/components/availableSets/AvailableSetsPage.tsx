@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { TimelineSetAssignmentConfig } from "../../lib/catalog/timelineSets";
+import type { TimelineSetDefinition } from "../../lib/catalog/setSchema";
 import type { TimelineSetId } from "../../lib/core/timelineTypes";
 import { useAvailableSetsDrag } from "./AvailableSetsPage.hooks";
 import type {
@@ -33,7 +33,7 @@ export function AvailableSetsPage({
   const [activeTags, setActiveTags] = useState<Set<string>>(() => new Set());
 
   const setsById = useMemo(
-    () => new Map(allSets.map((set) => [set.id, set] as const)),
+    () => new Map(allSets.map((set) => [set.metadata.id, set] as const)),
     [allSets],
   );
 
@@ -50,11 +50,11 @@ export function AvailableSetsPage({
 
   const enabledSets = draftColumns.enabled
     .map((setId) => setsById.get(setId))
-    .filter((set): set is TimelineSetAssignmentConfig => Boolean(set));
+    .filter((set): set is TimelineSetDefinition => Boolean(set));
 
   const availableSets = draftColumns.available
     .map((setId) => setsById.get(setId))
-    .filter((set): set is TimelineSetAssignmentConfig => Boolean(set));
+    .filter((set): set is TimelineSetDefinition => Boolean(set));
 
   const visibleAvailableSetIds = useMemo(
     () =>
@@ -63,7 +63,7 @@ export function AvailableSetsPage({
           if (
             activeTags.size > 0 &&
             !(
-              set.tags?.some((tag) => activeTags.has(tag.toLowerCase())) ??
+              set.metadata.tags?.some((tag) => activeTags.has(tag.toLowerCase())) ??
               false
             )
           ) {
@@ -72,7 +72,7 @@ export function AvailableSetsPage({
 
           return matchesQuery(set, query);
         })
-        .map((set) => set.id),
+        .map((set) => set.metadata.id),
     [activeTags, availableSets, query],
   );
 
@@ -88,7 +88,7 @@ export function AvailableSetsPage({
   );
 
   const setTimeRanges = useMemo(
-    () => computeSetTimeRanges(allSets.map((set) => set.id)),
+    () => computeSetTimeRanges(allSets.map((set) => set.metadata.id)),
     [allSets],
   );
 
@@ -152,7 +152,7 @@ export function AvailableSetsPage({
   };
 
   const renderColumnItems = (
-    sets: TimelineSetAssignmentConfig[],
+    sets: TimelineSetDefinition[],
     columnId: ColumnId,
     emptyMessage: string,
   ): React.ReactNode => {
@@ -189,18 +189,19 @@ export function AvailableSetsPage({
   };
 
   const renderSetCard = (
-    set: TimelineSetAssignmentConfig,
+    set: TimelineSetDefinition,
     columnId: ColumnId,
   ) => {
+    const setId = set.metadata.id;
     const isEnabled = columnId === "enabled";
-    const obscuredCount = isEnabled ? (eraObscuredCounts.get(set.id) ?? 0) : 0;
-    const timeRange = setTimeRanges.get(set.id) ?? null;
-    const isDragged = dragState?.setId === set.id;
+    const obscuredCount = isEnabled ? (eraObscuredCounts.get(setId) ?? 0) : 0;
+    const timeRange = setTimeRanges.get(setId) ?? null;
+    const isDragged = dragState?.setId === setId;
     const isCrossColumnDrag =
       dragState !== null && dragState.sourceColumn !== dragState.targetColumn;
     const layout = dragState?.layouts[columnId] ?? null;
-    const previewTop = previewTopByColumn?.[columnId]?.get(set.id);
-    const originalTop = layout?.tops.get(set.id);
+    const previewTop = previewTopByColumn?.[columnId]?.get(setId);
+    const originalTop = layout?.tops.get(setId);
     const shiftY =
       dragState &&
       !isDragged &&
@@ -224,15 +225,15 @@ export function AvailableSetsPage({
         data-drag-state={
           isDragged ? "dragging" : dragState ? "shifting" : "idle"
         }
-        key={set.id}
+        key={setId}
         onPointerDown={(event) => {
-          handlePointerDown(event, set.id, columnId);
+          handlePointerDown(event, setId, columnId);
         }}
         ref={(element) => {
           if (element) {
-            itemRefs.current.set(set.id, element);
+            itemRefs.current.set(setId, element);
           } else {
-            itemRefs.current.delete(set.id);
+            itemRefs.current.delete(setId);
           }
         }}
         style={
@@ -248,7 +249,7 @@ export function AvailableSetsPage({
         }
       >
         <div className="avsets__item-body">
-          <span className="avsets__item-label">{set.label}</span>
+          <span className="avsets__item-label">{set.metadata.label}</span>
           {timeRange ? (
             <span className="avsets__item-meta">{timeRange}</span>
           ) : null}
@@ -270,12 +271,12 @@ export function AvailableSetsPage({
               higher-priority sets
             </div>
           </div>
-          {set.description ? (
-            <span className="avsets__item-desc">{set.description}</span>
+          {set.metadata.description ? (
+            <span className="avsets__item-desc">{set.metadata.description}</span>
           ) : null}
-          {set.tags && set.tags.length > 0 ? (
+          {set.metadata.tags && set.metadata.tags.length > 0 ? (
             <span className="avsets__item-tags">
-              {set.tags.map((tag) => (
+              {set.metadata.tags.map((tag) => (
                 <span className="avsets__item-tag" key={tag}>
                   {tag}
                 </span>
@@ -285,11 +286,15 @@ export function AvailableSetsPage({
         </div>
 
         <button
-          aria-label={isEnabled ? `Remove ${set.label}` : `Add ${set.label}`}
+          aria-label={
+            isEnabled
+              ? `Remove ${set.metadata.label}`
+              : `Add ${set.metadata.label}`
+          }
           className="avsets__item-action"
           data-variant={isEnabled ? "remove" : "add"}
           onClick={() => {
-            handleToggleDraft(set.id, !isEnabled);
+            handleToggleDraft(setId, !isEnabled);
           }}
           type="button"
         >
@@ -443,7 +448,7 @@ export function AvailableSetsPage({
               {renderColumnItems(
                 visibleAvailableSetIds
                   .map((setId) => setsById.get(setId))
-                  .filter((set): set is TimelineSetAssignmentConfig =>
+                  .filter((set): set is TimelineSetDefinition =>
                     Boolean(set),
                   ),
                 "available",
