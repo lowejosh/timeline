@@ -1,10 +1,7 @@
-import {
-  formatTimelineDateLabel,
-  formatTimelineYear,
-} from "../bands";
+import { formatTimelineDateLabel, formatTimelineYear } from "../bands";
 import type { AxisTickRenderState } from "../axisTickStates";
-import type { PreciseTimelineYear } from "../../core/viewport";
-import { clamp01 } from "../../core/easing";
+import type { PreciseTimelineYear } from "@/lib/core/viewport";
+import { clamp01 } from "@/lib/core/easing";
 import {
   AXIS_DUPLICATE_LABEL_MIN_GAP,
   AXIS_LABEL_CLEARANCE_FADE_END,

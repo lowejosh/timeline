@@ -1,4 +1,4 @@
-import type { TimelineTooltipContent } from "../../app/tooltipModel";
+import type { TimelineTooltipContent } from "@/lib/app/tooltipModel";
 
 export type HoveredTooltipState = {
   id: string;

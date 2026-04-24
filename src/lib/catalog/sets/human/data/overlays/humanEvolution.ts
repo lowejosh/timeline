@@ -1,6 +1,6 @@
-import { TIMELINE_MAX_YEAR } from "../../../../../core/timelineYears";
-import type { TimelineOverlayBand } from "../../../../../core/timelineTypes";
-import { yearsAgo } from "../../../../../core/timelineDateBuilders";
+import { TIMELINE_MAX_YEAR } from "@/lib/core/timelineYears";
+import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
+import { yearsAgo } from "@/lib/core/timelineDateBuilders";
 
 const CURRENT_YEAR = TIMELINE_MAX_YEAR;
 const HUMAN_EVOLUTION_MIN_ZOOM = 8;

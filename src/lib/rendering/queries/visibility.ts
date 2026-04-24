@@ -2,7 +2,7 @@ import type {
   TimelineMarker,
   TimelineOverlayBand,
   TimelineZoomVisibility,
-} from "../../core/timelineTypes";
+} from "@/lib/core/timelineTypes";
 
 const PRIORITY_ZOOM_GRACE_START = 75;
 const PRIORITY_ZOOM_GRACE_STEP = 5;

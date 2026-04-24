@@ -1,11 +1,11 @@
 import {
   UNIVERSE_AGE_YEARS,
   getYearsAfterBigBang,
-} from "../../core/timelineYears";
+} from "@/lib/core/timelineYears";
 import {
   toApproximateTimelineYear,
   type PreciseTimelineYear,
-} from "../../core/viewport";
+} from "@/lib/core/viewport";
 
 /**
  * Carl Sagan's Cosmic Calendar: the entire 13.8-billion-year history of the

@@ -1,6 +1,6 @@
-import type { TimelineOverlayBand } from "../../core/timelineTypes";
-import { getEffectiveTimelinePriority } from "../../catalog/timelineSets";
-import { getOverlayLaneStartBiasYears } from "../../catalog/overlayLaneBias";
+import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
+import { getEffectiveTimelinePriority } from "@/lib/catalog/timelineSets";
+import { getOverlayLaneStartBiasYears } from "@/lib/catalog/overlayLaneBias";
 
 export type AssignedTimelineOverlayBand = {
   band: TimelineOverlayBand;

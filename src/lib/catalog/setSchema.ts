@@ -301,7 +301,10 @@ function normalizeRawExactTimestamp(
     microseconds:
       timestamp.microseconds === undefined
         ? undefined
-        : parseNonNegativeBigInt(timestamp.microseconds, "Elapsed microseconds"),
+        : parseNonNegativeBigInt(
+            timestamp.microseconds,
+            "Elapsed microseconds",
+          ),
   });
 }
 
@@ -402,12 +405,19 @@ function normalizeGroupNode(
     defaultEnabled: node.defaultEnabled,
     autoToggleRule: node.autoToggleRule,
     children: node.children?.map((child, index) =>
-      normalizeGroupNode(child, categoryId, `${path}.children[${index}]`, seenGroupIds),
+      normalizeGroupNode(
+        child,
+        categoryId,
+        `${path}.children[${index}]`,
+        seenGroupIds,
+      ),
     ),
   };
 }
 
-function flattenGroupTree(nodes: readonly TimelineSetGroupNode[]): TimelineDecorationGroup[] {
+function flattenGroupTree(
+  nodes: readonly TimelineSetGroupNode[],
+): TimelineDecorationGroup[] {
   return nodes.flatMap((node) => {
     const { children, ...group } = node;
 
@@ -425,10 +435,16 @@ function normalizeMarker(
   assertNonEmptyString(marker.label, `Marker ${marker.id} label`);
 
   if (marker.groupId && !validGroupIds.has(marker.groupId)) {
-    throw new Error(`Marker ${marker.id} references unknown group: ${marker.groupId}`);
+    throw new Error(
+      `Marker ${marker.id} references unknown group: ${marker.groupId}`,
+    );
   }
 
-  validateSourceIds(marker.sourceIds, availableSourceIds, `Marker ${marker.id}`);
+  validateSourceIds(
+    marker.sourceIds,
+    availableSourceIds,
+    `Marker ${marker.id}`,
+  );
 
   return {
     id: marker.id,
@@ -467,10 +483,16 @@ function normalizeOverlay(
   const groupId = overlay.groupId ?? inheritedGroupId;
 
   if (groupId && !validGroupIds.has(groupId)) {
-    throw new Error(`Overlay ${overlay.id} references unknown group: ${groupId}`);
+    throw new Error(
+      `Overlay ${overlay.id} references unknown group: ${groupId}`,
+    );
   }
 
-  validateSourceIds(overlay.sourceIds, availableSourceIds, `Overlay ${overlay.id}`);
+  validateSourceIds(
+    overlay.sourceIds,
+    availableSourceIds,
+    `Overlay ${overlay.id}`,
+  );
 
   return {
     id: overlay.id,
@@ -489,7 +511,10 @@ function normalizeOverlay(
       overlay.startYear,
       `Overlay ${overlay.id} startYear`,
     ),
-    endYear: resolveTimelinePoint(overlay.endYear, `Overlay ${overlay.id} endYear`),
+    endYear: resolveTimelinePoint(
+      overlay.endYear,
+      `Overlay ${overlay.id} endYear`,
+    ),
     exactStartTime: overlay.exactStartTime
       ? normalizeRawExactTimestamp(overlay.exactStartTime)
       : undefined,
@@ -501,7 +526,13 @@ function normalizeOverlay(
     color: overlay.color,
     autoToggleRule: overlay.autoToggleRule,
     children: overlay.children?.map((child) =>
-      normalizeOverlay(child, setId, validGroupIds, availableSourceIds, groupId),
+      normalizeOverlay(
+        child,
+        setId,
+        validGroupIds,
+        availableSourceIds,
+        groupId,
+      ),
     ),
   };
 }
@@ -565,7 +596,10 @@ export function normalizeTimelineSetDocument(
   assertNonEmptyString(document.metadata.id, "Set id");
   assertNonEmptyString(document.metadata.label, "Set label");
 
-  const sourceIds = collectUniqueIds(Object.keys(document.sources), "source id");
+  const sourceIds = collectUniqueIds(
+    Object.keys(document.sources),
+    "source id",
+  );
   const categoryIds = collectUniqueIds(
     document.categories.map((category) => category.id),
     "category id",

@@ -1,16 +1,14 @@
-import { TIMELINE_MARKERS, TIMELINE_OVERLAYS } from "../../lib/catalog/content";
-import { getRootDisplayErasBySets, ROOT_ERA } from "../../lib/catalog/eras";
-import { formatTimelineYear } from "../../lib/rendering/bands";
-import { TIMELINE_MAX_YEAR } from "../../lib/core/timelineYears";
-import type { TimelineSetDefinition } from "../../lib/catalog/setSchema";
-import {
-  resolveDecorationSetId,
-} from "../../lib/catalog/timelineSets";
+import { TIMELINE_MARKERS, TIMELINE_OVERLAYS } from "@/lib/catalog/content";
+import { getRootDisplayErasBySets, ROOT_ERA } from "@/lib/catalog/eras";
+import { formatTimelineYear } from "@/lib/rendering/bands";
+import { TIMELINE_MAX_YEAR } from "@/lib/core/timelineYears";
+import type { TimelineSetDefinition } from "@/lib/catalog/setSchema";
+import { resolveDecorationSetId } from "@/lib/catalog/timelineSets";
 import type {
   Era,
   TimelineOverlayBand,
   TimelineSetId,
-} from "../../lib/core/timelineTypes";
+} from "@/lib/core/timelineTypes";
 import type {
   ColumnId,
   ColumnLayoutSnapshot,

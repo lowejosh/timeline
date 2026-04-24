@@ -1,1163 +1,1239 @@
 export const HUMAN_SOURCES = {
-	"appleIPhoneIntroduction": {
-		"shortTitle": "Apple: iPhone introduced",
-		"title": "Apple Reinvents the Phone with iPhone",
-		"organization": "Apple",
-		"citation": "Apple, \"Apple Reinvents the Phone with iPhone.\"",
-		"url": "https://www.apple.com/newsroom/2007/01/09Apple-Reinvents-the-Phone-with-iPhone/"
-	},
-	"britannicaAkkad": {
-		"shortTitle": "Britannica: Akkad",
-		"title": "Akkad",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Akkad.\"",
-		"url": "https://www.britannica.com/place/Akkad"
-	},
-	"britannicaAncientEgypt": {
-		"shortTitle": "Britannica: Ancient Egypt",
-		"title": "ancient Egypt",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"ancient Egypt.\"",
-		"url": "https://www.britannica.com/place/ancient-Egypt"
-	},
-	"britannicaAncientGreece": {
-		"shortTitle": "Britannica: ancient Greece",
-		"title": "ancient Greek civilization",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"ancient Greek civilization.\"",
-		"url": "https://www.britannica.com/place/ancient-Greece"
-	},
-	"britannicaBabylonia": {
-		"shortTitle": "Britannica: Babylonia",
-		"title": "Babylonia",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Babylonia.\"",
-		"url": "https://www.britannica.com/place/Babylonia"
-	},
-	"britannicaBronzeAge": {
-		"shortTitle": "Britannica: Bronze Age",
-		"title": "Bronze Age",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Bronze Age.\"",
-		"url": "https://www.britannica.com/topic/Bronze-Age"
-	},
-	"britannicaCarthage": {
-		"shortTitle": "Britannica: Carthage",
-		"title": "Carthage",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Carthage.\"",
-		"url": "https://www.britannica.com/place/Carthage-ancient-city-Tunisia"
-	},
-	"britannicaClassicalAntiquity": {
-		"shortTitle": "Britannica: Classical antiquity",
-		"title": "Classical antiquity",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Classical antiquity.\"",
-		"url": "https://www.britannica.com/event/classical-antiquity"
-	},
-	"britannicaColdWar": {
-		"shortTitle": "Britannica: Cold War",
-		"title": "Cold War",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Cold War.\"",
-		"url": "https://www.britannica.com/event/Cold-War"
-	},
-	"britannicaEncyclopedie": {
-		"shortTitle": "Britannica: Encyclopédie",
-		"title": "Encyclopédie",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Encyclopédie.\"",
-		"url": "https://www.britannica.com/topic/Encyclopedie"
-	},
-	"britannicaGermanEmpire": {
-		"shortTitle": "Britannica: German Empire",
-		"title": "German Empire",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"German Empire.\"",
-		"url": "https://www.britannica.com/place/German-Empire"
-	},
-	"britannicaHammurabi": {
-		"shortTitle": "Britannica: Hammurabi",
-		"title": "Hammurabi",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Hammurabi.\"",
-		"url": "https://www.britannica.com/biography/Hammurabi"
-	},
-	"britannicaHanDynasty": {
-		"shortTitle": "Britannica: Han dynasty",
-		"title": "Han dynasty",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Han dynasty.\"",
-		"url": "https://www.britannica.com/topic/Han-dynasty"
-	},
-	"britannicaHellenisticAge": {
-		"shortTitle": "Britannica: Hellenistic age",
-		"title": "Hellenistic age",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Hellenistic age.\"",
-		"url": "https://www.britannica.com/event/Hellenistic-Age"
-	},
-	"britannicaHittiteEmpire": {
-		"shortTitle": "Britannica: Hittites",
-		"title": "The Hittite empire, c. 1650–1180 BCE",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Anatolia: The Hittite empire, c. 1650–1180 BCE.\"",
-		"url": "https://www.britannica.com/place/Anatolia/The-Hittite-empire-c-1650-1180-bce"
-	},
-	"britannicaIndusCivilization": {
-		"shortTitle": "Britannica: Indus civilization",
-		"title": "Indus civilization",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Indus civilization.\"",
-		"url": "https://www.britannica.com/topic/Indus-civilization"
-	},
-	"britannicaIranianRevolution": {
-		"shortTitle": "Britannica: Iranian Revolution",
-		"title": "Iranian Revolution",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Iranian Revolution.\"",
-		"url": "https://www.britannica.com/event/Iranian-Revolution"
-	},
-	"britannicaIronAge": {
-		"shortTitle": "Britannica: Iron Age",
-		"title": "Iron Age",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Iron Age.\"",
-		"url": "https://www.britannica.com/topic/Iron-Age"
-	},
-	"britannicaMehrgarh": {
-		"shortTitle": "Britannica: Mehrgarh",
-		"title": "Mehrgarh",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Mehrgarh.\"",
-		"url": "https://www.britannica.com/place/Mehrgarh"
-	},
-	"britannicaMesopotamia": {
-		"shortTitle": "Britannica: Mesopotamia",
-		"title": "history of Mesopotamia",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"history of Mesopotamia.\"",
-		"url": "https://www.britannica.com/place/Mesopotamia-historical-region-Asia"
-	},
-	"britannicaMetallurgy": {
-		"shortTitle": "Britannica: Metallurgy",
-		"title": "metallurgy",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"metallurgy.\"",
-		"url": "https://www.britannica.com/science/metallurgy"
-	},
-	"britannicaMiddleEast": {
-		"shortTitle": "Britannica: Middle East",
-		"title": "Middle East",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Middle East.\"",
-		"url": "https://www.britannica.com/place/Middle-East"
-	},
-	"britannicaMongolEmpire": {
-		"shortTitle": "Britannica: Mongol empire",
-		"title": "Mongol empire",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Mongol empire.\"",
-		"url": "https://www.britannica.com/topic/Mongol-empire"
-	},
-	"britannicaRevolutionsOf1848": {
-		"shortTitle": "Britannica: Revolutions of 1848",
-		"title": "Revolutions of 1848",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Revolutions of 1848.\"",
-		"url": "https://www.britannica.com/event/Revolutions-of-1848"
-	},
-	"britannicaRisorgimento": {
-		"shortTitle": "Britannica: Risorgimento",
-		"title": "Risorgimento",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Risorgimento.\"",
-		"url": "https://www.britannica.com/event/Risorgimento"
-	},
-	"britannicaScrambleForAfrica": {
-		"shortTitle": "Britannica: Scramble for Africa",
-		"title": "Scramble for Africa",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Scramble for Africa.\"",
-		"url": "https://www.britannica.com/event/Scramble-for-Africa"
-	},
-	"britannicaSiegeOfVienna": {
-		"shortTitle": "Britannica: Siege of Vienna",
-		"title": "Siege of Vienna",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Siege of Vienna.\"",
-		"url": "https://www.britannica.com/event/Siege-of-Vienna-1683"
-	},
-	"britannicaSovietCollapse": {
-		"shortTitle": "Britannica: Soviet collapse",
-		"title": "collapse of the Soviet Union",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"collapse of the Soviet Union.\"",
-		"url": "https://www.britannica.com/event/the-collapse-of-the-Soviet-Union"
-	},
-	"britannicaSumer": {
-		"shortTitle": "Britannica: Sumer",
-		"title": "Sumer",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Sumer.\"",
-		"url": "https://www.britannica.com/place/Sumer"
-	},
-	"britannicaTelephone": {
-		"shortTitle": "Britannica: telephone",
-		"title": "telephone",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"telephone.\"",
-		"url": "https://www.britannica.com/technology/telephone"
-	},
-	"britannicaTitanic": {
-		"shortTitle": "Britannica: Titanic",
-		"title": "Titanic",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Titanic.\"",
-		"url": "https://www.britannica.com/topic/Titanic"
-	},
-	"britannicaVietnamWar": {
-		"shortTitle": "Britannica: Vietnam War",
-		"title": "Vietnam War",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Vietnam War.\"",
-		"url": "https://www.britannica.com/event/Vietnam-War"
-	},
-	"britannicaWheel": {
-		"shortTitle": "Britannica: wheel",
-		"title": "wheel",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"wheel.\"",
-		"url": "https://www.britannica.com/technology/wheel"
-	},
-	"britannicaYuriGagarin": {
-		"shortTitle": "Britannica: Yuri Gagarin",
-		"title": "Yuri Gagarin",
-		"organization": "Encyclopaedia Britannica",
-		"citation": "Encyclopaedia Britannica, \"Yuri Gagarin.\"",
-		"url": "https://www.britannica.com/biography/Yuri-Gagarin"
-	},
-	"cayonuWikipedia": {
-		"shortTitle": "Wikipedia: Çayönü",
-		"title": "Çayönü",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Çayönü.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/%C3%87ay%C3%B6n%C3%BC"
-	},
-	"cernBirthWeb": {
-		"shortTitle": "CERN: birth of the Web",
-		"title": "The birth of the Web",
-		"organization": "CERN",
-		"citation": "CERN, \"The birth of the Web.\"",
-		"url": "https://home.cern/science/computing/birth-web"
-	},
-	"cernHiggsBoson2012": {
-		"shortTitle": "CERN: Higgs boson announcement",
-		"title": "CERN experiments observe particle consistent with long-sought Higgs boson",
-		"organization": "CERN",
-		"citation": "CERN, \"CERN experiments observe particle consistent with long-sought Higgs boson.\"",
-		"url": "https://home.cern/news/press-release/cern/cern-experiments-observe-particle-consistent-long-sought-higgs-boson"
-	},
-	"cernShortHistoryWeb": {
-		"shortTitle": "CERN: short history of the Web",
-		"title": "A short history of the Web",
-		"organization": "CERN",
-		"citation": "CERN, \"A short history of the Web.\"",
-		"url": "https://home.cern/science/computing/birth-web/short-history-web"
-	},
-	"chogaMamiWikipedia": {
-		"shortTitle": "Wikipedia: Choga Mami",
-		"title": "Choga Mami",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Choga Mami.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Choga_Mami"
-	},
-	"energyHistoryLightBulb": {
-		"shortTitle": "DOE: history of the light bulb",
-		"title": "The History of the Light Bulb",
-		"organization": "U.S. Department of Energy",
-		"citation": "U.S. Department of Energy, \"The History of the Light Bulb.\"",
-		"url": "https://www.energy.gov/articles/history-light-bulb"
-	},
-	"halafCultureWikipedia": {
-		"shortTitle": "Wikipedia: Halaf culture",
-		"title": "Halaf culture",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Halaf culture.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Halaf_culture"
-	},
-	"historyAlexanderGreat": {
-		"shortTitle": "History: Alexander the Great",
-		"title": "Alexander the Great",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Alexander the Great.\"",
-		"url": "https://www.history.com/articles/alexander-the-great"
-	},
-	"historyAmericanRevolution": {
-		"shortTitle": "History: Revolutionary War",
-		"title": "Revolutionary War",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Revolutionary War.\"",
-		"url": "https://www.history.com/articles/american-revolution-history"
-	},
-	"historyAncientRome": {
-		"shortTitle": "History: Ancient Rome",
-		"title": "Ancient Rome",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Ancient Rome.\"",
-		"url": "https://www.history.com/articles/ancient-rome"
-	},
-	"historyAztecs": {
-		"shortTitle": "History: Aztecs",
-		"title": "Aztecs",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Aztecs.\"",
-		"url": "https://www.history.com/topics/ancient-americas/aztecs"
-	},
-	"historyBlackDeath": {
-		"shortTitle": "History: Black Death",
-		"title": "Black Death",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Black Death.\"",
-		"url": "https://www.history.com/articles/black-death"
-	},
-	"historyByzantineEmpire": {
-		"shortTitle": "History: Byzantine Empire",
-		"title": "Byzantine Empire",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Byzantine Empire.\"",
-		"url": "https://www.history.com/articles/byzantine-empire"
-	},
-	"historyCharlemagne": {
-		"shortTitle": "History: Charlemagne",
-		"title": "Charlemagne",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Charlemagne.\"",
-		"url": "https://www.history.com/articles/charlemagne"
-	},
-	"historyChristopherColumbus": {
-		"shortTitle": "History: Christopher Columbus",
-		"title": "Christopher Columbus",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Christopher Columbus.\"",
-		"url": "https://www.history.com/articles/christopher-columbus"
-	},
-	"historyCrusades": {
-		"shortTitle": "History: Crusades",
-		"title": "Crusades",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Crusades.\"",
-		"url": "https://www.history.com/articles/crusades"
-	},
-	"historyEnglishCivilWars": {
-		"shortTitle": "History: English Civil Wars",
-		"title": "English Civil Wars",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"English Civil Wars.\"",
-		"url": "https://www.history.com/articles/english-civil-wars"
-	},
-	"historyEnlightenment": {
-		"shortTitle": "History: Enlightenment",
-		"title": "Enlightenment",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Enlightenment.\"",
-		"url": "https://www.history.com/articles/enlightenment"
-	},
-	"historyFerdinandMagellan": {
-		"shortTitle": "History: Ferdinand Magellan",
-		"title": "Ferdinand Magellan",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Ferdinand Magellan.\"",
-		"url": "https://www.history.com/articles/ferdinand-magellan"
-	},
-	"historyFrenchRevolution": {
-		"shortTitle": "History: French Revolution",
-		"title": "French Revolution",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"French Revolution.\"",
-		"url": "https://www.history.com/articles/french-revolution"
-	},
-	"historyGenghisKhan": {
-		"shortTitle": "History: Genghis Khan",
-		"title": "Genghis Khan",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Genghis Khan.\"",
-		"url": "https://www.history.com/articles/genghis-khan"
-	},
-	"historyGreatDepression": {
-		"shortTitle": "History: Great Depression",
-		"title": "Great Depression History",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Great Depression History.\"",
-		"url": "https://www.history.com/articles/great-depression-history"
-	},
-	"historyInca": {
-		"shortTitle": "History: Inca",
-		"title": "Inca",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Inca.\"",
-		"url": "https://www.history.com/topics/south-america/inca"
-	},
-	"historyIndustrialRevolution": {
-		"shortTitle": "History: Industrial Revolution",
-		"title": "Industrial Revolution",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Industrial Revolution.\"",
-		"url": "https://www.history.com/articles/industrial-revolution"
-	},
-	"historyIslam": {
-		"shortTitle": "History: Islam",
-		"title": "Islam",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Islam.\"",
-		"url": "https://www.history.com/articles/islam"
-	},
-	"historyJamestown": {
-		"shortTitle": "History: Jamestown Colony",
-		"title": "Jamestown Colony",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Jamestown Colony.\"",
-		"url": "https://www.history.com/articles/jamestown"
-	},
-	"historyMarshallPlan": {
-		"shortTitle": "History: Marshall Plan",
-		"title": "Marshall Plan",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Marshall Plan.\"",
-		"url": "https://www.history.com/articles/marshall-plan"
-	},
-	"historyMeijiRestoration": {
-		"shortTitle": "History: Meiji Restoration",
-		"title": "Meiji Restoration",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Meiji Restoration.\"",
-		"url": "https://www.history.com/articles/meiji-restoration"
-	},
-	"historyMingDynasty": {
-		"shortTitle": "History: Ming Dynasty",
-		"title": "Ming Dynasty",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Ming Dynasty.\"",
-		"url": "https://www.history.com/topics/china/ming-dynasty"
-	},
-	"historyMoonLanding": {
-		"shortTitle": "History: 1969 Moon Landing",
-		"title": "1969 Moon Landing",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"1969 Moon Landing.\"",
-		"url": "https://www.history.com/articles/moon-landing-1969"
-	},
-	"historyOfChinaWikipedia": {
-		"shortTitle": "Wikipedia: History of China",
-		"title": "History of China",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"History of China.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/History_of_China"
-	},
-	"historyOfMayaCivilizationWikipedia": {
-		"shortTitle": "Wikipedia: History of the Maya civilization",
-		"title": "History of the Maya civilization",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"History of the Maya civilization.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/History_of_the_Maya_civilization"
-	},
-	"historyOttomanEmpire": {
-		"shortTitle": "History: Ottoman Empire",
-		"title": "Ottoman Empire",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Ottoman Empire.\"",
-		"url": "https://www.history.com/topics/middle-east/ottoman-empire"
-	},
-	"historyPersianEmpire": {
-		"shortTitle": "History: Persian Empire",
-		"title": "Persian Empire",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Persian Empire.\"",
-		"url": "https://www.history.com/topics/ancient-middle-east/persian-empire"
-	},
-	"historyPrintingPress": {
-		"shortTitle": "History: Printing Press",
-		"title": "Printing Press",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Printing Press.\"",
-		"url": "https://www.history.com/articles/printing-press"
-	},
-	"historyReformation": {
-		"shortTitle": "History: Reformation",
-		"title": "The Reformation",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"The Reformation.\"",
-		"url": "https://www.history.com/articles/reformation"
-	},
-	"historyRussianRevolution": {
-		"shortTitle": "History: Russian Revolution",
-		"title": "Russian Revolution",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Russian Revolution.\"",
-		"url": "https://www.history.com/articles/russian-revolution"
-	},
-	"historySeptember11Attacks": {
-		"shortTitle": "History: September 11 Attacks",
-		"title": "September 11 Attacks",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"September 11 Attacks.\"",
-		"url": "https://www.history.com/articles/9-11-attacks"
-	},
-	"historyStateCubanMissileCrisis": {
-		"shortTitle": "State Dept: Cuban Missile Crisis",
-		"title": "The Cuban Missile Crisis, October 1962",
-		"organization": "U.S. Department of State, Office of the Historian",
-		"citation": "U.S. Department of State, Office of the Historian, \"The Cuban Missile Crisis, October 1962.\"",
-		"url": "https://history.state.gov/milestones/1961-1968/cuban-missile-crisis"
-	},
-	"historyStateFallCommunism": {
-		"shortTitle": "State Dept: fall of communism",
-		"title": "Fall of Communism in Eastern Europe, 1989",
-		"organization": "U.S. Department of State, Office of the Historian",
-		"citation": "U.S. Department of State, Office of the Historian, \"Fall of Communism in Eastern Europe, 1989.\"",
-		"url": "https://history.state.gov/milestones/1989-1992/fall-of-communism"
-	},
-	"historyTelegraph": {
-		"shortTitle": "History: Telegraph",
-		"title": "Morse Code & the Telegraph",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Morse Code & the Telegraph.\"",
-		"url": "https://www.history.com/articles/telegraph"
-	},
-	"historyThirtyYearsWar": {
-		"shortTitle": "History: Thirty Years' War",
-		"title": "Thirty Years' War",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Thirty Years’ War.\"",
-		"url": "https://www.history.com/articles/thirty-years-war"
-	},
-	"historyWorldWarOne": {
-		"shortTitle": "History: World War I",
-		"title": "World War I",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"World War I.\"",
-		"url": "https://www.history.com/articles/world-war-i-history"
-	},
-	"historyWorldWarTwo": {
-		"shortTitle": "History: World War II",
-		"title": "World War II",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"World War II.\"",
-		"url": "https://www.history.com/articles/world-war-ii-history"
-	},
-	"historyWrightBrothers": {
-		"shortTitle": "History: Wright Brothers",
-		"title": "Wright Brothers",
-		"organization": "HISTORY",
-		"citation": "HISTORY.com Editors, \"Wright Brothers.\"",
-		"url": "https://www.history.com/articles/wright-brothers"
-	},
-	"holyRomanEmpireWikipedia": {
-		"shortTitle": "Wikipedia: Holy Roman Empire",
-		"title": "Holy Roman Empire",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Holy Roman Empire.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Holy_Roman_Empire"
-	},
-	"iaeaChernobylFaq": {
-		"shortTitle": "IAEA: Chernobyl FAQs",
-		"title": "Frequently Asked Chernobyl Questions",
-		"organization": "International Atomic Energy Agency",
-		"citation": "International Atomic Energy Agency, \"Frequently Asked Chernobyl Questions.\"",
-		"url": "https://www.iaea.org/topics/chornobyl/faqs"
-	},
-	"investopediaLehmanCollapse": {
-		"shortTitle": "Investopedia: Lehman collapse",
-		"title": "Lehman Brothers Collapse Explained: Causes and Legacy",
-		"organization": "Investopedia",
-		"citation": "Liodis, Nick, \"Lehman Brothers Collapse Explained: Causes and Legacy.\" Investopedia.",
-		"url": "https://www.investopedia.com/articles/economics/09/lehman-brothers-collapse.asp"
-	},
-	"jemdetNasrPeriodWikipedia": {
-		"shortTitle": "Wikipedia: Jemdet Nasr period",
-		"title": "Jemdet Nasr period",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Jemdet Nasr period.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Jemdet_Nasr_period"
-	},
-	"khanGoldenAgeOfIslam": {
-		"shortTitle": "Khan: Golden age of Islam",
-		"title": "The golden age of Islam",
-		"organization": "Khan Academy",
-		"citation": "Khan Academy, \"The golden age of Islam.\"",
-		"url": "https://www.khanacademy.org/humanities/world-history/medieval-times/islam-medieval/a/the-golden-age-of-islam"
-	},
-	"khanNeolithicRevolution": {
-		"shortTitle": "Khan: Neolithic Revolution",
-		"title": "The Neolithic Revolution",
-		"organization": "Khan Academy / Smarthistory",
-		"citation": "Khan Academy, \"The Neolithic Revolution.\"",
-		"url": "https://www.khanacademy.org/humanities/world-history/world-history-beginnings/origin-humans-early-societies/a/the-neolithic-revolution"
-	},
-	"khanPaleolithicCulture": {
-		"shortTitle": "Khan: Paleolithic culture",
-		"title": "Paleolithic technology, culture, and art",
-		"organization": "Khan Academy",
-		"citation": "Khan Academy, \"Paleolithic technology, culture, and art.\"",
-		"url": "https://www.khanacademy.org/humanities/world-history/world-history-beginnings/origin-humans-early-societies/a/paleolithic-culture-and-technology"
-	},
-	"khanRomanEmpire": {
-		"shortTitle": "Khan: Roman Empire",
-		"title": "The Roman Empire",
-		"organization": "Khan Academy",
-		"citation": "Khan Academy, \"The Roman Empire.\"",
-		"url": "https://www.khanacademy.org/humanities/world-history/ancient-medieval/roman/a/roman-empire"
-	},
-	"khanRomanRepublic": {
-		"shortTitle": "Khan: Roman Republic",
-		"title": "The Roman Republic",
-		"organization": "Khan Academy",
-		"citation": "Khan Academy, \"The Roman Republic.\"",
-		"url": "https://www.khanacademy.org/humanities/world-history/ancient-medieval/roman/a/roman-republic"
-	},
-	"khanSongChina": {
-		"shortTitle": "Khan: Song China",
-		"title": "Prosperity in Song China (960-1279)",
-		"organization": "Khan Academy",
-		"citation": "Khan Academy, \"Prosperity in Song China (960-1279).\"",
-		"url": "https://www.khanacademy.org/humanities/world-history/medieval-times/song-china/v/prosperity-in-song-china-960-1279"
-	},
-	"khiamianCultureWikipedia": {
-		"shortTitle": "Wikipedia: Khiamian culture",
-		"title": "Khiamian culture",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Khiamian culture.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Khiamian_culture"
-	},
-	"maliEmpireWikipedia": {
-		"shortTitle": "Wikipedia: Mali Empire",
-		"title": "Mali Empire",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Mali Empire.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Mali_Empire"
-	},
-	"mercedesFirstAutomobile": {
-		"shortTitle": "Mercedes-Benz: first automobile",
-		"title": "1885–1886, The first automobile",
-		"organization": "Mercedes-Benz Group",
-		"citation": "Mercedes-Benz Group, \"1885–1886, The first automobile.\"",
-		"url": "https://group.mercedes-benz.com/company/tradition/company-history/1885-1886.html"
-	},
-	"metAkkadianPeriod": {
-		"shortTitle": "Met: Akkadian period",
-		"title": "The Akkadian Period (ca. 2350–2150 B.C.)",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Department of Ancient Near Eastern Art. \"The Akkadian Period (ca. 2350–2150 B.C.).\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/essays/the-akkadian-period-ca-2350-2150-b-c"
-	},
-	"metAssyria": {
-		"shortTitle": "Met: Assyria",
-		"title": "Assyria, 1365–609 B.C.",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Department of Ancient Near Eastern Art. \"Assyria, 1365–609 B.C.\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/toah/hd/assy/hd_assy.htm"
-	},
-	"metBabylon": {
-		"shortTitle": "Met: Babylon",
-		"title": "Babylon",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Seymour, Michael. \"Babylon.\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/toah/hd/babl/hd_babl.htm"
-	},
-	"metByzantium": {
-		"shortTitle": "Met: Byzantium",
-		"title": "Byzantium (ca. 330–1453)",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "The Metropolitan Museum of Art, \"Byzantium (ca. 330–1453).\"",
-		"url": "https://www.metmuseum.org/toah/hd/byza/hd_byza.htm"
-	},
-	"metChauvet": {
-		"shortTitle": "Met: Chauvet Cave",
-		"title": "Chauvet Cave (ca. 30,000 B.C.)",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Clottes, Jean. \"Chauvet Cave (ca. 30,000 B.C.).\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/toah/hd/chav/hd_chav.htm"
-	},
-	"metEarlyDynasticSculpture": {
-		"shortTitle": "Met: Early Dynastic",
-		"title": "Early Dynastic Sculpture, 2900–2350 B.C.",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Department of Ancient Near Eastern Art. \"Early Dynastic Sculpture, 2900–2350 B.C.\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/toah/hd/edys/hd_edys.htm"
-	},
-	"metIsinLarsaOldBabylonian": {
-		"shortTitle": "Met: Isin-Larsa and Old Babylonian",
-		"title": "The Isin-Larsa and Old Babylonian Periods (2004–1595 B.C.)",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Knott, Elizabeth. \"The Isin-Larsa and Old Babylonian Periods (2004–1595 B.C.).\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/essays/the-isin-larsa-and-old-babylonian-periods-2004-1595-b-c"
-	},
-	"metJiahu": {
-		"shortTitle": "Met: Jiahu",
-		"title": "Jiahu (ca. 7000–5700 B.C.)",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Tedesco, Laura Anne. \"Jiahu (ca. 7000–5700 B.C.).\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/toah/hd/jiah/hd_jiah.htm"
-	},
-	"metMiddleBabylonianKassite": {
-		"shortTitle": "Met: Kassite period",
-		"title": "The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.) in Mesopotamia",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Knott, Elizabeth. \"The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.) in Mesopotamia.\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/essays/the-middle-babylonian-kassite-period-ca-1595-1155-b-c-in-mesopotamia"
-	},
-	"metPrehistoricArt": {
-		"shortTitle": "Met: Prehistoric Art",
-		"title": "Introduction to Prehistoric Art, 20,000–8000 B.C.",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Tedesco, Laura Anne. \"Introduction to Prehistoric Art, 20,000–8000 B.C.\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/toah/hd/preh/hd_preh.htm"
-	},
-	"metUrZiggurat": {
-		"shortTitle": "Met: Ur ziggurat",
-		"title": "Ur: The Ziggurat",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Department of Ancient Near Eastern Art. \"Ur: The Ziggurat.\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/essays/ur-the-ziggurat"
-	},
-	"metUrukFirstCity": {
-		"shortTitle": "Met: Uruk",
-		"title": "Uruk: The First City",
-		"organization": "The Metropolitan Museum of Art",
-		"citation": "Department of Ancient Near Eastern Art. \"Uruk: The First City.\" In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.",
-		"url": "https://www.metmuseum.org/toah/hd/uruk/hd_uruk.htm"
-	},
-	"mureybetWikipedia": {
-		"shortTitle": "Wikipedia: Mureybet",
-		"title": "Mureybet",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Mureybet.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Mureybet"
-	},
-	"natGeoGlobalization": {
-		"shortTitle": "NatGeo: Globalization",
-		"title": "Globalization",
-		"organization": "National Geographic Society",
-		"citation": "National Geographic Society, \"Globalization.\"",
-		"url": "https://education.nationalgeographic.org/resource/globalization/"
-	},
-	"natoFoundingTreaty": {
-		"shortTitle": "NATO: Founding treaty",
-		"title": "Founding treaty",
-		"organization": "North Atlantic Treaty Organization",
-		"citation": "North Atlantic Treaty Organization, \"Founding treaty.\"",
-		"url": "https://www.nato.int/cps/en/natohq/topics_67656.htm"
-	},
-	"natufianCultureWikipedia": {
-		"shortTitle": "Wikipedia: Natufian culture",
-		"title": "Natufian culture",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Natufian culture.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Natufian_culture"
-	},
-	"nevaliCoriWikipedia": {
-		"shortTitle": "Wikipedia: Nevalı Çori",
-		"title": "Nevalı Çori",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Nevalı Çori.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Neval%C4%B1_%C3%87ori"
-	},
-	"nobelMarconiBiographical": {
-		"shortTitle": "Nobel: Guglielmo Marconi",
-		"title": "Guglielmo Marconi, Biographical",
-		"organization": "Nobel Prize Outreach",
-		"citation": "Nobel Prize Outreach, \"Guglielmo Marconi – Biographical.\"",
-		"url": "https://www.nobelprize.org/prizes/physics/1909/marconi/biographical/"
-	},
-	"oecdAiWipsProgram": {
-		"shortTitle": "OECD: AI-WIPS",
-		"title": "AI in Work, Innovation, Productivity and Skills (AI-WIPS)",
-		"organization": "Organisation for Economic Co-operation and Development",
-		"citation": "OECD, \"AI in Work, Innovation, Productivity and Skills (AI-WIPS).\"",
-		"url": "https://www.oecd.org/en/about/programmes/ai-in-work-innovation-productivity-and-skills.html"
-	},
-	"openAiIntroducingChatGpt": {
-		"shortTitle": "OpenAI: Introducing ChatGPT",
-		"title": "Introducing ChatGPT",
-		"organization": "OpenAI",
-		"citation": "OpenAI, \"Introducing ChatGPT.\"",
-		"url": "https://openai.com/index/chatgpt/"
-	},
-	"originsOfAgricultureInWestAsiaWikipedia": {
-		"shortTitle": "Wikipedia: West Asian agriculture origins",
-		"title": "Origins of agriculture in West Asia",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Origins of agriculture in West Asia.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Origins_of_agriculture_in_West_Asia"
-	},
-	"periodo": {
-		"shortTitle": "PeriodO",
-		"title": "PeriodO: A Gazetteer of Period Definitions",
-		"organization": "PeriodO",
-		"citation": "Rabinowitz, A. et al., PeriodO: a public-domain gazetteer of scholarly period definitions.",
-		"url": "https://perio.do/en/"
-	},
-	"prePotteryNeolithicAWikipedia": {
-		"shortTitle": "Wikipedia: Pre-Pottery Neolithic A",
-		"title": "Pre-Pottery Neolithic A",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Pre-Pottery Neolithic A.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Pre-Pottery_Neolithic_A"
-	},
-	"preclassicMayaWikipedia": {
-		"shortTitle": "Wikipedia: Preclassic Maya",
-		"title": "Preclassic Maya",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Preclassic Maya.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Preclassic_Maya"
-	},
-	"qinDynastyWikipedia": {
-		"shortTitle": "Wikipedia: Qin dynasty",
-		"title": "Qin dynasty",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Qin dynasty.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Qin_dynasty"
-	},
-	"qingDynastyWikipedia": {
-		"shortTitle": "Wikipedia: Qing dynasty",
-		"title": "Qing dynasty",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Qing dynasty.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Qing_dynasty"
-	},
-	"samarraCultureWikipedia": {
-		"shortTitle": "Wikipedia: Samarra culture",
-		"title": "Samarra culture",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Samarra culture.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Samarra_culture"
-	},
-	"sasanianEmpireWikipedia": {
-		"shortTitle": "Wikipedia: Sasanian Empire",
-		"title": "Sasanian Empire",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Sasanian Empire.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Sasanian_Empire"
-	},
-	"shangDynastyWikipedia": {
-		"shortTitle": "Wikipedia: Shang dynasty",
-		"title": "Shang dynasty",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Shang dynasty.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Shang_dynasty"
-	},
-	"smithsonianArdipithecusKadabba": {
-		"shortTitle": "Smithsonian: Ardipithecus kadabba",
-		"title": "Ardipithecus kadabba",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Ardipithecus kadabba.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/ardipithecus-kadabba"
-	},
-	"smithsonianArdipithecusRamidus": {
-		"shortTitle": "Smithsonian: Ardipithecus ramidus",
-		"title": "Ardipithecus ramidus",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Ardipithecus ramidus.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/ardipithecus-ramidus"
-	},
-	"smithsonianAustralopithecusAfarensis": {
-		"shortTitle": "Smithsonian: Au. afarensis",
-		"title": "Australopithecus afarensis",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Australopithecus afarensis.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-afarensis"
-	},
-	"smithsonianAustralopithecusAfricanus": {
-		"shortTitle": "Smithsonian: Au. africanus",
-		"title": "Australopithecus africanus",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Australopithecus africanus.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-africanus"
-	},
-	"smithsonianAustralopithecusAnamensis": {
-		"shortTitle": "Smithsonian: Au. anamensis",
-		"title": "Australopithecus anamensis",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Australopithecus anamensis.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-anamensis"
-	},
-	"smithsonianAustralopithecusGarhi": {
-		"shortTitle": "Smithsonian: Au. garhi",
-		"title": "Australopithecus garhi",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Australopithecus garhi.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-garhi"
-	},
-	"smithsonianAustralopithecusSediba": {
-		"shortTitle": "Smithsonian: Au. sediba",
-		"title": "Australopithecus sediba",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Australopithecus sediba.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-sediba"
-	},
-	"smithsonianHomoErectus": {
-		"shortTitle": "Smithsonian: Homo erectus",
-		"title": "Homo erectus",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Homo erectus.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/homo-erectus"
-	},
-	"smithsonianHomoFloresiensis": {
-		"shortTitle": "Smithsonian: Homo floresiensis",
-		"title": "Homo floresiensis",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Homo floresiensis.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/homo-floresiensis"
-	},
-	"smithsonianHomoHabilis": {
-		"shortTitle": "Smithsonian: Homo habilis",
-		"title": "Homo habilis",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Homo habilis.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/homo-habilis"
-	},
-	"smithsonianHomoHeidelbergensis": {
-		"shortTitle": "Smithsonian: Homo heidelbergensis",
-		"title": "Homo heidelbergensis",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Homo heidelbergensis.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/homo-heidelbergensis"
-	},
-	"smithsonianHomoNaledi": {
-		"shortTitle": "Smithsonian: Homo naledi",
-		"title": "Homo naledi",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Homo naledi.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/homo-naledi"
-	},
-	"smithsonianHomoNeanderthalensis": {
-		"shortTitle": "Smithsonian: Neanderthals",
-		"title": "Homo neanderthalensis",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Homo neanderthalensis.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/homo-neanderthalensis"
-	},
-	"smithsonianHomoRudolfensis": {
-		"shortTitle": "Smithsonian: H. rudolfensis",
-		"title": "Homo rudolfensis",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Homo rudolfensis.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/homo-rudolfensis"
-	},
-	"smithsonianHomoSapiens": {
-		"shortTitle": "Smithsonian: Homo sapiens",
-		"title": "Homo sapiens",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Homo sapiens.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/homo-sapiens"
-	},
-	"smithsonianHumanEvolutionIntro": {
-		"shortTitle": "Smithsonian: Human evolution intro",
-		"title": "Introduction to Human Evolution",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Introduction to Human Evolution.\"",
-		"url": "https://humanorigins.si.edu/education/introduction-human-evolution"
-	},
-	"smithsonianHumanFamilyTree": {
-		"shortTitle": "Smithsonian: Family tree",
-		"title": "Human Family Tree",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Human Family Tree.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-family-tree"
-	},
-	"smithsonianHumanOrigins": {
-		"shortTitle": "Smithsonian Human Origins",
-		"title": "Interactive Human Origins Timeline",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Interactive Human Origins Timeline.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-evolution-interactive-timeline"
-	},
-	"smithsonianKenyanthropusPlatyops": {
-		"shortTitle": "Smithsonian: Kenyanthropus",
-		"title": "Kenyanthropus platyops",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Kenyanthropus platyops.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/kenyanthropus-platyops"
-	},
-	"smithsonianOrrorin": {
-		"shortTitle": "Smithsonian: Orrorin",
-		"title": "Orrorin tugenensis",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Orrorin tugenensis.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/orrorin-tugenensis"
-	},
-	"smithsonianParanthropusAethiopicus": {
-		"shortTitle": "Smithsonian: P. aethiopicus",
-		"title": "Paranthropus aethiopicus",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Paranthropus aethiopicus.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/paranthropus-aethiopicus"
-	},
-	"smithsonianParanthropusBoisei": {
-		"shortTitle": "Smithsonian: P. boisei",
-		"title": "Paranthropus boisei",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Paranthropus boisei.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/paranthropus-boisei"
-	},
-	"smithsonianParanthropusRobustus": {
-		"shortTitle": "Smithsonian: P. robustus",
-		"title": "Paranthropus robustus",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Paranthropus robustus.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/paranthropus-robustus"
-	},
-	"smithsonianSahelanthropus": {
-		"shortTitle": "Smithsonian: Sahelanthropus",
-		"title": "Sahelanthropus tchadensis",
-		"organization": "Smithsonian Institution Human Origins Program",
-		"citation": "Smithsonian Institution, Human Origins Program, \"Sahelanthropus tchadensis.\"",
-		"url": "https://humanorigins.si.edu/evidence/human-fossils/species/sahelanthropus-tchadensis"
-	},
-	"tangDynastyWikipedia": {
-		"shortTitle": "Wikipedia: Tang dynasty",
-		"title": "Tang dynasty",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Tang dynasty.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Tang_dynasty"
-	},
-	"trustMeBro": {
-		"shortTitle": "Trust me bro",
-		"title": "Trust me bro",
-		"organization": "Personal bias",
-		"citation": "\"Trust me bro.\""
-	},
-	"ubaidPeriodWikipedia": {
-		"shortTitle": "Wikipedia: Ubaid period",
-		"title": "Ubaid period",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Ubaid period.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Ubaid_period"
-	},
-	"unAntiColonialismDay": {
-		"shortTitle": "UN: Anti-Colonialism Day",
-		"title": "International Day Against Colonialism in All Its Forms and Manifestations",
-		"organization": "United Nations",
-		"citation": "United Nations, \"International Day Against Colonialism in All Its Forms and Manifestations.\"",
-		"url": "https://www.un.org/en/observances/anti-colonialism-day"
-	},
-	"unDecolonization": {
-		"shortTitle": "UN: Decolonization",
-		"title": "Decolonization",
-		"organization": "United Nations",
-		"citation": "United Nations, \"Decolonization.\"",
-		"url": "https://www.un.org/en/global-issues/decolonization"
-	},
-	"unHistoryUnitedNations": {
-		"shortTitle": "UN: History of the UN",
-		"title": "History of the United Nations",
-		"organization": "United Nations",
-		"citation": "United Nations, \"History of the United Nations.\"",
-		"url": "https://www.un.org/en/about-us/history-of-the-un"
-	},
-	"unParisAgreement": {
-		"shortTitle": "UN: Paris Agreement",
-		"title": "The Paris Agreement",
-		"organization": "United Nations",
-		"citation": "United Nations, \"The Paris Agreement.\"",
-		"url": "https://www.un.org/en/climatechange/paris-agreement"
-	},
-	"unUniversalDeclarationHumanRights": {
-		"shortTitle": "UN: UDHR",
-		"title": "Universal Declaration of Human Rights",
-		"organization": "United Nations",
-		"citation": "United Nations, \"Universal Declaration of Human Rights.\"",
-		"url": "https://www.un.org/en/about-us/universal-declaration-of-human-rights"
-	},
-	"unescoCatalhoyuk": {
-		"shortTitle": "UNESCO: Çatalhöyük",
-		"title": "Neolithic Site of Çatalhöyük",
-		"organization": "UNESCO World Heritage Centre",
-		"citation": "UNESCO World Heritage Centre, \"Neolithic Site of Çatalhöyük.\"",
-		"url": "https://whc.unesco.org/en/list/1405/"
-	},
-	"unescoChauvet": {
-		"shortTitle": "UNESCO: Chauvet",
-		"title": "Decorated Cave of Pont d’Arc, known as Grotte Chauvet-Pont d’Arc, Ardèche",
-		"organization": "UNESCO World Heritage Centre",
-		"citation": "UNESCO World Heritage Centre, \"Decorated Cave of Pont d’Arc, known as Grotte Chauvet-Pont d’Arc, Ardèche.\"",
-		"url": "https://whc.unesco.org/en/list/1426/"
-	},
-	"unescoGobekliTepe": {
-		"shortTitle": "UNESCO: Göbekli Tepe",
-		"title": "Göbekli Tepe",
-		"organization": "UNESCO World Heritage Centre",
-		"citation": "UNESCO World Heritage Centre, \"Göbekli Tepe.\"",
-		"url": "https://whc.unesco.org/en/list/1572/"
-	},
-	"unescoMycenaeTiryns": {
-		"shortTitle": "UNESCO: Mycenae",
-		"title": "Archaeological Sites of Mycenae and Tiryns",
-		"organization": "UNESCO World Heritage Centre",
-		"citation": "UNESCO World Heritage Centre, \"Archaeological Sites of Mycenae and Tiryns.\"",
-		"url": "https://whc.unesco.org/en/list/941/"
-	},
-	"unescoStonehenge": {
-		"shortTitle": "UNESCO: Stonehenge",
-		"title": "Stonehenge, Avebury and Associated Sites",
-		"organization": "UNESCO World Heritage Centre",
-		"citation": "UNESCO World Heritage Centre, \"Stonehenge, Avebury and Associated Sites.\"",
-		"url": "https://whc.unesco.org/en/list/373/"
-	},
-	"unescoYinXu": {
-		"shortTitle": "UNESCO: Yin Xu",
-		"title": "Yin Xu",
-		"organization": "UNESCO World Heritage Centre",
-		"citation": "UNESCO World Heritage Centre, \"Yin Xu.\"",
-		"url": "https://whc.unesco.org/en/list/1114/"
-	},
-	"urukPeriodWikipedia": {
-		"shortTitle": "Wikipedia: Uruk period",
-		"title": "Uruk period",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Uruk period.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Uruk_period"
-	},
-	"whoCovid19Pandemic": {
-		"shortTitle": "WHO: COVID-19 pandemic",
-		"title": "Coronavirus disease (COVID-19) pandemic",
-		"organization": "World Health Organization",
-		"citation": "World Health Organization, \"Coronavirus disease (COVID-19) pandemic.\"",
-		"url": "https://www.who.int/europe/emergencies/situations/covid-19"
-	},
-	"whoSmallpoxEradication": {
-		"shortTitle": "WHO: smallpox eradication",
-		"title": "WHO commemorates the 40th anniversary of smallpox eradication",
-		"organization": "World Health Organization",
-		"citation": "World Health Organization, \"WHO commemorates the 40th anniversary of smallpox eradication.\"",
-		"url": "https://www.who.int/news/item/13-12-2019-who-commemorates-the-40th-anniversary-of-smallpox-eradication"
-	},
-	"worldHistoryGreatPyramidGiza": {
-		"shortTitle": "WHE: Great Pyramid",
-		"title": "Great Pyramid of Giza",
-		"organization": "World History Encyclopedia",
-		"citation": "Mark, Joshua J., \"Great Pyramid of Giza.\" World History Encyclopedia.",
-		"url": "https://www.worldhistory.org/Great_Pyramid_of_Giza/"
-	},
-	"worldHistoryNeoAssyrianEmpire": {
-		"shortTitle": "WHE: Neo-Assyrian Empire",
-		"title": "Neo-Assyrian Empire",
-		"organization": "World History Encyclopedia",
-		"citation": "Mark, Joshua J. \"Neo-Assyrian Empire.\" World History Encyclopedia.",
-		"url": "https://www.worldhistory.org/Neo-Assyrian_Empire/"
-	},
-	"yuanDynastyWikipedia": {
-		"shortTitle": "Wikipedia: Yuan dynasty",
-		"title": "Yuan dynasty",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Yuan dynasty.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Yuan_dynasty"
-	},
-	"zhouDynastyWikipedia": {
-		"shortTitle": "Wikipedia: Zhou dynasty",
-		"title": "Zhou dynasty",
-		"organization": "Wikimedia Foundation",
-		"citation": "Wikipedia contributors, \"Zhou dynasty.\" In Wikipedia, The Free Encyclopedia.",
-		"url": "https://en.wikipedia.org/wiki/Zhou_dynasty"
-	}
+  appleIPhoneIntroduction: {
+    shortTitle: "Apple: iPhone introduced",
+    title: "Apple Reinvents the Phone with iPhone",
+    organization: "Apple",
+    citation: 'Apple, "Apple Reinvents the Phone with iPhone."',
+    url: "https://www.apple.com/newsroom/2007/01/09Apple-Reinvents-the-Phone-with-iPhone/",
+  },
+  britannicaAkkad: {
+    shortTitle: "Britannica: Akkad",
+    title: "Akkad",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Akkad."',
+    url: "https://www.britannica.com/place/Akkad",
+  },
+  britannicaAncientEgypt: {
+    shortTitle: "Britannica: Ancient Egypt",
+    title: "ancient Egypt",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "ancient Egypt."',
+    url: "https://www.britannica.com/place/ancient-Egypt",
+  },
+  britannicaAncientGreece: {
+    shortTitle: "Britannica: ancient Greece",
+    title: "ancient Greek civilization",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "ancient Greek civilization."',
+    url: "https://www.britannica.com/place/ancient-Greece",
+  },
+  britannicaBabylonia: {
+    shortTitle: "Britannica: Babylonia",
+    title: "Babylonia",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Babylonia."',
+    url: "https://www.britannica.com/place/Babylonia",
+  },
+  britannicaBronzeAge: {
+    shortTitle: "Britannica: Bronze Age",
+    title: "Bronze Age",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Bronze Age."',
+    url: "https://www.britannica.com/topic/Bronze-Age",
+  },
+  britannicaCarthage: {
+    shortTitle: "Britannica: Carthage",
+    title: "Carthage",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Carthage."',
+    url: "https://www.britannica.com/place/Carthage-ancient-city-Tunisia",
+  },
+  britannicaClassicalAntiquity: {
+    shortTitle: "Britannica: Classical antiquity",
+    title: "Classical antiquity",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Classical antiquity."',
+    url: "https://www.britannica.com/event/classical-antiquity",
+  },
+  britannicaColdWar: {
+    shortTitle: "Britannica: Cold War",
+    title: "Cold War",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Cold War."',
+    url: "https://www.britannica.com/event/Cold-War",
+  },
+  britannicaEncyclopedie: {
+    shortTitle: "Britannica: Encyclopédie",
+    title: "Encyclopédie",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Encyclopédie."',
+    url: "https://www.britannica.com/topic/Encyclopedie",
+  },
+  britannicaGermanEmpire: {
+    shortTitle: "Britannica: German Empire",
+    title: "German Empire",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "German Empire."',
+    url: "https://www.britannica.com/place/German-Empire",
+  },
+  britannicaHammurabi: {
+    shortTitle: "Britannica: Hammurabi",
+    title: "Hammurabi",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Hammurabi."',
+    url: "https://www.britannica.com/biography/Hammurabi",
+  },
+  britannicaHanDynasty: {
+    shortTitle: "Britannica: Han dynasty",
+    title: "Han dynasty",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Han dynasty."',
+    url: "https://www.britannica.com/topic/Han-dynasty",
+  },
+  britannicaHellenisticAge: {
+    shortTitle: "Britannica: Hellenistic age",
+    title: "Hellenistic age",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Hellenistic age."',
+    url: "https://www.britannica.com/event/Hellenistic-Age",
+  },
+  britannicaHittiteEmpire: {
+    shortTitle: "Britannica: Hittites",
+    title: "The Hittite empire, c. 1650–1180 BCE",
+    organization: "Encyclopaedia Britannica",
+    citation:
+      'Encyclopaedia Britannica, "Anatolia: The Hittite empire, c. 1650–1180 BCE."',
+    url: "https://www.britannica.com/place/Anatolia/The-Hittite-empire-c-1650-1180-bce",
+  },
+  britannicaIndusCivilization: {
+    shortTitle: "Britannica: Indus civilization",
+    title: "Indus civilization",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Indus civilization."',
+    url: "https://www.britannica.com/topic/Indus-civilization",
+  },
+  britannicaIranianRevolution: {
+    shortTitle: "Britannica: Iranian Revolution",
+    title: "Iranian Revolution",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Iranian Revolution."',
+    url: "https://www.britannica.com/event/Iranian-Revolution",
+  },
+  britannicaIronAge: {
+    shortTitle: "Britannica: Iron Age",
+    title: "Iron Age",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Iron Age."',
+    url: "https://www.britannica.com/topic/Iron-Age",
+  },
+  britannicaMehrgarh: {
+    shortTitle: "Britannica: Mehrgarh",
+    title: "Mehrgarh",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Mehrgarh."',
+    url: "https://www.britannica.com/place/Mehrgarh",
+  },
+  britannicaMesopotamia: {
+    shortTitle: "Britannica: Mesopotamia",
+    title: "history of Mesopotamia",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "history of Mesopotamia."',
+    url: "https://www.britannica.com/place/Mesopotamia-historical-region-Asia",
+  },
+  britannicaMetallurgy: {
+    shortTitle: "Britannica: Metallurgy",
+    title: "metallurgy",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "metallurgy."',
+    url: "https://www.britannica.com/science/metallurgy",
+  },
+  britannicaMiddleEast: {
+    shortTitle: "Britannica: Middle East",
+    title: "Middle East",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Middle East."',
+    url: "https://www.britannica.com/place/Middle-East",
+  },
+  britannicaMongolEmpire: {
+    shortTitle: "Britannica: Mongol empire",
+    title: "Mongol empire",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Mongol empire."',
+    url: "https://www.britannica.com/topic/Mongol-empire",
+  },
+  britannicaRevolutionsOf1848: {
+    shortTitle: "Britannica: Revolutions of 1848",
+    title: "Revolutions of 1848",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Revolutions of 1848."',
+    url: "https://www.britannica.com/event/Revolutions-of-1848",
+  },
+  britannicaRisorgimento: {
+    shortTitle: "Britannica: Risorgimento",
+    title: "Risorgimento",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Risorgimento."',
+    url: "https://www.britannica.com/event/Risorgimento",
+  },
+  britannicaScrambleForAfrica: {
+    shortTitle: "Britannica: Scramble for Africa",
+    title: "Scramble for Africa",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Scramble for Africa."',
+    url: "https://www.britannica.com/event/Scramble-for-Africa",
+  },
+  britannicaSiegeOfVienna: {
+    shortTitle: "Britannica: Siege of Vienna",
+    title: "Siege of Vienna",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Siege of Vienna."',
+    url: "https://www.britannica.com/event/Siege-of-Vienna-1683",
+  },
+  britannicaSovietCollapse: {
+    shortTitle: "Britannica: Soviet collapse",
+    title: "collapse of the Soviet Union",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "collapse of the Soviet Union."',
+    url: "https://www.britannica.com/event/the-collapse-of-the-Soviet-Union",
+  },
+  britannicaSumer: {
+    shortTitle: "Britannica: Sumer",
+    title: "Sumer",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Sumer."',
+    url: "https://www.britannica.com/place/Sumer",
+  },
+  britannicaTelephone: {
+    shortTitle: "Britannica: telephone",
+    title: "telephone",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "telephone."',
+    url: "https://www.britannica.com/technology/telephone",
+  },
+  britannicaTitanic: {
+    shortTitle: "Britannica: Titanic",
+    title: "Titanic",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Titanic."',
+    url: "https://www.britannica.com/topic/Titanic",
+  },
+  britannicaVietnamWar: {
+    shortTitle: "Britannica: Vietnam War",
+    title: "Vietnam War",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Vietnam War."',
+    url: "https://www.britannica.com/event/Vietnam-War",
+  },
+  britannicaWheel: {
+    shortTitle: "Britannica: wheel",
+    title: "wheel",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "wheel."',
+    url: "https://www.britannica.com/technology/wheel",
+  },
+  britannicaYuriGagarin: {
+    shortTitle: "Britannica: Yuri Gagarin",
+    title: "Yuri Gagarin",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Yuri Gagarin."',
+    url: "https://www.britannica.com/biography/Yuri-Gagarin",
+  },
+  cayonuWikipedia: {
+    shortTitle: "Wikipedia: Çayönü",
+    title: "Çayönü",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Çayönü." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/%C3%87ay%C3%B6n%C3%BC",
+  },
+  cernBirthWeb: {
+    shortTitle: "CERN: birth of the Web",
+    title: "The birth of the Web",
+    organization: "CERN",
+    citation: 'CERN, "The birth of the Web."',
+    url: "https://home.cern/science/computing/birth-web",
+  },
+  humanCernHiggsBoson2012: {
+    shortTitle: "CERN: Higgs boson announcement",
+    title:
+      "CERN experiments observe particle consistent with long-sought Higgs boson",
+    organization: "CERN",
+    citation:
+      'CERN, "CERN experiments observe particle consistent with long-sought Higgs boson."',
+    url: "https://home.cern/news/press-release/cern/cern-experiments-observe-particle-consistent-long-sought-higgs-boson",
+  },
+  cernShortHistoryWeb: {
+    shortTitle: "CERN: short history of the Web",
+    title: "A short history of the Web",
+    organization: "CERN",
+    citation: 'CERN, "A short history of the Web."',
+    url: "https://home.cern/science/computing/birth-web/short-history-web",
+  },
+  chogaMamiWikipedia: {
+    shortTitle: "Wikipedia: Choga Mami",
+    title: "Choga Mami",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Choga Mami." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Choga_Mami",
+  },
+  energyHistoryLightBulb: {
+    shortTitle: "DOE: history of the light bulb",
+    title: "The History of the Light Bulb",
+    organization: "U.S. Department of Energy",
+    citation: 'U.S. Department of Energy, "The History of the Light Bulb."',
+    url: "https://www.energy.gov/articles/history-light-bulb",
+  },
+  halafCultureWikipedia: {
+    shortTitle: "Wikipedia: Halaf culture",
+    title: "Halaf culture",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Halaf culture." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Halaf_culture",
+  },
+  historyAlexanderGreat: {
+    shortTitle: "History: Alexander the Great",
+    title: "Alexander the Great",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Alexander the Great."',
+    url: "https://www.history.com/articles/alexander-the-great",
+  },
+  historyAmericanRevolution: {
+    shortTitle: "History: Revolutionary War",
+    title: "Revolutionary War",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Revolutionary War."',
+    url: "https://www.history.com/articles/american-revolution-history",
+  },
+  historyAncientRome: {
+    shortTitle: "History: Ancient Rome",
+    title: "Ancient Rome",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Ancient Rome."',
+    url: "https://www.history.com/articles/ancient-rome",
+  },
+  historyAztecs: {
+    shortTitle: "History: Aztecs",
+    title: "Aztecs",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Aztecs."',
+    url: "https://www.history.com/topics/ancient-americas/aztecs",
+  },
+  historyBlackDeath: {
+    shortTitle: "History: Black Death",
+    title: "Black Death",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Black Death."',
+    url: "https://www.history.com/articles/black-death",
+  },
+  historyByzantineEmpire: {
+    shortTitle: "History: Byzantine Empire",
+    title: "Byzantine Empire",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Byzantine Empire."',
+    url: "https://www.history.com/articles/byzantine-empire",
+  },
+  historyCharlemagne: {
+    shortTitle: "History: Charlemagne",
+    title: "Charlemagne",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Charlemagne."',
+    url: "https://www.history.com/articles/charlemagne",
+  },
+  historyChristopherColumbus: {
+    shortTitle: "History: Christopher Columbus",
+    title: "Christopher Columbus",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Christopher Columbus."',
+    url: "https://www.history.com/articles/christopher-columbus",
+  },
+  historyCrusades: {
+    shortTitle: "History: Crusades",
+    title: "Crusades",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Crusades."',
+    url: "https://www.history.com/articles/crusades",
+  },
+  historyEnglishCivilWars: {
+    shortTitle: "History: English Civil Wars",
+    title: "English Civil Wars",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "English Civil Wars."',
+    url: "https://www.history.com/articles/english-civil-wars",
+  },
+  historyEnlightenment: {
+    shortTitle: "History: Enlightenment",
+    title: "Enlightenment",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Enlightenment."',
+    url: "https://www.history.com/articles/enlightenment",
+  },
+  historyFerdinandMagellan: {
+    shortTitle: "History: Ferdinand Magellan",
+    title: "Ferdinand Magellan",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Ferdinand Magellan."',
+    url: "https://www.history.com/articles/ferdinand-magellan",
+  },
+  historyFrenchRevolution: {
+    shortTitle: "History: French Revolution",
+    title: "French Revolution",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "French Revolution."',
+    url: "https://www.history.com/articles/french-revolution",
+  },
+  historyGenghisKhan: {
+    shortTitle: "History: Genghis Khan",
+    title: "Genghis Khan",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Genghis Khan."',
+    url: "https://www.history.com/articles/genghis-khan",
+  },
+  historyGreatDepression: {
+    shortTitle: "History: Great Depression",
+    title: "Great Depression History",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Great Depression History."',
+    url: "https://www.history.com/articles/great-depression-history",
+  },
+  historyInca: {
+    shortTitle: "History: Inca",
+    title: "Inca",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Inca."',
+    url: "https://www.history.com/topics/south-america/inca",
+  },
+  historyIndustrialRevolution: {
+    shortTitle: "History: Industrial Revolution",
+    title: "Industrial Revolution",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Industrial Revolution."',
+    url: "https://www.history.com/articles/industrial-revolution",
+  },
+  historyIslam: {
+    shortTitle: "History: Islam",
+    title: "Islam",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Islam."',
+    url: "https://www.history.com/articles/islam",
+  },
+  historyJamestown: {
+    shortTitle: "History: Jamestown Colony",
+    title: "Jamestown Colony",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Jamestown Colony."',
+    url: "https://www.history.com/articles/jamestown",
+  },
+  historyMarshallPlan: {
+    shortTitle: "History: Marshall Plan",
+    title: "Marshall Plan",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Marshall Plan."',
+    url: "https://www.history.com/articles/marshall-plan",
+  },
+  historyMeijiRestoration: {
+    shortTitle: "History: Meiji Restoration",
+    title: "Meiji Restoration",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Meiji Restoration."',
+    url: "https://www.history.com/articles/meiji-restoration",
+  },
+  historyMingDynasty: {
+    shortTitle: "History: Ming Dynasty",
+    title: "Ming Dynasty",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Ming Dynasty."',
+    url: "https://www.history.com/topics/china/ming-dynasty",
+  },
+  historyMoonLanding: {
+    shortTitle: "History: 1969 Moon Landing",
+    title: "1969 Moon Landing",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "1969 Moon Landing."',
+    url: "https://www.history.com/articles/moon-landing-1969",
+  },
+  historyOfChinaWikipedia: {
+    shortTitle: "Wikipedia: History of China",
+    title: "History of China",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "History of China." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/History_of_China",
+  },
+  historyOfMayaCivilizationWikipedia: {
+    shortTitle: "Wikipedia: History of the Maya civilization",
+    title: "History of the Maya civilization",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "History of the Maya civilization." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/History_of_the_Maya_civilization",
+  },
+  historyOttomanEmpire: {
+    shortTitle: "History: Ottoman Empire",
+    title: "Ottoman Empire",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Ottoman Empire."',
+    url: "https://www.history.com/topics/middle-east/ottoman-empire",
+  },
+  historyPersianEmpire: {
+    shortTitle: "History: Persian Empire",
+    title: "Persian Empire",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Persian Empire."',
+    url: "https://www.history.com/topics/ancient-middle-east/persian-empire",
+  },
+  historyPrintingPress: {
+    shortTitle: "History: Printing Press",
+    title: "Printing Press",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Printing Press."',
+    url: "https://www.history.com/articles/printing-press",
+  },
+  historyReformation: {
+    shortTitle: "History: Reformation",
+    title: "The Reformation",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "The Reformation."',
+    url: "https://www.history.com/articles/reformation",
+  },
+  historyRussianRevolution: {
+    shortTitle: "History: Russian Revolution",
+    title: "Russian Revolution",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Russian Revolution."',
+    url: "https://www.history.com/articles/russian-revolution",
+  },
+  historySeptember11Attacks: {
+    shortTitle: "History: September 11 Attacks",
+    title: "September 11 Attacks",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "September 11 Attacks."',
+    url: "https://www.history.com/articles/9-11-attacks",
+  },
+  historyStateCubanMissileCrisis: {
+    shortTitle: "State Dept: Cuban Missile Crisis",
+    title: "The Cuban Missile Crisis, October 1962",
+    organization: "U.S. Department of State, Office of the Historian",
+    citation:
+      'U.S. Department of State, Office of the Historian, "The Cuban Missile Crisis, October 1962."',
+    url: "https://history.state.gov/milestones/1961-1968/cuban-missile-crisis",
+  },
+  historyStateFallCommunism: {
+    shortTitle: "State Dept: fall of communism",
+    title: "Fall of Communism in Eastern Europe, 1989",
+    organization: "U.S. Department of State, Office of the Historian",
+    citation:
+      'U.S. Department of State, Office of the Historian, "Fall of Communism in Eastern Europe, 1989."',
+    url: "https://history.state.gov/milestones/1989-1992/fall-of-communism",
+  },
+  historyTelegraph: {
+    shortTitle: "History: Telegraph",
+    title: "Morse Code & the Telegraph",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Morse Code & the Telegraph."',
+    url: "https://www.history.com/articles/telegraph",
+  },
+  historyThirtyYearsWar: {
+    shortTitle: "History: Thirty Years' War",
+    title: "Thirty Years' War",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Thirty Years’ War."',
+    url: "https://www.history.com/articles/thirty-years-war",
+  },
+  historyWorldWarOne: {
+    shortTitle: "History: World War I",
+    title: "World War I",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "World War I."',
+    url: "https://www.history.com/articles/world-war-i-history",
+  },
+  historyWorldWarTwo: {
+    shortTitle: "History: World War II",
+    title: "World War II",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "World War II."',
+    url: "https://www.history.com/articles/world-war-ii-history",
+  },
+  historyWrightBrothers: {
+    shortTitle: "History: Wright Brothers",
+    title: "Wright Brothers",
+    organization: "HISTORY",
+    citation: 'HISTORY.com Editors, "Wright Brothers."',
+    url: "https://www.history.com/articles/wright-brothers",
+  },
+  holyRomanEmpireWikipedia: {
+    shortTitle: "Wikipedia: Holy Roman Empire",
+    title: "Holy Roman Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Holy Roman Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Holy_Roman_Empire",
+  },
+  iaeaChernobylFaq: {
+    shortTitle: "IAEA: Chernobyl FAQs",
+    title: "Frequently Asked Chernobyl Questions",
+    organization: "International Atomic Energy Agency",
+    citation:
+      'International Atomic Energy Agency, "Frequently Asked Chernobyl Questions."',
+    url: "https://www.iaea.org/topics/chornobyl/faqs",
+  },
+  investopediaLehmanCollapse: {
+    shortTitle: "Investopedia: Lehman collapse",
+    title: "Lehman Brothers Collapse Explained: Causes and Legacy",
+    organization: "Investopedia",
+    citation:
+      'Liodis, Nick, "Lehman Brothers Collapse Explained: Causes and Legacy." Investopedia.',
+    url: "https://www.investopedia.com/articles/economics/09/lehman-brothers-collapse.asp",
+  },
+  jemdetNasrPeriodWikipedia: {
+    shortTitle: "Wikipedia: Jemdet Nasr period",
+    title: "Jemdet Nasr period",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Jemdet Nasr period." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Jemdet_Nasr_period",
+  },
+  humanKhanGoldenAgeOfIslam: {
+    shortTitle: "Khan: Golden age of Islam",
+    title: "The golden age of Islam",
+    organization: "Khan Academy",
+    citation: 'Khan Academy, "The golden age of Islam."',
+    url: "https://www.khanacademy.org/humanities/world-history/medieval-times/islam-medieval/a/the-golden-age-of-islam",
+  },
+  khanNeolithicRevolution: {
+    shortTitle: "Khan: Neolithic Revolution",
+    title: "The Neolithic Revolution",
+    organization: "Khan Academy / Smarthistory",
+    citation: 'Khan Academy, "The Neolithic Revolution."',
+    url: "https://www.khanacademy.org/humanities/world-history/world-history-beginnings/origin-humans-early-societies/a/the-neolithic-revolution",
+  },
+  khanPaleolithicCulture: {
+    shortTitle: "Khan: Paleolithic culture",
+    title: "Paleolithic technology, culture, and art",
+    organization: "Khan Academy",
+    citation: 'Khan Academy, "Paleolithic technology, culture, and art."',
+    url: "https://www.khanacademy.org/humanities/world-history/world-history-beginnings/origin-humans-early-societies/a/paleolithic-culture-and-technology",
+  },
+  khanRomanEmpire: {
+    shortTitle: "Khan: Roman Empire",
+    title: "The Roman Empire",
+    organization: "Khan Academy",
+    citation: 'Khan Academy, "The Roman Empire."',
+    url: "https://www.khanacademy.org/humanities/world-history/ancient-medieval/roman/a/roman-empire",
+  },
+  khanRomanRepublic: {
+    shortTitle: "Khan: Roman Republic",
+    title: "The Roman Republic",
+    organization: "Khan Academy",
+    citation: 'Khan Academy, "The Roman Republic."',
+    url: "https://www.khanacademy.org/humanities/world-history/ancient-medieval/roman/a/roman-republic",
+  },
+  khanSongChina: {
+    shortTitle: "Khan: Song China",
+    title: "Prosperity in Song China (960-1279)",
+    organization: "Khan Academy",
+    citation: 'Khan Academy, "Prosperity in Song China (960-1279)."',
+    url: "https://www.khanacademy.org/humanities/world-history/medieval-times/song-china/v/prosperity-in-song-china-960-1279",
+  },
+  khiamianCultureWikipedia: {
+    shortTitle: "Wikipedia: Khiamian culture",
+    title: "Khiamian culture",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Khiamian culture." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Khiamian_culture",
+  },
+  maliEmpireWikipedia: {
+    shortTitle: "Wikipedia: Mali Empire",
+    title: "Mali Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Mali Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Mali_Empire",
+  },
+  mercedesFirstAutomobile: {
+    shortTitle: "Mercedes-Benz: first automobile",
+    title: "1885–1886, The first automobile",
+    organization: "Mercedes-Benz Group",
+    citation: 'Mercedes-Benz Group, "1885–1886, The first automobile."',
+    url: "https://group.mercedes-benz.com/company/tradition/company-history/1885-1886.html",
+  },
+  metAkkadianPeriod: {
+    shortTitle: "Met: Akkadian period",
+    title: "The Akkadian Period (ca. 2350–2150 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "The Akkadian Period (ca. 2350–2150 B.C.)." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/essays/the-akkadian-period-ca-2350-2150-b-c",
+  },
+  metAssyria: {
+    shortTitle: "Met: Assyria",
+    title: "Assyria, 1365–609 B.C.",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "Assyria, 1365–609 B.C." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/assy/hd_assy.htm",
+  },
+  metBabylon: {
+    shortTitle: "Met: Babylon",
+    title: "Babylon",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Seymour, Michael. "Babylon." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/babl/hd_babl.htm",
+  },
+  metByzantium: {
+    shortTitle: "Met: Byzantium",
+    title: "Byzantium (ca. 330–1453)",
+    organization: "The Metropolitan Museum of Art",
+    citation: 'The Metropolitan Museum of Art, "Byzantium (ca. 330–1453)."',
+    url: "https://www.metmuseum.org/toah/hd/byza/hd_byza.htm",
+  },
+  metChauvet: {
+    shortTitle: "Met: Chauvet Cave",
+    title: "Chauvet Cave (ca. 30,000 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Clottes, Jean. "Chauvet Cave (ca. 30,000 B.C.)." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/chav/hd_chav.htm",
+  },
+  metEarlyDynasticSculpture: {
+    shortTitle: "Met: Early Dynastic",
+    title: "Early Dynastic Sculpture, 2900–2350 B.C.",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "Early Dynastic Sculpture, 2900–2350 B.C." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/edys/hd_edys.htm",
+  },
+  metIsinLarsaOldBabylonian: {
+    shortTitle: "Met: Isin-Larsa and Old Babylonian",
+    title: "The Isin-Larsa and Old Babylonian Periods (2004–1595 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Knott, Elizabeth. "The Isin-Larsa and Old Babylonian Periods (2004–1595 B.C.)." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/essays/the-isin-larsa-and-old-babylonian-periods-2004-1595-b-c",
+  },
+  metJiahu: {
+    shortTitle: "Met: Jiahu",
+    title: "Jiahu (ca. 7000–5700 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Tedesco, Laura Anne. "Jiahu (ca. 7000–5700 B.C.)." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/jiah/hd_jiah.htm",
+  },
+  metMiddleBabylonianKassite: {
+    shortTitle: "Met: Kassite period",
+    title:
+      "The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.) in Mesopotamia",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Knott, Elizabeth. "The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.) in Mesopotamia." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/essays/the-middle-babylonian-kassite-period-ca-1595-1155-b-c-in-mesopotamia",
+  },
+  metPrehistoricArt: {
+    shortTitle: "Met: Prehistoric Art",
+    title: "Introduction to Prehistoric Art, 20,000–8000 B.C.",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Tedesco, Laura Anne. "Introduction to Prehistoric Art, 20,000–8000 B.C." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/preh/hd_preh.htm",
+  },
+  metUrZiggurat: {
+    shortTitle: "Met: Ur ziggurat",
+    title: "Ur: The Ziggurat",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "Ur: The Ziggurat." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/essays/ur-the-ziggurat",
+  },
+  metUrukFirstCity: {
+    shortTitle: "Met: Uruk",
+    title: "Uruk: The First City",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "Uruk: The First City." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/toah/hd/uruk/hd_uruk.htm",
+  },
+  mureybetWikipedia: {
+    shortTitle: "Wikipedia: Mureybet",
+    title: "Mureybet",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Mureybet." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Mureybet",
+  },
+  natGeoGlobalization: {
+    shortTitle: "NatGeo: Globalization",
+    title: "Globalization",
+    organization: "National Geographic Society",
+    citation: 'National Geographic Society, "Globalization."',
+    url: "https://education.nationalgeographic.org/resource/globalization/",
+  },
+  natoFoundingTreaty: {
+    shortTitle: "NATO: Founding treaty",
+    title: "Founding treaty",
+    organization: "North Atlantic Treaty Organization",
+    citation: 'North Atlantic Treaty Organization, "Founding treaty."',
+    url: "https://www.nato.int/cps/en/natohq/topics_67656.htm",
+  },
+  natufianCultureWikipedia: {
+    shortTitle: "Wikipedia: Natufian culture",
+    title: "Natufian culture",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Natufian culture." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Natufian_culture",
+  },
+  nevaliCoriWikipedia: {
+    shortTitle: "Wikipedia: Nevalı Çori",
+    title: "Nevalı Çori",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Nevalı Çori." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Neval%C4%B1_%C3%87ori",
+  },
+  nobelMarconiBiographical: {
+    shortTitle: "Nobel: Guglielmo Marconi",
+    title: "Guglielmo Marconi, Biographical",
+    organization: "Nobel Prize Outreach",
+    citation: 'Nobel Prize Outreach, "Guglielmo Marconi – Biographical."',
+    url: "https://www.nobelprize.org/prizes/physics/1909/marconi/biographical/",
+  },
+  oecdAiWipsProgram: {
+    shortTitle: "OECD: AI-WIPS",
+    title: "AI in Work, Innovation, Productivity and Skills (AI-WIPS)",
+    organization: "Organisation for Economic Co-operation and Development",
+    citation:
+      'OECD, "AI in Work, Innovation, Productivity and Skills (AI-WIPS)."',
+    url: "https://www.oecd.org/en/about/programmes/ai-in-work-innovation-productivity-and-skills.html",
+  },
+  openAiIntroducingChatGpt: {
+    shortTitle: "OpenAI: Introducing ChatGPT",
+    title: "Introducing ChatGPT",
+    organization: "OpenAI",
+    citation: 'OpenAI, "Introducing ChatGPT."',
+    url: "https://openai.com/index/chatgpt/",
+  },
+  originsOfAgricultureInWestAsiaWikipedia: {
+    shortTitle: "Wikipedia: West Asian agriculture origins",
+    title: "Origins of agriculture in West Asia",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Origins of agriculture in West Asia." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Origins_of_agriculture_in_West_Asia",
+  },
+  periodo: {
+    shortTitle: "PeriodO",
+    title: "PeriodO: A Gazetteer of Period Definitions",
+    organization: "PeriodO",
+    citation:
+      "Rabinowitz, A. et al., PeriodO: a public-domain gazetteer of scholarly period definitions.",
+    url: "https://perio.do/en/",
+  },
+  prePotteryNeolithicAWikipedia: {
+    shortTitle: "Wikipedia: Pre-Pottery Neolithic A",
+    title: "Pre-Pottery Neolithic A",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Pre-Pottery Neolithic A." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Pre-Pottery_Neolithic_A",
+  },
+  preclassicMayaWikipedia: {
+    shortTitle: "Wikipedia: Preclassic Maya",
+    title: "Preclassic Maya",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Preclassic Maya." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Preclassic_Maya",
+  },
+  qinDynastyWikipedia: {
+    shortTitle: "Wikipedia: Qin dynasty",
+    title: "Qin dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Qin dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Qin_dynasty",
+  },
+  qingDynastyWikipedia: {
+    shortTitle: "Wikipedia: Qing dynasty",
+    title: "Qing dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Qing dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Qing_dynasty",
+  },
+  samarraCultureWikipedia: {
+    shortTitle: "Wikipedia: Samarra culture",
+    title: "Samarra culture",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Samarra culture." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Samarra_culture",
+  },
+  sasanianEmpireWikipedia: {
+    shortTitle: "Wikipedia: Sasanian Empire",
+    title: "Sasanian Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Sasanian Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Sasanian_Empire",
+  },
+  shangDynastyWikipedia: {
+    shortTitle: "Wikipedia: Shang dynasty",
+    title: "Shang dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Shang dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Shang_dynasty",
+  },
+  smithsonianArdipithecusKadabba: {
+    shortTitle: "Smithsonian: Ardipithecus kadabba",
+    title: "Ardipithecus kadabba",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Ardipithecus kadabba."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/ardipithecus-kadabba",
+  },
+  smithsonianArdipithecusRamidus: {
+    shortTitle: "Smithsonian: Ardipithecus ramidus",
+    title: "Ardipithecus ramidus",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Ardipithecus ramidus."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/ardipithecus-ramidus",
+  },
+  smithsonianAustralopithecusAfarensis: {
+    shortTitle: "Smithsonian: Au. afarensis",
+    title: "Australopithecus afarensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Australopithecus afarensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-afarensis",
+  },
+  smithsonianAustralopithecusAfricanus: {
+    shortTitle: "Smithsonian: Au. africanus",
+    title: "Australopithecus africanus",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Australopithecus africanus."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-africanus",
+  },
+  smithsonianAustralopithecusAnamensis: {
+    shortTitle: "Smithsonian: Au. anamensis",
+    title: "Australopithecus anamensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Australopithecus anamensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-anamensis",
+  },
+  smithsonianAustralopithecusGarhi: {
+    shortTitle: "Smithsonian: Au. garhi",
+    title: "Australopithecus garhi",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Australopithecus garhi."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-garhi",
+  },
+  smithsonianAustralopithecusSediba: {
+    shortTitle: "Smithsonian: Au. sediba",
+    title: "Australopithecus sediba",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Australopithecus sediba."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/australopithecus-sediba",
+  },
+  smithsonianHomoErectus: {
+    shortTitle: "Smithsonian: Homo erectus",
+    title: "Homo erectus",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation: 'Smithsonian Institution, Human Origins Program, "Homo erectus."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-erectus",
+  },
+  smithsonianHomoFloresiensis: {
+    shortTitle: "Smithsonian: Homo floresiensis",
+    title: "Homo floresiensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo floresiensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-floresiensis",
+  },
+  smithsonianHomoHabilis: {
+    shortTitle: "Smithsonian: Homo habilis",
+    title: "Homo habilis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation: 'Smithsonian Institution, Human Origins Program, "Homo habilis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-habilis",
+  },
+  smithsonianHomoHeidelbergensis: {
+    shortTitle: "Smithsonian: Homo heidelbergensis",
+    title: "Homo heidelbergensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo heidelbergensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-heidelbergensis",
+  },
+  smithsonianHomoNaledi: {
+    shortTitle: "Smithsonian: Homo naledi",
+    title: "Homo naledi",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation: 'Smithsonian Institution, Human Origins Program, "Homo naledi."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-naledi",
+  },
+  smithsonianHomoNeanderthalensis: {
+    shortTitle: "Smithsonian: Neanderthals",
+    title: "Homo neanderthalensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo neanderthalensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-neanderthalensis",
+  },
+  smithsonianHomoRudolfensis: {
+    shortTitle: "Smithsonian: H. rudolfensis",
+    title: "Homo rudolfensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Homo rudolfensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-rudolfensis",
+  },
+  smithsonianHomoSapiens: {
+    shortTitle: "Smithsonian: Homo sapiens",
+    title: "Homo sapiens",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation: 'Smithsonian Institution, Human Origins Program, "Homo sapiens."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/homo-sapiens",
+  },
+  smithsonianHumanEvolutionIntro: {
+    shortTitle: "Smithsonian: Human evolution intro",
+    title: "Introduction to Human Evolution",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Introduction to Human Evolution."',
+    url: "https://humanorigins.si.edu/education/introduction-human-evolution",
+  },
+  smithsonianHumanFamilyTree: {
+    shortTitle: "Smithsonian: Family tree",
+    title: "Human Family Tree",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Human Family Tree."',
+    url: "https://humanorigins.si.edu/evidence/human-family-tree",
+  },
+  smithsonianHumanOrigins: {
+    shortTitle: "Smithsonian Human Origins",
+    title: "Interactive Human Origins Timeline",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Interactive Human Origins Timeline."',
+    url: "https://humanorigins.si.edu/evidence/human-evolution-interactive-timeline",
+  },
+  smithsonianKenyanthropusPlatyops: {
+    shortTitle: "Smithsonian: Kenyanthropus",
+    title: "Kenyanthropus platyops",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Kenyanthropus platyops."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/kenyanthropus-platyops",
+  },
+  smithsonianOrrorin: {
+    shortTitle: "Smithsonian: Orrorin",
+    title: "Orrorin tugenensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Orrorin tugenensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/orrorin-tugenensis",
+  },
+  smithsonianParanthropusAethiopicus: {
+    shortTitle: "Smithsonian: P. aethiopicus",
+    title: "Paranthropus aethiopicus",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Paranthropus aethiopicus."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/paranthropus-aethiopicus",
+  },
+  smithsonianParanthropusBoisei: {
+    shortTitle: "Smithsonian: P. boisei",
+    title: "Paranthropus boisei",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Paranthropus boisei."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/paranthropus-boisei",
+  },
+  smithsonianParanthropusRobustus: {
+    shortTitle: "Smithsonian: P. robustus",
+    title: "Paranthropus robustus",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Paranthropus robustus."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/paranthropus-robustus",
+  },
+  smithsonianSahelanthropus: {
+    shortTitle: "Smithsonian: Sahelanthropus",
+    title: "Sahelanthropus tchadensis",
+    organization: "Smithsonian Institution Human Origins Program",
+    citation:
+      'Smithsonian Institution, Human Origins Program, "Sahelanthropus tchadensis."',
+    url: "https://humanorigins.si.edu/evidence/human-fossils/species/sahelanthropus-tchadensis",
+  },
+  tangDynastyWikipedia: {
+    shortTitle: "Wikipedia: Tang dynasty",
+    title: "Tang dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Tang dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Tang_dynasty",
+  },
+  trustMeBro: {
+    shortTitle: "Trust me bro",
+    title: "Trust me bro",
+    organization: "Personal bias",
+    citation: '"Trust me bro."',
+  },
+  ubaidPeriodWikipedia: {
+    shortTitle: "Wikipedia: Ubaid period",
+    title: "Ubaid period",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Ubaid period." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Ubaid_period",
+  },
+  unAntiColonialismDay: {
+    shortTitle: "UN: Anti-Colonialism Day",
+    title:
+      "International Day Against Colonialism in All Its Forms and Manifestations",
+    organization: "United Nations",
+    citation:
+      'United Nations, "International Day Against Colonialism in All Its Forms and Manifestations."',
+    url: "https://www.un.org/en/observances/anti-colonialism-day",
+  },
+  unDecolonization: {
+    shortTitle: "UN: Decolonization",
+    title: "Decolonization",
+    organization: "United Nations",
+    citation: 'United Nations, "Decolonization."',
+    url: "https://www.un.org/en/global-issues/decolonization",
+  },
+  unHistoryUnitedNations: {
+    shortTitle: "UN: History of the UN",
+    title: "History of the United Nations",
+    organization: "United Nations",
+    citation: 'United Nations, "History of the United Nations."',
+    url: "https://www.un.org/en/about-us/history-of-the-un",
+  },
+  unParisAgreement: {
+    shortTitle: "UN: Paris Agreement",
+    title: "The Paris Agreement",
+    organization: "United Nations",
+    citation: 'United Nations, "The Paris Agreement."',
+    url: "https://www.un.org/en/climatechange/paris-agreement",
+  },
+  unUniversalDeclarationHumanRights: {
+    shortTitle: "UN: UDHR",
+    title: "Universal Declaration of Human Rights",
+    organization: "United Nations",
+    citation: 'United Nations, "Universal Declaration of Human Rights."',
+    url: "https://www.un.org/en/about-us/universal-declaration-of-human-rights",
+  },
+  unescoCatalhoyuk: {
+    shortTitle: "UNESCO: Çatalhöyük",
+    title: "Neolithic Site of Çatalhöyük",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Neolithic Site of Çatalhöyük."',
+    url: "https://whc.unesco.org/en/list/1405/",
+  },
+  unescoChauvet: {
+    shortTitle: "UNESCO: Chauvet",
+    title:
+      "Decorated Cave of Pont d’Arc, known as Grotte Chauvet-Pont d’Arc, Ardèche",
+    organization: "UNESCO World Heritage Centre",
+    citation:
+      'UNESCO World Heritage Centre, "Decorated Cave of Pont d’Arc, known as Grotte Chauvet-Pont d’Arc, Ardèche."',
+    url: "https://whc.unesco.org/en/list/1426/",
+  },
+  unescoGobekliTepe: {
+    shortTitle: "UNESCO: Göbekli Tepe",
+    title: "Göbekli Tepe",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Göbekli Tepe."',
+    url: "https://whc.unesco.org/en/list/1572/",
+  },
+  unescoMycenaeTiryns: {
+    shortTitle: "UNESCO: Mycenae",
+    title: "Archaeological Sites of Mycenae and Tiryns",
+    organization: "UNESCO World Heritage Centre",
+    citation:
+      'UNESCO World Heritage Centre, "Archaeological Sites of Mycenae and Tiryns."',
+    url: "https://whc.unesco.org/en/list/941/",
+  },
+  unescoStonehenge: {
+    shortTitle: "UNESCO: Stonehenge",
+    title: "Stonehenge, Avebury and Associated Sites",
+    organization: "UNESCO World Heritage Centre",
+    citation:
+      'UNESCO World Heritage Centre, "Stonehenge, Avebury and Associated Sites."',
+    url: "https://whc.unesco.org/en/list/373/",
+  },
+  unescoYinXu: {
+    shortTitle: "UNESCO: Yin Xu",
+    title: "Yin Xu",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Yin Xu."',
+    url: "https://whc.unesco.org/en/list/1114/",
+  },
+  urukPeriodWikipedia: {
+    shortTitle: "Wikipedia: Uruk period",
+    title: "Uruk period",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Uruk period." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Uruk_period",
+  },
+  whoCovid19Pandemic: {
+    shortTitle: "WHO: COVID-19 pandemic",
+    title: "Coronavirus disease (COVID-19) pandemic",
+    organization: "World Health Organization",
+    citation:
+      'World Health Organization, "Coronavirus disease (COVID-19) pandemic."',
+    url: "https://www.who.int/europe/emergencies/situations/covid-19",
+  },
+  whoSmallpoxEradication: {
+    shortTitle: "WHO: smallpox eradication",
+    title: "WHO commemorates the 40th anniversary of smallpox eradication",
+    organization: "World Health Organization",
+    citation:
+      'World Health Organization, "WHO commemorates the 40th anniversary of smallpox eradication."',
+    url: "https://www.who.int/news/item/13-12-2019-who-commemorates-the-40th-anniversary-of-smallpox-eradication",
+  },
+  worldHistoryGreatPyramidGiza: {
+    shortTitle: "WHE: Great Pyramid",
+    title: "Great Pyramid of Giza",
+    organization: "World History Encyclopedia",
+    citation:
+      'Mark, Joshua J., "Great Pyramid of Giza." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Great_Pyramid_of_Giza/",
+  },
+  worldHistoryNeoAssyrianEmpire: {
+    shortTitle: "WHE: Neo-Assyrian Empire",
+    title: "Neo-Assyrian Empire",
+    organization: "World History Encyclopedia",
+    citation:
+      'Mark, Joshua J. "Neo-Assyrian Empire." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Neo-Assyrian_Empire/",
+  },
+  yuanDynastyWikipedia: {
+    shortTitle: "Wikipedia: Yuan dynasty",
+    title: "Yuan dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Yuan dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Yuan_dynasty",
+  },
+  zhouDynastyWikipedia: {
+    shortTitle: "Wikipedia: Zhou dynasty",
+    title: "Zhou dynasty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Zhou dynasty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Zhou_dynasty",
+  },
 } as const;

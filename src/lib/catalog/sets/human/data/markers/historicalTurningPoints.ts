@@ -1,9 +1,9 @@
-import type { TimelineMarker } from "../../../../../core/timelineTypes";
+import type { TimelineMarker } from "@/lib/core/timelineTypes";
 import {
   createExactCalendarTimestamp,
   getTimelineYearFromExactTimestamp,
-} from "../../../../../core/exactTimestamp";
-import { bce, ce } from "../../../../../core/timelineDateBuilders";
+} from "@/lib/core/exactTimestamp";
+import { bce, ce } from "@/lib/core/timelineDateBuilders";
 
 const TITANIC_SINKS_AT = createExactCalendarTimestamp({
   era: "ce",
@@ -208,7 +208,10 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 81,
-    sourceIds: ["originsOfAgricultureInWestAsiaWikipedia", "prePotteryNeolithicAWikipedia"],
+    sourceIds: [
+      "originsOfAgricultureInWestAsiaWikipedia",
+      "prePotteryNeolithicAWikipedia",
+    ],
   },
   {
     id: "catalhoyuk-settled-farming-community",
@@ -807,7 +810,9 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     shortLabel: "Iranian Revolution",
     description:
       "Iran's monarchy fell and Khomeini's movement opened the way to an Islamic republic.",
-    year: getTimelineYearFromExactTimestamp(IRANIAN_REVOLUTION_TOPPLES_MONARCHY_AT),
+    year: getTimelineYearFromExactTimestamp(
+      IRANIAN_REVOLUTION_TOPPLES_MONARCHY_AT,
+    ),
     exactTime: IRANIAN_REVOLUTION_TOPPLES_MONARCHY_AT,
     dateLabel: "Feb 11, 1979",
     minZoom: 20,
@@ -939,7 +944,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Jul 4, 2012",
     minZoom: 20,
     priority: 81,
-    sourceIds: ["cernHiggsBoson2012"],
+    sourceIds: ["humanCernHiggsBoson2012"],
   },
   {
     id: "paris-agreement-adopted",

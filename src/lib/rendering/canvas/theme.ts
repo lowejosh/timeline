@@ -1,4 +1,4 @@
-import { THEME } from "../../ui/theme";
+import { THEME } from "@/lib/ui/theme";
 
 export type TimelineCanvasTheme = {
   paper: string;

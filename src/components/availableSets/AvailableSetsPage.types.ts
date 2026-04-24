@@ -1,5 +1,5 @@
-import type { TimelineSetDefinition } from "../../lib/catalog/setSchema";
-import type { TimelineSetId } from "../../lib/core/timelineTypes";
+import type { TimelineSetDefinition } from "@/lib/catalog/setSchema";
+import type { TimelineSetId } from "@/lib/core/timelineTypes";
 
 export type ColumnId = "enabled" | "available";
 

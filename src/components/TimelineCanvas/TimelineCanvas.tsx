@@ -12,11 +12,11 @@ import {
   type Era,
   type TimelineMarker,
   type TimelineOverlayBand,
-} from "../../lib/catalog/eras";
+} from "@/lib/catalog/eras";
 import {
   EARLY_UNIVERSE_END_YEAR,
   EARLY_UNIVERSE_START_YEAR,
-} from "../../lib/catalog/sets/cosmic/index";
+} from "@/lib/catalog/sets/cosmic/index";
 import {
   comparePreciseTimelineYears,
   getMinZoomForWidth,
@@ -35,33 +35,33 @@ import {
   worldToScreen,
   zoomAtPosition,
   type TimelineViewport,
-} from "../../lib/core/viewport";
+} from "@/lib/core/viewport";
 import {
   getInteractiveDescendantEras,
   getPreviewFocusChain,
   resolveTimelineEraLayersFromOpacityMap,
-} from "../../lib/rendering/childLayers";
+} from "@/lib/rendering/childLayers";
 import {
   resolveTimelineOverlayTracks,
   type ResolvedTimelineOverlayBand,
-} from "../../lib/rendering/overlayTracks";
-import { getVisibleTimelineMarkers } from "../../lib/rendering/queries/markers";
-import { resolveExpandedOverlayLayout } from "../../lib/rendering/expandedOverlayLayout";
+} from "@/lib/rendering/overlayTracks";
+import { getVisibleTimelineMarkers } from "@/lib/rendering/queries/markers";
+import { resolveExpandedOverlayLayout } from "@/lib/rendering/expandedOverlayLayout";
 import {
   shouldPrioritizeTooltipRetention,
   shouldRetainTooltipAtPoint,
-} from "../../lib/rendering/tooltipRetention";
+} from "@/lib/rendering/tooltipRetention";
 import {
   resolveAxisTickRenderStates,
   type AxisTickRenderState,
-} from "../../lib/rendering/axisTickStates";
-import type { AnimatedContextBandLabelState } from "../../lib/rendering/contextBands";
+} from "@/lib/rendering/axisTickStates";
+import type { AnimatedContextBandLabelState } from "@/lib/rendering/contextBands";
 import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
 import {
   DEFAULT_TIMELINE_THEME,
   readTimelineCanvasTheme,
   type TimelineCanvasTheme,
-} from "../../lib/rendering/canvas/theme";
+} from "@/lib/rendering/canvas/theme";
 import {
   createTimelinePerfBreakdown,
   createTimelinePerfStats,
@@ -74,14 +74,14 @@ import {
   type TimelinePerfMode,
   type TimelinePerfStats,
   type TimelineVerboseStats,
-} from "../../lib/rendering/canvas/perf";
+} from "@/lib/rendering/canvas/perf";
 import {
   PRIMORDIAL_DETAIL_STRIP_FADE_DURATION_MS,
   PRIMORDIAL_SYNTHETIC_DETAIL_MAX_ZOOM_WINDOW,
   resolveEraScreenSpanMap,
   resolvePrimordialDetailStripSegments,
   type PrimordialDetailStripSegment,
-} from "../../lib/rendering/canvas/primordial";
+} from "@/lib/rendering/canvas/primordial";
 import {
   compareOverlayBands,
   findEraAtYear,
@@ -89,30 +89,30 @@ import {
   getOverlayLaneY,
   getTimelineLayout,
   resolveExpandedOverlayDetails,
-} from "../../lib/rendering/canvas/overlayLayout";
+} from "@/lib/rendering/canvas/overlayLayout";
 import {
   isEquivalentHoveredTooltip,
   type HoveredTooltipState,
   type RenderedTooltipState,
-} from "../../lib/rendering/canvas/tooltip";
-import { useWheelZoomPan } from "../../hooks/useWheelZoomPan";
-import { useMarkerPriorityBoost } from "../../hooks/useMarkerPriorityBoost";
-import { useEraChildAnimation } from "../../hooks/useEraChildAnimation";
-import { useOverlayBandAnimation } from "../../hooks/useOverlayBandAnimation";
-import { useAxisTickAnimation } from "../../hooks/useAxisTickAnimation";
-import { useExpandedOverlayAnimation } from "../../hooks/useExpandedOverlayAnimation";
-import { drawBackground } from "../../lib/rendering/canvas/draw/drawBackground";
-import { drawEras } from "../../lib/rendering/canvas/draw/drawEras";
-import { drawOverlays } from "../../lib/rendering/canvas/draw/drawOverlays";
-import { drawAxis } from "../../lib/rendering/canvas/draw/drawAxis";
-import { drawMarkers } from "../../lib/rendering/canvas/draw/drawMarkers";
-import { drawNowIndicator } from "../../lib/rendering/canvas/draw/drawNowIndicator";
+} from "@/lib/rendering/canvas/tooltip";
+import { useWheelZoomPan } from "@/hooks/useWheelZoomPan";
+import { useMarkerPriorityBoost } from "@/hooks/useMarkerPriorityBoost";
+import { useEraChildAnimation } from "@/hooks/useEraChildAnimation";
+import { useOverlayBandAnimation } from "@/hooks/useOverlayBandAnimation";
+import { useAxisTickAnimation } from "@/hooks/useAxisTickAnimation";
+import { useExpandedOverlayAnimation } from "@/hooks/useExpandedOverlayAnimation";
+import { drawBackground } from "@/lib/rendering/canvas/draw/drawBackground";
+import { drawEras } from "@/lib/rendering/canvas/draw/drawEras";
+import { drawOverlays } from "@/lib/rendering/canvas/draw/drawOverlays";
+import { drawAxis } from "@/lib/rendering/canvas/draw/drawAxis";
+import { drawMarkers } from "@/lib/rendering/canvas/draw/drawMarkers";
+import { drawNowIndicator } from "@/lib/rendering/canvas/draw/drawNowIndicator";
 import "./TimelineCanvas.styles.css";
 import type {
   CanvasDrawContext,
   HoverRegion,
   OverlayInteractionRegion,
-} from "../../lib/rendering/canvas/draw/drawContext";
+} from "@/lib/rendering/canvas/draw/drawContext";
 
 type TimelineCanvasProps = {
   width: number;
@@ -186,7 +186,7 @@ import {
   TOOLTIP_MAX_WIDTH,
   TOOLTIP_OFFSET,
   VIEWPORT_INTERACTION_SETTLE_MS,
-} from "../../lib/rendering/canvas/constants";
+} from "@/lib/rendering/canvas/constants";
 
 export function TimelineCanvas({
   width,

@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../core/timelineTypes";
-import { getVisibleRange, type TimelineViewport } from "../../core/viewport";
+import type { TimelineMarker } from "@/lib/core/timelineTypes";
+import { getVisibleRange, type TimelineViewport } from "@/lib/core/viewport";
 import {
   isDecorationGroupEnabled,
   isTimelineDecorationVisibleAtZoom,

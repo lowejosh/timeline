@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TIMELINE_CANVAS_PAD } from "../rendering/layout/padding";
-import { useAnimatedViewport } from "../../hooks/useAnimatedViewport";
-import { useElementSize } from "../../hooks/useElementSize";
+import { useAnimatedViewport } from "@/hooks/useAnimatedViewport";
+import { useElementSize } from "@/hooks/useElementSize";
 import {
   ROOT_ERA,
   TIMELINE_DISPLAY,
@@ -264,16 +264,16 @@ export function useTimelineAppState() {
   const [visibleSetIds, setVisibleSetIds] = useState<Set<TimelineSetId>>(() =>
     readStoredVisibleSetIds(),
   );
-    useEffect(() => {
-      try {
-        window.localStorage.setItem(
-          TIMELINE_VISIBLE_SET_IDS_STORAGE_KEY,
-          JSON.stringify(Array.from(visibleSetIds)),
-        );
-      } catch {
-        // Ignore storage failures; state still works in memory.
-      }
-    }, [visibleSetIds]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        TIMELINE_VISIBLE_SET_IDS_STORAGE_KEY,
+        JSON.stringify(Array.from(visibleSetIds)),
+      );
+    } catch {
+      // Ignore storage failures; state still works in memory.
+    }
+  }, [visibleSetIds]);
   const [orderedSetIds, setOrderedSetIds] = useState<TimelineSetId[]>(() =>
     readStoredTimelineSetOrder(),
   );

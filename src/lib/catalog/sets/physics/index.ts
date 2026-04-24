@@ -1,5 +1,5 @@
-import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "../../../core/timelineYears";
-import { normalizeTimelineSetSource } from "../../setSource";
+import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "@/lib/core/timelineYears";
+import { normalizeTimelineSetSource } from "@/lib/catalog/setSource";
 import { PHYSICS_HISTORY_ERA_DEFINITIONS } from "./data/eras";
 import { PHYSICS_HISTORY_MARKERS } from "./data/markers";
 import { PHYSICS_CONTEXT_OVERLAYS } from "./data/overlays";
@@ -10,9 +10,8 @@ const physicsFamilyRoot = {
   name: "History of Physics",
   startYear: PHYSICS_HISTORY_ERA_DEFINITIONS[0]?.startYear ?? TIMELINE_MIN_YEAR,
   endYear:
-    PHYSICS_HISTORY_ERA_DEFINITIONS[
-      PHYSICS_HISTORY_ERA_DEFINITIONS.length - 1
-    ]?.endYear ?? TIMELINE_MAX_YEAR,
+    PHYSICS_HISTORY_ERA_DEFINITIONS[PHYSICS_HISTORY_ERA_DEFINITIONS.length - 1]
+      ?.endYear ?? TIMELINE_MAX_YEAR,
   color: "rgba(0, 0, 0, 0)",
   scheme: "history-of-science" as const,
   children: PHYSICS_HISTORY_ERA_DEFINITIONS,

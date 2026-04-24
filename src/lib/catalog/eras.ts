@@ -160,9 +160,8 @@ function toEraFamilyConfig(
   };
 }
 
-export const TIMELINE_ERA_FAMILIES: TimelineEraFamilyConfig[] = TIMELINE_SETS
-  .flatMap((set) => set.families.map(toEraFamilyConfig))
-  .sort(
+export const TIMELINE_ERA_FAMILIES: TimelineEraFamilyConfig[] =
+  TIMELINE_SETS.flatMap((set) => set.families.map(toEraFamilyConfig)).sort(
     (left, right) =>
       left.order - right.order || left.label.localeCompare(right.label),
   );

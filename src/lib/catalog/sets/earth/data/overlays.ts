@@ -1,5 +1,5 @@
-import type { TimelineOverlayBand } from "../../../../core/timelineTypes";
-import { yearsAgo } from "../../../../core/timelineDateBuilders";
+import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
+import { yearsAgo } from "@/lib/core/timelineDateBuilders";
 
 export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
   {
@@ -43,7 +43,10 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(92, 129, 104)",
     minZoom: 0,
     priority: 87,
-    sourceIds: ["gsaOrdovicianBiodiversificationEvent", "samNobleOrdovicianCommunities"],
+    sourceIds: [
+      "gsaOrdovicianBiodiversificationEvent",
+      "samNobleOrdovicianCommunities",
+    ],
   },
   {
     id: "age-of-invertebrates",
@@ -84,7 +87,10 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(86, 126, 148)",
     minZoom: 0,
     priority: 87,
-    sourceIds: ["umdMacroecologyNektonRevolution", "royalSocietyPalaeozoicWaterColumn"],
+    sourceIds: [
+      "umdMacroecologyNektonRevolution",
+      "royalSocietyPalaeozoicWaterColumn",
+    ],
   },
   {
     id: "age-of-amphibians",
@@ -112,7 +118,11 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(108, 120, 78)",
     minZoom: 0,
     priority: 87,
-    sourceIds: ["birminghamCarboniferousCurios", "nhmCarboniferousRainforestCollapse", "icsChart2024"],
+    sourceIds: [
+      "birminghamCarboniferousCurios",
+      "nhmCarboniferousRainforestCollapse",
+      "icsChart2024",
+    ],
   },
   {
     id: "mesozoic-marine-revolution",
@@ -167,7 +177,11 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
         color: "rgb(105, 136, 86)",
         minZoom: 0,
         priority: 90,
-        sourceIds: ["ucmpMesozoicLife", "smithsonianExtinctionOverTime", "icsChart2024"],
+        sourceIds: [
+          "ucmpMesozoicLife",
+          "smithsonianExtinctionOverTime",
+          "icsChart2024",
+        ],
       },
     ],
   },
@@ -202,6 +216,9 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(164, 118, 88)",
     minZoom: 0,
     priority: 88,
-    sourceIds: ["amnhPaleoceneEoceneThermalMaximum", "nhmPaleoceneEoceneThermalMaximum"],
+    sourceIds: [
+      "amnhPaleoceneEoceneThermalMaximum",
+      "nhmPaleoceneEoceneThermalMaximum",
+    ],
   },
 ];

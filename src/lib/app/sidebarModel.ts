@@ -114,7 +114,8 @@ export function resolveTimelineSidebarTree(
     .sort(
       (left, right) =>
         (orderIndexBySetId.get(left.metadata.id) ?? Number.MAX_SAFE_INTEGER) -
-          (orderIndexBySetId.get(right.metadata.id) ?? Number.MAX_SAFE_INTEGER) ||
+          (orderIndexBySetId.get(right.metadata.id) ??
+            Number.MAX_SAFE_INTEGER) ||
         left.metadata.order - right.metadata.order ||
         left.metadata.label.localeCompare(right.metadata.label),
     )

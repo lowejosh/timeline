@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { THEME } from "../../lib/ui/theme";
+import { THEME } from "@/lib/ui/theme";
 import "./TimelineSettings.styles.css";
 
 type TimelineSettingsProps = {

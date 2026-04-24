@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import type { TimelineSetDefinition } from "../../lib/catalog/setSchema";
-import type { TimelineSetId } from "../../lib/core/timelineTypes";
+import type { TimelineSetDefinition } from "@/lib/catalog/setSchema";
+import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import { useAvailableSetsDrag } from "./AvailableSetsPage.hooks";
 import type {
   AvailableSetsPageProps,
@@ -63,8 +63,9 @@ export function AvailableSetsPage({
           if (
             activeTags.size > 0 &&
             !(
-              set.metadata.tags?.some((tag) => activeTags.has(tag.toLowerCase())) ??
-              false
+              set.metadata.tags?.some((tag) =>
+                activeTags.has(tag.toLowerCase()),
+              ) ?? false
             )
           ) {
             return false;
@@ -188,10 +189,7 @@ export function AvailableSetsPage({
     return [...cards.slice(0, insertAt), ghost, ...cards.slice(insertAt)];
   };
 
-  const renderSetCard = (
-    set: TimelineSetDefinition,
-    columnId: ColumnId,
-  ) => {
+  const renderSetCard = (set: TimelineSetDefinition, columnId: ColumnId) => {
     const setId = set.metadata.id;
     const isEnabled = columnId === "enabled";
     const obscuredCount = isEnabled ? (eraObscuredCounts.get(setId) ?? 0) : 0;
@@ -272,7 +270,9 @@ export function AvailableSetsPage({
             </div>
           </div>
           {set.metadata.description ? (
-            <span className="avsets__item-desc">{set.metadata.description}</span>
+            <span className="avsets__item-desc">
+              {set.metadata.description}
+            </span>
           ) : null}
           {set.metadata.tags && set.metadata.tags.length > 0 ? (
             <span className="avsets__item-tags">
@@ -448,9 +448,7 @@ export function AvailableSetsPage({
               {renderColumnItems(
                 visibleAvailableSetIds
                   .map((setId) => setsById.get(setId))
-                  .filter((set): set is TimelineSetDefinition =>
-                    Boolean(set),
-                  ),
+                  .filter((set): set is TimelineSetDefinition => Boolean(set)),
                 "available",
                 "No available sets match this search or filter.",
               )}

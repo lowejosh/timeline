@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { TimelineSetId } from "../../lib/core/timelineTypes";
+import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import type {
   ColumnId,
   ColumnLayoutSnapshot,
@@ -260,7 +260,12 @@ export function useAvailableSetsDrag(
 
     previousRectsRef.current = currentRects;
     previousSignatureRef.current = visibleSignature;
-  }, [draftColumns.enabled, dragState, visibleAvailableSetIds, visibleSignature]);
+  }, [
+    draftColumns.enabled,
+    dragState,
+    visibleAvailableSetIds,
+    visibleSignature,
+  ]);
 
   const handlePointerDown = (
     event: ReactPointerEvent<HTMLElement>,
@@ -330,7 +335,7 @@ export function useAvailableSetsDrag(
       return {
         enabled: draftColumns.enabled,
         available: visibleAvailableSetIds,
-    } satisfies Record<ColumnId, readonly TimelineSetId[]>;
+      } satisfies Record<ColumnId, readonly TimelineSetId[]>;
     }
 
     const nextEnabledOrder =
@@ -363,7 +368,11 @@ export function useAvailableSetsDrag(
       enabled:
         dragState.sourceColumn === "enabled"
           ? nextEnabledOrder.filter((id) => id !== dragState.setId)
-          : insertItem(nextEnabledOrder, dragState.targetIndex, dragState.setId),
+          : insertItem(
+              nextEnabledOrder,
+              dragState.targetIndex,
+              dragState.setId,
+            ),
       available:
         dragState.sourceColumn === "available"
           ? nextAvailableOrder.filter((id) => id !== dragState.setId)

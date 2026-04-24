@@ -2,13 +2,13 @@ import {
   compareEraPriorityDescending,
   type Era,
   type TimelineOverlayBand,
-} from "../../catalog/eras";
-import { getEffectiveTimelinePriority } from "../../catalog/timelineSets";
+} from "@/lib/catalog/eras";
+import { getEffectiveTimelinePriority } from "@/lib/catalog/timelineSets";
 import {
   getVisibleRange,
   type TimelineViewport,
   worldToScreen,
-} from "../../core/viewport";
+} from "@/lib/core/viewport";
 import type { ResolvedTimelineOverlayBand } from "../overlayTracks";
 import {
   EXPANDED_OVERLAY_BOTTOM_PADDING,

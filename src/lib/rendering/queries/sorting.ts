@@ -1,8 +1,8 @@
 import type {
   TimelineMarker,
   TimelineOverlayBand,
-} from "../../core/timelineTypes";
-import { getEffectiveTimelinePriority } from "../../catalog/timelineSets";
+} from "@/lib/core/timelineTypes";
+import { getEffectiveTimelinePriority } from "@/lib/catalog/timelineSets";
 
 type DecorationLike =
   | (Pick<TimelineMarker, "id" | "priority"> & {

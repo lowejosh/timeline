@@ -1,5 +1,5 @@
-import type { TimelineOverlayBand } from "../../../../../core/timelineTypes";
-import { bce, yearsAgo } from "../../../../../core/timelineDateBuilders";
+import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
+import { bce, yearsAgo } from "@/lib/core/timelineDateBuilders";
 
 export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
   {

@@ -7,14 +7,14 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
-import { compareEraPriorityAscending, type Era } from "../../lib/catalog/eras";
+import { compareEraPriorityAscending, type Era } from "@/lib/catalog/eras";
 import {
   getOverviewRulerYearsPerPixel,
   mapOverviewRulerXToYear,
   resolveOverviewRulerBandRect,
   resolveOverviewRulerSpotlight,
   type OverviewRulerDomain,
-} from "../../lib/rendering/overviewRuler";
+} from "@/lib/rendering/overviewRuler";
 import {
   normalizeViewport,
   panByPixels,
@@ -22,8 +22,8 @@ import {
   TIMELINE_MAX_YEAR,
   TIMELINE_MIN_YEAR,
   type TimelineViewport,
-} from "../../lib/core/viewport";
-import { THEME } from "../../lib/ui/theme";
+} from "@/lib/core/viewport";
+import { THEME } from "@/lib/ui/theme";
 
 type TimelineOverviewRulerProps = {
   width: number;

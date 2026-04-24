@@ -1,4 +1,4 @@
-import { clamp01 } from "../../core/easing";
+import { clamp01 } from "@/lib/core/easing";
 
 export type RgbaColor = {
   r: number;

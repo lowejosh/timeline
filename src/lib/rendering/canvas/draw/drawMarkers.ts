@@ -3,8 +3,8 @@ import {
   type MarkerTextMeasureInput,
   resolveMarkerRenderStates,
   type ResolvedMarkerRenderState,
-} from "../../markerGlyphs";
-import { getMarkerTooltipContent } from "../../../app/tooltipModel";
+} from "@/lib/rendering/markerGlyphs";
+import { getMarkerTooltipContent } from "@/lib/app/tooltipModel";
 import type { CanvasDrawContext } from "./drawContext";
 
 export function drawMarkers(

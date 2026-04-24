@@ -11,8 +11,8 @@ import { createPortal, flushSync } from "react-dom";
 import type {
   TimelineSidebarChildState,
   TimelineSidebarSetState,
-} from "../../lib/app/sidebarModel";
-import type { TimelineSetId } from "../../lib/core/timelineTypes";
+} from "@/lib/app/sidebarModel";
+import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import { OverlayGroupIconSvg } from "../TimelineCanvas/OverlayGroupIconSvg";
 import { computeEraObscuredCounts } from "../AvailableSets/AvailableSetsPage.utils";
 import "./TimelineSidebar.styles.css";

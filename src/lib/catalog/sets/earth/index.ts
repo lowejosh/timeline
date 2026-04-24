@@ -1,7 +1,10 @@
-import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "../../../core/timelineYears";
-import { normalizeTimelineSetSource } from "../../setSource";
+import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "@/lib/core/timelineYears";
+import { normalizeTimelineSetSource } from "@/lib/catalog/setSource";
 import { GEOLOGICAL_ERA_DEFINITIONS } from "./data/eras";
-import { EARTH_MILESTONE_MARKERS, DEEP_TIME_LIFE_MARKERS } from "./data/markers";
+import {
+  EARTH_MILESTONE_MARKERS,
+  DEEP_TIME_LIFE_MARKERS,
+} from "./data/markers";
 import { DEEP_TIME_LIFE_OVERLAYS } from "./data/overlays";
 import { EARTH_SOURCES } from "./data/sources";
 
@@ -10,8 +13,8 @@ const geologicalRoot = {
   name: "Geological History",
   startYear: GEOLOGICAL_ERA_DEFINITIONS[0]?.startYear ?? TIMELINE_MIN_YEAR,
   endYear:
-    GEOLOGICAL_ERA_DEFINITIONS[GEOLOGICAL_ERA_DEFINITIONS.length - 1]?.endYear ??
-    TIMELINE_MAX_YEAR,
+    GEOLOGICAL_ERA_DEFINITIONS[GEOLOGICAL_ERA_DEFINITIONS.length - 1]
+      ?.endYear ?? TIMELINE_MAX_YEAR,
   color: "rgba(0, 0, 0, 0)",
   scheme: "chronostratigraphic" as const,
   children: GEOLOGICAL_ERA_DEFINITIONS,

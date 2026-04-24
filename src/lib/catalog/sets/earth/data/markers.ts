@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../../../core/timelineTypes";
-import { yearsAgo } from "../../../../core/timelineDateBuilders";
+import type { TimelineMarker } from "@/lib/core/timelineTypes";
+import { yearsAgo } from "@/lib/core/timelineDateBuilders";
 
 export const EARTH_MILESTONE_MARKERS: TimelineMarker[] = [
   {
@@ -117,7 +117,10 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       "A two-pulse marine crisis driven by climate upheaval that wiped out about 85% of species, shattering reefs and open-ocean ecosystems alike.",
     minZoom: 0,
     priority: 94,
-    sourceIds: ["smithsonianExtinctionOverTime", "geoscienceworldLateOrdovicianExtinction"],
+    sourceIds: [
+      "smithsonianExtinctionOverTime",
+      "geoscienceworldLateOrdovicianExtinction",
+    ],
   },
   {
     id: "earliest-vascular-plants-appear",
@@ -129,7 +132,10 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       "Cooksonia appears among the oldest known vascular plants, marking an early step toward taller and more complex land floras.",
     minZoom: 0,
     priority: 89,
-    sourceIds: ["nationalMuseumEarliestVascularPlants", "museumsVictoriaPalaeobotany"],
+    sourceIds: [
+      "nationalMuseumEarliestVascularPlants",
+      "museumsVictoriaPalaeobotany",
+    ],
   },
   {
     id: "first-forests-appear",
@@ -195,7 +201,11 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       "Earth's worst known extinction: roughly 9 in 10 marine species and 7 in 10 land species vanished as massive volcanism drove runaway warming and ecosystem collapse.",
     minZoom: 0,
     priority: 97,
-    sourceIds: ["smithsonianExtinctionOverTime", "nasaGreatDying", "amnhSixExtinctions"],
+    sourceIds: [
+      "smithsonianExtinctionOverTime",
+      "nasaGreatDying",
+      "amnhSixExtinctions",
+    ],
   },
   {
     id: "first-mammals-appear",
@@ -217,7 +227,11 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       "A volcanic crisis as the Atlantic began opening that wiped out more than a third of marine species and many large land reptiles, clearing space for dinosaur dominance.",
     minZoom: 0,
     priority: 95,
-    sourceIds: ["smithsonianExtinctionOverTime", "smithsonianTriassicLife", "amnhSixExtinctions"],
+    sourceIds: [
+      "smithsonianExtinctionOverTime",
+      "smithsonianTriassicLife",
+      "amnhSixExtinctions",
+    ],
   },
   {
     id: "archaeopteryx-first-known-bird",
@@ -239,7 +253,10 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       "Fossils such as Archaefructus show flowering plants were already present by about 125 million years ago, with southern Australian flower-bearing forests appearing soon after.",
     minZoom: 0,
     priority: 90,
-    sourceIds: ["australianMuseumCretaceous", "universityMelbourneFlowersReachedAustralia"],
+    sourceIds: [
+      "australianMuseumCretaceous",
+      "universityMelbourneFlowersReachedAustralia",
+    ],
   },
   {
     id: "k-pg-asteroid-impact",
@@ -251,6 +268,10 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       "The Chicxulub impact triggered abrupt global collapse that wiped out about 75% of species, including all non-avian dinosaurs, while birds and mammals pulled through.",
     minZoom: 0,
     priority: 99,
-    sourceIds: ["smithsonianExtinctionOverTime", "icsChart2024", "amnhSixExtinctions"],
+    sourceIds: [
+      "smithsonianExtinctionOverTime",
+      "icsChart2024",
+      "amnhSixExtinctions",
+    ],
   },
 ];

@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../../../../core/timelineTypes";
-import { bce } from "../../../../../core/timelineDateBuilders";
+import type { TimelineMarker } from "@/lib/core/timelineTypes";
+import { bce } from "@/lib/core/timelineDateBuilders";
 
 export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
   {
@@ -13,7 +13,10 @@ export const CHALCOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 70,
-    sourceIds: ["chogaMamiWikipedia", "originsOfAgricultureInWestAsiaWikipedia"],
+    sourceIds: [
+      "chogaMamiWikipedia",
+      "originsOfAgricultureInWestAsiaWikipedia",
+    ],
   },
   {
     id: "wheeled-transport-appears-in-sumer",

@@ -1,7 +1,7 @@
-import { shouldHideOverlappedEraLabel } from "../../childLayers";
-import { resolveContextBandRenderState } from "../../contextBands";
-import { resolveTextHoverBounds } from "../../overlayLabelHover";
-import { getEraTooltipContent } from "../../../app/tooltipModel";
+import { shouldHideOverlappedEraLabel } from "@/lib/rendering/childLayers";
+import { resolveContextBandRenderState } from "@/lib/rendering/contextBands";
+import { resolveTextHoverBounds } from "@/lib/rendering/overlayLabelHover";
+import { getEraTooltipContent } from "@/lib/app/tooltipModel";
 import {
   getEraBackdropResetAlpha,
   getEraBandAlphaMultiplier,

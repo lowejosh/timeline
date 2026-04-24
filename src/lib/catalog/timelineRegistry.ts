@@ -12,7 +12,10 @@ import { EARTH_SET } from "./sets/earth/index";
 import { HUMAN_SET } from "./sets/human/index";
 import { PHYSICS_SET } from "./sets/physics/index";
 
-function compareSetOrder(left: TimelineSetDefinition, right: TimelineSetDefinition) {
+function compareSetOrder(
+  left: TimelineSetDefinition,
+  right: TimelineSetDefinition,
+) {
   return (
     left.metadata.order - right.metadata.order ||
     left.metadata.label.localeCompare(right.metadata.label)
@@ -45,7 +48,10 @@ function compareMarkerOrder(left: TimelineMarker, right: TimelineMarker) {
   );
 }
 
-function compareOverlayOrder(left: TimelineOverlayBand, right: TimelineOverlayBand) {
+function compareOverlayOrder(
+  left: TimelineOverlayBand,
+  right: TimelineOverlayBand,
+) {
   return (
     left.startYear - right.startYear ||
     left.endYear - right.endYear ||
@@ -94,10 +100,11 @@ assertUniqueRegistryKeys(
   "source id",
 );
 
-export const TIMELINE_SETS_BY_ID: Readonly<Record<TimelineSetId, TimelineSetDefinition>> =
-  Object.fromEntries(
-    TIMELINE_SETS.map((set) => [set.metadata.id, set] as const),
-  ) as Readonly<Record<TimelineSetId, TimelineSetDefinition>>;
+export const TIMELINE_SETS_BY_ID: Readonly<
+  Record<TimelineSetId, TimelineSetDefinition>
+> = Object.fromEntries(
+  TIMELINE_SETS.map((set) => [set.metadata.id, set] as const),
+) as Readonly<Record<TimelineSetId, TimelineSetDefinition>>;
 
 export const TIMELINE_DECORATION_CATEGORIES: TimelineDecorationCategory[] =
   TIMELINE_SETS.flatMap((set) => set.categories).sort(compareCategoryOrder);

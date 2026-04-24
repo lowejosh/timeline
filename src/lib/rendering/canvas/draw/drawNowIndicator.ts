@@ -1,7 +1,7 @@
 import {
   TIMELINE_MAX_YEAR,
   toApproximateTimelineYear,
-} from "../../../core/viewport";
+} from "@/lib/core/viewport";
 import type { CanvasDrawContext } from "./drawContext";
 
 export function drawNowIndicator(cx: CanvasDrawContext): void {

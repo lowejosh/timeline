@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../../../../core/timelineTypes";
-import { ce } from "../../../../../core/timelineDateBuilders";
+import type { TimelineMarker } from "@/lib/core/timelineTypes";
+import { ce } from "@/lib/core/timelineDateBuilders";
 
 export const POST_CLASSICAL_MARKERS: TimelineMarker[] = [
   {

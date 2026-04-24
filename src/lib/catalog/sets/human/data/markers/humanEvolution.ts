@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../../../../core/timelineTypes";
-import { yearsAgo } from "../../../../../core/timelineDateBuilders";
+import type { TimelineMarker } from "@/lib/core/timelineTypes";
+import { yearsAgo } from "@/lib/core/timelineDateBuilders";
 
 export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
   {

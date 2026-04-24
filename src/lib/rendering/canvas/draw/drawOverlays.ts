@@ -1,17 +1,17 @@
-import { clamp01, smoothstep01 } from "../../../core/easing";
+import { clamp01, smoothstep01 } from "@/lib/core/easing";
 import {
   isAnimatedContextBandLabelStateActive,
   resolveAnimatedContextBandLabelLayers,
   resolveContextBandLabelVariant,
   stepAnimatedContextBandLabelState,
   syncAnimatedContextBandLabelState,
-} from "../../contextBands";
-import { resolveOverlayLabelHoverBounds } from "../../overlayLabelHover";
+} from "@/lib/rendering/contextBands";
+import { resolveOverlayLabelHoverBounds } from "@/lib/rendering/overlayLabelHover";
 import {
   drawOverlayGroupIcon,
   resolveOverlayGroupIconLayout,
-} from "../../overlayGroupIcons";
-import { getOverlayTooltipContent } from "../../../app/tooltipModel";
+} from "@/lib/rendering/overlayGroupIcons";
+import { getOverlayTooltipContent } from "@/lib/app/tooltipModel";
 import {
   clipCanvasOutsideOcclusionRects,
   drawPaperOverlayBand,
@@ -29,7 +29,7 @@ import {
   getOverlayLaneY,
   resolveExpandedOverlayConnectorGeometry,
 } from "../overlayLayout";
-import { getExpandedOverlayPanelBounds } from "../../expandedOverlayLayout";
+import { getExpandedOverlayPanelBounds } from "@/lib/rendering/expandedOverlayLayout";
 import { parseColor, toCssColor, withAlpha } from "../colors";
 import {
   canExpandOverlayParent,
@@ -49,7 +49,7 @@ import {
   OVERLAY_LANE_GAP,
   OVERLAY_LANE_HEIGHT,
 } from "../constants";
-import type { TimelineTooltipContent } from "../../../app/tooltipModel";
+import type { TimelineTooltipContent } from "@/lib/app/tooltipModel";
 import type { CanvasDrawContext } from "./drawContext";
 
 type DrawAnimatedOverlayLabelParams = {

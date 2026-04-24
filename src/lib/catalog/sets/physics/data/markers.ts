@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../../../core/timelineTypes";
-import { bce, ce } from "../../../../core/timelineDateBuilders";
+import type { TimelineMarker } from "@/lib/core/timelineTypes";
+import { bce, ce } from "@/lib/core/timelineDateBuilders";
 
 const PHYSICS_OF_UNIVERSE_SOURCE_IDS = ["physicsOfUniverseDates"];
 const WIKIPEDIA_TIMELINE_SOURCE_IDS = [
@@ -14,7 +14,8 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     year: ce(2004),
     minZoom: 20,
     priority: 85,
-    description: "Graphene is isolated and found to have remarkable electronic properties.",
+    description:
+      "Graphene is isolated and found to have remarkable electronic properties.",
     sourceIds: WIKIPEDIA_TIMELINE_SOURCE_IDS,
   },
   {
@@ -24,7 +25,8 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     year: ce(2008),
     minZoom: 20,
     priority: 84,
-    description: "Laboratory creates positrons, marking the first artificial production of antimatter.",
+    description:
+      "Laboratory creates positrons, marking the first artificial production of antimatter.",
     sourceIds: WIKIPEDIA_TIMELINE_SOURCE_IDS,
   },
   {
@@ -34,7 +36,8 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     year: ce(2008),
     minZoom: 20,
     priority: 83,
-    description: "Stellar orbits confirm a supermassive black hole at the center of the Milky Way.",
+    description:
+      "Stellar orbits confirm a supermassive black hole at the center of the Milky Way.",
     sourceIds: WIKIPEDIA_TIMELINE_SOURCE_IDS,
   },
   {
@@ -44,7 +47,8 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     year: ce(2009),
     minZoom: 20,
     priority: 82,
-    description: "The Planck spacecraft starts mapping the cosmic microwave background in detail.",
+    description:
+      "The Planck spacecraft starts mapping the cosmic microwave background in detail.",
     sourceIds: WIKIPEDIA_TIMELINE_SOURCE_IDS,
   },
   {
@@ -54,7 +58,8 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     year: ce(2016),
     minZoom: 20,
     priority: 80,
-    description: "Nobel Prize awarded for discoveries on topological phase transitions and order.",
+    description:
+      "Nobel Prize awarded for discoveries on topological phase transitions and order.",
     sourceIds: WIKIPEDIA_TIMELINE_SOURCE_IDS,
   },
   {
@@ -64,7 +69,8 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     year: ce(2023),
     minZoom: 20,
     priority: 79,
-    description: "Astronomers create the first image of the Milky Way using neutrinos instead of light.",
+    description:
+      "Astronomers create the first image of the Milky Way using neutrinos instead of light.",
     sourceIds: WIKIPEDIA_TIMELINE_SOURCE_IDS,
   },
   {
@@ -74,7 +80,8 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     year: ce(2024),
     minZoom: 20,
     priority: 78,
-    description: "DESI releases a precise 3D map suggesting dark energy's strength may be changing over time.",
+    description:
+      "DESI releases a precise 3D map suggesting dark energy's strength may be changing over time.",
     sourceIds: WIKIPEDIA_TIMELINE_SOURCE_IDS,
   },
   {
@@ -84,7 +91,8 @@ export const PHYSICS_HISTORY_MARKERS: TimelineMarker[] = [
     year: ce(2025),
     minZoom: 20,
     priority: 77,
-    description: "A paradigm-shifting black hole type is found, challenging existing formation theories.",
+    description:
+      "A paradigm-shifting black hole type is found, challenging existing formation theories.",
     sourceIds: WIKIPEDIA_TIMELINE_SOURCE_IDS,
   },
   {

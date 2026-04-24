@@ -1,5 +1,5 @@
-import { TIMELINE_MAX_YEAR } from "../../../core/timelineYears";
-import { normalizeTimelineSetSource } from "../../setSource";
+import { TIMELINE_MAX_YEAR } from "@/lib/core/timelineYears";
+import { normalizeTimelineSetSource } from "@/lib/catalog/setSource";
 import { HUMAN_HISTORY_ERA_DEFINITIONS } from "./data/eras";
 import {
   BRONZE_AGE_MARKERS,
@@ -64,7 +64,8 @@ export const HUMAN_SET = normalizeTimelineSetSource({
         {
           id: "human-history",
           label: "Human History",
-          description: "Archaeological and historical markers across human time.",
+          description:
+            "Archaeological and historical markers across human time.",
           contentType: "markers",
           order: 0,
           markers: humanHistoryMarkers,
@@ -80,7 +81,8 @@ export const HUMAN_SET = normalizeTimelineSetSource({
         {
           id: "human-evolution",
           label: "Human Evolution",
-          description: "Branching hominin overlays and major evolutionary markers.",
+          description:
+            "Branching hominin overlays and major evolutionary markers.",
           contentType: "mixed",
           order: 0,
           autoToggleRule: {

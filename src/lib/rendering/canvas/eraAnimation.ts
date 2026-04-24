@@ -1,4 +1,4 @@
-import type { Era } from "../../catalog/eras";
+import type { Era } from "@/lib/catalog/eras";
 import {
   EXPANDED_OVERLAY_CHILD_LANE_STAGGER,
   EXPANDED_OVERLAY_CHILD_REVEAL_DURATION,
@@ -9,7 +9,7 @@ import {
   EXPANDED_OVERLAY_LABEL_REVEAL_DELAY,
   EXPANDED_OVERLAY_LABEL_REVEAL_DURATION,
 } from "./constants";
-import { clamp01, interpolateProgress, smoothstep01 } from "../../core/easing";
+import { clamp01, interpolateProgress, smoothstep01 } from "@/lib/core/easing";
 
 export function getEraInlineLabelVisibility(childOpacity: number) {
   return 1 - smoothstep01((childOpacity - 0.12) / 0.36);

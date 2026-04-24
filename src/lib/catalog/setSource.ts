@@ -55,7 +55,12 @@ export type TimelineSetOverlaySource = Omit<
 
 export type TimelineSetEraNodeSource = Omit<
   EraDefinition,
-  "familyId" | "startYear" | "endYear" | "exactStartTime" | "exactEndTime" | "children"
+  | "familyId"
+  | "startYear"
+  | "endYear"
+  | "exactStartTime"
+  | "exactEndTime"
+  | "children"
 > & {
   startYear: TimelineSetTimelinePoint;
   endYear: TimelineSetTimelinePoint;
@@ -199,7 +204,9 @@ function toDocumentOverlay(
     approximateEnd: overlay.approximateEnd,
     color: overlay.color,
     autoToggleRule: overlay.autoToggleRule,
-    children: overlay.children?.map((child) => toDocumentOverlay(child, groupId)),
+    children: overlay.children?.map((child) =>
+      toDocumentOverlay(child, groupId),
+    ),
   };
 }
 

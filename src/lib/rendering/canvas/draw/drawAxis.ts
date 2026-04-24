@@ -3,7 +3,7 @@ import {
   formatTimelineElapsedAxisLabelLines,
   formatTimelineYear,
   getDominantTimelineDateReference,
-} from "../../bands";
+} from "@/lib/rendering/bands";
 import { formatCosmicCalendarLabel } from "../cosmicCalendar";
 import {
   comparePreciseTimelineYears,
@@ -16,7 +16,7 @@ import {
   worldPreciseToScreen,
   worldToScreen,
   type PreciseTimelineYear,
-} from "../../../core/viewport";
+} from "@/lib/core/viewport";
 import {
   type AxisLabelCandidate,
   getAllowedAxisLabelSteps,
@@ -42,7 +42,7 @@ import {
   EARLY_UNIVERSE_CHILD_ERA_ORDER,
   EARLY_UNIVERSE_END_YEAR,
   EARLY_UNIVERSE_START_YEAR,
-} from "../../../catalog/sets/cosmic/index";
+} from "@/lib/catalog/sets/cosmic/index";
 import type { CanvasDrawContext } from "./drawContext";
 
 export function drawAxis(cx: CanvasDrawContext): void {
@@ -289,8 +289,10 @@ export function drawAxis(cx: CanvasDrawContext): void {
   // --- Axis label formatters ---
   const isCosmicCalendar = cx.isCosmicCalendarMode;
   const useSubYearAxis = !isCosmicCalendar && fineGrainedAxisMode !== null;
-  const useCalendarSubYearAxis = !isCosmicCalendar && fineGrainedAxisMode === "calendar";
-  const useElapsedSubYearAxis = !isCosmicCalendar && fineGrainedAxisMode === "elapsed";
+  const useCalendarSubYearAxis =
+    !isCosmicCalendar && fineGrainedAxisMode === "calendar";
+  const useElapsedSubYearAxis =
+    !isCosmicCalendar && fineGrainedAxisMode === "elapsed";
   const formatAxisLabel = (year: number | PreciseTimelineYear, step: number) =>
     isCosmicCalendar
       ? formatCosmicCalendarLabel(year, step)

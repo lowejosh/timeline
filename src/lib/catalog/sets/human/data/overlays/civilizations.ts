@@ -1,5 +1,5 @@
-import type { TimelineOverlayBand } from "../../../../../core/timelineTypes";
-import { bce, ce } from "../../../../../core/timelineDateBuilders";
+import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
+import { bce, ce } from "@/lib/core/timelineDateBuilders";
 
 const POST_CLASSICAL_MIN_ZOOM = 15;
 
@@ -420,7 +420,10 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     priority: 79,
     subGroup: "mesoamerica",
     children: MAYA_SUB_BANDS,
-    sourceIds: ["preclassicMayaWikipedia", "historyOfMayaCivilizationWikipedia"],
+    sourceIds: [
+      "preclassicMayaWikipedia",
+      "historyOfMayaCivilizationWikipedia",
+    ],
   },
   {
     id: "ancient-greece",
@@ -559,7 +562,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 75,
     subGroup: "near-east",
-    sourceIds: ["khanGoldenAgeOfIslam"],
+    sourceIds: ["humanKhanGoldenAgeOfIslam"],
   },
   {
     id: "holy-roman-empire",

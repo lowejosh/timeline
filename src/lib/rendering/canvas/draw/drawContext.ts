@@ -1,13 +1,13 @@
 import type { RefObject } from "react";
-import type { Era, TimelineMarker } from "../../../core/timelineTypes";
-import type { PreciseTimelineYear } from "../../../core/viewport";
-import type { ResolvedTimelineEraLayer } from "../../childLayers";
-import type { ResolvedTimelineOverlayBand } from "../../overlayTracks";
-import type { AnimatedOverlayBandState } from "../../animation/overlayBand";
-import type { AnimatedAxisTickState } from "../../animation/axisTickState";
-import type { MarkerPriorityBoostState } from "../../animation/markerPriorityBoost";
-import type { AnimatedContextBandLabelState } from "../../contextBands";
-import type { ExpandedOverlayLayoutResult } from "../../expandedOverlayLayout";
+import type { Era, TimelineMarker } from "@/lib/core/timelineTypes";
+import type { PreciseTimelineYear } from "@/lib/core/viewport";
+import type { ResolvedTimelineEraLayer } from "@/lib/rendering/childLayers";
+import type { ResolvedTimelineOverlayBand } from "@/lib/rendering/overlayTracks";
+import type { AnimatedOverlayBandState } from "@/lib/rendering/animation/overlayBand";
+import type { AnimatedAxisTickState } from "@/lib/rendering/animation/axisTickState";
+import type { MarkerPriorityBoostState } from "@/lib/rendering/animation/markerPriorityBoost";
+import type { AnimatedContextBandLabelState } from "@/lib/rendering/contextBands";
+import type { ExpandedOverlayLayoutResult } from "@/lib/rendering/expandedOverlayLayout";
 import type {
   TimelineCanvasLayout,
   ExpandedOverlayDetail,
@@ -18,7 +18,7 @@ import type {
 } from "../primordial";
 import type { CanvasOcclusionRect } from "../drawing";
 import type { TimelinePerfBreakdown } from "../perf";
-import type { TimelineTooltipContent } from "../../../app/tooltipModel";
+import type { TimelineTooltipContent } from "@/lib/app/tooltipModel";
 
 export type HoverRegion = {
   id: string;
@@ -65,7 +65,7 @@ export type CanvasDrawContext = {
   devicePixelRatio: number;
 
   // Viewport
-  sceneViewport: import("../../../core/viewport").TimelineViewport;
+  sceneViewport: import("@/lib/core/viewport").TimelineViewport;
 
   // Layout
   layout: TimelineCanvasLayout;

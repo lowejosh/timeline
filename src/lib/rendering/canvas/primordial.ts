@@ -1,11 +1,11 @@
-import type { Era } from "../../catalog/eras";
+import type { Era } from "@/lib/catalog/eras";
 import type { ResolvedTimelineEraLayer } from "../childLayers";
-import { getPreciseTimelineYearFromExactTimestamp } from "../../core/exactTimestamp";
+import { getPreciseTimelineYearFromExactTimestamp } from "@/lib/core/exactTimestamp";
 import {
   EARLY_UNIVERSE_CHILD_ERA_ORDER,
   EARLY_UNIVERSE_END_YEAR,
   EARLY_UNIVERSE_START_YEAR,
-} from "../../catalog/sets/cosmic/index";
+} from "@/lib/catalog/sets/cosmic/index";
 import {
   comparePreciseTimelineYears,
   getVisibleRangePrecise,
@@ -16,7 +16,7 @@ import {
   toApproximateTimelineYear,
   type TimelineViewport,
   worldPreciseToScreen,
-} from "../../core/viewport";
+} from "@/lib/core/viewport";
 
 export type EraScreenSpan = {
   x0: number;

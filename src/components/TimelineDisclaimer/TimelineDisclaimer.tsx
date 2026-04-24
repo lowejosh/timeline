@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
-import { THEME } from "../../lib/ui/theme";
+import { THEME } from "@/lib/ui/theme";
 import "./TimelineDisclaimer.styles.css";
 
 export function TimelineDisclaimer() {
