@@ -14,7 +14,7 @@ import {
   isEraFamilyRoot,
   type Era,
   type TimelineSetId,
-} from "../domain/eras";
+} from "../catalog/eras";
 import {
   TIMELINE_DECORATION_GROUPS,
   getDefaultEnabledTimelineGroupIds,

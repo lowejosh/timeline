@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../core/timelineTypes";
-import { yearsAgo } from "../timelineDateBuilders";
+import type { TimelineMarker } from "../../../../../core/timelineTypes";
+import { yearsAgo } from "../../../../../core/timelineDateBuilders";
 
 export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
   {
@@ -33,10 +33,7 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 77,
-    sourceIds: [
-      "unescoChauvet",
-      "metChauvet"
-    ],
+    sourceIds: ["unescoChauvet", "metChauvet"],
   },
   {
     id: "venus-of-dolni-vestonice",

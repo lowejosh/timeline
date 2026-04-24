@@ -42,7 +42,7 @@ import {
   EARLY_UNIVERSE_CHILD_ERA_ORDER,
   EARLY_UNIVERSE_END_YEAR,
   EARLY_UNIVERSE_START_YEAR,
-} from "../../../domain/eraTrees/cosmic";
+} from "../../../catalog/sets/cosmic/index";
 import type { CanvasDrawContext } from "./drawContext";
 
 export function drawAxis(cx: CanvasDrawContext): void {

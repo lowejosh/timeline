@@ -1,11 +1,11 @@
-import type { Era } from "../../domain/eras";
+import type { Era } from "../../catalog/eras";
 import type { ResolvedTimelineEraLayer } from "../childLayers";
 import { getPreciseTimelineYearFromExactTimestamp } from "../../core/exactTimestamp";
 import {
   EARLY_UNIVERSE_CHILD_ERA_ORDER,
   EARLY_UNIVERSE_END_YEAR,
   EARLY_UNIVERSE_START_YEAR,
-} from "../../domain/eraTrees/cosmic";
+} from "../../catalog/sets/cosmic/index";
 import {
   comparePreciseTimelineYears,
   getVisibleRangePrecise,

@@ -12,11 +12,11 @@ import {
   type Era,
   type TimelineMarker,
   type TimelineOverlayBand,
-} from "../../lib/domain/eras";
+} from "../../lib/catalog/eras";
 import {
   EARLY_UNIVERSE_END_YEAR,
   EARLY_UNIVERSE_START_YEAR,
-} from "../../lib/domain/eraTrees/cosmic";
+} from "../../lib/catalog/sets/cosmic/index";
 import {
   comparePreciseTimelineYears,
   getMinZoomForWidth,
@@ -871,6 +871,7 @@ export function TimelineCanvas({
         });
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       commitHoveredTooltip,
       height,

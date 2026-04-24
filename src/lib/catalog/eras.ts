@@ -1,9 +1,9 @@
-import { TIMELINE_DISPLAY } from "../catalog/decorations";
+import { TIMELINE_DISPLAY } from "./decorations";
 import {
   getEffectiveTimelinePriority,
   getSetIdForEraFamily,
   TIMELINE_SETS,
-} from "../catalog/timelineSets";
+} from "./timelineSets";
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "../core/timelineYears";
 import type {
   Era,
@@ -26,7 +26,7 @@ export type {
   TimelineOverlayBand,
   TimelineSetId,
 } from "../core/timelineTypes";
-export { TIMELINE_DISPLAY } from "../catalog/decorations";
+export { TIMELINE_DISPLAY } from "./decorations";
 
 /** Find an era by id anywhere in the tree */
 export function findEraById(era: Era, id: string): Era | undefined {

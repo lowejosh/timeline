@@ -1,5 +1,5 @@
-import type { TimelineOverlayBand } from "../../core/timelineTypes";
-import { bce, ce } from "../timelineDateBuilders";
+import type { TimelineOverlayBand } from "../../../../../core/timelineTypes";
+import { bce, ce } from "../../../../../core/timelineDateBuilders";
 
 const POST_CLASSICAL_MIN_ZOOM = 15;
 
@@ -17,10 +17,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(214, 166, 112)",
     subGroup: "near-east",
-    sourceIds: [
-      "urukPeriodWikipedia",
-      "metUrukFirstCity"
-    ],
+    sourceIds: ["urukPeriodWikipedia", "metUrukFirstCity"],
   },
   {
     id: "jemdet-nasr-period",
@@ -78,10 +75,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(182, 144, 101)",
     subGroup: "near-east",
-    sourceIds: [
-      "metUrZiggurat",
-      "metIsinLarsaOldBabylonian"
-    ],
+    sourceIds: ["metUrZiggurat", "metIsinLarsaOldBabylonian"],
   },
   {
     id: "old-babylonian-empire",
@@ -344,10 +338,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     priority: 95,
     subGroup: "near-east",
     children: MESOPOTAMIA_SUB_BANDS,
-    sourceIds: [
-      "britannicaSumer",
-      "metBabylon"
-    ],
+    sourceIds: ["britannicaSumer", "metBabylon"],
   },
   {
     id: "indus-valley-civilization",
@@ -429,10 +420,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     priority: 79,
     subGroup: "mesoamerica",
     children: MAYA_SUB_BANDS,
-    sourceIds: [
-      "preclassicMayaWikipedia",
-      "historyOfMayaCivilizationWikipedia"
-    ],
+    sourceIds: ["preclassicMayaWikipedia", "historyOfMayaCivilizationWikipedia"],
   },
   {
     id: "ancient-greece",
@@ -492,10 +480,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 84,
     subGroup: "mediterranean",
-    sourceIds: [
-      "historyAncientRome",
-      "khanRomanRepublic"
-    ],
+    sourceIds: ["historyAncientRome", "khanRomanRepublic"],
   },
   {
     id: "chinese-civilization",
@@ -526,10 +511,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 78,
     subGroup: "mediterranean",
-    sourceIds: [
-      "historyAncientRome",
-      "khanRomanEmpire"
-    ],
+    sourceIds: ["historyAncientRome", "khanRomanEmpire"],
   },
 ];
 
@@ -562,10 +544,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
     subGroup: "mediterranean",
-    sourceIds: [
-      "metByzantium",
-      "historyByzantineEmpire"
-    ],
+    sourceIds: ["metByzantium", "historyByzantineEmpire"],
   },
   {
     id: "abbasid-caliphate",
@@ -610,10 +589,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 78,
     subGroup: "steppe",
-    sourceIds: [
-      "britannicaMongolEmpire",
-      "historyGenghisKhan"
-    ],
+    sourceIds: ["britannicaMongolEmpire", "historyGenghisKhan"],
   },
   {
     id: "mali-empire",

@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../core/timelineTypes";
-import { bce } from "../timelineDateBuilders";
+import type { TimelineMarker } from "../../../../../core/timelineTypes";
+import { bce } from "../../../../../core/timelineDateBuilders";
 
 export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
   {
@@ -13,10 +13,7 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 79,
-    sourceIds: [
-      "britannicaMesopotamia",
-      "britannicaBabylonia"
-    ],
+    sourceIds: ["britannicaMesopotamia", "britannicaBabylonia"],
   },
   {
     id: "great-pyramid-of-giza-completed",
@@ -55,10 +52,7 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 81,
-    sourceIds: [
-      "britannicaHammurabi",
-      "britannicaBabylonia"
-    ],
+    sourceIds: ["britannicaHammurabi", "britannicaBabylonia"],
   },
   {
     id: "earliest-attested-chinese-writing",

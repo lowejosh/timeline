@@ -1,5 +1,5 @@
 import { TIMELINE_MARKERS, TIMELINE_OVERLAYS } from "../../lib/catalog/content";
-import { getRootDisplayErasBySets, ROOT_ERA } from "../../lib/domain/eras";
+import { getRootDisplayErasBySets, ROOT_ERA } from "../../lib/catalog/eras";
 import { formatTimelineYear } from "../../lib/rendering/bands";
 import { TIMELINE_MAX_YEAR } from "../../lib/core/timelineYears";
 import type { TimelineSetDefinition } from "../../lib/catalog/setSchema";

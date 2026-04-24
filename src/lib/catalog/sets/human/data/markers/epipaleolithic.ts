@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../core/timelineTypes";
-import { bce } from "../timelineDateBuilders";
+import type { TimelineMarker } from "../../../../../core/timelineTypes";
+import { bce } from "../../../../../core/timelineDateBuilders";
 
 export const EPIPALEOLITHIC_MARKERS: TimelineMarker[] = [
   {

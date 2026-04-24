@@ -2,7 +2,7 @@ import {
   compareEraPriorityDescending,
   type Era,
   type TimelineOverlayBand,
-} from "../../domain/eras";
+} from "../../catalog/eras";
 import { getEffectiveTimelinePriority } from "../../catalog/timelineSets";
 import {
   getVisibleRange,

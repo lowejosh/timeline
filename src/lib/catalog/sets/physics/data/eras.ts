@@ -1,5 +1,5 @@
 import type { EraDefinition } from "../../../../core/timelineTypes";
-import { bce, ce } from "../../../../domain/timelineDateBuilders";
+import { bce, ce } from "../../../../core/timelineDateBuilders";
 import { TIMELINE_MAX_YEAR } from "../../../../core/timelineYears";
 
 export const PHYSICS_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [

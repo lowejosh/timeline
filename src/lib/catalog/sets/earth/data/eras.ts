@@ -1,5 +1,5 @@
 import type { EraDefinition } from "../../../../core/timelineTypes";
-import { yearsAgo } from "../../../../domain/timelineDateBuilders";
+import { yearsAgo } from "../../../../core/timelineDateBuilders";
 
 function chartRef(): EraDefinition["sourceIds"] {
   return ["icsChart2024"];

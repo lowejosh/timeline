@@ -1,4 +1,4 @@
-import type { Era } from "../../domain/eras";
+import type { Era } from "../../catalog/eras";
 import {
   EXPANDED_OVERLAY_CHILD_LANE_STAGGER,
   EXPANDED_OVERLAY_CHILD_REVEAL_DURATION,

@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../core/timelineTypes";
-import { yearsAgo } from "../timelineDateBuilders";
+import type { TimelineMarker } from "../../../../../core/timelineTypes";
+import { yearsAgo } from "../../../../../core/timelineDateBuilders";
 
 export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
   {
@@ -13,10 +13,7 @@ export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
     priority: 92,
     description:
       "Some of the oldest candidate hominins already show anatomy linked to upright posture.",
-    sourceIds: [
-      "smithsonianSahelanthropus",
-      "smithsonianHumanEvolutionIntro"
-    ],
+    sourceIds: ["smithsonianSahelanthropus", "smithsonianHumanEvolutionIntro"],
   },
   {
     id: "early-bipedal-femur-evidence-in-kenya",
@@ -68,10 +65,7 @@ export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
     priority: 87,
     description:
       "The first major dispersal carries early humans out of Africa and into Asia.",
-    sourceIds: [
-      "smithsonianHumanEvolutionIntro",
-      "smithsonianHomoErectus"
-    ],
+    sourceIds: ["smithsonianHumanEvolutionIntro", "smithsonianHomoErectus"],
   },
   {
     id: "acheulean-handaxes-appear",

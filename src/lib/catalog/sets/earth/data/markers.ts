@@ -1,5 +1,5 @@
 import type { TimelineMarker } from "../../../../core/timelineTypes";
-import { yearsAgo } from "../../../../domain/timelineDateBuilders";
+import { yearsAgo } from "../../../../core/timelineDateBuilders";
 
 export const EARTH_MILESTONE_MARKERS: TimelineMarker[] = [
   {

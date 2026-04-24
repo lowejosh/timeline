@@ -1,5 +1,5 @@
-import type { TimelineMarker } from "../../core/timelineTypes";
-import { bce } from "../timelineDateBuilders";
+import type { TimelineMarker } from "../../../../../core/timelineTypes";
+import { bce } from "../../../../../core/timelineDateBuilders";
 
 export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
   {
@@ -11,10 +11,7 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     year: bce(323),
     minZoom: 18,
     priority: 76,
-    sourceIds: [
-      "historyAlexanderGreat",
-      "britannicaHellenisticAge"
-    ],
+    sourceIds: ["historyAlexanderGreat", "britannicaHellenisticAge"],
   },
   {
     id: "rome-destroys-carthage",

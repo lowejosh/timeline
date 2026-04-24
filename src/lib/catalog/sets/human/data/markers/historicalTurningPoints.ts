@@ -1,9 +1,9 @@
-import type { TimelineMarker } from "../../core/timelineTypes";
+import type { TimelineMarker } from "../../../../../core/timelineTypes";
 import {
   createExactCalendarTimestamp,
   getTimelineYearFromExactTimestamp,
-} from "../../core/exactTimestamp";
-import { bce, ce } from "../timelineDateBuilders";
+} from "../../../../../core/exactTimestamp";
+import { bce, ce } from "../../../../../core/timelineDateBuilders";
 
 const TITANIC_SINKS_AT = createExactCalendarTimestamp({
   era: "ce",
@@ -208,10 +208,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 81,
-    sourceIds: [
-      "originsOfAgricultureInWestAsiaWikipedia",
-      "prePotteryNeolithicAWikipedia"
-    ],
+    sourceIds: ["originsOfAgricultureInWestAsiaWikipedia", "prePotteryNeolithicAWikipedia"],
   },
   {
     id: "catalhoyuk-settled-farming-community",
@@ -250,10 +247,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 66,
-    sourceIds: [
-      "unescoStonehenge",
-      "khanNeolithicRevolution"
-    ],
+    sourceIds: ["unescoStonehenge", "khanNeolithicRevolution"],
   },
   {
     id: "bronze-age-collapse",
@@ -266,10 +260,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 78,
-    sourceIds: [
-      "britannicaBronzeAge",
-      "britannicaAncientGreece"
-    ],
+    sourceIds: ["britannicaBronzeAge", "britannicaAncientGreece"],
   },
   {
     id: "augustus-becomes-emperor",
@@ -280,10 +271,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: bce(27),
     minZoom: 18,
     priority: 83,
-    sourceIds: [
-      "historyAncientRome",
-      "khanRomanEmpire"
-    ],
+    sourceIds: ["historyAncientRome", "khanRomanEmpire"],
   },
   {
     id: "fall-of-western-rome",
@@ -763,10 +751,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     dateLabel: "Dec 14, 1960",
     minZoom: 20,
     priority: 79,
-    sourceIds: [
-      "unAntiColonialismDay",
-      "unDecolonization"
-    ],
+    sourceIds: ["unAntiColonialismDay", "unDecolonization"],
   },
   {
     id: "first-human-in-space",
@@ -822,9 +807,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     shortLabel: "Iranian Revolution",
     description:
       "Iran's monarchy fell and Khomeini's movement opened the way to an Islamic republic.",
-    year: getTimelineYearFromExactTimestamp(
-      IRANIAN_REVOLUTION_TOPPLES_MONARCHY_AT,
-    ),
+    year: getTimelineYearFromExactTimestamp(IRANIAN_REVOLUTION_TOPPLES_MONARCHY_AT),
     exactTime: IRANIAN_REVOLUTION_TOPPLES_MONARCHY_AT,
     dateLabel: "Feb 11, 1979",
     minZoom: 20,

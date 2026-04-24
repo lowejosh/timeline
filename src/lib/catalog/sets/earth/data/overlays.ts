@@ -1,5 +1,5 @@
 import type { TimelineOverlayBand } from "../../../../core/timelineTypes";
-import { yearsAgo } from "../../../../domain/timelineDateBuilders";
+import { yearsAgo } from "../../../../core/timelineDateBuilders";
 
 export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
   {

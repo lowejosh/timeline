@@ -1,5 +1,5 @@
 import type { TimelineMarker } from "../../../../core/timelineTypes";
-import { bce, ce } from "../../../../domain/timelineDateBuilders";
+import { bce, ce } from "../../../../core/timelineDateBuilders";
 
 const PHYSICS_OF_UNIVERSE_SOURCE_IDS = ["physicsOfUniverseDates"];
 const WIKIPEDIA_TIMELINE_SOURCE_IDS = [

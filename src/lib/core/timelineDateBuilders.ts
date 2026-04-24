@@ -1,8 +1,8 @@
-import { getTimelineYearFromExactTimestamp } from "../core/exactTimestamp";
+import { getTimelineYearFromExactTimestamp } from "./exactTimestamp";
 import {
   createExactCalendarTimestamp,
   createExactElapsedTimestamp,
-} from "../core/exactTimestamp";
+} from "./exactTimestamp";
 
 export function bce(year: number) {
   return getTimelineYearFromExactTimestamp(

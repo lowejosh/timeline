@@ -2,7 +2,7 @@ import {
   compareEraPriorityAscending,
   compareEraPriorityDescending,
   type Era,
-} from "../domain/eras";
+} from "../catalog/eras";
 import { getEffectiveTimelinePriority } from "../catalog/timelineSets";
 import { worldToScreen, type TimelineViewport } from "../core/viewport";
 

@@ -1,5 +1,5 @@
 import type { TimelineOverlayBand } from "../../../../core/timelineTypes";
-import { bce, ce } from "../../../../domain/timelineDateBuilders";
+import { bce, ce } from "../../../../core/timelineDateBuilders";
 import { TIMELINE_MAX_YEAR } from "../../../../core/timelineYears";
 
 export const PHYSICS_CONTEXT_OVERLAYS: TimelineOverlayBand[] = [

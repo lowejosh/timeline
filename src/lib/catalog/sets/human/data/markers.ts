@@ -1,11 +1,9 @@
-export {
-  BRONZE_AGE_MARKERS,
-  CHALCOLITHIC_MARKERS,
-  CLASSICAL_ANTIQUITY_MARKERS,
-  EPIPALEOLITHIC_MARKERS,
-  HISTORICAL_TURNING_POINT_MARKERS,
-  HUMAN_EVOLUTION_MARKERS,
-  NEOLITHIC_MARKERS,
-  PALEOLITHIC_MARKERS,
-  POST_CLASSICAL_MARKERS,
-} from "../../../../domain/markers";
+export { BRONZE_AGE_MARKERS } from "./markers/bronzeAge";
+export { CHALCOLITHIC_MARKERS } from "./markers/chalcolithic";
+export { CLASSICAL_ANTIQUITY_MARKERS } from "./markers/classicalAntiquity";
+export { EPIPALEOLITHIC_MARKERS } from "./markers/epipaleolithic";
+export { HISTORICAL_TURNING_POINT_MARKERS } from "./markers/historicalTurningPoints";
+export { HUMAN_EVOLUTION_MARKERS } from "./markers/humanEvolution";
+export { NEOLITHIC_MARKERS } from "./markers/neolithic";
+export { PALEOLITHIC_MARKERS } from "./markers/paleolithic";
+export { POST_CLASSICAL_MARKERS } from "./markers/postClassical";

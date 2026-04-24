@@ -1,5 +1,5 @@
-import type { TimelineOverlayBand } from "../../core/timelineTypes";
-import { bce, yearsAgo } from "../timelineDateBuilders";
+import type { TimelineOverlayBand } from "../../../../../core/timelineTypes";
+import { bce, yearsAgo } from "../../../../../core/timelineDateBuilders";
 
 export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
   {
@@ -15,10 +15,7 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(154, 120, 88)",
     priority: 76,
     subGroup: "near-east",
-    sourceIds: [
-      "natufianCultureWikipedia",
-      "metPrehistoricArt"
-    ],
+    sourceIds: ["natufianCultureWikipedia", "metPrehistoricArt"],
   },
   {
     id: "khiamian-culture",

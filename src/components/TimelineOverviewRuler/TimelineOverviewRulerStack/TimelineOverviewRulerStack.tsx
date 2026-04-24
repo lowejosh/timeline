@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { type Era } from "../../../lib/domain/eras";
+import { type Era } from "../../../lib/catalog/eras";
 import {
   formatOverviewRulerPercentageLabel,
   formatOverviewRulerSpanLabel,

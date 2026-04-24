@@ -7,7 +7,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
-import { compareEraPriorityAscending, type Era } from "../../lib/domain/eras";
+import { compareEraPriorityAscending, type Era } from "../../lib/catalog/eras";
 import {
   getOverviewRulerYearsPerPixel,
   mapOverviewRulerXToYear,
