@@ -47,12 +47,11 @@ export const PHYSICS_CONTEXT_OVERLAYS: TimelineOverlayBand[] = [
     label: "Newtonian Physics",
     shortLabel: "Newtonian Physics",
     description:
-      "Newton's Principia unified celestial and terrestrial physics, and 18th-century tests helped persuade European scientists to shift from Cartesian to Newtonian physics.",
+      "Newton's Principia unified the laws of motion and gravity, establishing a framework that explained both celestial and terrestrial phenomena. For over two centuries, Newtonian mechanics shaped scientific understanding and became the foundation for physics until the early 20th century revolutions in relativity and quantum theory.",
     startYear: ce(1687),
-    endYear: ce(1750),
-    approximateEnd: true,
+    endYear: ce(1905),
     color: "rgb(66, 110, 172)",
-    sourceIds: ["britannicaPhysicalScience"],
+    sourceIds: ["sepNewtonPrincipia"],
   },
   {
     id: "physics-context-electromagnetic-revolution",
@@ -82,7 +81,7 @@ export const PHYSICS_CONTEXT_OVERLAYS: TimelineOverlayBand[] = [
     shortLabel: "Quantum Revolution",
     description:
       "From Planck's quanta and Einstein's photoelectric paper through de Broglie, Bohr, Heisenberg, Schrödinger, and Dirac, quantum theory became the new framework for atomic-scale physics.",
-    startYear: ce(1901),
+    startYear: ce(1900),
     endYear: ce(1930),
     color: "rgb(118, 84, 182)",
     sourceIds: ["libreTextsFailuresOfClassicalPhysics"],

@@ -7,6 +7,13 @@ export type EraSource = {
 };
 
 export const ERA_SOURCES = {
+    sepNewtonPrincipia: {
+      shortTitle: "SEP: Newton's Principia",
+      title: "Newton’s Principia",
+      organization: "Stanford Encyclopedia of Philosophy",
+      citation: 'Smith, G. E. (2023), "Newton’s Principia," SEP. https://plato.stanford.edu/entries/newton-principia/',
+      url: "https://plato.stanford.edu/entries/newton-principia/",
+    },
   nasaUniverseOverview: {
     shortTitle: "NASA: Cosmic History",
     title: "Universe: Cosmic History",
