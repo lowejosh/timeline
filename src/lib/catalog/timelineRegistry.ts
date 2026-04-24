@@ -7,10 +7,10 @@ import type {
   TimelineSetId,
 } from "../core/timelineTypes";
 import type { TimelineSetDefinition } from "./setSchema";
-import { COSMIC_SET } from "./sets/cosmic";
-import { EARTH_SET } from "./sets/earth";
-import { HUMAN_SET } from "./sets/human";
-import { PHYSICS_SET } from "./sets/physics";
+import { COSMIC_SET } from "./sets/cosmic/index";
+import { EARTH_SET } from "./sets/earth/index";
+import { HUMAN_SET } from "./sets/human/index";
+import { PHYSICS_SET } from "./sets/physics/index";
 
 function compareSetOrder(left: TimelineSetDefinition, right: TimelineSetDefinition) {
   return (

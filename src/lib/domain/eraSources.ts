@@ -1,8 +1,8 @@
-import { COSMIC_SET_SOURCES } from "../catalog/sets/cosmic";
+import { COSMIC_SET } from "../catalog/sets/cosmic/index";
 import type { EraSource } from "../core/timelineTypes";
 
 export const ERA_SOURCES = {
-  ...COSMIC_SET_SOURCES,
+  ...COSMIC_SET.sources,
   sepNewtonPrincipia: {
       shortTitle: "SEP: Newton's Principia",
       title: "Newton’s Principia",

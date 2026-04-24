@@ -1,6 +1,6 @@
-import { TIMELINE_MAX_YEAR } from "../../core/timelineYears";
-import { HUMAN_HISTORY_ERA_DEFINITIONS } from "../../domain/eraTrees/humanHistory";
-import { ERA_SOURCES } from "../../domain/eraSources";
+import { TIMELINE_MAX_YEAR } from "../../../core/timelineYears";
+import { normalizeTimelineSetSource } from "../../setSource";
+import { HUMAN_HISTORY_ERA_DEFINITIONS } from "./data/eras";
 import {
   BRONZE_AGE_MARKERS,
   CHALCOLITHIC_MARKERS,
@@ -11,26 +11,13 @@ import {
   NEOLITHIC_MARKERS,
   PALEOLITHIC_MARKERS,
   POST_CLASSICAL_MARKERS,
-} from "../../domain/markers";
+} from "./data/markers";
 import {
   CIVILIZATION_OVERLAYS,
   CULTURE_OVERLAYS,
   HUMAN_EVOLUTION_OVERLAYS,
-} from "../../domain/overlays";
-import { normalizeTimelineSetDocument } from "../setSchema";
-import {
-  buildTimelineSetDocument,
-  toRawEraNode,
-  toRawMarker,
-  toRawOverlay,
-} from "./shared";
-
-export const HUMAN_SET_ID = "human";
-export const HUMAN_EVOLUTION_GROUP_ID = "human-evolution";
-export const HUMAN_HISTORY_GROUP_ID = "human-history";
-export const CULTURES_GROUP_ID = "cultures";
-export const CIVILIZATIONS_GROUP_ID = "civilizations";
-const HUMAN_FAMILY_ID = "human-history";
+} from "./data/overlays";
+import { HUMAN_SOURCES } from "./data/sources";
 
 const humanFamilyRoot = {
   id: "human-history-root",
@@ -41,7 +28,7 @@ const humanFamilyRoot = {
       ?.endYear ?? TIMELINE_MAX_YEAR,
   color: "rgba(0, 0, 0, 0)",
   scheme: "world-history" as const,
-  children: HUMAN_HISTORY_ERA_DEFINITIONS.map(toRawEraNode),
+  children: HUMAN_HISTORY_ERA_DEFINITIONS,
 };
 
 const humanHistoryMarkers = [
@@ -55,9 +42,10 @@ const humanHistoryMarkers = [
   ...POST_CLASSICAL_MARKERS,
 ];
 
-const humanSetDocument = buildTimelineSetDocument({
+export const HUMAN_SET = normalizeTimelineSetSource({
+  version: 1,
   metadata: {
-    id: HUMAN_SET_ID,
+    id: "human",
     label: "Human",
     description:
       "Hominin evolution, archaeological cultures, civilizations, and recorded history.",
@@ -65,34 +53,34 @@ const humanSetDocument = buildTimelineSetDocument({
     order: 2,
     defaultEnabled: true,
   },
+  sources: HUMAN_SOURCES,
   categories: [
     {
-      id: HUMAN_HISTORY_GROUP_ID,
+      id: "human-history",
       label: "Human History",
       description: "All toggleable human-history marker collections.",
       order: 4,
       groups: [
         {
-          id: HUMAN_HISTORY_GROUP_ID,
+          id: "human-history",
           label: "Human History",
-          description:
-            "Archaeological and historical markers across human time.",
+          description: "Archaeological and historical markers across human time.",
           contentType: "markers",
           order: 0,
+          markers: humanHistoryMarkers,
         },
       ],
     },
     {
-      id: HUMAN_EVOLUTION_GROUP_ID,
+      id: "human-evolution",
       label: "Human Evolution",
       description: "Toggleable hominin overlays and milestone markers.",
       order: 5,
       groups: [
         {
-          id: HUMAN_EVOLUTION_GROUP_ID,
+          id: "human-evolution",
           label: "Human Evolution",
-          description:
-            "Branching hominin overlays and major evolutionary markers.",
+          description: "Branching hominin overlays and major evolutionary markers.",
           contentType: "mixed",
           order: 0,
           autoToggleRule: {
@@ -100,34 +88,37 @@ const humanSetDocument = buildTimelineSetDocument({
             hideAtOrBelowYears: 500_000,
             showAboveYears: 1_000_000,
           },
+          markers: HUMAN_EVOLUTION_MARKERS,
+          overlays: HUMAN_EVOLUTION_OVERLAYS,
         },
       ],
     },
     {
-      id: CULTURES_GROUP_ID,
+      id: "cultures",
       label: "Pre-Civilization Cultures",
       description:
         "Toggleable archaeological cultures and village worlds before early states and cities.",
       order: 6,
       groups: [
         {
-          id: CULTURES_GROUP_ID,
+          id: "cultures",
           label: "Pre-Civilization Cultures",
           description:
             "Archaeological cultures and village worlds before or alongside the rise of early states and cities.",
           contentType: "overlays",
           order: 0,
+          overlays: CULTURE_OVERLAYS,
         },
       ],
     },
     {
-      id: CIVILIZATIONS_GROUP_ID,
+      id: "civilizations",
       label: "Civilizations",
       description: "All toggleable civilization overlay bands.",
       order: 7,
       groups: [
         {
-          id: CIVILIZATIONS_GROUP_ID,
+          id: "civilizations",
           label: "Civilizations",
           description: "Ancient through early-modern civilization overlays.",
           contentType: "overlays",
@@ -138,13 +129,14 @@ const humanSetDocument = buildTimelineSetDocument({
             hideCoverage: 0.82,
             showCoverage: 0.68,
           },
+          overlays: CIVILIZATION_OVERLAYS,
         },
       ],
     },
   ],
   families: [
     {
-      id: HUMAN_FAMILY_ID,
+      id: "human-history",
       label: "Human History",
       description: "Archaeological and world-history eras.",
       order: 2,
@@ -153,36 +145,8 @@ const humanSetDocument = buildTimelineSetDocument({
       root: humanFamilyRoot,
     },
   ],
-  markers: [
-    ...HUMAN_EVOLUTION_MARKERS.map((marker) =>
-      toRawMarker(marker, HUMAN_EVOLUTION_GROUP_ID),
-    ),
-    ...humanHistoryMarkers.map((marker) =>
-      toRawMarker(marker, HUMAN_HISTORY_GROUP_ID),
-    ),
-  ],
-  overlays: [
-    ...HUMAN_EVOLUTION_OVERLAYS.map((overlay) =>
-      toRawOverlay(overlay, HUMAN_EVOLUTION_GROUP_ID),
-    ),
-    ...CULTURE_OVERLAYS.map((overlay) =>
-      toRawOverlay(overlay, CULTURES_GROUP_ID),
-    ),
-    ...CIVILIZATION_OVERLAYS.map((overlay) =>
-      toRawOverlay(overlay, CIVILIZATIONS_GROUP_ID),
-    ),
-  ],
-  sourceCatalog: ERA_SOURCES,
   overlayLaneBias: {
     "chinese-civilization": -250,
     "homo-sapiens": -7_000_000,
   },
 });
-
-export const HUMAN_SET = normalizeTimelineSetDocument(humanSetDocument);
-export const HUMAN_SET_FAMILY_IDS = HUMAN_SET.metadata.familyIds;
-export const HUMAN_SET_CATEGORIES = HUMAN_SET.categories;
-export const HUMAN_SET_GROUPS = HUMAN_SET.groups;
-export const HUMAN_SET_MARKERS = HUMAN_SET.markers;
-export const HUMAN_SET_OVERLAYS = HUMAN_SET.overlays;
-export const HUMAN_SET_ERA_FAMILIES = HUMAN_SET.families;

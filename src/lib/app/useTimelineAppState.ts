@@ -16,7 +16,6 @@ import {
   type TimelineSetId,
 } from "../domain/eras";
 import {
-  TIMELINE_DECORATION_CATEGORY_IDS,
   TIMELINE_DECORATION_GROUPS,
   getDefaultEnabledTimelineGroupIds,
 } from "../catalog/decorations";
@@ -52,8 +51,7 @@ import type {
 
 type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
 
-const HUMAN_EVOLUTION_GROUP_ID =
-  TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
+const HUMAN_EVOLUTION_GROUP_ID = "human-evolution";
 const OVERVIEW_RULER_TIER_HEIGHT = 18;
 const OVERVIEW_RULER_MAX_TIERS = 3;
 const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
