@@ -21,9 +21,11 @@ import "./AvailableSetsPage.styles.css";
 export function AvailableSetsPage({
   allSets,
   enabledSetIds,
+  visibleSetIds,
   orderedSetIds,
   isActive,
   onApply,
+  onToggleVisible,
   onClose,
 }: AvailableSetsPageProps) {
   const [draftColumns, setDraftColumns] = useState<DraftColumns>(() =>
@@ -32,6 +34,9 @@ export function AvailableSetsPage({
   const [query, setQuery] = useState("");
   const [activeTags, setActiveTags] = useState<Set<string>>(() => new Set());
 
+  // Track sets that passed through the available column during this session.
+  // When such a set is re-added to enabled, restore its visibility so a hidden
+  // set never stays hidden simply because it was removed and re-added.
   const setsById = useMemo(
     () => new Map(allSets.map((set) => [set.metadata.id, set] as const)),
     [allSets],
@@ -104,6 +109,11 @@ export function AvailableSetsPage({
     draftColumns,
     visibleAvailableSetIds,
     setDraftColumns,
+    (setId) => {
+      if (!visibleSetIds.has(setId)) {
+        onToggleVisible(setId, true);
+      }
+    },
   );
 
   const handleToggleTag = (tag: string) => {
@@ -122,6 +132,12 @@ export function AvailableSetsPage({
   };
 
   const handleToggleDraft = (setId: TimelineSetId, nextEnabled: boolean) => {
+    // When a set is moved to the available column, clear any hidden state
+    // immediately so it comes back visible if the user re-adds it.
+    if (!nextEnabled && !visibleSetIds.has(setId)) {
+      onToggleVisible(setId, true);
+    }
+
     setDraftColumns((current) => {
       if (nextEnabled) {
         if (current.enabled.includes(setId)) {
@@ -192,6 +208,7 @@ export function AvailableSetsPage({
   const renderSetCard = (set: TimelineSetDefinition, columnId: ColumnId) => {
     const setId = set.metadata.id;
     const isEnabled = columnId === "enabled";
+    const isVisible = visibleSetIds.has(setId);
     const obscuredCount = isEnabled ? (eraObscuredCounts.get(setId) ?? 0) : 0;
     const timeRange = setTimeRanges.get(setId) ?? null;
     const isDragged = dragState?.setId === setId;
@@ -217,9 +234,12 @@ export function AvailableSetsPage({
         ? dragState.currentClientY - dragState.startClientY
         : shiftY;
 
+    const cardWash = isEnabled && !isVisible
+      ? "opacity-50 grayscale-[0.25] pointer-events-auto"
+      : "";
     return (
       <article
-        className="avsets__card"
+        className={`avsets__card ${cardWash}`}
         data-drag-state={
           isDragged ? "dragging" : dragState ? "shifting" : "idle"
         }
@@ -285,20 +305,58 @@ export function AvailableSetsPage({
           ) : null}
         </div>
 
+        {isEnabled ? (
+          <button
+            aria-label={isVisible ? `Hide ${set.metadata.label}` : `Show ${set.metadata.label}`}
+            aria-pressed={isVisible}
+            className="avsets__item-visibility"
+            data-visible={isVisible ? "true" : "false"}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleVisible(setId, !isVisible);
+            }}
+            type="button"
+          >
+            {isVisible ? (
+              // Heroicons Eye (solid)
+              <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 4c-4.418 0-8 3.134-8 6s3.582 6 8 6 8-3.134 8-6-3.582-6-8-6Zm0 10c-2.21 0-4-1.567-4-3.5S7.79 7 10 7s4 1.567 4 3.5S12.21 14 10 14Zm0-5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" clipRule="evenodd"/>
+              </svg>
+            ) : (
+              // Heroicons Eye Slash (solid)
+              <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3.28 2.22a.75.75 0 0 0-1.06 1.06l14.5 14.5a.75.75 0 1 0 1.06-1.06l-1.745-1.745a10.029 10.029 0 0 0 3.3-4.38 1.651 1.651 0 0 0 0-1.185A10.004 10.004 0 0 0 9.999 3a9.956 9.956 0 0 0-4.744 1.194L3.28 2.22ZM7.752 6.69l1.092 1.092a2.5 2.5 0 0 1 3.374 3.373l1.091 1.092a4 4 0 0 0-5.557-5.557Z" clipRule="evenodd"/>
+                <path d="M10.748 13.93a2.5 2.5 0 0 1-3.678-3.678l-.748-.748a4 4 0 0 0 5.424 5.425l-.998-.999ZM15.44 12.576l.392.392a10.048 10.048 0 0 1-2.106 1.564.75.75 0 1 1-.695-1.326 8.549 8.549 0 0 0 2.409-1.63ZM4.508 8.56l-1.5-1.5A9.949 9.949 0 0 0 1.934 9.41a1.651 1.651 0 0 0 0 1.185 10.004 10.004 0 0 0 9.999 5.388c.307-.032.61-.079.908-.138l-1.12-1.12a4 4 0 0 1-4.747-4.747L4.508 8.56Z"/>
+              </svg>
+            )}
+          </button>
+        ) : null}
+
         <button
           aria-label={
             isEnabled
               ? `Remove ${set.metadata.label}`
               : `Add ${set.metadata.label}`
           }
-          className="avsets__item-action"
+          className="avsets__item-toggle"
           data-variant={isEnabled ? "remove" : "add"}
           onClick={() => {
             handleToggleDraft(setId, !isEnabled);
           }}
           type="button"
         >
-          <span aria-hidden="true">{isEnabled ? "−" : "+"}</span>
+          {isEnabled ? (
+            // Minus icon
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
+              <rect x="4" y="9" width="12" height="2" rx="1" />
+            </svg>
+          ) : (
+            // Plus icon
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
+              <rect x="9" y="4" width="2" height="12" rx="1" />
+              <rect x="4" y="9" width="12" height="2" rx="1" />
+            </svg>
+          )}
         </button>
       </article>
     );

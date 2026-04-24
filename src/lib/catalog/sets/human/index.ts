@@ -87,8 +87,8 @@ export const HUMAN_SET = normalizeTimelineSetSource({
           order: 0,
           autoToggleRule: {
             kind: "max-visible-span",
-            hideAtOrBelowYears: 500_000,
-            showAboveYears: 1_000_000,
+            hideAtOrBelowYears: 10_000,
+            showAboveYears: 12_000,
           },
           markers: HUMAN_EVOLUTION_MARKERS,
           overlays: HUMAN_EVOLUTION_OVERLAYS,

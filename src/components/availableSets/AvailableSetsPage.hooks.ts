@@ -33,6 +33,7 @@ export function useAvailableSetsDrag(
   draftColumns: DraftColumns,
   visibleAvailableSetIds: readonly TimelineSetId[],
   setDraftColumns: Dispatch<SetStateAction<DraftColumns>>,
+  onMovedToAvailable: (setId: TimelineSetId) => void,
 ) {
   const enabledColumnRef = useRef<HTMLDivElement | null>(null);
   const availableColumnRef = useRef<HTMLDivElement | null>(null);
@@ -150,6 +151,13 @@ export function useAvailableSetsDrag(
       }
 
       setDragState(null);
+
+      if (
+        current.sourceColumn === "enabled" &&
+        current.targetColumn === "available"
+      ) {
+        onMovedToAvailable(current.setId);
+      }
 
       setDraftColumns((cols) => {
         if (

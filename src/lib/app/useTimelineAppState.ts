@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TIMELINE_CANVAS_PAD } from "../rendering/layout/padding";
-import { useAnimatedViewport } from "@/hooks/useAnimatedViewport";
-import { useElementSize } from "@/hooks/useElementSize";
+import { useAnimatedViewport } from "../../hooks/useAnimatedViewport";
+import { useElementSize } from "../../hooks/useElementSize";
 import {
   ROOT_ERA,
   TIMELINE_DISPLAY,
@@ -14,8 +14,9 @@ import {
   isEraFamilyRoot,
   type Era,
   type TimelineSetId,
-} from "../catalog/eras";
+} from "@/lib/catalog/eras";
 import {
+  TIMELINE_DECORATION_CATEGORY_IDS,
   TIMELINE_DECORATION_GROUPS,
   getDefaultEnabledTimelineGroupIds,
 } from "../catalog/decorations";
@@ -51,7 +52,8 @@ import type {
 
 type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
 
-const HUMAN_EVOLUTION_GROUP_ID = "human-evolution";
+const HUMAN_EVOLUTION_GROUP_ID =
+  TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
 const OVERVIEW_RULER_TIER_HEIGHT = 18;
 const OVERVIEW_RULER_MAX_TIERS = 3;
 const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
@@ -264,16 +266,16 @@ export function useTimelineAppState() {
   const [visibleSetIds, setVisibleSetIds] = useState<Set<TimelineSetId>>(() =>
     readStoredVisibleSetIds(),
   );
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(
-        TIMELINE_VISIBLE_SET_IDS_STORAGE_KEY,
-        JSON.stringify(Array.from(visibleSetIds)),
-      );
-    } catch {
-      // Ignore storage failures; state still works in memory.
-    }
-  }, [visibleSetIds]);
+    useEffect(() => {
+      try {
+        window.localStorage.setItem(
+          TIMELINE_VISIBLE_SET_IDS_STORAGE_KEY,
+          JSON.stringify(Array.from(visibleSetIds)),
+        );
+      } catch {
+        // Ignore storage failures; state still works in memory.
+      }
+    }, [visibleSetIds]);
   const [orderedSetIds, setOrderedSetIds] = useState<TimelineSetId[]>(() =>
     readStoredTimelineSetOrder(),
   );
@@ -547,7 +549,7 @@ export function useTimelineAppState() {
         : (activeEra.children ?? []);
 
   const checkAutoTransition = useCallback(() => {
-    setActiveEraId((currentId) => {
+    setActiveEraId((currentId: string) => {
       const era =
         findEraById(prioritizedRootEra, currentId) ?? prioritizedRootEra;
       const navigableAncestor = getNavigableAncestor(
@@ -856,6 +858,7 @@ export function useTimelineAppState() {
     sidebarTree,
     expandedSetIds,
     enabledSetIds,
+    visibleSetIds,
     orderedSetIds,
 
     // view

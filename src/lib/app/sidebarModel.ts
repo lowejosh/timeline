@@ -1,6 +1,5 @@
 import { getVisibleRange, type TimelineViewport } from "../core/viewport";
 import { isTimelineDecorationVisibleAtZoom } from "../rendering/queries/visibility";
-import { TIMELINE_DECORATION_GROUPS_BY_ID } from "../catalog/decorations";
 import {
   TIMELINE_SETS,
   getDefaultTimelineSetOrder,
@@ -114,29 +113,14 @@ export function resolveTimelineSidebarTree(
     .sort(
       (left, right) =>
         (orderIndexBySetId.get(left.metadata.id) ?? Number.MAX_SAFE_INTEGER) -
-          (orderIndexBySetId.get(right.metadata.id) ??
-            Number.MAX_SAFE_INTEGER) ||
+          (orderIndexBySetId.get(right.metadata.id) ?? Number.MAX_SAFE_INTEGER) ||
         left.metadata.order - right.metadata.order ||
         left.metadata.label.localeCompare(right.metadata.label),
     )
     .map((set) => {
-      const children = [...set.groups]
-        .sort(
-          (left, right) =>
-            left.order - right.order || left.label.localeCompare(right.label),
-        )
-        .map<TimelineSidebarChildState | null>((groupId) => {
-          const group =
-            typeof groupId === "string"
-              ? TIMELINE_DECORATION_GROUPS_BY_ID[groupId]
-              : groupId;
-
-          if (!group) {
-            return null;
-          }
-
+      const children = set.groups
+        .map<TimelineSidebarChildState>((group) => {
           const counts = countsByGroupId.get(group.id) ?? createEmptyCounts();
-          const enabledCount = enabledGroupIds.has(group.id) ? 1 : 0;
 
           return {
             id: group.id,
@@ -144,21 +128,23 @@ export function resolveTimelineSidebarTree(
             description: group.description,
             groupIds: [group.id],
             contentType: group.contentType,
-            enabled: enabledCount === 1,
+            enabled: enabledGroupIds.has(group.id),
             mixed: false,
             suppressed: suppressedGroupIds.has(group.id),
             markerCount: counts.markerCount,
             overlayCount: counts.overlayCount,
             relevantItemCount: getRelevantItemCount(counts),
           };
-        })
-        .filter((child): child is TimelineSidebarChildState => child !== null);
+        });
 
-      const totals = children.reduce((aggregate, child) => {
-        aggregate.markerCount += child.markerCount;
-        aggregate.overlayCount += child.overlayCount;
-        return aggregate;
-      }, createEmptyCounts());
+      const totals = children.reduce<TimelineSidebarCounts>(
+        (aggregate, child) => {
+          aggregate.markerCount += child.markerCount;
+          aggregate.overlayCount += child.overlayCount;
+          return aggregate;
+        },
+        createEmptyCounts(),
+      );
 
       return {
         id: set.metadata.id,

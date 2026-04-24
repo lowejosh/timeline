@@ -356,7 +356,7 @@ export function computeEraObscuredCounts(
     const obscuredCount = thisSetEras.filter((era) =>
       higherPriorityEras.some(
         (higher) =>
-          higher.startYear <= era.startYear && higher.endYear >= era.endYear,
+          higher.startYear < era.endYear && higher.endYear > era.startYear,
       ),
     ).length;
 

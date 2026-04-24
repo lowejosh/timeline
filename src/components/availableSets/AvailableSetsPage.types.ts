@@ -6,12 +6,14 @@ export type ColumnId = "enabled" | "available";
 export type AvailableSetsPageProps = {
   allSets: readonly TimelineSetDefinition[];
   enabledSetIds: ReadonlySet<TimelineSetId>;
+  visibleSetIds: ReadonlySet<TimelineSetId>;
   orderedSetIds: readonly TimelineSetId[];
   isActive: boolean;
   onApply: (
     nextEnabledSetIds: Set<TimelineSetId>,
     nextOrderedSetIds: TimelineSetId[],
   ) => void;
+  onToggleVisible: (setId: TimelineSetId, nextVisible: boolean) => void;
   onClose: () => void;
 };
 

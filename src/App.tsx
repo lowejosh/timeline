@@ -132,9 +132,11 @@ function App() {
             <AvailableSetsPage
               allSets={TIMELINE_SETS}
               enabledSetIds={app.enabledSetIds}
+              visibleSetIds={app.visibleSetIds}
               orderedSetIds={app.orderedSetIds}
               isActive={app.activeView === "available-sets"}
               onApply={app.handleApplySets}
+              onToggleVisible={app.handleToggleSet}
               onClose={app.handleCloseSetManager}
             />
           </div>
