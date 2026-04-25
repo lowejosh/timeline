@@ -11,12 +11,36 @@ import {
 } from "@/lib/core/viewport";
 import type { ResolvedTimelineOverlayBand } from "../overlayTracks";
 import {
+  AXIS_DATE_LABEL_HEIGHT,
+  AXIS_LABEL_ROW_GAP,
+  AXIS_MAJOR_TICK_BOTTOM_OFFSET,
+  AXIS_MAJOR_TICK_TOP_OFFSET,
+  AXIS_TICK_TO_LABEL_GAP,
+  AXIS_YEAR_LABEL_HEIGHT,
+  BREADCRUMB_HEIGHT,
+  BREADCRUMB_TO_OVERLAY_GAP,
+  BREADCRUMB_TOP,
+  COMFORTABLE_AXIS_TO_MARKER_LABEL_GAP,
+  COMFORTABLE_MARKER_LABEL_ROW_GAP,
+  COMFORTABLE_MARKER_TO_AXIS_LABEL_GAP,
+  COMPACT_AXIS_TO_MARKER_LABEL_GAP,
+  COMPACT_MARKER_LABEL_ROW_GAP,
+  COMPACT_MARKER_STACK_MAX_HEIGHT,
+  COMPACT_MARKER_TO_AXIS_LABEL_GAP,
   EXPANDED_OVERLAY_BOTTOM_PADDING,
   EXPANDED_OVERLAY_TOP_PADDING,
+  MARKER_DATE_HEIGHT,
+  MARKER_LABEL_HEIGHT,
+  MARKER_STEM_BOTTOM_OFFSET,
+  MARKER_STEM_TO_LABEL_GAP,
   MIN_VISIBLE_OVERLAY_CHILD_WIDTH,
+  NOW_INDICATOR_TOP_OFFSET,
   OVERLAY_LANE_GAP,
   OVERLAY_LANE_HEIGHT,
   OVERLAY_PANEL_GAP,
+  ROOMY_TIMELINE_BOTTOM_PADDING_MAX_EXTRA,
+  ROOMY_TIMELINE_BOTTOM_PADDING_START_HEIGHT,
+  TIMELINE_BOTTOM_PADDING,
 } from "./constants";
 
 export type TimelineCanvasLayout = {
@@ -33,9 +57,11 @@ export type TimelineCanvasLayout = {
   markerLabelY: number;
   markerDateY: number;
   majorTickTop: number;
+  majorTickBottom: number;
   dateLabelY: number;
   yearLabelY: number;
   nowTop: number;
+  nowBottom: number;
 };
 
 export type ExpandedOverlayChild = {
@@ -80,17 +106,62 @@ export function getTimelineLayout(
   height: number,
   overlayLaneCount: number,
   requestedOverlayScrollOffset = 0,
+  options?: {
+    reserveAxisDateRow?: boolean;
+    overviewReservedHeight?: number;
+  },
 ): TimelineCanvasLayout {
+  const reserveAxisDateRow = options?.reserveAxisDateRow ?? true;
+  const overviewReservedHeight = Math.max(options?.overviewReservedHeight ?? 0, 0);
+  const effectiveHeight = Math.max(height - overviewReservedHeight, 0);
   const overlayHeight =
     overlayLaneCount > 0
       ? overlayLaneCount * OVERLAY_LANE_HEIGHT +
         Math.max(overlayLaneCount - 1, 0) * OVERLAY_LANE_GAP
       : 0;
-  const axisY = Math.min(Math.max(128, height * 0.62), height - 96);
-  const majorTickTop = axisY - 28;
+  const compactMarkerStack =
+    effectiveHeight <= COMPACT_MARKER_STACK_MAX_HEIGHT;
+  const roomyBottomPadding = Math.round(
+    Math.min(
+      Math.max(effectiveHeight - ROOMY_TIMELINE_BOTTOM_PADDING_START_HEIGHT, 0) * 0.06,
+      ROOMY_TIMELINE_BOTTOM_PADDING_MAX_EXTRA,
+    ),
+  );
+  const timelineBottomPadding = TIMELINE_BOTTOM_PADDING + roomyBottomPadding;
+  const axisToMarkerLabelGap = compactMarkerStack
+    ? COMPACT_AXIS_TO_MARKER_LABEL_GAP
+    : COMFORTABLE_AXIS_TO_MARKER_LABEL_GAP;
+  const markerLabelRowGap = compactMarkerStack
+    ? COMPACT_MARKER_LABEL_ROW_GAP
+    : COMFORTABLE_MARKER_LABEL_ROW_GAP;
+  const markerToAxisLabelGap = compactMarkerStack
+    ? COMPACT_MARKER_TO_AXIS_LABEL_GAP
+    : COMFORTABLE_MARKER_TO_AXIS_LABEL_GAP;
+  const breadcrumbY = BREADCRUMB_TOP;
+  const overlayClipTop =
+    breadcrumbY + BREADCRUMB_HEIGHT + BREADCRUMB_TO_OVERLAY_GAP;
+  const yearLabelY =
+    height - timelineBottomPadding - overviewReservedHeight - AXIS_YEAR_LABEL_HEIGHT;
+  const dateLabelY = reserveAxisDateRow
+    ? yearLabelY - AXIS_LABEL_ROW_GAP - AXIS_DATE_LABEL_HEIGHT
+    : yearLabelY;
+  const axisLabelTopY = reserveAxisDateRow ? dateLabelY : yearLabelY;
+  const markerDateY =
+    axisLabelTopY - markerToAxisLabelGap - MARKER_DATE_HEIGHT;
+  const markerLabelY =
+    markerDateY - markerLabelRowGap - MARKER_LABEL_HEIGHT;
+  const axisY = markerLabelY - axisToMarkerLabelGap;
+  const majorTickTop = axisY - AXIS_MAJOR_TICK_TOP_OFFSET;
+  const majorTickBottom = Math.min(
+    axisY + AXIS_MAJOR_TICK_BOTTOM_OFFSET,
+    axisLabelTopY - AXIS_TICK_TO_LABEL_GAP,
+  );
+  const markerStemBottom = Math.min(
+    axisY + MARKER_STEM_BOTTOM_OFFSET,
+    markerLabelY - MARKER_STEM_TO_LABEL_GAP,
+  );
   const baseOverlayBottom =
     overlayLaneCount > 0 ? majorTickTop - OVERLAY_PANEL_GAP : majorTickTop;
-  const overlayClipTop = 44;
   const overlayClipBottom = Math.max(overlayClipTop, baseOverlayBottom);
   const visibleOverlayHeight = Math.max(overlayClipBottom - overlayClipTop, 0);
   const overlayScrollMax = Math.max(overlayHeight - visibleOverlayHeight, 0);
@@ -102,7 +173,7 @@ export function getTimelineLayout(
   const overlayTop = overlayBottom - overlayHeight;
 
   return {
-    breadcrumbY: 14,
+    breadcrumbY,
     overlayTop,
     overlayHeight,
     overlayBottom,
@@ -111,13 +182,15 @@ export function getTimelineLayout(
     overlayScrollMax,
     overlayScrollOffset,
     axisY,
-    markerStemBottom: axisY + 14,
-    markerLabelY: axisY + 18,
-    markerDateY: axisY + 34,
+    markerStemBottom,
+    markerLabelY,
+    markerDateY,
     majorTickTop,
-    dateLabelY: axisY + 50,
-    yearLabelY: axisY + 68,
-    nowTop: majorTickTop - 18,
+    majorTickBottom,
+    dateLabelY,
+    yearLabelY,
+    nowTop: majorTickTop - NOW_INDICATOR_TOP_OFFSET,
+    nowBottom: Math.min(majorTickBottom + 12, axisLabelTopY - 4),
   };
 }
 

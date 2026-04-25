@@ -9,6 +9,7 @@
   z-index: 2;
   pointer-events: none;
   opacity: 1;
+  width: var(--tooltip-width, auto);
   padding: 0.55rem 0.65rem;
   border-radius: 12px;
   border: 1px solid var(--brown-12);

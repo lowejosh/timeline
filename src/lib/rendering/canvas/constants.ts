@@ -5,13 +5,38 @@ export const PAD = TIMELINE_CANVAS_PAD;
 
 export const OVERLAY_LANE_HEIGHT = 16;
 export const OVERLAY_LANE_GAP = 8;
-export const OVERLAY_PANEL_GAP = 56;
+export const OVERLAY_PANEL_GAP = 48;
 // Keep breathing room beneath the parent, but avoid bottom padding so child rows
 // can still snap to the same vertical rhythm as neighboring overlay lanes.
 export const EXPANDED_OVERLAY_TOP_PADDING = OVERLAY_LANE_GAP;
 export const EXPANDED_OVERLAY_BOTTOM_PADDING = 0;
 
 export const CALENDAR_DAY_STEP = 1 / 365.2425;
+
+export const BREADCRUMB_TOP = 14;
+export const BREADCRUMB_HEIGHT = 16;
+export const BREADCRUMB_TO_OVERLAY_GAP = 8;
+export const TIMELINE_BOTTOM_PADDING = 18;
+export const COMPACT_MARKER_STACK_MAX_HEIGHT = 430;
+export const ROOMY_TIMELINE_BOTTOM_PADDING_START_HEIGHT = 640;
+export const ROOMY_TIMELINE_BOTTOM_PADDING_MAX_EXTRA = 12;
+export const AXIS_DATE_LABEL_HEIGHT = 11;
+export const AXIS_YEAR_LABEL_HEIGHT = 11;
+export const AXIS_LABEL_ROW_GAP = 2;
+export const AXIS_MAJOR_TICK_TOP_OFFSET = 24;
+export const AXIS_MAJOR_TICK_BOTTOM_OFFSET = 24;
+export const AXIS_TICK_TO_LABEL_GAP = 8;
+export const COMFORTABLE_AXIS_TO_MARKER_LABEL_GAP = 18;
+export const COMPACT_AXIS_TO_MARKER_LABEL_GAP = 4;
+export const MARKER_STEM_BOTTOM_OFFSET = 12;
+export const MARKER_STEM_TO_LABEL_GAP = 4;
+export const MARKER_LABEL_HEIGHT = 12;
+export const COMFORTABLE_MARKER_LABEL_ROW_GAP = 4;
+export const COMPACT_MARKER_LABEL_ROW_GAP = 1;
+export const MARKER_DATE_HEIGHT = 10;
+export const COMFORTABLE_MARKER_TO_AXIS_LABEL_GAP = 6;
+export const COMPACT_MARKER_TO_AXIS_LABEL_GAP = 4;
+export const NOW_INDICATOR_TOP_OFFSET = 16;
 
 export const AXIS_LABEL_OCCUPIED_PADDING = 28;
 export const AXIS_LABEL_CLEARANCE_FADE_START = -14;

@@ -316,7 +316,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
     context.save();
     context.lineWidth = 1;
     const majorExtraAbove = axisY - 10 - layout.majorTickTop;
-    const majorExtraBelow = axisY + 28 - (axisY + 10);
+    const majorExtraBelow = layout.majorTickBottom - (axisY + 10);
 
     for (const tick of resolvedAxisTickStates) {
       const x =
@@ -403,7 +403,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
     context.lineWidth = 1.5;
     context.beginPath();
     context.moveTo(x, layout.majorTickTop);
-    context.lineTo(x, axisY + 28);
+    context.lineTo(x, layout.majorTickBottom);
     context.stroke();
 
     context.fillStyle = labelColor;

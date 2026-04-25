@@ -25,6 +25,11 @@ function App() {
   const overviewRulerDockHeight =
     TIMELINE_APP_LAYOUT.overviewRulerTierHeight *
     TIMELINE_APP_LAYOUT.overviewRulerMaxTiers;
+  const overviewRulerDockBottomInset = "calc(env(safe-area-inset-bottom, 0px) + 14px)";
+  const overviewReservedHeight =
+    app.isOverviewVisible && !shouldDockOverviewRuler
+      ? overviewRulerDockHeight
+      : 0;
 
   useEffect(() => {
     if (!isSidebarOpen || activeView !== "timeline") {
@@ -47,44 +52,46 @@ function App() {
   }, [activeView, isSidebarOpen, setIsSidebarOpen]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("ontouchstart" in window)) {
+    if (typeof window === "undefined") {
       return;
     }
 
-    const CHROME_NUDGE_PX = 96;
-    const nudgeBrowserChrome = () => {
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          window.scrollTo(0, CHROME_NUDGE_PX);
-        });
-      });
-    };
-    const handleTouchStart = () => {
-      if (window.scrollY < CHROME_NUDGE_PX * 0.5) {
-        nudgeBrowserChrome();
-      }
+    const root = document.documentElement;
+    const updateStandaloneViewportHeight = () => {
+      const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+
+      root.style.setProperty(
+        "--app-standalone-viewport-height",
+        `${viewportHeight}px`,
+      );
     };
 
-    const timeoutId = window.setTimeout(nudgeBrowserChrome, 48);
-
-    nudgeBrowserChrome();
-    window.addEventListener("pageshow", nudgeBrowserChrome);
-    window.addEventListener("resize", nudgeBrowserChrome);
-    window.addEventListener("orientationchange", nudgeBrowserChrome);
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.visualViewport?.addEventListener("resize", nudgeBrowserChrome);
-    window.visualViewport?.addEventListener("scroll", nudgeBrowserChrome);
+    updateStandaloneViewportHeight();
+    window.addEventListener("pageshow", updateStandaloneViewportHeight);
+    window.addEventListener("resize", updateStandaloneViewportHeight);
+    window.addEventListener(
+      "orientationchange",
+      updateStandaloneViewportHeight,
+    );
+    window.visualViewport?.addEventListener(
+      "resize",
+      updateStandaloneViewportHeight,
+    );
 
     return () => {
-      window.clearTimeout(timeoutId);
-      window.removeEventListener("pageshow", nudgeBrowserChrome);
-      window.removeEventListener("resize", nudgeBrowserChrome);
-      window.removeEventListener("orientationchange", nudgeBrowserChrome);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.visualViewport?.removeEventListener("resize", nudgeBrowserChrome);
-      window.visualViewport?.removeEventListener("scroll", nudgeBrowserChrome);
+      window.removeEventListener("pageshow", updateStandaloneViewportHeight);
+      window.removeEventListener("resize", updateStandaloneViewportHeight);
+      window.removeEventListener(
+        "orientationchange",
+        updateStandaloneViewportHeight,
+      );
+      window.visualViewport?.removeEventListener(
+        "resize",
+        updateStandaloneViewportHeight,
+      );
+      root.style.removeProperty("--app-standalone-viewport-height");
     };
-  }, [activeView]);
+  }, []);
 
   return (
     <main
@@ -162,6 +169,7 @@ function App() {
                   <TimelineCanvas
                     height={app.mainCanvasHeight}
                     pad={app.canvasPad}
+                    overviewReservedHeight={overviewReservedHeight}
                     viewport={app.animated.viewport}
                     width={app.stageSize.width}
                     activeEra={app.activeEra}
@@ -195,12 +203,15 @@ function App() {
                     style={
                       shouldDockOverviewRuler
                         ? {
-                            height: overviewRulerDockHeight,
+                            height: `calc(${overviewRulerDockHeight}px + ${overviewRulerDockBottomInset})`,
                           }
                         : undefined
                     }
                   >
                     <TimelineOverviewRulerStack
+                      bottomInset={
+                        shouldDockOverviewRuler ? overviewRulerDockBottomInset : 0
+                      }
                       eras={app.rootDisplayEras}
                       mainInnerWidth={Math.max(
                         app.stageSize.width - app.canvasPad * 2,

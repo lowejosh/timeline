@@ -59,14 +59,12 @@ import type { AnimatedContextBandLabelState } from "@/lib/rendering/contextBands
 import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
 import {
   getEdgeRailGlowIntensity,
-  getEdgeRailPanPixelsPerFrame,
   getEdgeRailZoomDelta,
   hasEdgeRailVerticalIntent,
-  shouldPanEdgeRail,
   shouldShowEdgeRailZoomState,
   type EdgeRailSide,
 } from "./TimelineCanvas.edgeInteraction";
-import { getPinchZoomDeltaFromScale } from "./TimelineCanvas.pinch";
+import { getPinchZoomForScale } from "./TimelineCanvas.pinch";
 import {
   DEFAULT_TIMELINE_THEME,
   readTimelineCanvasTheme,
@@ -128,6 +126,7 @@ type TimelineCanvasProps = {
   width: number;
   height: number;
   pad: number;
+  overviewReservedHeight?: number;
   viewport: TimelineViewport;
   /** The currently drilled-into era (or root) */
   activeEra: Era;
@@ -168,12 +167,7 @@ type EdgeRailInteractionState = {
   side: EdgeRailSide;
   startY: number;
   lastY: number;
-  startedAt: number;
-  lastFrameTime: number;
   lastEventTime: number;
-  lastVerticalIntentTime: number;
-  lastZoomIntentTime: number | null;
-  currentMode: "idle" | "zoom" | "pan";
   hasEngagedZoom: boolean;
   element: HTMLDivElement;
 };
@@ -182,6 +176,13 @@ type DualEdgeTouchZoomState = {
   leftTouchId: number;
   rightTouchId: number;
   lastAverageY: number;
+};
+
+type PinchZoomState = {
+  firstTouchId: number;
+  secondTouchId: number;
+  startDistance: number;
+  startViewport: TimelineViewport;
 };
 
 type TimelineCanvasScene = {
@@ -231,6 +232,7 @@ export function TimelineCanvas({
   width,
   height,
   pad,
+  overviewReservedHeight = 0,
   viewport,
   activeEra,
   activeChain,
@@ -271,7 +273,7 @@ export function TimelineCanvas({
   const dragStateRef = useRef<DragState | null>(null);
   const edgeRailInteractionRef = useRef<EdgeRailInteractionState | null>(null);
   const dualEdgeTouchZoomRef = useRef<DualEdgeTouchZoomState | null>(null);
-  const edgeRailFrameRef = useRef(0);
+  const pinchZoomRef = useRef<PinchZoomState | null>(null);
   const interactionSettleTimeoutRef = useRef<number | null>(null);
   const hoverRegionsRef = useRef<HoverRegion[]>([]);
   const overlayInteractionRegionsRef = useRef<OverlayInteractionRegion[]>([]);
@@ -322,12 +324,17 @@ export function TimelineCanvas({
   const [isViewportInteractionActive, setIsViewportInteractionActive] =
     useState(false);
   const overlayScrollOffsetRef = useRef(0);
+  const viewportRef = useRef(viewport);
+  const reserveAxisDateRowRef = useRef(true);
   useEffect(() => {
     hoveredTooltipRef.current = hoveredTooltip;
   }, [hoveredTooltip]);
   useEffect(() => {
     overlayScrollOffsetRef.current = overlayScrollOffset;
   }, [overlayScrollOffset]);
+  useEffect(() => {
+    viewportRef.current = viewport;
+  }, [viewport]);
   useEffect(() => {
     themeRef.current = readTimelineCanvasTheme();
     perfModeRef.current = getTimelinePerfMode();
@@ -344,10 +351,6 @@ export function TimelineCanvas({
 
       if (tooltipEnterFrameRef.current) {
         cancelAnimationFrame(tooltipEnterFrameRef.current);
-      }
-
-      if (edgeRailFrameRef.current) {
-        cancelAnimationFrame(edgeRailFrameRef.current);
       }
     };
   }, []);
@@ -660,6 +663,10 @@ export function TimelineCanvas({
         sceneHeight,
         animatedOverlayLaneCount,
         overlayScrollOffset,
+        {
+          reserveAxisDateRow: reserveAxisDateRowRef.current,
+          overviewReservedHeight,
+        },
       );
       const overlayBottomY = getOverlayLaneY(layout, 0);
       const resolvedOverlayLayout = resolveExpandedOverlayLayout(
@@ -966,6 +973,7 @@ export function TimelineCanvas({
       isCosmicCalendarMode,
       isViewportInteractionActive,
       overlayScrollOffset,
+      overviewReservedHeight,
       resolveHoveredTooltipForCanvasDraw,
       width,
     ],
@@ -1029,6 +1037,10 @@ export function TimelineCanvas({
     dualEdgeTouchZoomRef.current = null;
   }, []);
 
+  const stopPinchZoom = useCallback(() => {
+    pinchZoomRef.current = null;
+  }, []);
+
   const stopEdgeRailInteraction = useCallback(
     (pointerId?: number) => {
       const edgeRailInteraction = edgeRailInteractionRef.current;
@@ -1049,11 +1061,6 @@ export function TimelineCanvas({
       setDraggingEdgeZoomSide(null);
       setEdgeZoomGlow(null);
 
-      if (edgeRailFrameRef.current) {
-        cancelAnimationFrame(edgeRailFrameRef.current);
-        edgeRailFrameRef.current = 0;
-      }
-
       if (
         edgeRailInteraction.element.hasPointerCapture(
           edgeRailInteraction.pointerId,
@@ -1067,52 +1074,6 @@ export function TimelineCanvas({
       recordVerboseInteractionEvent("edge-rail-stop");
     },
     [recordVerboseInteractionEvent],
-  );
-
-  const stepEdgeRailInteraction = useCallback(
-    (now: number) => {
-      const edgeRailInteraction = edgeRailInteractionRef.current;
-
-      if (!edgeRailInteraction || width <= pad * 2) {
-        edgeRailFrameRef.current = 0;
-        return;
-      }
-
-      const dt = Math.max(now - edgeRailInteraction.lastFrameTime, 8);
-      const heldForMs = Math.max(now - edgeRailInteraction.startedAt, 0);
-      const idleForMs = Math.max(
-        now - edgeRailInteraction.lastVerticalIntentTime,
-        0,
-      );
-      const hasRecentZoomIntent =
-        edgeRailInteraction.lastZoomIntentTime !== null;
-      const innerWidth = Math.max(width - pad * 2, 1);
-
-      edgeRailInteraction.lastFrameTime = now;
-
-      if (shouldPanEdgeRail({ heldForMs, idleForMs, hasRecentZoomIntent })) {
-        const direction = edgeRailInteraction.side === "left" ? 1 : -1;
-        const pixelsPerFrame = getEdgeRailPanPixelsPerFrame(heldForMs);
-
-        edgeRailInteraction.currentMode = "pan";
-        setDraggingEdgeZoomSide((current) =>
-          current === edgeRailInteraction.side ? null : current,
-        );
-        markViewportInteraction("edge-pan-hold");
-        onViewportChange((current) =>
-          panByPixels(
-            current,
-            direction * pixelsPerFrame * (dt / 16),
-            innerWidth,
-          ),
-        );
-      } else if (edgeRailInteraction.currentMode === "pan") {
-        edgeRailInteraction.currentMode = "idle";
-      }
-
-      edgeRailFrameRef.current = requestAnimationFrame(stepEdgeRailInteraction);
-    },
-    [markViewportInteraction, onViewportChange, pad, width],
   );
 
   const handleEdgeRailPointerDown = useCallback(
@@ -1134,19 +1095,13 @@ export function TimelineCanvas({
       recordVerboseInteractionEvent("edge-rail-start");
 
       const zoneRect = event.currentTarget.getBoundingClientRect();
-      const now = performance.now();
 
       edgeRailInteractionRef.current = {
         pointerId: event.pointerId,
         side,
         startY: event.clientY,
         lastY: event.clientY,
-        startedAt: now,
-        lastFrameTime: now,
         lastEventTime: event.timeStamp,
-        lastVerticalIntentTime: now,
-        lastZoomIntentTime: null,
-        currentMode: "idle",
         hasEngagedZoom: false,
         element: event.currentTarget,
       };
@@ -1157,13 +1112,11 @@ export function TimelineCanvas({
         intensity: 0.22,
       });
       event.currentTarget.setPointerCapture(event.pointerId);
-      edgeRailFrameRef.current = requestAnimationFrame(stepEdgeRailInteraction);
     },
     [
       commitHoveredTooltip,
       pad,
       recordVerboseInteractionEvent,
-      stepEdgeRailInteraction,
       stopEdgeRailInteraction,
       width,
     ],
@@ -1205,19 +1158,9 @@ export function TimelineCanvas({
         intensity: glowIntensity,
       });
 
-      if (
-        !hasEdgeRailVerticalIntent(deltaY, {
-          interruptingPan: edgeRailInteraction.currentMode === "pan",
-        })
-      ) {
+      if (!hasEdgeRailVerticalIntent(deltaY)) {
         return;
       }
-
-      const zoomIntentTime = performance.now();
-
-      edgeRailInteraction.lastVerticalIntentTime = zoomIntentTime;
-      edgeRailInteraction.lastZoomIntentTime = zoomIntentTime;
-      edgeRailInteraction.currentMode = "zoom";
 
       if (shouldShowEdgeRailZoomState(totalTravel)) {
         setDraggingEdgeZoomSide(edgeRailInteraction.side);
@@ -1245,13 +1188,7 @@ export function TimelineCanvas({
         zoomAtPosition(current, current.zoom + zoomDelta, anchorX, innerWidth),
       );
     },
-    [
-      markViewportInteraction,
-      onViewportChange,
-      pad,
-      recordVerboseInteractionEvent,
-      width,
-    ],
+    [markViewportInteraction, onViewportChange, pad, recordVerboseInteractionEvent, width],
   );
 
   const handleEdgeRailPointerUp = useCallback(
@@ -1311,6 +1248,75 @@ export function TimelineCanvas({
 
     return selectedRegion;
   }
+  const axisTickTargets = useMemo(() => {
+    if (width <= pad * 2) {
+      return [] as AxisTickRenderState[];
+    }
+
+    const innerWidth = width - pad * 2;
+    const [preciseRangeStart, preciseRangeEnd] = getVisibleRangePrecise(
+      viewport,
+      innerWidth,
+    );
+    const tickRangeStart = screenToWorldPrecise(
+      -AXIS_TICK_OVERSCAN_PX,
+      viewport,
+      innerWidth,
+    );
+    const tickRangeEnd = screenToWorldPrecise(
+      innerWidth + AXIS_TICK_OVERSCAN_PX,
+      viewport,
+      innerWidth,
+    );
+    const tickStart = Math.max(
+      toApproximateTimelineYear(tickRangeStart),
+      TIMELINE_MIN_YEAR,
+    );
+    const tickEnd = Math.min(
+      toApproximateTimelineYear(tickRangeEnd),
+      TIMELINE_MAX_YEAR,
+    );
+    const visibleSpan = Math.max(
+      Math.abs(
+        subtractPreciseTimelineYears(preciseRangeEnd, preciseRangeStart),
+      ),
+      1e-18,
+    );
+    const earlyUniverseOverlapStart = Math.max(
+      tickStart,
+      EARLY_UNIVERSE_START_YEAR,
+    );
+    const earlyUniverseOverlapEnd = Math.min(tickEnd, EARLY_UNIVERSE_END_YEAR);
+    const earlyUniverseOverlap = Math.max(
+      0,
+      earlyUniverseOverlapEnd - earlyUniverseOverlapStart,
+    );
+    const startsAtBigBang =
+      comparePreciseTimelineYears(
+        preciseRangeStart,
+        splitTimelineYear(TIMELINE_MIN_YEAR),
+      ) === 0;
+    const isFullyZoomedOut =
+      viewport.zoom <=
+      getMinZoomForWidth(innerWidth, viewport.scaleMode ?? "linear") + 0.001;
+    const isPrimordialFocused =
+      !isFullyZoomedOut &&
+      (startsAtBigBang || earlyUniverseOverlap / visibleSpan >= 0.75);
+
+    return resolveAxisTickRenderStates(tickStart, tickEnd, innerWidth, {
+      elapsedReference: isPrimordialFocused ? "after-big-bang" : "ago",
+      elapsedSubYearReference: isPrimordialFocused ? "after-big-bang" : "ago",
+      preciseStartYear: preciseRangeStart,
+      preciseEndYear: preciseRangeEnd,
+      preciseAnchorYear: getViewportCenterYear(viewport),
+      scaleMode: "logarithmic",
+    });
+  }, [pad, viewport, width]);
+  const reserveAxisDateRow = useMemo(
+    () => axisTickTargets.some((tick) => tick.labelStep < 1),
+    [axisTickTargets],
+  );
+  reserveAxisDateRowRef.current = reserveAxisDateRow;
   const visibleMarkers = useMemo(
     () =>
       getVisibleTimelineMarkers(markers, viewport, width, pad, enabledGroupIds),
@@ -1330,15 +1336,27 @@ export function TimelineCanvas({
   );
   const overlayLaneCount = resolvedOverlayBands[0]?.laneCount ?? 0;
   const overlayInteractionLayout = useMemo(
-    () => getTimelineLayout(height, overlayLaneCount, overlayScrollOffset),
-    [height, overlayLaneCount, overlayScrollOffset],
+    () =>
+      getTimelineLayout(height, overlayLaneCount, overlayScrollOffset, {
+        reserveAxisDateRow,
+        overviewReservedHeight,
+      }),
+    [
+      height,
+      overlayLaneCount,
+      overlayScrollOffset,
+      overviewReservedHeight,
+      reserveAxisDateRow,
+    ],
   );
 
   const clampOverlayScrollOffset = useCallback(
     (requestedOffset: number) =>
-      getTimelineLayout(height, overlayLaneCount, requestedOffset)
-        .overlayScrollOffset,
-    [height, overlayLaneCount],
+      getTimelineLayout(height, overlayLaneCount, requestedOffset, {
+        reserveAxisDateRow,
+        overviewReservedHeight,
+      }).overlayScrollOffset,
+    [height, overlayLaneCount, overviewReservedHeight, reserveAxisDateRow],
   );
 
   const adjustOverlayScrollOffset = useCallback(
@@ -1404,71 +1422,6 @@ export function TimelineCanvas({
     recordVerboseInteractionEvent,
   ]);
 
-  const axisTickTargets = useMemo(() => {
-    if (width <= pad * 2) {
-      return [] as AxisTickRenderState[];
-    }
-
-    const innerWidth = width - pad * 2;
-    const [preciseRangeStart, preciseRangeEnd] = getVisibleRangePrecise(
-      viewport,
-      innerWidth,
-    );
-    const tickRangeStart = screenToWorldPrecise(
-      -AXIS_TICK_OVERSCAN_PX,
-      viewport,
-      innerWidth,
-    );
-    const tickRangeEnd = screenToWorldPrecise(
-      innerWidth + AXIS_TICK_OVERSCAN_PX,
-      viewport,
-      innerWidth,
-    );
-    const tickStart = Math.max(
-      toApproximateTimelineYear(tickRangeStart),
-      TIMELINE_MIN_YEAR,
-    );
-    const tickEnd = Math.min(
-      toApproximateTimelineYear(tickRangeEnd),
-      TIMELINE_MAX_YEAR,
-    );
-    const visibleSpan = Math.max(
-      Math.abs(
-        subtractPreciseTimelineYears(preciseRangeEnd, preciseRangeStart),
-      ),
-      1e-18,
-    );
-    const earlyUniverseOverlapStart = Math.max(
-      tickStart,
-      EARLY_UNIVERSE_START_YEAR,
-    );
-    const earlyUniverseOverlapEnd = Math.min(tickEnd, EARLY_UNIVERSE_END_YEAR);
-    const earlyUniverseOverlap = Math.max(
-      0,
-      earlyUniverseOverlapEnd - earlyUniverseOverlapStart,
-    );
-    const startsAtBigBang =
-      comparePreciseTimelineYears(
-        preciseRangeStart,
-        splitTimelineYear(TIMELINE_MIN_YEAR),
-      ) === 0;
-    const isFullyZoomedOut =
-      viewport.zoom <=
-      getMinZoomForWidth(innerWidth, viewport.scaleMode ?? "linear") + 0.001;
-    const isPrimordialFocused =
-      !isFullyZoomedOut &&
-      (startsAtBigBang || earlyUniverseOverlap / visibleSpan >= 0.75);
-
-    return resolveAxisTickRenderStates(tickStart, tickEnd, innerWidth, {
-      elapsedReference: isPrimordialFocused ? "after-big-bang" : "ago",
-      elapsedSubYearReference: isPrimordialFocused ? "after-big-bang" : "ago",
-      preciseStartYear: preciseRangeStart,
-      preciseEndYear: preciseRangeEnd,
-      preciseAnchorYear: getViewportCenterYear(viewport),
-      scaleMode: "logarithmic",
-    });
-  }, [pad, viewport, width]);
-
   const scheduleRedraw = useCallback((reason = "unspecified") => {
     if (drawFrameRef.current) return;
     drawFrameRef.current = requestAnimationFrame(() => {
@@ -1496,6 +1449,8 @@ export function TimelineCanvas({
     overlayLaneCount,
     height,
     overlayScrollOffset,
+    reserveAxisDateRow,
+    overviewReservedHeight,
     overlayVisibilityTransitionKey,
     scheduleRedraw,
   );
@@ -1667,9 +1622,8 @@ export function TimelineCanvas({
     width,
   ]);
 
-  // Pinch-to-zoom via native gesture events (Safari) and touch events.
-  // Safari can emit both paths for one pinch, so we explicitly suppress the
-  // touch fallback while a native gesture is active to avoid double zooming.
+  // Pinch-to-zoom resolves from total finger spread since the gesture began,
+  // which removes hold-to-zoom drift and direction-change lag.
   useEffect(() => {
     const canvas = canvasRef.current;
     const surface = shellRef.current;
@@ -1677,10 +1631,6 @@ export function TimelineCanvas({
     if (!canvas || !surface || !width) {
       return;
     }
-
-    let lastGestureScale = 1;
-    let lastTouchDist = 0;
-    let isNativeGestureActive = false;
 
     const getTouchById = (touches: TouchList, identifier: number) => {
       for (let index = 0; index < touches.length; index += 1) {
@@ -1696,6 +1646,46 @@ export function TimelineCanvas({
       x: touch.clientX - rect.left,
       y: touch.clientY - rect.top,
     });
+
+    const stopActiveCanvasDrag = () => {
+      const dragState = dragStateRef.current;
+
+      if (!dragState) {
+        return;
+      }
+
+      dragStateRef.current = null;
+
+      if (canvas.hasPointerCapture(dragState.pointerId)) {
+        canvas.releasePointerCapture(dragState.pointerId);
+      }
+    };
+
+    const startPinchZoom = (touches: TouchList) => {
+      if (touches.length !== 2 || width <= pad * 2) {
+        stopPinchZoom();
+        return false;
+      }
+
+      const [firstTouch, secondTouch] = [touches[0], touches[1]];
+      const dx = secondTouch.clientX - firstTouch.clientX;
+      const dy = secondTouch.clientY - firstTouch.clientY;
+      const distance = Math.hypot(dx, dy);
+
+      if (!Number.isFinite(distance) || distance <= 0) {
+        stopPinchZoom();
+        return false;
+      }
+
+      pinchZoomRef.current = {
+        firstTouchId: firstTouch.identifier,
+        secondTouchId: secondTouch.identifier,
+        startDistance: distance,
+        startViewport: { ...viewportRef.current },
+      };
+
+      return true;
+    };
 
     const tryStartDualEdgeTouchZoom = (touches: TouchList, rect: DOMRect) => {
       if (touches.length !== 2 || width <= pad * 2) {
@@ -1741,47 +1731,7 @@ export function TimelineCanvas({
       return true;
     };
 
-    const clearTouchZoomState = () => {
-      lastTouchDist = 0;
-      stopDualEdgeTouchZoom();
-    };
-
-    const handleGestureStart = (event: Event) => {
-      isNativeGestureActive = true;
-      lastGestureScale = 1;
-      lastTouchDist = 0;
-      stopEdgeRailInteraction();
-      dragStateRef.current = null;
-      stopDualEdgeTouchZoom();
-      event.preventDefault();
-    };
-
-    const handleGestureChange = (event: Event) => {
-      event.preventDefault();
-      markViewportInteraction("gesture-change");
-
-      const gestureEvent = event as unknown as {
-        scale: number;
-        clientX: number;
-      };
-      const incrementalScale =
-        gestureEvent.scale / Math.max(lastGestureScale, 0.001);
-      const rect = canvas.getBoundingClientRect();
-      const localX = gestureEvent.clientX - rect.left;
-      const anchorX = getZoomAnchorForCanvasX(localX, width, pad);
-      const zoomDelta = getPinchZoomDeltaFromScale(incrementalScale);
-
-      lastGestureScale = gestureEvent.scale;
-
-      if (zoomDelta !== null) {
-        applyTouchZoomDelta(zoomDelta, anchorX);
-      }
-    };
-
-    const handleGestureEnd = (event: Event) => {
-      isNativeGestureActive = false;
-      lastGestureScale = 1;
-      clearTouchZoomState();
+    const handleGesture = (event: Event) => {
       event.preventDefault();
     };
 
@@ -1790,13 +1740,15 @@ export function TimelineCanvas({
 
       if (tryStartDualEdgeTouchZoom(event.touches, rect)) {
         event.preventDefault();
+        stopPinchZoom();
+        stopActiveCanvasDrag();
         recordVerboseInteractionEvent("dual-edge-center-zoom-start");
         return;
       }
 
-      if (isNativeGestureActive || event.touches.length !== 2) {
+      if (event.touches.length !== 2) {
         if (event.touches.length < 2) {
-          lastTouchDist = 0;
+          stopPinchZoom();
         }
 
         return;
@@ -1804,11 +1756,14 @@ export function TimelineCanvas({
 
       event.preventDefault();
       stopEdgeRailInteraction();
-      dragStateRef.current = null;
-      recordVerboseInteractionEvent("touch-start");
-      const dx = event.touches[1].clientX - event.touches[0].clientX;
-      const dy = event.touches[1].clientY - event.touches[0].clientY;
-      lastTouchDist = Math.hypot(dx, dy);
+      stopDualEdgeTouchZoom();
+      stopActiveCanvasDrag();
+      lastPointerRef.current = null;
+      commitHoveredTooltip(null);
+
+      if (startPinchZoom(event.touches)) {
+        recordVerboseInteractionEvent("touch-pinch-start");
+      }
     };
 
     const handleTouchMove = (event: TouchEvent) => {
@@ -1826,7 +1781,7 @@ export function TimelineCanvas({
         );
 
         if (!leftTouch || !rightTouch) {
-          clearTouchZoomState();
+          stopDualEdgeTouchZoom();
           return;
         }
 
@@ -1847,31 +1802,50 @@ export function TimelineCanvas({
         return;
       }
 
-      if (isNativeGestureActive || event.touches.length !== 2) {
+      const pinchZoom = pinchZoomRef.current;
+
+      if (!pinchZoom || event.touches.length !== 2) {
+        return;
+      }
+
+      const firstTouch = getTouchById(event.touches, pinchZoom.firstTouchId);
+      const secondTouch = getTouchById(
+        event.touches,
+        pinchZoom.secondTouchId,
+      );
+
+      if (!firstTouch || !secondTouch) {
+        stopPinchZoom();
         return;
       }
 
       event.preventDefault();
       markViewportInteraction("touch-pinch");
 
-      const dx = event.touches[1].clientX - event.touches[0].clientX;
-      const dy = event.touches[1].clientY - event.touches[0].clientY;
+      const dx = secondTouch.clientX - firstTouch.clientX;
+      const dy = secondTouch.clientY - firstTouch.clientY;
       const dist = Math.hypot(dx, dy);
 
-      if (lastTouchDist > 0) {
-        const scale = dist / lastTouchDist;
-        const localX =
-          (event.touches[0].clientX + event.touches[1].clientX) * 0.5 -
-          rect.left;
-        const anchorX = getZoomAnchorForCanvasX(localX, width, pad);
-        const zoomDelta = getPinchZoomDeltaFromScale(scale);
-
-        if (zoomDelta !== null) {
-          applyTouchZoomDelta(zoomDelta, anchorX);
-        }
+      if (!Number.isFinite(dist) || dist <= 0) {
+        return;
       }
 
-      lastTouchDist = dist;
+      const localX = (firstTouch.clientX + secondTouch.clientX) * 0.5 - rect.left;
+      const anchorX = getZoomAnchorForCanvasX(localX, width, pad);
+      const nextZoom = getPinchZoomForScale(
+        pinchZoom.startViewport.zoom,
+        dist / pinchZoom.startDistance,
+      );
+
+      if (nextZoom === null) {
+        return;
+      }
+
+      const innerWidth = Math.max(width - pad * 2, 1);
+
+      onViewportChange(() =>
+        zoomAtPosition(pinchZoom.startViewport, nextZoom, anchorX, innerWidth),
+      );
     };
 
     const handleTouchEnd = (event: TouchEvent) => {
@@ -1893,23 +1867,20 @@ export function TimelineCanvas({
       }
 
       if (event.touches.length < 2) {
-        lastTouchDist = 0;
+        stopPinchZoom();
       }
     };
 
     const handleTouchCancel = () => {
-      clearTouchZoomState();
+      stopPinchZoom();
+      stopDualEdgeTouchZoom();
     };
 
-    canvas.addEventListener("gesturestart", handleGestureStart, {
+    canvas.addEventListener("gesturestart", handleGesture, { passive: false });
+    canvas.addEventListener("gesturechange", handleGesture, {
       passive: false,
     });
-    canvas.addEventListener("gesturechange", handleGestureChange, {
-      passive: false,
-    });
-    canvas.addEventListener("gestureend", handleGestureEnd, {
-      passive: false,
-    });
+    canvas.addEventListener("gestureend", handleGesture, { passive: false });
     surface.addEventListener("touchstart", handleTouchStart, {
       passive: false,
     });
@@ -1922,9 +1893,9 @@ export function TimelineCanvas({
     });
 
     return () => {
-      canvas.removeEventListener("gesturestart", handleGestureStart);
-      canvas.removeEventListener("gesturechange", handleGestureChange);
-      canvas.removeEventListener("gestureend", handleGestureEnd);
+      canvas.removeEventListener("gesturestart", handleGesture);
+      canvas.removeEventListener("gesturechange", handleGesture);
+      canvas.removeEventListener("gestureend", handleGesture);
       surface.removeEventListener("touchstart", handleTouchStart);
       surface.removeEventListener("touchmove", handleTouchMove);
       surface.removeEventListener("touchend", handleTouchEnd);
@@ -1934,9 +1905,11 @@ export function TimelineCanvas({
     applyTouchZoomDelta,
     commitHoveredTooltip,
     markViewportInteraction,
+    onViewportChange,
     pad,
     recordVerboseInteractionEvent,
     stopEdgeRailInteraction,
+    stopPinchZoom,
     stopDualEdgeTouchZoom,
     width,
   ]);
@@ -2230,16 +2203,23 @@ export function TimelineCanvas({
     | (CSSProperties & Record<string, string | number>)
     | undefined = displayedTooltip
     ? (() => {
-        const tooltipMaxWidth = Math.min(
+        const tooltipHorizontalPadding = 10;
+        const tooltipWidth = Math.min(
           TOOLTIP_MAX_WIDTH,
           Math.max(
             width - safeViewportInsets.left - safeViewportInsets.right - 24,
             220,
           ),
         );
-        const centeredMinX = safeViewportInsets.left + tooltipMaxWidth * 0.5;
+        const centeredMinX = safeViewportInsets.left + tooltipWidth * 0.5;
         const centeredMaxX =
-          width - safeViewportInsets.right - tooltipMaxWidth * 0.5;
+          width - safeViewportInsets.right - tooltipWidth * 0.5;
+        const horizontalPlacement =
+          displayedTooltip.anchorX < centeredMinX
+            ? "left"
+            : displayedTooltip.anchorX > centeredMaxX
+              ? "right"
+              : "center";
         const shouldPlaceBelow =
           displayedTooltip.anchorY < safeViewportInsets.top + 96 ||
           (displayedTooltip.placement === "below" &&
@@ -2247,25 +2227,22 @@ export function TimelineCanvas({
               height - safeViewportInsets.bottom - 120);
 
         return {
-          left:
-            displayedTooltip.anchorX >= centeredMinX &&
-            displayedTooltip.anchorX <= centeredMaxX
-              ? displayedTooltip.anchorX
-              : displayedTooltip.anchorX > centeredMaxX
-                ? width - safeViewportInsets.right - 10
-                : safeViewportInsets.left + 10,
+          ...(horizontalPlacement === "right"
+            ? { right: safeViewportInsets.right + tooltipHorizontalPadding }
+            : {
+                left:
+                  horizontalPlacement === "center"
+                    ? displayedTooltip.anchorX
+                    : safeViewportInsets.left + tooltipHorizontalPadding,
+              }),
           top: Math.min(
             Math.max(displayedTooltip.anchorY, safeViewportInsets.top + 6),
             height - safeViewportInsets.bottom - 6,
           ),
-          maxWidth: `${tooltipMaxWidth}px`,
+          width: `${tooltipWidth}px`,
+          maxWidth: `${tooltipWidth}px`,
           "--tooltip-translate-x":
-            displayedTooltip.anchorX >= centeredMinX &&
-            displayedTooltip.anchorX <= centeredMaxX
-              ? "-50%"
-              : displayedTooltip.anchorX > centeredMaxX
-                ? "-100%"
-                : "0%",
+            horizontalPlacement === "center" ? "-50%" : "0%",
           "--tooltip-translate-y": shouldPlaceBelow
             ? `${TOOLTIP_OFFSET}px`
             : `calc(-100% - ${TOOLTIP_OFFSET}px)`,
@@ -2396,9 +2373,6 @@ export function TimelineCanvas({
             >
               <path d="M4.5 7 8 10.5 11.5 7" />
             </svg>
-            <span className="timeline-canvas__edge-zoom-hint-label">
-              Hold to pan
-            </span>
           </div>
         </div>
       ))}

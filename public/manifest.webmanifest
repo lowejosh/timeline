@@ -4,7 +4,7 @@
   "description": "An interactive educational timeline.",
   "start_url": "/",
   "scope": "/",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#f4ecdd",
   "theme_color": "#f4ecdd",
   "icons": [

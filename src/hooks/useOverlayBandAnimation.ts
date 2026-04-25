@@ -20,6 +20,8 @@ export function useOverlayBandAnimation(
   overlayLaneCount: number,
   height: number,
   overlayScrollOffset: number,
+  reserveAxisDateRow: boolean,
+  overviewReservedHeight: number,
   overlayVisibilityTransitionKey: string,
   invalidateCanvas: (reason?: string) => void,
 ): React.RefObject<Map<string, AnimatedOverlayBandState>> {
@@ -36,6 +38,7 @@ export function useOverlayBandAnimation(
       height,
       overlayLaneCount,
       overlayScrollOffset,
+      { reserveAxisDateRow, overviewReservedHeight },
     );
     const shouldAnimateVisibilityChange =
       initializedRef.current &&
@@ -208,6 +211,8 @@ export function useOverlayBandAnimation(
     invalidateCanvas,
     overlayLaneCount,
     overlayScrollOffset,
+    reserveAxisDateRow,
+    overviewReservedHeight,
     overlayVisibilityTransitionKey,
     resolvedOverlayBands,
   ]);

@@ -25,6 +25,7 @@ type TimelineOverviewRulerStackProps = {
   width: number;
   tierHeight: number;
   pad: number;
+  bottomInset?: number | string;
   showSideLabels?: boolean;
   eras: Era[];
   viewport: TimelineViewport;
@@ -40,6 +41,7 @@ export function TimelineOverviewRulerStack({
   width,
   tierHeight,
   pad,
+  bottomInset = 0,
   showSideLabels = true,
   eras,
   viewport,
@@ -112,6 +114,7 @@ export function TimelineOverviewRulerStack({
     <div
       className="absolute inset-x-0 bottom-0 w-full pointer-events-auto overflow-hidden"
       style={{
+        bottom: bottomInset,
         height: stackHeight,
         transition: `height 200ms ${THEME.easing.spring}`,
       }}

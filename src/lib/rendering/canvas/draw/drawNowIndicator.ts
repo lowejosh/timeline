@@ -17,7 +17,7 @@ export function drawNowIndicator(cx: CanvasDrawContext): void {
     context.setLineDash([4, 4]);
     context.beginPath();
     context.moveTo(nowX, layout.nowTop);
-    context.lineTo(nowX, cx.layout.axisY + 40);
+    context.lineTo(nowX, layout.nowBottom);
     context.stroke();
     context.setLineDash([]);
     context.fillStyle = "rgba(180, 80, 40, 0.7)";

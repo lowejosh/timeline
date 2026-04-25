@@ -61,6 +61,18 @@ const OVERVIEW_RULER_TIER_HEIGHT = 18;
 const OVERVIEW_RULER_MAX_TIERS = 3;
 const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
 
+function shouldUseMobileTimelineDrawer(width: number, height: number) {
+  return width <= 720 || (width <= 980 && height <= 560);
+}
+
+function shouldStartWithSidebarOpen() {
+  if (typeof window === "undefined") {
+    return true;
+  }
+
+  return !shouldUseMobileTimelineDrawer(window.innerWidth, window.innerHeight);
+}
+
 const TIMELINE_SET_ORDER_STORAGE_KEY = "timeline:set-order:v1";
 const TIMELINE_ENABLED_SET_IDS_STORAGE_KEY = "timeline:enabled-set-ids:v1";
 const TIMELINE_EXPANDED_SET_IDS_STORAGE_KEY = "timeline:expanded-set-ids:v1";
@@ -255,7 +267,9 @@ export function useTimelineAppState() {
     "timeline",
   );
   const [activeEraId, setActiveEraId] = useState(ROOT_ERA.id);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() =>
+    shouldStartWithSidebarOpen(),
+  );
   const [isCosmicCalendarMode, setIsCosmicCalendarMode] = useState(false);
   const [overlayVisibilityTransitionSeed, setOverlayVisibilityTransitionSeed] =
     useState(0);
@@ -296,6 +310,7 @@ export function useTimelineAppState() {
     Set<string>
   >(() => new Set());
   const autoTransitionFrameRef = useRef(0);
+  const hasResolvedInitialSidebarVisibilityRef = useRef(false);
 
   const autoToggleRulesByGroupId = useMemo(
     () =>
@@ -315,6 +330,21 @@ export function useTimelineAppState() {
     viewportRef.current = animated.viewport;
     viewportWidthRef.current = viewportWidth;
   });
+
+  useEffect(() => {
+    if (
+      hasResolvedInitialSidebarVisibilityRef.current ||
+      stageSize.width <= 0 ||
+      stageSize.height <= 0
+    ) {
+      return;
+    }
+
+    hasResolvedInitialSidebarVisibilityRef.current = true;
+    setIsSidebarOpen(
+      !shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height),
+    );
+  }, [stageSize.height, stageSize.width]);
 
   useEffect(() => {
     try {
@@ -764,8 +794,8 @@ export function useTimelineAppState() {
 
   const handleCloseSetManager = useCallback(() => {
     setActiveView("timeline");
-    setIsSidebarOpen(true);
-  }, []);
+    setIsSidebarOpen(!shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height));
+  }, [stageSize.height, stageSize.width]);
 
   const handleApplySets = useCallback(
     (
@@ -816,9 +846,11 @@ export function useTimelineAppState() {
       });
       setOverlayVisibilityTransitionSeed((current) => current + 1);
       setActiveView("timeline");
-      setIsSidebarOpen(true);
+      setIsSidebarOpen(
+        !shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height),
+      );
     },
-    [activeEraId, animated, enabledSetIds, prioritizedRootEra],
+    [activeEraId, animated, enabledSetIds, prioritizedRootEra, stageSize.height, stageSize.width],
   );
 
   const handleReorderSets = useCallback((nextOrder: TimelineSetId[]) => {

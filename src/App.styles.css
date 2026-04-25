@@ -8,7 +8,7 @@
   position: fixed;
   inset: 0;
   width: 100%;
-  min-height: 100dvh;
+  min-height: 100svh;
   height: 100dvh;
   padding:
     env(safe-area-inset-top, 0px)
@@ -16,6 +16,13 @@
     0
     0;
   background: var(--app-page-background);
+}
+
+@media (display-mode: standalone) {
+  .app-shell {
+    min-height: var(--app-standalone-viewport-height, 100lvh);
+    height: var(--app-standalone-viewport-height, 100lvh);
+  }
 }
 
 .timeline-sidebar-toggle__wrap {
