@@ -239,6 +239,16 @@ export function drawOverlays(cx: CanvasDrawContext): void {
     expandedOverlayProgressByIdRef,
   } = cx;
 
+  context.save();
+  context.beginPath();
+  context.rect(
+    0,
+    layout.overlayClipTop,
+    sceneWidth,
+    Math.max(layout.overlayClipBottom - layout.overlayClipTop, 0),
+  );
+  context.clip();
+
   if (animatedOverlayBands.length > 0) {
     for (const overlayState of animatedOverlayBands) {
       const overlay = overlayState.overlay;
@@ -608,4 +618,6 @@ export function drawOverlays(cx: CanvasDrawContext): void {
       context.restore();
     }
   }
+
+  context.restore();
 }

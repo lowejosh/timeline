@@ -24,6 +24,10 @@ export type TimelineCanvasLayout = {
   overlayTop: number;
   overlayHeight: number;
   overlayBottom: number;
+  overlayClipTop: number;
+  overlayClipBottom: number;
+  overlayScrollMax: number;
+  overlayScrollOffset: number;
   axisY: number;
   markerStemBottom: number;
   markerLabelY: number;
@@ -75,28 +79,37 @@ export function findEraAtYear(eras: Era[], year: number): Era | undefined {
 export function getTimelineLayout(
   height: number,
   overlayLaneCount: number,
+  requestedOverlayScrollOffset = 0,
 ): TimelineCanvasLayout {
   const overlayHeight =
     overlayLaneCount > 0
       ? overlayLaneCount * OVERLAY_LANE_HEIGHT +
         Math.max(overlayLaneCount - 1, 0) * OVERLAY_LANE_GAP
       : 0;
-  const axisY = Math.max(
-    128 + overlayHeight,
-    Math.min(height * 0.62, height - 96),
-  );
+  const axisY = Math.min(Math.max(128, height * 0.62), height - 96);
   const majorTickTop = axisY - 28;
-  const overlayTop =
-    overlayLaneCount > 0
-      ? Math.max(44, majorTickTop - OVERLAY_PANEL_GAP - overlayHeight)
-      : majorTickTop;
-  const overlayBottom = overlayTop + overlayHeight;
+  const baseOverlayBottom =
+    overlayLaneCount > 0 ? majorTickTop - OVERLAY_PANEL_GAP : majorTickTop;
+  const overlayClipTop = 44;
+  const overlayClipBottom = Math.max(overlayClipTop, baseOverlayBottom);
+  const visibleOverlayHeight = Math.max(overlayClipBottom - overlayClipTop, 0);
+  const overlayScrollMax = Math.max(overlayHeight - visibleOverlayHeight, 0);
+  const overlayScrollOffset = Math.min(
+    Math.max(requestedOverlayScrollOffset, 0),
+    overlayScrollMax,
+  );
+  const overlayBottom = baseOverlayBottom + overlayScrollOffset;
+  const overlayTop = overlayBottom - overlayHeight;
 
   return {
     breadcrumbY: 14,
     overlayTop,
     overlayHeight,
     overlayBottom,
+    overlayClipTop,
+    overlayClipBottom,
+    overlayScrollMax,
+    overlayScrollOffset,
     axisY,
     markerStemBottom: axisY + 14,
     markerLabelY: axisY + 18,

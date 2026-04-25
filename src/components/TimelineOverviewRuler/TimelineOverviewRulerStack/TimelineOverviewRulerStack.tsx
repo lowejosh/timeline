@@ -25,6 +25,7 @@ type TimelineOverviewRulerStackProps = {
   width: number;
   tierHeight: number;
   pad: number;
+  showSideLabels?: boolean;
   eras: Era[];
   viewport: TimelineViewport;
   mainInnerWidth: number;
@@ -39,6 +40,7 @@ export function TimelineOverviewRulerStack({
   width,
   tierHeight,
   pad,
+  showSideLabels = true,
   eras,
   viewport,
   mainInnerWidth,
@@ -141,15 +143,17 @@ export function TimelineOverviewRulerStack({
                 : `timeline-overview-ruler-tier-in 220ms ${THEME.easing.spring}`,
             }}
           >
-            <div
-              aria-hidden="true"
-              className="absolute top-0 bottom-0 left-0 z-[1] flex items-center justify-end pr-[0.42rem] pl-[0.28rem] text-right pointer-events-none whitespace-nowrap tabular-nums tracking-[0.01em] text-[0.55rem] leading-none font-medium font-sans text-[rgba(54,41,30,0.42)]"
-              style={{ width: pad }}
-            >
-              <span className="text-[rgba(54,41,30,0.46)]">
-                {tierPercentageLabel}
-              </span>
-            </div>
+            {showSideLabels ? (
+              <div
+                aria-hidden="true"
+                className="absolute top-0 bottom-0 left-0 z-[1] flex items-center justify-end pr-[0.42rem] pl-[0.28rem] text-right pointer-events-none whitespace-nowrap tabular-nums tracking-[0.01em] text-[0.55rem] leading-none font-medium font-sans text-[rgba(54,41,30,0.42)]"
+                style={{ width: pad }}
+              >
+                <span className="text-[rgba(54,41,30,0.46)]">
+                  {tierPercentageLabel}
+                </span>
+              </div>
+            ) : null}
             <TimelineOverviewRuler
               domain={tier.domain}
               eras={eras}
@@ -197,15 +201,17 @@ export function TimelineOverviewRulerStack({
               viewport={viewport}
               width={width}
             />
-            <div
-              aria-hidden="true"
-              className="absolute top-0 right-0 bottom-0 z-[1] flex items-center justify-start gap-[0.22rem] pr-[0.28rem] pl-[0.5rem] text-left pointer-events-none whitespace-nowrap tabular-nums tracking-[0.01em] text-[0.56rem] leading-none font-medium font-sans text-[rgba(54,41,30,0.5)] lowercase"
-              style={{ width: pad }}
-            >
-              <span className="text-[rgba(54,41,30,0.54)] font-semibold">
-                {tierSpanLabel}
-              </span>
-            </div>
+            {showSideLabels ? (
+              <div
+                aria-hidden="true"
+                className="absolute top-0 right-0 bottom-0 z-[1] flex items-center justify-start gap-[0.22rem] pr-[0.28rem] pl-[0.5rem] text-left pointer-events-none whitespace-nowrap tabular-nums tracking-[0.01em] text-[0.56rem] leading-none font-medium font-sans text-[rgba(54,41,30,0.5)] lowercase"
+                style={{ width: pad }}
+              >
+                <span className="text-[rgba(54,41,30,0.54)] font-semibold">
+                  {tierSpanLabel}
+                </span>
+              </div>
+            ) : null}
           </div>
         );
       })}

@@ -19,6 +19,7 @@ export function useOverlayBandAnimation(
   resolvedOverlayBands: ResolvedTimelineOverlayBand[],
   overlayLaneCount: number,
   height: number,
+  overlayScrollOffset: number,
   overlayVisibilityTransitionKey: string,
   invalidateCanvas: (reason?: string) => void,
 ): React.RefObject<Map<string, AnimatedOverlayBandState>> {
@@ -31,7 +32,11 @@ export function useOverlayBandAnimation(
   useEffect(() => {
     const animationStates = animationRef.current;
     const activeIds = new Set<string>();
-    const baseLayout = getTimelineLayout(height, overlayLaneCount);
+    const baseLayout = getTimelineLayout(
+      height,
+      overlayLaneCount,
+      overlayScrollOffset,
+    );
     const shouldAnimateVisibilityChange =
       initializedRef.current &&
       overlayVisibilityTransitionKey !== previousTransitionKeyRef.current;
@@ -202,6 +207,7 @@ export function useOverlayBandAnimation(
     height,
     invalidateCanvas,
     overlayLaneCount,
+    overlayScrollOffset,
     overlayVisibilityTransitionKey,
     resolvedOverlayBands,
   ]);

@@ -24,13 +24,13 @@ import {
   getViewportCenterYear,
   getZoomAnchorForCanvasX,
   getVisibleRangePrecise,
+  screenToWorld,
   screenToWorldPrecise,
   splitTimelineYear,
   subtractPreciseTimelineYears,
   TIMELINE_MAX_YEAR,
   TIMELINE_MIN_YEAR,
   panByPixels,
-  screenToWorld,
   toApproximateTimelineYear,
   worldToScreen,
   zoomAtPosition,
@@ -57,6 +57,16 @@ import {
 } from "@/lib/rendering/axisTickStates";
 import type { AnimatedContextBandLabelState } from "@/lib/rendering/contextBands";
 import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
+import {
+  getEdgeRailGlowIntensity,
+  getEdgeRailPanPixelsPerFrame,
+  getEdgeRailZoomDelta,
+  hasEdgeRailVerticalIntent,
+  shouldPanEdgeRail,
+  shouldShowEdgeRailZoomState,
+  type EdgeRailSide,
+} from "./TimelineCanvas.edgeInteraction";
+import { getPinchZoomDeltaFromScale } from "./TimelineCanvas.pinch";
 import {
   DEFAULT_TIMELINE_THEME,
   readTimelineCanvasTheme,
@@ -117,6 +127,7 @@ import type {
 type TimelineCanvasProps = {
   width: number;
   height: number;
+  pad: number;
   viewport: TimelineViewport;
   /** The currently drilled-into era (or root) */
   activeEra: Era;
@@ -143,10 +154,34 @@ type TimelineCanvasProps = {
 
 type DragState = {
   pointerId: number;
+  pointerType: string;
   startX: number;
   startY: number;
   lastX: number;
+  lastY: number;
   moved: boolean;
+  mode: "pending" | "pan" | "overlay-scroll";
+};
+
+type EdgeRailInteractionState = {
+  pointerId: number;
+  side: EdgeRailSide;
+  startY: number;
+  lastY: number;
+  startedAt: number;
+  lastFrameTime: number;
+  lastEventTime: number;
+  lastVerticalIntentTime: number;
+  lastZoomIntentTime: number | null;
+  currentMode: "idle" | "zoom" | "pan";
+  hasEngagedZoom: boolean;
+  element: HTMLDivElement;
+};
+
+type DualEdgeTouchZoomState = {
+  leftTouchId: number;
+  rightTouchId: number;
+  lastAverageY: number;
 };
 
 type TimelineCanvasScene = {
@@ -180,7 +215,6 @@ import {
   CLICK_DRAG_THRESHOLD,
   OVERLAY_LANE_GAP,
   OVERLAY_LANE_HEIGHT,
-  PAD,
   TOOLTIP_BRIDGE_BASE_HALF_WIDTH,
   TOOLTIP_EXIT_DURATION_MS,
   TOOLTIP_MAX_WIDTH,
@@ -188,9 +222,15 @@ import {
   VIEWPORT_INTERACTION_SETTLE_MS,
 } from "@/lib/rendering/canvas/constants";
 
+const DUAL_EDGE_CENTER_ZOOM_DELTA_PER_PIXEL = 0.01;
+const TOUCH_CLICK_DRAG_THRESHOLD = 12;
+const TOUCH_TOOLTIP_HIT_SLOP_PX = 28;
+const OVERLAY_SCROLL_TOUCH_THRESHOLD_PX = 8;
+
 export function TimelineCanvas({
   width,
   height,
+  pad,
   viewport,
   activeEra,
   activeChain,
@@ -229,10 +269,14 @@ export function TimelineCanvas({
   const pendingInvalidateReasonsRef = useRef<Set<string>>(new Set());
   const interactiveChildErasRef = useRef<Era[]>([]);
   const dragStateRef = useRef<DragState | null>(null);
+  const edgeRailInteractionRef = useRef<EdgeRailInteractionState | null>(null);
+  const dualEdgeTouchZoomRef = useRef<DualEdgeTouchZoomState | null>(null);
+  const edgeRailFrameRef = useRef(0);
   const interactionSettleTimeoutRef = useRef<number | null>(null);
   const hoverRegionsRef = useRef<HoverRegion[]>([]);
   const overlayInteractionRegionsRef = useRef<OverlayInteractionRegion[]>([]);
   const hoveredTooltipRef = useRef<HoveredTooltipState | null>(null);
+  const isTouchTooltipPinnedRef = useRef(false);
   const tooltipExitTimeoutRef = useRef<number | null>(null);
   const tooltipEnterFrameRef = useRef(0);
   const lastPointerRef = useRef<{
@@ -263,11 +307,27 @@ export function TimelineCanvas({
   const [renderedTooltip, setRenderedTooltip] =
     useState<RenderedTooltipState | null>(null);
   const [expandedOverlayIds, setExpandedOverlayIds] = useState<string[]>([]);
+  const [hoveredEdgeZoomSide, setHoveredEdgeZoomSide] =
+    useState<EdgeRailSide | null>(null);
+  const [pressedEdgeZoomSide, setPressedEdgeZoomSide] =
+    useState<EdgeRailSide | null>(null);
+  const [draggingEdgeZoomSide, setDraggingEdgeZoomSide] =
+    useState<EdgeRailSide | null>(null);
+  const [edgeZoomGlow, setEdgeZoomGlow] = useState<{
+    side: EdgeRailSide;
+    yPercent: number;
+    intensity: number;
+  } | null>(null);
+  const [overlayScrollOffset, setOverlayScrollOffset] = useState(0);
   const [isViewportInteractionActive, setIsViewportInteractionActive] =
     useState(false);
+  const overlayScrollOffsetRef = useRef(0);
   useEffect(() => {
     hoveredTooltipRef.current = hoveredTooltip;
   }, [hoveredTooltip]);
+  useEffect(() => {
+    overlayScrollOffsetRef.current = overlayScrollOffset;
+  }, [overlayScrollOffset]);
   useEffect(() => {
     themeRef.current = readTimelineCanvasTheme();
     perfModeRef.current = getTimelinePerfMode();
@@ -284,6 +344,10 @@ export function TimelineCanvas({
 
       if (tooltipEnterFrameRef.current) {
         cancelAnimationFrame(tooltipEnterFrameRef.current);
+      }
+
+      if (edgeRailFrameRef.current) {
+        cancelAnimationFrame(edgeRailFrameRef.current);
       }
     };
   }, []);
@@ -364,9 +428,24 @@ export function TimelineCanvas({
   );
   const highlightedMarkerId =
     hoveredTooltip?.tooltip.kind === "marker" ? hoveredTooltip.id : null;
-  const resolveHoveredTooltipForCanvasDraw = useCallback(
-    (x: number, y: number, pointerType: string) => {
-      if (pointerType !== "mouse" && pointerType !== "pen") {
+  const resolveTooltipAtPoint = useCallback(
+    (
+      x: number,
+      y: number,
+      options: {
+        pointerType?: string;
+        allowTouch?: boolean;
+        hitSlopPx?: number;
+      } = {},
+    ) => {
+      const { pointerType, allowTouch = false, hitSlopPx = 0 } = options;
+
+      if (
+        !allowTouch &&
+        pointerType !== undefined &&
+        pointerType !== "mouse" &&
+        pointerType !== "pen"
+      ) {
         return null;
       }
 
@@ -378,10 +457,10 @@ export function TimelineCanvas({
 
       for (const region of hoverRegionsRef.current) {
         if (
-          x < region.left ||
-          x > region.right ||
-          y < region.top ||
-          y > region.bottom
+          x < region.left - hitSlopPx ||
+          x > region.right + hitSlopPx ||
+          y < region.top - hitSlopPx ||
+          y > region.bottom + hitSlopPx
         ) {
           continue;
         }
@@ -424,6 +503,12 @@ export function TimelineCanvas({
     },
     [],
   );
+  const resolveHoveredTooltipForCanvasDraw = useCallback(
+    (x: number, y: number, pointerType: string) => {
+      return resolveTooltipAtPoint(x, y, { pointerType });
+    },
+    [resolveTooltipAtPoint],
+  );
   const drawCanvas = useCallback(
     (invalidateReasons: string[] = []) => {
       const scene = sceneRef.current;
@@ -462,7 +547,7 @@ export function TimelineCanvas({
         sceneActiveEra.id,
         sceneViewport,
         sceneWidth,
-        PAD,
+        pad,
         animatedEraChildOpacityById,
       );
       const visibleEraLayers = resolvedEraLayers.filter(
@@ -503,7 +588,7 @@ export function TimelineCanvas({
         sceneResolvedOverlayBands,
         sceneViewport,
         sceneWidth,
-        PAD,
+        pad,
       );
       const expandedOverlayExpansionStates = expandedOverlayDetails.map(
         (detail) => {
@@ -552,7 +637,6 @@ export function TimelineCanvas({
         perfSample[key] += now - perfPhaseStart;
         perfPhaseStart = now;
       };
-      const pad = PAD;
       const innerWidth = sceneWidth - pad * 2;
       const devicePixelRatio =
         typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
@@ -572,7 +656,11 @@ export function TimelineCanvas({
           ),
         sceneOverlayLaneCount,
       );
-      const layout = getTimelineLayout(sceneHeight, animatedOverlayLaneCount);
+      const layout = getTimelineLayout(
+        sceneHeight,
+        animatedOverlayLaneCount,
+        overlayScrollOffset,
+      );
       const overlayBottomY = getOverlayLaneY(layout, 0);
       const resolvedOverlayLayout = resolveExpandedOverlayLayout(
         sceneResolvedOverlayBands.map((overlay) => ({
@@ -826,7 +914,7 @@ export function TimelineCanvas({
             commitHoveredTooltip(null);
           }
         }
-      } else if (!lastPointerRef.current) {
+      } else if (!lastPointerRef.current && !isTouchTooltipPinnedRef.current) {
         commitHoveredTooltip(null);
       }
 
@@ -877,6 +965,7 @@ export function TimelineCanvas({
       height,
       isCosmicCalendarMode,
       isViewportInteractionActive,
+      overlayScrollOffset,
       resolveHoveredTooltipForCanvasDraw,
       width,
     ],
@@ -910,8 +999,273 @@ export function TimelineCanvas({
     [recordVerboseInteractionEvent],
   );
 
+  const applyTouchZoomDelta = useCallback(
+    (zoomDelta: number, anchorX: number) => {
+      if (width <= pad * 2) {
+        return;
+      }
+
+      const clampedZoomDelta = Math.max(-0.05, Math.min(0.05, zoomDelta));
+
+      if (Math.abs(clampedZoomDelta) <= 0.0001) {
+        return;
+      }
+
+      const innerWidth = Math.max(width - pad * 2, 1);
+
+      onViewportChange((current) =>
+        zoomAtPosition(
+          current,
+          current.zoom + clampedZoomDelta,
+          anchorX,
+          innerWidth,
+        ),
+      );
+    },
+    [onViewportChange, pad, width],
+  );
+
+  const stopDualEdgeTouchZoom = useCallback(() => {
+    dualEdgeTouchZoomRef.current = null;
+  }, []);
+
+  const stopEdgeRailInteraction = useCallback(
+    (pointerId?: number) => {
+      const edgeRailInteraction = edgeRailInteractionRef.current;
+
+      if (!edgeRailInteraction) {
+        return;
+      }
+
+      if (
+        pointerId !== undefined &&
+        edgeRailInteraction.pointerId !== pointerId
+      ) {
+        return;
+      }
+
+      edgeRailInteractionRef.current = null;
+      setPressedEdgeZoomSide(null);
+      setDraggingEdgeZoomSide(null);
+      setEdgeZoomGlow(null);
+
+      if (edgeRailFrameRef.current) {
+        cancelAnimationFrame(edgeRailFrameRef.current);
+        edgeRailFrameRef.current = 0;
+      }
+
+      if (
+        edgeRailInteraction.element.hasPointerCapture(
+          edgeRailInteraction.pointerId,
+        )
+      ) {
+        edgeRailInteraction.element.releasePointerCapture(
+          edgeRailInteraction.pointerId,
+        );
+      }
+
+      recordVerboseInteractionEvent("edge-rail-stop");
+    },
+    [recordVerboseInteractionEvent],
+  );
+
+  const stepEdgeRailInteraction = useCallback(
+    (now: number) => {
+      const edgeRailInteraction = edgeRailInteractionRef.current;
+
+      if (!edgeRailInteraction || width <= pad * 2) {
+        edgeRailFrameRef.current = 0;
+        return;
+      }
+
+      const dt = Math.max(now - edgeRailInteraction.lastFrameTime, 8);
+      const heldForMs = Math.max(now - edgeRailInteraction.startedAt, 0);
+      const idleForMs = Math.max(
+        now - edgeRailInteraction.lastVerticalIntentTime,
+        0,
+      );
+      const hasRecentZoomIntent =
+        edgeRailInteraction.lastZoomIntentTime !== null;
+      const innerWidth = Math.max(width - pad * 2, 1);
+
+      edgeRailInteraction.lastFrameTime = now;
+
+      if (shouldPanEdgeRail({ heldForMs, idleForMs, hasRecentZoomIntent })) {
+        const direction = edgeRailInteraction.side === "left" ? 1 : -1;
+        const pixelsPerFrame = getEdgeRailPanPixelsPerFrame(heldForMs);
+
+        edgeRailInteraction.currentMode = "pan";
+        setDraggingEdgeZoomSide((current) =>
+          current === edgeRailInteraction.side ? null : current,
+        );
+        markViewportInteraction("edge-pan-hold");
+        onViewportChange((current) =>
+          panByPixels(
+            current,
+            direction * pixelsPerFrame * (dt / 16),
+            innerWidth,
+          ),
+        );
+      } else if (edgeRailInteraction.currentMode === "pan") {
+        edgeRailInteraction.currentMode = "idle";
+      }
+
+      edgeRailFrameRef.current = requestAnimationFrame(stepEdgeRailInteraction);
+    },
+    [markViewportInteraction, onViewportChange, pad, width],
+  );
+
+  const handleEdgeRailPointerDown = useCallback(
+    (event: PointerEvent<HTMLDivElement>, side: EdgeRailSide) => {
+      if (dualEdgeTouchZoomRef.current) {
+        return;
+      }
+
+      if (width <= pad * 2) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      lastPointerRef.current = null;
+      commitHoveredTooltip(null);
+      dragStateRef.current = null;
+      stopEdgeRailInteraction();
+      recordVerboseInteractionEvent("edge-rail-start");
+
+      const zoneRect = event.currentTarget.getBoundingClientRect();
+      const now = performance.now();
+
+      edgeRailInteractionRef.current = {
+        pointerId: event.pointerId,
+        side,
+        startY: event.clientY,
+        lastY: event.clientY,
+        startedAt: now,
+        lastFrameTime: now,
+        lastEventTime: event.timeStamp,
+        lastVerticalIntentTime: now,
+        lastZoomIntentTime: null,
+        currentMode: "idle",
+        hasEngagedZoom: false,
+        element: event.currentTarget,
+      };
+      setPressedEdgeZoomSide(side);
+      setEdgeZoomGlow({
+        side,
+        yPercent: ((event.clientY - zoneRect.top) / zoneRect.height) * 100,
+        intensity: 0.22,
+      });
+      event.currentTarget.setPointerCapture(event.pointerId);
+      edgeRailFrameRef.current = requestAnimationFrame(stepEdgeRailInteraction);
+    },
+    [
+      commitHoveredTooltip,
+      pad,
+      recordVerboseInteractionEvent,
+      stepEdgeRailInteraction,
+      stopEdgeRailInteraction,
+      width,
+    ],
+  );
+
+  const handleEdgeRailPointerMove = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      const edgeRailInteraction = edgeRailInteractionRef.current;
+
+      if (
+        !edgeRailInteraction ||
+        edgeRailInteraction.pointerId !== event.pointerId ||
+        dualEdgeTouchZoomRef.current
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const zoneRect = event.currentTarget.getBoundingClientRect();
+      const deltaY = event.clientY - edgeRailInteraction.lastY;
+      const totalTravel = Math.abs(event.clientY - edgeRailInteraction.startY);
+      const dt = Math.max(
+        event.timeStamp - edgeRailInteraction.lastEventTime,
+        8,
+      );
+      const glowIntensity = getEdgeRailGlowIntensity({
+        totalTravelPx: totalTravel,
+        deltaYPx: deltaY,
+        deltaTimeMs: dt,
+      });
+
+      edgeRailInteraction.lastY = event.clientY;
+      edgeRailInteraction.lastEventTime = event.timeStamp;
+      setEdgeZoomGlow({
+        side: edgeRailInteraction.side,
+        yPercent: ((event.clientY - zoneRect.top) / zoneRect.height) * 100,
+        intensity: glowIntensity,
+      });
+
+      if (
+        !hasEdgeRailVerticalIntent(deltaY, {
+          interruptingPan: edgeRailInteraction.currentMode === "pan",
+        })
+      ) {
+        return;
+      }
+
+      const zoomIntentTime = performance.now();
+
+      edgeRailInteraction.lastVerticalIntentTime = zoomIntentTime;
+      edgeRailInteraction.lastZoomIntentTime = zoomIntentTime;
+      edgeRailInteraction.currentMode = "zoom";
+
+      if (shouldShowEdgeRailZoomState(totalTravel)) {
+        setDraggingEdgeZoomSide(edgeRailInteraction.side);
+
+        if (!edgeRailInteraction.hasEngagedZoom) {
+          edgeRailInteraction.hasEngagedZoom = true;
+          recordVerboseInteractionEvent("edge-zoom-engaged");
+        }
+      }
+
+      const zoomDelta = getEdgeRailZoomDelta({
+        deltaYPx: deltaY,
+        deltaTimeMs: dt,
+      });
+
+      if (zoomDelta === null) {
+        return;
+      }
+
+      const innerWidth = Math.max(width - pad * 2, 1);
+      const anchorX = edgeRailInteraction.side === "left" ? 0 : innerWidth;
+
+      markViewportInteraction("edge-zoom");
+      onViewportChange((current) =>
+        zoomAtPosition(current, current.zoom + zoomDelta, anchorX, innerWidth),
+      );
+    },
+    [
+      markViewportInteraction,
+      onViewportChange,
+      pad,
+      recordVerboseInteractionEvent,
+      width,
+    ],
+  );
+
+  const handleEdgeRailPointerUp = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      stopEdgeRailInteraction(event.pointerId);
+    },
+    [stopEdgeRailInteraction],
+  );
+
   useWheelZoomPan({
-    canvasRef,
+    surfaceRef: shellRef,
+    pad,
     width,
     onViewportChange,
     recordVerboseInteractionEvent,
@@ -919,61 +1273,7 @@ export function TimelineCanvas({
   });
 
   function resolveHoveredTooltip(x: number, y: number, pointerType: string) {
-    if (pointerType !== "mouse" && pointerType !== "pen") {
-      return null;
-    }
-
-    const previousTooltip = hoveredTooltipRef.current;
-    let selectedRegion: HoverRegion | null = null;
-    let selectedKindPriority = Number.POSITIVE_INFINITY;
-    let selectedDistance = Number.POSITIVE_INFINITY;
-    let selectedBias = Number.POSITIVE_INFINITY;
-
-    for (const region of hoverRegionsRef.current) {
-      if (
-        x < region.left ||
-        x > region.right ||
-        y < region.top ||
-        y > region.bottom
-      ) {
-        continue;
-      }
-
-      const kindPriority = region.tooltip.kind === "marker" ? 0 : 1;
-      const distance = Math.hypot(x - region.anchorX, y - region.anchorY);
-      const currentBias = previousTooltip?.id === region.id ? -0.25 : 0;
-
-      const isBetter =
-        kindPriority < selectedKindPriority ||
-        (kindPriority === selectedKindPriority &&
-          (distance < selectedDistance - 0.001 ||
-            (Math.abs(distance - selectedDistance) <= 0.001 &&
-              currentBias < selectedBias)));
-
-      if (isBetter) {
-        selectedRegion = region;
-        selectedKindPriority = kindPriority;
-        selectedDistance = distance;
-        selectedBias = currentBias;
-      }
-    }
-
-    if (!selectedRegion) {
-      return null;
-    }
-
-    const resolvedTooltip = {
-      id: selectedRegion.id,
-      anchorX:
-        selectedRegion.anchorMode === "follow-x" ? x : selectedRegion.anchorX,
-      anchorY: selectedRegion.anchorY,
-      placement: selectedRegion.placement,
-      tooltip: selectedRegion.tooltip,
-    } satisfies HoveredTooltipState;
-
-    return isEquivalentHoveredTooltip(previousTooltip, resolvedTooltip)
-      ? previousTooltip
-      : resolvedTooltip;
+    return resolveTooltipAtPoint(x, y, { pointerType });
   }
   function resolveOverlayInteractionRegion(x: number, y: number) {
     const rolePriority = {
@@ -1013,8 +1313,8 @@ export function TimelineCanvas({
   }
   const visibleMarkers = useMemo(
     () =>
-      getVisibleTimelineMarkers(markers, viewport, width, PAD, enabledGroupIds),
-    [enabledGroupIds, markers, viewport, width],
+      getVisibleTimelineMarkers(markers, viewport, width, pad, enabledGroupIds),
+    [enabledGroupIds, markers, pad, viewport, width],
   );
   const resolvedOverlayBands = useMemo(
     () =>
@@ -1022,20 +1322,94 @@ export function TimelineCanvas({
         overlayBands,
         viewport,
         width,
-        PAD,
+        pad,
         typeof window === "undefined" ? 1 : window.devicePixelRatio || 1,
         enabledGroupIds,
       ),
-    [enabledGroupIds, overlayBands, viewport, width],
+    [enabledGroupIds, overlayBands, pad, viewport, width],
   );
   const overlayLaneCount = resolvedOverlayBands[0]?.laneCount ?? 0;
+  const overlayInteractionLayout = useMemo(
+    () => getTimelineLayout(height, overlayLaneCount, overlayScrollOffset),
+    [height, overlayLaneCount, overlayScrollOffset],
+  );
+
+  const clampOverlayScrollOffset = useCallback(
+    (requestedOffset: number) =>
+      getTimelineLayout(height, overlayLaneCount, requestedOffset)
+        .overlayScrollOffset,
+    [height, overlayLaneCount],
+  );
+
+  const adjustOverlayScrollOffset = useCallback(
+    (deltaY: number) => {
+      if (overlayInteractionLayout.overlayScrollMax <= 0) {
+        return;
+      }
+
+      setOverlayScrollOffset((current) =>
+        clampOverlayScrollOffset(current + deltaY),
+      );
+    },
+    [clampOverlayScrollOffset, overlayInteractionLayout.overlayScrollMax],
+  );
+
+  useEffect(() => {
+    setOverlayScrollOffset((current) => clampOverlayScrollOffset(current));
+  }, [clampOverlayScrollOffset]);
+
+  useEffect(() => {
+    const surface = shellRef.current;
+
+    if (!surface || overlayInteractionLayout.overlayScrollMax <= 0) {
+      return;
+    }
+
+    const handleOverlayWheel = (event: globalThis.WheelEvent) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
+        return;
+      }
+
+      const rect = surface.getBoundingClientRect();
+      const localY = event.clientY - rect.top;
+
+      if (
+        localY < overlayInteractionLayout.overlayClipTop ||
+        localY > overlayInteractionLayout.overlayClipBottom
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      recordVerboseInteractionEvent("overlay-wheel-scroll");
+      adjustOverlayScrollOffset(-event.deltaY);
+    };
+
+    surface.addEventListener("wheel", handleOverlayWheel, {
+      capture: true,
+      passive: false,
+    });
+
+    return () => {
+      surface.removeEventListener("wheel", handleOverlayWheel, {
+        capture: true,
+      });
+    };
+  }, [
+    adjustOverlayScrollOffset,
+    overlayInteractionLayout.overlayClipBottom,
+    overlayInteractionLayout.overlayClipTop,
+    overlayInteractionLayout.overlayScrollMax,
+    recordVerboseInteractionEvent,
+  ]);
 
   const axisTickTargets = useMemo(() => {
-    if (width <= PAD * 2) {
+    if (width <= pad * 2) {
       return [] as AxisTickRenderState[];
     }
 
-    const innerWidth = width - PAD * 2;
+    const innerWidth = width - pad * 2;
     const [preciseRangeStart, preciseRangeEnd] = getVisibleRangePrecise(
       viewport,
       innerWidth,
@@ -1093,7 +1467,7 @@ export function TimelineCanvas({
       preciseAnchorYear: getViewportCenterYear(viewport),
       scaleMode: "logarithmic",
     });
-  }, [viewport, width]);
+  }, [pad, viewport, width]);
 
   const scheduleRedraw = useCallback((reason = "unspecified") => {
     if (drawFrameRef.current) return;
@@ -1108,6 +1482,7 @@ export function TimelineCanvas({
     siblingEras,
     viewport,
     width,
+    pad,
     isAnimating,
     isViewportInteractionActive,
     scheduleRedraw,
@@ -1120,6 +1495,7 @@ export function TimelineCanvas({
     resolvedOverlayBands,
     overlayLaneCount,
     height,
+    overlayScrollOffset,
     overlayVisibilityTransitionKey,
     scheduleRedraw,
   );
@@ -1279,8 +1655,8 @@ export function TimelineCanvas({
   }, [
     activeChain,
     activeEra,
-    drawCanvas,
     axisTickTargets,
+    drawCanvas,
     height,
     overlayLaneCount,
     parentEra,
@@ -1291,67 +1667,238 @@ export function TimelineCanvas({
     width,
   ]);
 
-  // Pinch-to-zoom via native gesture events (Safari) and touch events
+  // Pinch-to-zoom via native gesture events (Safari) and touch events.
+  // Safari can emit both paths for one pinch, so we explicitly suppress the
+  // touch fallback while a native gesture is active to avoid double zooming.
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !width) return;
+    const surface = shellRef.current;
 
-    // Safari gesture events
+    if (!canvas || !surface || !width) {
+      return;
+    }
+
+    let lastGestureScale = 1;
+    let lastTouchDist = 0;
+    let isNativeGestureActive = false;
+
+    const getTouchById = (touches: TouchList, identifier: number) => {
+      for (let index = 0; index < touches.length; index += 1) {
+        if (touches[index].identifier === identifier) {
+          return touches[index];
+        }
+      }
+
+      return null;
+    };
+
+    const resolveLocalTouchPoint = (touch: Touch, rect: DOMRect) => ({
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top,
+    });
+
+    const tryStartDualEdgeTouchZoom = (touches: TouchList, rect: DOMRect) => {
+      if (touches.length !== 2 || width <= pad * 2) {
+        stopDualEdgeTouchZoom();
+        return false;
+      }
+
+      const [firstTouch, secondTouch] = [touches[0], touches[1]];
+      const firstPoint = resolveLocalTouchPoint(firstTouch, rect);
+      const secondPoint = resolveLocalTouchPoint(secondTouch, rect);
+      const leftTouch =
+        firstPoint.x <= pad
+          ? { touch: firstTouch, point: firstPoint }
+          : secondPoint.x <= pad
+            ? { touch: secondTouch, point: secondPoint }
+            : null;
+      const rightTouch =
+        firstPoint.x >= width - pad
+          ? { touch: firstTouch, point: firstPoint }
+          : secondPoint.x >= width - pad
+            ? { touch: secondTouch, point: secondPoint }
+            : null;
+
+      if (
+        !leftTouch ||
+        !rightTouch ||
+        leftTouch.touch.identifier === rightTouch.touch.identifier
+      ) {
+        stopDualEdgeTouchZoom();
+        return false;
+      }
+
+      stopEdgeRailInteraction();
+      dragStateRef.current = null;
+      lastPointerRef.current = null;
+      commitHoveredTooltip(null);
+      dualEdgeTouchZoomRef.current = {
+        leftTouchId: leftTouch.touch.identifier,
+        rightTouchId: rightTouch.touch.identifier,
+        lastAverageY: (leftTouch.point.y + rightTouch.point.y) * 0.5,
+      };
+
+      return true;
+    };
+
+    const clearTouchZoomState = () => {
+      lastTouchDist = 0;
+      stopDualEdgeTouchZoom();
+    };
+
+    const handleGestureStart = (event: Event) => {
+      isNativeGestureActive = true;
+      lastGestureScale = 1;
+      lastTouchDist = 0;
+      stopEdgeRailInteraction();
+      dragStateRef.current = null;
+      stopDualEdgeTouchZoom();
+      event.preventDefault();
+    };
+
     const handleGestureChange = (event: Event) => {
       event.preventDefault();
       markViewportInteraction("gesture-change");
+
       const gestureEvent = event as unknown as {
         scale: number;
         clientX: number;
-        clientY: number;
       };
+      const incrementalScale =
+        gestureEvent.scale / Math.max(lastGestureScale, 0.001);
       const rect = canvas.getBoundingClientRect();
       const localX = gestureEvent.clientX - rect.left;
-      const anchorX = getZoomAnchorForCanvasX(localX, width, PAD);
-      const zoomDelta = Math.log2(gestureEvent.scale) * 2;
-      onAnimateZoom(zoomDelta, anchorX);
+      const anchorX = getZoomAnchorForCanvasX(localX, width, pad);
+      const zoomDelta = getPinchZoomDeltaFromScale(incrementalScale);
+
+      lastGestureScale = gestureEvent.scale;
+
+      if (zoomDelta !== null) {
+        applyTouchZoomDelta(zoomDelta, anchorX);
+      }
     };
 
-    const handleGestureStart = (event: Event) => event.preventDefault();
-    const handleGestureEnd = (event: Event) => event.preventDefault();
-
-    // Touch pinch for non-Safari
-    let lastTouchDist = 0;
+    const handleGestureEnd = (event: Event) => {
+      isNativeGestureActive = false;
+      lastGestureScale = 1;
+      clearTouchZoomState();
+      event.preventDefault();
+    };
 
     const handleTouchStart = (event: TouchEvent) => {
-      if (event.touches.length === 2) {
+      const rect = surface.getBoundingClientRect();
+
+      if (tryStartDualEdgeTouchZoom(event.touches, rect)) {
         event.preventDefault();
-        recordVerboseInteractionEvent("touch-start");
-        const dx = event.touches[1].clientX - event.touches[0].clientX;
-        const dy = event.touches[1].clientY - event.touches[0].clientY;
-        lastTouchDist = Math.hypot(dx, dy);
+        recordVerboseInteractionEvent("dual-edge-center-zoom-start");
+        return;
       }
+
+      if (isNativeGestureActive || event.touches.length !== 2) {
+        if (event.touches.length < 2) {
+          lastTouchDist = 0;
+        }
+
+        return;
+      }
+
+      event.preventDefault();
+      stopEdgeRailInteraction();
+      dragStateRef.current = null;
+      recordVerboseInteractionEvent("touch-start");
+      const dx = event.touches[1].clientX - event.touches[0].clientX;
+      const dy = event.touches[1].clientY - event.touches[0].clientY;
+      lastTouchDist = Math.hypot(dx, dy);
     };
 
     const handleTouchMove = (event: TouchEvent) => {
-      if (event.touches.length === 2) {
-        event.preventDefault();
-        markViewportInteraction("touch-pinch");
-        const dx = event.touches[1].clientX - event.touches[0].clientX;
-        const dy = event.touches[1].clientY - event.touches[0].clientY;
-        const dist = Math.hypot(dx, dy);
+      const rect = surface.getBoundingClientRect();
+      const dualEdgeTouchZoom = dualEdgeTouchZoomRef.current;
 
-        if (lastTouchDist > 0) {
-          const scale = dist / lastTouchDist;
-          const zoomDelta = Math.log2(scale) * 3;
-          const rect = canvas.getBoundingClientRect();
-          const localX =
-            (event.touches[0].clientX + event.touches[1].clientX) / 2 -
-            rect.left;
-          const anchorX = getZoomAnchorForCanvasX(localX, width, PAD);
-          const innerW = width - PAD * 2;
-          onViewportChange((current) =>
-            zoomAtPosition(current, current.zoom + zoomDelta, anchorX, innerW),
-          );
+      if (dualEdgeTouchZoom) {
+        const leftTouch = getTouchById(
+          event.touches,
+          dualEdgeTouchZoom.leftTouchId,
+        );
+        const rightTouch = getTouchById(
+          event.touches,
+          dualEdgeTouchZoom.rightTouchId,
+        );
+
+        if (!leftTouch || !rightTouch) {
+          clearTouchZoomState();
+          return;
         }
 
-        lastTouchDist = dist;
+        event.preventDefault();
+        markViewportInteraction("dual-edge-center-zoom");
+
+        const leftPoint = resolveLocalTouchPoint(leftTouch, rect);
+        const rightPoint = resolveLocalTouchPoint(rightTouch, rect);
+        const averageY = (leftPoint.y + rightPoint.y) * 0.5;
+        const deltaY = averageY - dualEdgeTouchZoom.lastAverageY;
+        const innerWidth = Math.max(width - pad * 2, 1);
+
+        dualEdgeTouchZoom.lastAverageY = averageY;
+        applyTouchZoomDelta(
+          -deltaY * DUAL_EDGE_CENTER_ZOOM_DELTA_PER_PIXEL,
+          innerWidth * 0.5,
+        );
+        return;
       }
+
+      if (isNativeGestureActive || event.touches.length !== 2) {
+        return;
+      }
+
+      event.preventDefault();
+      markViewportInteraction("touch-pinch");
+
+      const dx = event.touches[1].clientX - event.touches[0].clientX;
+      const dy = event.touches[1].clientY - event.touches[0].clientY;
+      const dist = Math.hypot(dx, dy);
+
+      if (lastTouchDist > 0) {
+        const scale = dist / lastTouchDist;
+        const localX =
+          (event.touches[0].clientX + event.touches[1].clientX) * 0.5 -
+          rect.left;
+        const anchorX = getZoomAnchorForCanvasX(localX, width, pad);
+        const zoomDelta = getPinchZoomDeltaFromScale(scale);
+
+        if (zoomDelta !== null) {
+          applyTouchZoomDelta(zoomDelta, anchorX);
+        }
+      }
+
+      lastTouchDist = dist;
+    };
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      const dualEdgeTouchZoom = dualEdgeTouchZoomRef.current;
+
+      if (dualEdgeTouchZoom) {
+        const leftTouch = getTouchById(
+          event.touches,
+          dualEdgeTouchZoom.leftTouchId,
+        );
+        const rightTouch = getTouchById(
+          event.touches,
+          dualEdgeTouchZoom.rightTouchId,
+        );
+
+        if (!leftTouch || !rightTouch) {
+          stopDualEdgeTouchZoom();
+        }
+      }
+
+      if (event.touches.length < 2) {
+        lastTouchDist = 0;
+      }
+    };
+
+    const handleTouchCancel = () => {
+      clearTouchZoomState();
     };
 
     canvas.addEventListener("gesturestart", handleGestureStart, {
@@ -1360,36 +1907,56 @@ export function TimelineCanvas({
     canvas.addEventListener("gesturechange", handleGestureChange, {
       passive: false,
     });
-    canvas.addEventListener("gestureend", handleGestureEnd, { passive: false });
-    canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
-    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+    canvas.addEventListener("gestureend", handleGestureEnd, {
+      passive: false,
+    });
+    surface.addEventListener("touchstart", handleTouchStart, {
+      passive: false,
+    });
+    surface.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
+    surface.addEventListener("touchend", handleTouchEnd, { passive: false });
+    surface.addEventListener("touchcancel", handleTouchCancel, {
+      passive: false,
+    });
 
     return () => {
       canvas.removeEventListener("gesturestart", handleGestureStart);
       canvas.removeEventListener("gesturechange", handleGestureChange);
       canvas.removeEventListener("gestureend", handleGestureEnd);
-      canvas.removeEventListener("touchstart", handleTouchStart);
-      canvas.removeEventListener("touchmove", handleTouchMove);
+      surface.removeEventListener("touchstart", handleTouchStart);
+      surface.removeEventListener("touchmove", handleTouchMove);
+      surface.removeEventListener("touchend", handleTouchEnd);
+      surface.removeEventListener("touchcancel", handleTouchCancel);
     };
   }, [
+    applyTouchZoomDelta,
+    commitHoveredTooltip,
     markViewportInteraction,
-    onAnimateZoom,
-    onViewportChange,
+    pad,
     recordVerboseInteractionEvent,
+    stopEdgeRailInteraction,
+    stopDualEdgeTouchZoom,
     width,
   ]);
 
   const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     event.preventDefault();
+    stopEdgeRailInteraction();
     recordVerboseInteractionEvent("pointer-down");
+    isTouchTooltipPinnedRef.current = false;
     lastPointerRef.current = null;
     commitHoveredTooltip(null);
     dragStateRef.current = {
       pointerId: event.pointerId,
+      pointerType: event.pointerType,
       lastX: event.clientX,
+      lastY: event.clientY,
       startX: event.clientX,
       startY: event.clientY,
       moved: false,
+      mode: "pending",
     };
 
     event.currentTarget.focus();
@@ -1402,19 +1969,55 @@ export function TimelineCanvas({
 
     markViewportInteraction("pointer-drag");
     const deltaX = event.clientX - dragState.lastX;
-    const dragDistance = Math.hypot(
-      event.clientX - dragState.startX,
-      event.clientY - dragState.startY,
-    );
+    const deltaY = event.clientY - dragState.lastY;
+    const totalDeltaX = event.clientX - dragState.startX;
+    const totalDeltaY = event.clientY - dragState.startY;
+    const dragDistance = Math.hypot(totalDeltaX, totalDeltaY);
+    const clickThreshold =
+      dragState.pointerType === "touch"
+        ? TOUCH_CLICK_DRAG_THRESHOLD
+        : CLICK_DRAG_THRESHOLD;
 
-    if (!dragState.moved && dragDistance > CLICK_DRAG_THRESHOLD) {
+    if (dragState.mode === "pending") {
+      if (dragDistance <= clickThreshold) {
+        dragStateRef.current = {
+          ...dragState,
+          lastX: event.clientX,
+          lastY: event.clientY,
+        };
+        return;
+      }
+
+      const startedInOverlayWindow =
+        dragState.startY >= overlayInteractionLayout.overlayClipTop &&
+        dragState.startY <= overlayInteractionLayout.overlayClipBottom;
+      const hasVerticalOverlayIntent =
+        dragState.pointerType === "touch" &&
+        overlayInteractionLayout.overlayScrollMax > 0 &&
+        startedInOverlayWindow &&
+        Math.abs(totalDeltaY) >= OVERLAY_SCROLL_TOUCH_THRESHOLD_PX &&
+        Math.abs(totalDeltaY) > Math.abs(totalDeltaX) * 1.15;
+
+      dragState.mode = hasVerticalOverlayIntent ? "overlay-scroll" : "pan";
+    }
+
+    if (!dragState.moved && dragDistance > clickThreshold) {
       dragState.moved = true;
     }
 
-    dragStateRef.current = { ...dragState, lastX: event.clientX };
+    dragStateRef.current = {
+      ...dragState,
+      lastX: event.clientX,
+      lastY: event.clientY,
+    };
+
+    if (dragState.mode === "overlay-scroll") {
+      adjustOverlayScrollOffset(deltaY);
+      return;
+    }
 
     onRecordDragSample(deltaX);
-    const innerW = width - PAD * 2;
+    const innerW = width - pad * 2;
     onViewportChange((current) => panByPixels(current, deltaX, innerW));
   };
 
@@ -1427,7 +2030,10 @@ export function TimelineCanvas({
         Math.hypot(
           event.clientX - dragState.startX,
           event.clientY - dragState.startY,
-        ) <= CLICK_DRAG_THRESHOLD;
+        ) <=
+          (dragState.pointerType === "touch"
+            ? TOUCH_CLICK_DRAG_THRESHOLD
+            : CLICK_DRAG_THRESHOLD);
 
       dragStateRef.current = null;
       onReleaseMomentum();
@@ -1435,18 +2041,26 @@ export function TimelineCanvas({
       if (wasClick) {
         recordVerboseInteractionEvent("pointer-click");
         const rect = event.currentTarget.getBoundingClientRect();
-        const clickedRegion = resolveOverlayInteractionRegion(
-          event.clientX - rect.left,
-          event.clientY - rect.top,
-        );
+        const localX = event.clientX - rect.left;
+        const localY = event.clientY - rect.top;
+        const clickedRegion = resolveOverlayInteractionRegion(localX, localY);
+        const tappedTooltip =
+          event.pointerType === "touch"
+            ? resolveTooltipAtPoint(localX, localY, {
+                allowTouch: true,
+                hitSlopPx: TOUCH_TOOLTIP_HIT_SLOP_PX,
+              })
+            : null;
 
         if (clickedRegion?.role === "parent") {
+          isTouchTooltipPinnedRef.current = false;
           setExpandedOverlayIds((current) =>
             current.includes(clickedRegion.id)
               ? current.filter((id) => id !== clickedRegion.id)
               : [...current, clickedRegion.id],
           );
         } else if (clickedRegion?.role === "child") {
+          isTouchTooltipPinnedRef.current = false;
           setExpandedOverlayIds((current) => {
             const parentId = clickedRegion.parentId ?? clickedRegion.id;
 
@@ -1455,6 +2069,7 @@ export function TimelineCanvas({
               : [...current, parentId];
           });
         } else if (clickedRegion?.role === "panel") {
+          isTouchTooltipPinnedRef.current = false;
           setExpandedOverlayIds((current) => {
             const parentId = clickedRegion.parentId ?? clickedRegion.id;
 
@@ -1462,16 +2077,29 @@ export function TimelineCanvas({
               ? current
               : [...current, parentId];
           });
+        } else if (tappedTooltip) {
+          isTouchTooltipPinnedRef.current = true;
+          lastPointerRef.current = null;
+          commitHoveredTooltip(tappedTooltip);
         } else {
+          isTouchTooltipPinnedRef.current = false;
           setExpandedOverlayIds([]);
+          commitHoveredTooltip(null);
         }
       }
     }
 
-    event.currentTarget.releasePointerCapture(event.pointerId);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
   };
 
   const handleShellPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") {
+      return;
+    }
+
+    isTouchTooltipPinnedRef.current = false;
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -1533,6 +2161,10 @@ export function TimelineCanvas({
   };
 
   const handleShellPointerLeave = () => {
+    if (isTouchTooltipPinnedRef.current) {
+      return;
+    }
+
     lastPointerRef.current = null;
     commitHoveredTooltip(null);
   };
@@ -1541,8 +2173,8 @@ export function TimelineCanvas({
     if (!width) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
-    const clickX = event.clientX - rect.left - PAD;
-    const innerW = width - PAD * 2;
+    const clickX = event.clientX - rect.left - pad;
+    const innerW = width - pad * 2;
     const clickYear = screenToWorld(clickX, viewport, innerW);
     // Check visible child layers first, then siblings
     const era =
@@ -1559,41 +2191,88 @@ export function TimelineCanvas({
   };
 
   const displayedTooltip = renderedTooltip?.tooltipState ?? null;
+  const edgeZoomZoneWidth = pad;
+  const safeViewportInsets =
+    typeof window === "undefined"
+      ? { top: 0, right: 0, bottom: 0, left: 0 }
+      : (() => {
+          const rootStyles = getComputedStyle(document.documentElement);
+          const readInset = (name: string) => {
+            const value = Number.parseFloat(rootStyles.getPropertyValue(name));
+            return Number.isFinite(value) ? value : 0;
+          };
+          const visualViewport = window.visualViewport;
+          const viewportTop = visualViewport?.offsetTop ?? 0;
+          const viewportLeft = visualViewport?.offsetLeft ?? 0;
+          const viewportHeight = visualViewport?.height ?? window.innerHeight;
+          const viewportWidth = visualViewport?.width ?? window.innerWidth;
+
+          return {
+            top: Math.max(readInset("--safe-area-top"), viewportTop) + 10,
+            right:
+              Math.max(
+                readInset("--safe-area-right"),
+                Math.max(window.innerWidth - (viewportLeft + viewportWidth), 0),
+              ) + 10,
+            bottom:
+              Math.max(
+                readInset("--safe-area-bottom"),
+                Math.max(
+                  window.innerHeight - (viewportTop + viewportHeight),
+                  0,
+                ),
+              ) + 10,
+            left: Math.max(readInset("--safe-area-left"), viewportLeft) + 10,
+          };
+        })();
 
   const tooltipStyle:
     | (CSSProperties & Record<string, string | number>)
     | undefined = displayedTooltip
-    ? {
-        left:
-          displayedTooltip.anchorX > width - TOOLTIP_MAX_WIDTH * 0.4
-            ? displayedTooltip.anchorX - TOOLTIP_OFFSET
-            : displayedTooltip.anchorX < TOOLTIP_MAX_WIDTH * 0.4
-              ? displayedTooltip.anchorX + TOOLTIP_OFFSET
-              : displayedTooltip.anchorX,
-        top: displayedTooltip.anchorY,
-        maxWidth: `${Math.min(TOOLTIP_MAX_WIDTH, Math.max(width - 32, 220))}px`,
-        "--tooltip-translate-x":
-          displayedTooltip.anchorX > width - TOOLTIP_MAX_WIDTH * 0.4
-            ? "-100%"
-            : displayedTooltip.anchorX < TOOLTIP_MAX_WIDTH * 0.4
-              ? "0%"
-              : "-50%",
-        "--tooltip-translate-y":
-          displayedTooltip.anchorY < 96 ||
-          displayedTooltip.placement === "below"
+    ? (() => {
+        const tooltipMaxWidth = Math.min(
+          TOOLTIP_MAX_WIDTH,
+          Math.max(
+            width - safeViewportInsets.left - safeViewportInsets.right - 24,
+            220,
+          ),
+        );
+        const centeredMinX = safeViewportInsets.left + tooltipMaxWidth * 0.5;
+        const centeredMaxX =
+          width - safeViewportInsets.right - tooltipMaxWidth * 0.5;
+        const shouldPlaceBelow =
+          displayedTooltip.anchorY < safeViewportInsets.top + 96 ||
+          (displayedTooltip.placement === "below" &&
+            displayedTooltip.anchorY <=
+              height - safeViewportInsets.bottom - 120);
+
+        return {
+          left:
+            displayedTooltip.anchorX >= centeredMinX &&
+            displayedTooltip.anchorX <= centeredMaxX
+              ? displayedTooltip.anchorX
+              : displayedTooltip.anchorX > centeredMaxX
+                ? width - safeViewportInsets.right - 10
+                : safeViewportInsets.left + 10,
+          top: Math.min(
+            Math.max(displayedTooltip.anchorY, safeViewportInsets.top + 6),
+            height - safeViewportInsets.bottom - 6,
+          ),
+          maxWidth: `${tooltipMaxWidth}px`,
+          "--tooltip-translate-x":
+            displayedTooltip.anchorX >= centeredMinX &&
+            displayedTooltip.anchorX <= centeredMaxX
+              ? "-50%"
+              : displayedTooltip.anchorX > centeredMaxX
+                ? "-100%"
+                : "0%",
+          "--tooltip-translate-y": shouldPlaceBelow
             ? `${TOOLTIP_OFFSET}px`
             : `calc(-100% - ${TOOLTIP_OFFSET}px)`,
-        "--tooltip-origin":
-          displayedTooltip.anchorY < 96 ||
-          displayedTooltip.placement === "below"
-            ? "top center"
-            : "bottom center",
-        "--tooltip-motion-offset-y":
-          displayedTooltip.anchorY < 96 ||
-          displayedTooltip.placement === "below"
-            ? "-4px"
-            : "4px",
-      }
+          "--tooltip-origin": shouldPlaceBelow ? "top center" : "bottom center",
+          "--tooltip-motion-offset-y": shouldPlaceBelow ? "-4px" : "4px",
+        };
+      })()
     : undefined;
 
   return (
@@ -1623,25 +2302,25 @@ export function TimelineCanvas({
 
           if (event.key === "+" || event.key === "=") {
             event.preventDefault();
-            const innerW = width - PAD * 2;
+            const innerW = width - pad * 2;
             onAnimateZoom(1, innerW / 2);
           }
 
           if (event.key === "-" || event.key === "_") {
             event.preventDefault();
-            const innerW = width - PAD * 2;
+            const innerW = width - pad * 2;
             onAnimateZoom(-1, innerW / 2);
           }
 
           if (event.key === "ArrowLeft") {
             event.preventDefault();
-            const innerW = width - PAD * 2;
+            const innerW = width - pad * 2;
             onViewportChange((current) => panByPixels(current, 120, innerW));
           }
 
           if (event.key === "ArrowRight") {
             event.preventDefault();
-            const innerW = width - PAD * 2;
+            const innerW = width - pad * 2;
             onViewportChange((current) => panByPixels(current, -120, innerW));
           }
         }}
@@ -1653,6 +2332,76 @@ export function TimelineCanvas({
         ref={canvasRef}
         tabIndex={0}
       />
+      {(["left", "right"] as const).map((side) => (
+        <div
+          aria-hidden="true"
+          className="timeline-canvas__edge-zoom-zone"
+          data-dragging={draggingEdgeZoomSide === side ? "true" : "false"}
+          data-hovered={hoveredEdgeZoomSide === side ? "true" : "false"}
+          data-pressed={pressedEdgeZoomSide === side ? "true" : "false"}
+          data-side={side}
+          key={side}
+          onLostPointerCapture={() => {
+            stopEdgeRailInteraction();
+          }}
+          onPointerCancel={handleEdgeRailPointerUp}
+          onPointerDown={(event) => {
+            handleEdgeRailPointerDown(event, side);
+          }}
+          onPointerEnter={() => {
+            setHoveredEdgeZoomSide(side);
+          }}
+          onPointerLeave={() => {
+            setHoveredEdgeZoomSide((current) =>
+              current === side ? null : current,
+            );
+          }}
+          onPointerMove={handleEdgeRailPointerMove}
+          onPointerUp={handleEdgeRailPointerUp}
+          style={
+            {
+              width: edgeZoomZoneWidth,
+              "--edge-zone-glow-y": `${
+                edgeZoomGlow?.side === side ? edgeZoomGlow.yPercent : 50
+              }%`,
+              "--edge-zone-glow-opacity": `${
+                edgeZoomGlow?.side === side ? edgeZoomGlow.intensity : 0.18
+              }`,
+            } as CSSProperties
+          }
+        >
+          <div className="timeline-canvas__edge-zoom-hint">
+            <span className="timeline-canvas__edge-zoom-hint-label timeline-canvas__edge-zoom-hint-label--top">
+              Drag to zoom
+            </span>
+            <svg
+              aria-hidden="true"
+              className="timeline-canvas__edge-zoom-hint-icon"
+              viewBox="0 0 16 16"
+            >
+              <path d="M4.5 9 8 5.5 11.5 9" />
+            </svg>
+            <svg
+              aria-hidden="true"
+              className="timeline-canvas__edge-zoom-hint-icon timeline-canvas__edge-zoom-hint-icon--glass"
+              viewBox="0 0 16 16"
+            >
+              <circle cx="7" cy="7" r="3.5" />
+              <path d="M9.7 9.7 13 13" />
+            </svg>
+            <svg
+              aria-hidden="true"
+              className="timeline-canvas__edge-zoom-hint-icon"
+              viewBox="0 0 16 16"
+            >
+              <path d="M4.5 7 8 10.5 11.5 7" />
+            </svg>
+            <span className="timeline-canvas__edge-zoom-hint-label">
+              Hold to pan
+            </span>
+          </div>
+        </div>
+      ))}
       {renderedTooltip ? (
         <div
           className="timeline-tooltip"

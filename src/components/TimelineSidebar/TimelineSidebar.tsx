@@ -40,6 +40,7 @@ type SetLayoutSnapshot = {
 
 type DragState = {
   pointerId: number;
+  captureElement: HTMLElement;
   setId: TimelineSetId;
   startClientY: number;
   currentClientY: number;
@@ -327,7 +328,14 @@ export function TimelineSidebar({
     }
 
     const previousCursor = document.body.style.cursor;
+    const previousTouchAction = document.body.style.touchAction;
+    const previousUserSelect = document.body.style.userSelect;
+    const previousWebkitUserSelect = document.body.style.webkitUserSelect;
+
     document.body.style.cursor = "grabbing";
+    document.body.style.touchAction = "none";
+    document.body.style.userSelect = "none";
+    document.body.style.webkitUserSelect = "none";
 
     const handlePointerMove = (event: PointerEvent) => {
       const currentDragState = dragStateRef.current;
@@ -421,6 +429,19 @@ export function TimelineSidebar({
         currentDragState.projectedIndex,
       );
 
+      try {
+        if (
+          currentDragState.captureElement.hasPointerCapture(event.pointerId)
+        ) {
+          currentDragState.captureElement.releasePointerCapture(
+            event.pointerId,
+          );
+        }
+      } catch {
+        // Some platforms can report the pointer as no longer active by the
+        // time teardown runs. Losing capture here is harmless.
+      }
+
       collapseOnDragRef.current = null;
       setDragState(null);
 
@@ -437,6 +458,9 @@ export function TimelineSidebar({
 
     return () => {
       document.body.style.cursor = previousCursor;
+      document.body.style.touchAction = previousTouchAction;
+      document.body.style.userSelect = previousUserSelect;
+      document.body.style.webkitUserSelect = previousWebkitUserSelect;
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", finishDrag);
       window.removeEventListener("pointercancel", finishDrag);
@@ -533,8 +557,16 @@ export function TimelineSidebar({
           }
         : null;
 
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // Pointer capture can fail on some touch/browser paths. Drag still
+      // works with the window listeners below, so we fall back gracefully.
+    }
+
     setDragState({
       pointerId: event.pointerId,
+      captureElement: event.currentTarget,
       setId,
       startClientY: event.clientY,
       currentClientY: event.clientY,

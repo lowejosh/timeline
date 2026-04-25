@@ -34,6 +34,7 @@ export type DragLayouts = Record<ColumnId, ColumnLayoutSnapshot | null>;
 
 export type DragState = {
   pointerId: number;
+  captureElement: HTMLElement;
   setId: TimelineSetId;
   sourceColumn: ColumnId;
   targetColumn: ColumnId;

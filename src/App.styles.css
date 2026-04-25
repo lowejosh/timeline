@@ -5,6 +5,22 @@
 .app-shell {
   --sidebar-width: 224px;
   --sidebar-max-height: min(calc(100svh - 80px), 540px);
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  min-height: 100dvh;
+  height: 100dvh;
+  padding:
+    env(safe-area-inset-top, 0px)
+    0
+    0
+    0;
+  background: var(--app-page-background);
+}
+
+.timeline-sidebar-toggle__wrap {
+  top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+  left: calc(env(safe-area-inset-left, 0px) + 0.75rem);
 }
 
 /* ──────────────────────────────────────────────
@@ -55,6 +71,10 @@
   transform: translateY(0) scale(1);
 }
 
+.timeline-sidebar-backdrop {
+  display: none;
+}
+
 /* ──────────────────────────────────────────────
    App view stack: slide transition between views
    ────────────────────────────────────────────── */
@@ -95,6 +115,7 @@
 
 /* Hide sidebar toggle + shell when on the sets page */
 .app-shell[data-active-view="available-sets"] .timeline-sidebar-toggle__wrap,
+.app-shell[data-active-view="available-sets"] .timeline-sidebar-backdrop,
 .app-shell[data-active-view="available-sets"] .timeline-sidebar-shell {
   opacity: 0;
   pointer-events: none;
@@ -113,11 +134,115 @@
 
 @media (max-width: 720px) {
   .app-shell {
-    --sidebar-width: min(200px, calc(100vw - 20px));
+    --sidebar-width: min(320px, calc(100vw - 28px));
+    --sidebar-max-height: 100%;
+  }
+
+  .timeline-sidebar-toggle__wrap {
+    opacity: 1;
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .app-shell[data-sidebar-open="true"] .timeline-sidebar-toggle__wrap {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px) scale(0.98);
   }
 
   .timeline-sidebar__inner {
     max-height: calc(var(--sidebar-max-height) - 8px);
     padding: 0.58rem 0.56rem 0.16rem 0.6rem;
   }
+
+  .timeline-sidebar-backdrop {
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+    background: rgba(44, 31, 20, 0.16);
+    backdrop-filter: blur(10px);
+    transition: opacity 220ms ease;
+  }
+
+  .timeline-sidebar-backdrop[data-open="true"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .timeline-sidebar-shell {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(var(--sidebar-width), calc(100vw - 18px));
+    max-height: none;
+    transform: translateX(calc(-100% - 12px));
+    transform-origin: left center;
+    transition:
+      opacity 180ms ease,
+      transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .timeline-sidebar-shell[data-open="true"] {
+    transform: translateX(0);
+  }
+}
+
+.app-shell[data-sidebar-mode="drawer"] {
+  --sidebar-width: min(320px, calc(100vw - env(safe-area-inset-left, 0px) - 28px));
+  --sidebar-max-height: 100%;
+}
+
+.app-shell[data-sidebar-mode="drawer"] .timeline-sidebar-toggle__wrap {
+  opacity: 1;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.app-shell[data-sidebar-mode="drawer"][data-sidebar-open="true"]
+  .timeline-sidebar-toggle__wrap {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px) scale(0.98);
+}
+
+.app-shell[data-sidebar-mode="drawer"] .timeline-sidebar-backdrop {
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  background: rgba(44, 31, 20, 0.16);
+  backdrop-filter: blur(10px);
+  transition: opacity 220ms ease;
+}
+
+.app-shell[data-sidebar-mode="drawer"] .timeline-sidebar-backdrop[data-open="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.app-shell[data-sidebar-mode="drawer"] .timeline-sidebar-shell {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(
+    calc(var(--sidebar-width) + env(safe-area-inset-left, 0px)),
+    calc(100vw - 18px)
+  );
+  max-height: none;
+  transform: translateX(calc(-100% - 12px));
+  transform-origin: left center;
+  transition:
+    opacity 180ms ease,
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.app-shell[data-sidebar-mode="drawer"] .timeline-sidebar-shell[data-open="true"] {
+  transform: translateX(0);
 }

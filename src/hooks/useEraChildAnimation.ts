@@ -10,7 +10,6 @@ import { smoothstep01 } from "../lib/core/easing";
 import {
   ERA_CHILD_FADE_IN_DURATION_MS,
   ERA_CHILD_FADE_OUT_DURATION_MS,
-  PAD,
 } from "../lib/rendering/canvas/constants";
 
 export type { AnimatedEraChildState };
@@ -20,6 +19,7 @@ export function useEraChildAnimation(
   siblingEras: Era[],
   viewport: TimelineViewport,
   width: number,
+  pad: number,
   isAnimating: boolean,
   isViewportInteractionActive: boolean,
   invalidateCanvas: (reason?: string) => void,
@@ -44,7 +44,7 @@ export function useEraChildAnimation(
             activeEraId,
             viewport,
             width,
-            PAD,
+            pad,
             isAnimating,
             animationStates.get(era.id)?.target ?? 0,
             isZoomingIn,
@@ -162,6 +162,7 @@ export function useEraChildAnimation(
     invalidateCanvas,
     isAnimating,
     isViewportInteractionActive,
+    pad,
     siblingEras,
     viewport,
     width,

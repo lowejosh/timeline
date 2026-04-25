@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { TIMELINE_CANVAS_PAD } from "../rendering/layout/padding";
+import {
+  getTimelineCanvasPad,
+  TIMELINE_CANVAS_PAD,
+} from "../rendering/layout/padding";
 import { useAnimatedViewport } from "../../hooks/useAnimatedViewport";
 import { useElementSize } from "../../hooks/useElementSize";
 import {
@@ -241,7 +244,12 @@ export function useTimelineAppState() {
   const [stageRef, stageSize] = useElementSize<HTMLDivElement>();
   const [timelineRef, timelineSize] = useElementSize<HTMLDivElement>();
   const innerWidth = Math.max(stageSize.width, 1);
-  const animated = useAnimatedViewport(getHomeViewport(1440), innerWidth);
+  const canvasPad = getTimelineCanvasPad(stageSize.width, stageSize.height);
+  const viewportWidth = Math.max(innerWidth - canvasPad * 2, 1);
+  const animated = useAnimatedViewport(
+    getHomeViewport(Math.max(1440 - canvasPad * 2, 1)),
+    viewportWidth,
+  );
 
   const [activeView, setActiveView] = useState<"timeline" | "available-sets">(
     "timeline",
@@ -266,16 +274,16 @@ export function useTimelineAppState() {
   const [visibleSetIds, setVisibleSetIds] = useState<Set<TimelineSetId>>(() =>
     readStoredVisibleSetIds(),
   );
-    useEffect(() => {
-      try {
-        window.localStorage.setItem(
-          TIMELINE_VISIBLE_SET_IDS_STORAGE_KEY,
-          JSON.stringify(Array.from(visibleSetIds)),
-        );
-      } catch {
-        // Ignore storage failures; state still works in memory.
-      }
-    }, [visibleSetIds]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        TIMELINE_VISIBLE_SET_IDS_STORAGE_KEY,
+        JSON.stringify(Array.from(visibleSetIds)),
+      );
+    } catch {
+      // Ignore storage failures; state still works in memory.
+    }
+  }, [visibleSetIds]);
   const [orderedSetIds, setOrderedSetIds] = useState<TimelineSetId[]>(() =>
     readStoredTimelineSetOrder(),
   );
@@ -302,10 +310,10 @@ export function useTimelineAppState() {
   );
 
   const viewportRef = useRef(animated.viewport);
-  const innerWidthRef = useRef(innerWidth);
+  const viewportWidthRef = useRef(viewportWidth);
   useEffect(() => {
     viewportRef.current = animated.viewport;
-    innerWidthRef.current = innerWidth;
+    viewportWidthRef.current = viewportWidth;
   });
 
   useEffect(() => {
@@ -364,10 +372,16 @@ export function useTimelineAppState() {
         filterOverlaysBySets(TIMELINE_DISPLAY.overlays, visibleSetIds),
         animated.viewport,
         innerWidth,
-        TIMELINE_CANVAS_PAD,
+        canvasPad,
         baseEnabledGroupIds,
       ),
-    [animated.viewport, baseEnabledGroupIds, visibleSetIds, innerWidth],
+    [
+      animated.viewport,
+      baseEnabledGroupIds,
+      canvasPad,
+      visibleSetIds,
+      innerWidth,
+    ],
   );
 
   const autoHiddenOverlayIds = useMemo(
@@ -376,7 +390,7 @@ export function useTimelineAppState() {
         filterOverlaysBySets(TIMELINE_DISPLAY.overlays, visibleSetIds),
         animated.viewport,
         innerWidth,
-        TIMELINE_CANVAS_PAD,
+        canvasPad,
         visibleSetIds,
         baseEnabledGroupIds,
         autoToggleVisibleGroupIds,
@@ -385,6 +399,7 @@ export function useTimelineAppState() {
       animated.viewport,
       autoToggleVisibleGroupIds,
       baseEnabledGroupIds,
+      canvasPad,
       visibleSetIds,
       innerWidth,
     ],
@@ -425,7 +440,7 @@ export function useTimelineAppState() {
             rule,
             animated.viewport,
             innerWidth,
-            TIMELINE_CANVAS_PAD,
+            canvasPad,
             currentlySuppressed,
           )
         : false;
@@ -454,6 +469,7 @@ export function useTimelineAppState() {
     autoToggleRulesByGroupId,
     autoToggleVisibleGroupIds,
     baseEnabledGroupIds,
+    canvasPad,
     visibleSetIds,
     innerWidth,
   ]);
@@ -566,14 +582,18 @@ export function useTimelineAppState() {
       }
 
       const eraPixelWidth = Math.abs(
-        worldToScreen(era.endYear, viewportRef.current, innerWidthRef.current) -
+        worldToScreen(
+          era.endYear,
+          viewportRef.current,
+          viewportWidthRef.current,
+        ) -
           worldToScreen(
             era.startYear,
             viewportRef.current,
-            innerWidthRef.current,
+            viewportWidthRef.current,
           ),
       );
-      const fillRatio = eraPixelWidth / innerWidthRef.current;
+      const fillRatio = eraPixelWidth / viewportWidthRef.current;
 
       if (fillRatio < 0.45) {
         return navigableAncestor.id;
@@ -644,7 +664,7 @@ export function useTimelineAppState() {
         setFilteredDisplay,
         animated.viewport,
         innerWidth,
-        TIMELINE_CANVAS_PAD,
+        canvasPad,
         enabledSetIds,
         visibleSetIds,
         baseEnabledGroupIds,
@@ -654,6 +674,7 @@ export function useTimelineAppState() {
     [
       animated.viewport,
       baseEnabledGroupIds,
+      canvasPad,
       enabledSetIds,
       visibleSetIds,
       innerWidth,
@@ -833,6 +854,7 @@ export function useTimelineAppState() {
     timelineSize,
     mainCanvasHeight,
     isOverviewVisible,
+    canvasPad,
 
     // viewport
     animated,

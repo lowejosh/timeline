@@ -99,8 +99,14 @@ export function useAvailableSetsDrag(
     }
 
     const previousCursor = document.body.style.cursor;
+    const previousTouchAction = document.body.style.touchAction;
+    const previousUserSelect = document.body.style.userSelect;
+    const previousWebkitUserSelect = document.body.style.webkitUserSelect;
 
     document.body.style.cursor = "grabbing";
+    document.body.style.touchAction = "none";
+    document.body.style.userSelect = "none";
+    document.body.style.webkitUserSelect = "none";
 
     const handlePointerMove = (event: PointerEvent) => {
       const current = dragStateRef.current;
@@ -110,6 +116,7 @@ export function useAvailableSetsDrag(
       }
 
       event.preventDefault();
+      event.stopPropagation();
 
       const nextTargetColumn = getDropColumn(current.layouts, event.clientX);
       const nextTargetIndex = getProjectedIndex(
@@ -148,6 +155,10 @@ export function useAvailableSetsDrag(
 
       if (!current || current.pointerId !== event.pointerId) {
         return;
+      }
+
+      if (current.captureElement.hasPointerCapture(current.pointerId)) {
+        current.captureElement.releasePointerCapture(current.pointerId);
       }
 
       setDragState(null);
@@ -217,11 +228,14 @@ export function useAvailableSetsDrag(
 
     return () => {
       document.body.style.cursor = previousCursor;
+      document.body.style.touchAction = previousTouchAction;
+      document.body.style.userSelect = previousUserSelect;
+      document.body.style.webkitUserSelect = previousWebkitUserSelect;
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", finishDrag);
       window.removeEventListener("pointercancel", finishDrag);
     };
-  }, [dragState, setDraftColumns]);
+  }, [dragState, onMovedToAvailable, setDraftColumns]);
 
   // FLIP: capture rects before render, animate from old position to new.
   useLayoutEffect(() => {
@@ -320,8 +334,11 @@ export function useAvailableSetsDrag(
       itemElement.getAnimations().forEach((animation) => animation.cancel());
     }
 
+    element.setPointerCapture(event.pointerId);
+
     setDragState({
       pointerId: event.pointerId,
+      captureElement: element,
       setId,
       sourceColumn,
       targetColumn: sourceColumn,

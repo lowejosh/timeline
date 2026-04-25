@@ -5,16 +5,17 @@ import {
   type TimelineViewport,
   zoomAtPosition,
 } from "../lib/core/viewport";
-import { PAD } from "../lib/rendering/canvas/constants";
 
 export function useWheelZoomPan({
-  canvasRef,
+  surfaceRef,
+  pad,
   width,
   onViewportChange,
   recordVerboseInteractionEvent,
   markViewportInteraction,
 }: {
-  canvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
+  surfaceRef: React.MutableRefObject<HTMLElement | null>;
+  pad: number;
   width: number;
   onViewportChange: (
     producer: (current: TimelineViewport) => TimelineViewport,
@@ -49,7 +50,7 @@ export function useWheelZoomPan({
 
     recordVerboseInteractionEvent("wheel-flush");
 
-    const innerW = width - PAD * 2;
+    const innerW = width - pad * 2;
     onViewportChange((current) => {
       let next = current;
 
@@ -68,10 +69,10 @@ export function useWheelZoomPan({
 
       return next;
     });
-  }, [onViewportChange, recordVerboseInteractionEvent, width]);
+  }, [onViewportChange, pad, recordVerboseInteractionEvent, width]);
 
   const handleWheel = useCallback(
-    (event: globalThis.WheelEvent, canvas: HTMLCanvasElement) => {
+    (event: globalThis.WheelEvent, surface: HTMLElement) => {
       if (!width) return;
 
       if (event.cancelable) {
@@ -80,9 +81,9 @@ export function useWheelZoomPan({
 
       markViewportInteraction("wheel");
 
-      const rect = canvas.getBoundingClientRect();
+      const rect = surface.getBoundingClientRect();
       const localX = event.clientX - rect.left;
-      const anchorX = getZoomAnchorForCanvasX(localX, width, PAD);
+      const anchorX = getZoomAnchorForCanvasX(localX, width, pad);
       const horizontalIntent = Math.abs(event.deltaX) > Math.abs(event.deltaY);
 
       if (horizontalIntent) {
@@ -101,30 +102,31 @@ export function useWheelZoomPan({
     [
       flushWheelUpdates,
       markViewportInteraction,
+      pad,
       recordVerboseInteractionEvent,
       width,
     ],
   );
 
   useEffect(() => {
-    const canvas = canvasRef.current;
+    const surface = surfaceRef.current;
 
-    if (!canvas || !width) {
+    if (!surface || !width) {
       return;
     }
 
     const handleNativeWheel = (event: globalThis.WheelEvent) => {
-      handleWheel(event, canvas);
+      handleWheel(event, surface);
     };
 
-    canvas.addEventListener("wheel", handleNativeWheel, { passive: false });
+    surface.addEventListener("wheel", handleNativeWheel, { passive: false });
 
     return () => {
-      canvas.removeEventListener("wheel", handleNativeWheel);
+      surface.removeEventListener("wheel", handleNativeWheel);
       if (wheelFrameRef.current) {
         cancelAnimationFrame(wheelFrameRef.current);
         wheelFrameRef.current = 0;
       }
     };
-  }, [canvasRef, handleWheel, width]);
+  }, [handleWheel, surfaceRef, width]);
 }

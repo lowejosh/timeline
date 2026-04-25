@@ -103,6 +103,19 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
     return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
+  const cancelTransientMotion = useCallback(() => {
+    animationRef.current = null;
+    momentumRef.current = null;
+    setIsAnimating(false);
+  }, []);
+
+  useEffect(() => {
+    const safeWidth = Math.max(width, 1);
+
+    cancelTransientMotion();
+    setViewport((current) => normalizeViewport(current, safeWidth));
+  }, [cancelTransientMotion, width]);
+
   const startRaf = useCallback(() => {
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(tick);
@@ -110,12 +123,12 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
 
   const updateViewport = useCallback(
     (updater: (current: TimelineViewport) => TimelineViewport) => {
-      // Direct updates cancel animations and momentum
-      animationRef.current = null;
-      momentumRef.current = null;
-      setViewport((current) => updater(current));
+      const safeWidth = Math.max(width, 1);
+
+      cancelTransientMotion();
+      setViewport((current) => normalizeViewport(updater(current), safeWidth));
     },
-    [],
+    [cancelTransientMotion, width],
   );
 
   const animateToRange = useCallback(
@@ -146,8 +159,7 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
 
   const animateZoom = useCallback(
     (zoomDelta: number, anchorX: number) => {
-      animationRef.current = null;
-      momentumRef.current = null;
+      cancelTransientMotion();
       setViewport((current) =>
         zoomAtPosition(
           current,
@@ -157,7 +169,7 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
         ),
       );
     },
-    [width],
+    [cancelTransientMotion, width],
   );
 
   // Drag velocity tracking
