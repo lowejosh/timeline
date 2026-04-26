@@ -4,7 +4,7 @@ import {
   panByPixels,
   type TimelineViewport,
   zoomAtPosition,
-} from "../lib/core/viewport";
+} from "@/lib/core/viewport";
 
 const WHEEL_LINE_PX = 16;
 const WHEEL_PAGE_PX = 320;

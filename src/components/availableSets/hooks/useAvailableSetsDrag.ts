@@ -2,19 +2,27 @@ import {
   type Dispatch,
   type PointerEvent as ReactPointerEvent,
   type SetStateAction,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
+import { useGlobalPointerDrag } from "@/hooks/useGlobalPointerDrag";
+import {
+  REORDER_EASING,
+  REORDER_SETTLE_MS,
+  moveItem,
+} from "@/lib/ui/reorder";
 import type {
   ColumnId,
   ColumnLayoutSnapshot,
   DragState,
   DraftColumns,
-} from "./AvailableSetsPage.types";
+} from "../AvailableSetsPage.types";
 import {
   estimateGap,
   getDropColumn,
@@ -22,12 +30,9 @@ import {
   getProjectedIndex,
   insertIntoFilteredColumn,
   insertItem,
-  moveItem,
   removeItem,
-  REORDER_EASING,
-  REORDER_SETTLE_MS,
   reorderVisibleSubset,
-} from "./AvailableSetsPage.utils";
+} from "../utils/availableSetsPage";
 
 export function useAvailableSetsDrag(
   draftColumns: DraftColumns,
@@ -93,22 +98,8 @@ export function useAvailableSetsDrag(
     };
   };
 
-  useEffect(() => {
-    if (!dragState) {
-      return;
-    }
-
-    const previousCursor = document.body.style.cursor;
-    const previousTouchAction = document.body.style.touchAction;
-    const previousUserSelect = document.body.style.userSelect;
-    const previousWebkitUserSelect = document.body.style.webkitUserSelect;
-
-    document.body.style.cursor = "grabbing";
-    document.body.style.touchAction = "none";
-    document.body.style.userSelect = "none";
-    document.body.style.webkitUserSelect = "none";
-
-    const handlePointerMove = (event: PointerEvent) => {
+  const handleDragPointerMove = useCallback(
+    (event: PointerEvent) => {
       const current = dragStateRef.current;
 
       if (!current || current.pointerId !== event.pointerId) {
@@ -148,9 +139,12 @@ export function useAvailableSetsDrag(
           targetIndex: nextTargetIndex,
         };
       });
-    };
+    },
+    [],
+  );
 
-    const finishDrag = (event: PointerEvent) => {
+  const finishDrag = useCallback(
+    (event: PointerEvent) => {
       const current = dragStateRef.current;
 
       if (!current || current.pointerId !== event.pointerId) {
@@ -218,24 +212,15 @@ export function useAvailableSetsDrag(
           available: removeItem(cols.available, current.setId),
         };
       });
-    };
+    },
+    [onMovedToAvailable, setDraftColumns],
+  );
 
-    window.addEventListener("pointermove", handlePointerMove, {
-      passive: false,
-    });
-    window.addEventListener("pointerup", finishDrag);
-    window.addEventListener("pointercancel", finishDrag);
-
-    return () => {
-      document.body.style.cursor = previousCursor;
-      document.body.style.touchAction = previousTouchAction;
-      document.body.style.userSelect = previousUserSelect;
-      document.body.style.webkitUserSelect = previousWebkitUserSelect;
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerup", finishDrag);
-      window.removeEventListener("pointercancel", finishDrag);
-    };
-  }, [dragState, onMovedToAvailable, setDraftColumns]);
+  useGlobalPointerDrag({
+    active: Boolean(dragState),
+    onPointerEnd: finishDrag,
+    onPointerMove: handleDragPointerMove,
+  });
 
   // FLIP: capture rects before render, animate from old position to new.
   useLayoutEffect(() => {

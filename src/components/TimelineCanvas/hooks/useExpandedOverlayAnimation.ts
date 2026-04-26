@@ -2,9 +2,9 @@ import { useEffect, useRef } from "react";
 import {
   EXPANDED_OVERLAY_ANIMATION_SMOOTHING_MS,
   MIN_EXPANDED_OVERLAY_PARENT_WIDTH,
-} from "../lib/rendering/canvas/constants";
-import { areStringArraysEqual } from "../lib/rendering/canvas/perf";
-import type { ResolvedTimelineOverlayBand } from "../lib/rendering/overlayTracks";
+} from "@/lib/rendering/canvas/constants";
+import { areStringArraysEqual } from "@/lib/rendering/canvas/perf";
+import type { ResolvedTimelineOverlayBand } from "@/lib/rendering/overlayTracks";
 
 export function useExpandedOverlayAnimation(
   expandedOverlayIds: string[],

@@ -1,88 +1,37 @@
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
-  type CSSProperties,
   type PointerEvent,
 } from "react";
-import {
-  compareEraPriorityAscending,
-  type Era,
-  type TimelineMarker,
-  type TimelineOverlayBand,
-} from "@/lib/catalog/eras";
-import {
-  EARLY_UNIVERSE_END_YEAR,
-  EARLY_UNIVERSE_START_YEAR,
-} from "@/lib/catalog/sets/cosmic/index";
-import {
-  comparePreciseTimelineYears,
-  getMinZoomForWidth,
-  getMaxZoomForTimelineViewport,
-  getViewportCenterYear,
-  getZoomAnchorForCanvasX,
-  getVisibleRangePrecise,
-  screenToWorld,
-  screenToWorldPrecise,
-  splitTimelineYear,
-  subtractPreciseTimelineYears,
-  TIMELINE_MAX_YEAR,
-  TIMELINE_MIN_YEAR,
-  panByPixels,
-  toApproximateTimelineYear,
-  worldToScreen,
-  zoomAtPosition,
-  type TimelineViewport,
-} from "@/lib/core/viewport";
-import {
-  getInteractiveDescendantEras,
-  getPreviewFocusChain,
-  resolveTimelineEraLayersFromOpacityMap,
-} from "@/lib/rendering/childLayers";
-import {
-  resolveTimelineOverlayTracks,
-  type ResolvedTimelineOverlayBand,
-} from "@/lib/rendering/overlayTracks";
-import { getVisibleTimelineMarkers } from "@/lib/rendering/queries/markers";
+
 import { resolveExpandedOverlayLayout } from "@/lib/rendering/expandedOverlayLayout";
-import {
-  shouldPrioritizeTooltipRetention,
-  shouldRetainTooltipAtPoint,
-} from "@/lib/rendering/tooltipRetention";
-import {
-  resolveAxisTickRenderStates,
-  type AxisTickRenderState,
-} from "@/lib/rendering/axisTickStates";
 import type { AnimatedContextBandLabelState } from "@/lib/rendering/contextBands";
-import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
-import {
-  getEdgeRailGlowIntensity,
-  getEdgeRailZoomDelta,
-  hasEdgeRailVerticalIntent,
-  shouldShowEdgeRailZoomState,
-  type EdgeRailSide,
-} from "./TimelineCanvas.edgeInteraction";
-import { getPinchZoomForScale } from "./TimelineCanvas.pinch";
-import {
-  DEFAULT_TIMELINE_THEME,
-  readTimelineCanvasTheme,
-  type TimelineCanvasTheme,
-} from "@/lib/rendering/canvas/theme";
-import {
-  createTimelinePerfBreakdown,
-  createTimelinePerfStats,
-  createTimelineVerboseStats,
-  getTimelinePerfMode,
-  incrementCounter,
-  recordTimelinePerf,
-  recordTimelineVerboseSample,
-  type TimelinePerfBreakdown,
-  type TimelinePerfMode,
-  type TimelinePerfStats,
-  type TimelineVerboseStats,
-} from "@/lib/rendering/canvas/perf";
+import { useExpandedOverlayAnimation } from "./hooks/useExpandedOverlayAnimation";
+import { useOverlayBandAnimation } from "./hooks/useOverlayBandAnimation";
+import { drawNowIndicator } from "@/lib/rendering/canvas/draw/drawNowIndicator";
+import { drawBackground } from "@/lib/rendering/canvas/draw/drawBackground";
+import { useMarkerPriorityBoost } from "./hooks/useMarkerPriorityBoost";
+import { compareEraPriorityAscending, type Era } from "@/lib/catalog/eras";
+import { useTimelineCanvasScene } from "./hooks/useTimelineCanvasScene";
+import { useEraChildAnimation } from "./hooks/useEraChildAnimation";
+import { useAxisTickAnimation } from "./hooks/useAxisTickAnimation";
+import { useCanvasBackingStore } from "./hooks/useCanvasBackingStore";
+import { drawOverlays } from "@/lib/rendering/canvas/draw/drawOverlays";
+import { drawMarkers } from "@/lib/rendering/canvas/draw/drawMarkers";
+import { TimelineTooltip } from "./components/TimelineTooltip";
+import { useWheelZoomPan } from "./hooks/useWheelZoomPan";
+import { EdgeZoomZones } from "./components/EdgeZoomZones";
+import { getPinchZoomForScale } from "./utils/pinch";
+import { drawEras } from "@/lib/rendering/canvas/draw/drawEras";
+import { drawAxis } from "@/lib/rendering/canvas/draw/drawAxis";
+import "./TimelineCanvas.styles.css";
+import type {
+  CanvasDrawContext,
+  HoverRegion,
+  OverlayInteractionRegion,
+} from "@/lib/rendering/canvas/draw/drawContext";
 import {
   PRIMORDIAL_DETAIL_STRIP_FADE_DURATION_MS,
   PRIMORDIAL_SYNTHETIC_DETAIL_MAX_ZOOM_WINDOW,
@@ -99,139 +48,76 @@ import {
   resolveExpandedOverlayDetails,
 } from "@/lib/rendering/canvas/overlayLayout";
 import {
-  isEquivalentHoveredTooltip,
-  type HoveredTooltipState,
-  type RenderedTooltipState,
-} from "@/lib/rendering/canvas/tooltip";
-import { useWheelZoomPan } from "@/hooks/useWheelZoomPan";
-import { useMarkerPriorityBoost } from "@/hooks/useMarkerPriorityBoost";
-import { useEraChildAnimation } from "@/hooks/useEraChildAnimation";
-import { useOverlayBandAnimation } from "@/hooks/useOverlayBandAnimation";
-import { useAxisTickAnimation } from "@/hooks/useAxisTickAnimation";
-import { useExpandedOverlayAnimation } from "@/hooks/useExpandedOverlayAnimation";
-import { drawBackground } from "@/lib/rendering/canvas/draw/drawBackground";
-import { drawEras } from "@/lib/rendering/canvas/draw/drawEras";
-import { drawOverlays } from "@/lib/rendering/canvas/draw/drawOverlays";
-import { drawAxis } from "@/lib/rendering/canvas/draw/drawAxis";
-import { drawMarkers } from "@/lib/rendering/canvas/draw/drawMarkers";
-import { drawNowIndicator } from "@/lib/rendering/canvas/draw/drawNowIndicator";
-import "./TimelineCanvas.styles.css";
-import type {
-  CanvasDrawContext,
-  HoverRegion,
-  OverlayInteractionRegion,
-} from "@/lib/rendering/canvas/draw/drawContext";
-
-type TimelineCanvasProps = {
-  width: number;
-  height: number;
-  pad: number;
-  overviewReservedHeight?: number;
-  viewport: TimelineViewport;
-  /** The currently drilled-into era (or root) */
-  activeEra: Era;
-  activeChain: Era[];
-  /** Children of the active era's parent (the "base" layer, always visible) */
-  siblingEras: Era[];
-  markers: TimelineMarker[];
-  overlayBands: TimelineOverlayBand[];
-  enabledGroupIds: ReadonlySet<string>;
-  overlayVisibilityTransitionKey: string;
-  parentEra: Era | null;
-  isCosmicCalendarMode: boolean;
-  isAnimating: boolean;
-  onViewportChange: (
-    updater: (current: TimelineViewport) => TimelineViewport,
-  ) => void;
-  onContinuousViewportChange: (
-    updater: (current: TimelineViewport) => TimelineViewport,
-  ) => void;
-  onViewportGestureStart: () => void;
-  onViewportGestureEnd: () => void;
-  onAnimateZoom: (zoomDelta: number, anchorX: number) => void;
-  onAnimateToRange: (startYear: number, endYear: number) => void;
-  onDrillIntoEra: (era: Era) => void;
-  onNavigateUp: () => void;
-  onRecordDragSample: (dx: number) => void;
-  onReleaseMomentum: () => void;
-};
-
-type DragState = {
-  pointerId: number;
-  pointerType: string;
-  startX: number;
-  startY: number;
-  lastX: number;
-  lastY: number;
-  moved: boolean;
-  mode: "pending" | "pan" | "overlay-scroll";
-};
-
-type EdgeRailInteractionState = {
-  pointerId: number;
-  side: EdgeRailSide;
-  startY: number;
-  lastY: number;
-  lastEventTime: number;
-  hasEngagedZoom: boolean;
-  element: HTMLDivElement;
-};
-
-type DualEdgeTouchZoomState = {
-  leftTouchId: number;
-  rightTouchId: number;
-  lastAverageY: number;
-};
-
-type PinchZoomState = {
-  firstTouchId: number;
-  secondTouchId: number;
-  startDistance: number;
-  startViewport: TimelineViewport;
-};
-
-type TimelineCanvasScene = {
-  width: number;
-  height: number;
-  viewport: TimelineViewport;
-  activeEra: Era;
-  activeChain: Era[];
-  siblingEras: Era[];
-  parentEra: Era | null;
-  visibleMarkers: TimelineMarker[];
-  resolvedOverlayBands: ResolvedTimelineOverlayBand[];
-  overlayLaneCount: number;
-  axisTickTargets: AxisTickRenderState[];
-};
-
-type TimelineSceneDiagnosticsSnapshot = {
-  width: number;
-  height: number;
-  centerYear: number;
-  zoom: number;
-  activeEraId: string;
-  visibleMarkerCount: number;
-  overlayCount: number;
-  overlayLaneCount: number;
-  axisTickCount: number;
-};
-
-import {
-  AXIS_TICK_OVERSCAN_PX,
   CLICK_DRAG_THRESHOLD,
   OVERLAY_LANE_GAP,
   OVERLAY_LANE_HEIGHT,
   TOOLTIP_BRIDGE_BASE_HALF_WIDTH,
   TOOLTIP_EXIT_DURATION_MS,
-  TOOLTIP_MAX_WIDTH,
-  TOOLTIP_OFFSET,
   VIEWPORT_INTERACTION_SETTLE_MS,
 } from "@/lib/rendering/canvas/constants";
-
-const DUAL_EDGE_CENTER_ZOOM_DELTA_PER_PIXEL = 0.01;
-const TOUCH_CLICK_DRAG_THRESHOLD = 12;
-const TOUCH_TOOLTIP_HIT_SLOP_PX = 28;
-const OVERLAY_SCROLL_TOUCH_THRESHOLD_PX = 8;
+import {
+  shouldPrioritizeTooltipRetention,
+  shouldRetainTooltipAtPoint,
+} from "@/lib/rendering/tooltipRetention";
+import {
+  isEquivalentHoveredTooltip,
+  type HoveredTooltipState,
+  type RenderedTooltipState,
+} from "@/lib/rendering/canvas/tooltip";
+import {
+  getMaxZoomForTimelineViewport,
+  getZoomAnchorForCanvasX,
+  screenToWorldPrecise,
+  screenToWorld,
+  panByPixels,
+  worldToScreen,
+  zoomAtPosition,
+} from "@/lib/core/viewport";
+import {
+  createTimelinePerfBreakdown,
+  createTimelinePerfStats,
+  createTimelineVerboseStats,
+  getTimelinePerfMode,
+  incrementCounter,
+  recordTimelinePerf,
+  recordTimelineVerboseSample,
+  type TimelinePerfBreakdown,
+  type TimelinePerfMode,
+  type TimelinePerfStats,
+  type TimelineVerboseStats,
+} from "@/lib/rendering/canvas/perf";
+import {
+  DEFAULT_TIMELINE_THEME,
+  readTimelineCanvasTheme,
+  type TimelineCanvasTheme,
+} from "@/lib/rendering/canvas/theme";
+import {
+  getInteractiveDescendantEras,
+  getPreviewFocusChain,
+  resolveTimelineEraLayersFromOpacityMap,
+} from "@/lib/rendering/childLayers";
+import {
+  getEdgeRailGlowIntensity,
+  getEdgeRailZoomDelta,
+  hasEdgeRailVerticalIntent,
+  shouldShowEdgeRailZoomState,
+  type EdgeRailSide,
+} from "./utils/edgeInteraction";
+import {
+  DUAL_EDGE_CENTER_ZOOM_DELTA_PER_PIXEL,
+  OVERLAY_SCROLL_TOUCH_THRESHOLD_PX,
+  TOUCH_CLICK_DRAG_THRESHOLD,
+  TOUCH_TOOLTIP_HIT_SLOP_PX,
+} from "./utils/constants";
+import type {
+  DragState,
+  DualEdgeTouchZoomState,
+  EdgeRailInteractionState,
+  PinchZoomState,
+  TimelineCanvasProps,
+  TimelineCanvasScene,
+  TimelineSceneDiagnosticsSnapshot,
+} from "./TimelineCanvas.types";
 
 export function TimelineCanvas({
   width,
@@ -276,7 +162,6 @@ export function TimelineCanvas({
   const lastSceneDiagnosticsRef =
     useRef<TimelineSceneDiagnosticsSnapshot | null>(null);
   const drawFrameRef = useRef(0);
-  const pendingInvalidateReasonsRef = useRef<Set<string>>(new Set());
   const interactiveChildErasRef = useRef<Era[]>([]);
   const dragStateRef = useRef<DragState | null>(null);
   const edgeRailInteractionRef = useRef<EdgeRailInteractionState | null>(null);
@@ -328,18 +213,13 @@ export function TimelineCanvas({
     yPercent: number;
     intensity: number;
   } | null>(null);
-  const [overlayScrollOffset, setOverlayScrollOffset] = useState(0);
   const [isViewportInteractionActive, setIsViewportInteractionActive] =
     useState(false);
-  const overlayScrollOffsetRef = useRef(0);
   const viewportRef = useRef(viewport);
   const reserveAxisDateRowRef = useRef(true);
   useEffect(() => {
     hoveredTooltipRef.current = hoveredTooltip;
   }, [hoveredTooltip]);
-  useEffect(() => {
-    overlayScrollOffsetRef.current = overlayScrollOffset;
-  }, [overlayScrollOffset]);
   useEffect(() => {
     viewportRef.current = viewport;
   }, [viewport]);
@@ -369,6 +249,28 @@ export function TimelineCanvas({
 
     incrementCounter(verbosePerfStatsRef.current.interactionCounts, eventName);
   }, []);
+  const {
+    adjustOverlayScrollOffset,
+    axisTickTargets,
+    overlayInteractionLayout,
+    overlayLaneCount,
+    overlayScrollOffset,
+    reserveAxisDateRow,
+    resolvedOverlayBands,
+    visibleMarkers,
+  } = useTimelineCanvasScene({
+    enabledGroupIds,
+    height,
+    markers,
+    onOverlayScroll: recordVerboseInteractionEvent,
+    overlayBands,
+    overviewReservedHeight,
+    pad,
+    surfaceRef: shellRef,
+    viewport,
+    width,
+  });
+  reserveAxisDateRowRef.current = reserveAxisDateRow;
   const commitHoveredTooltip = useCallback(
     (nextTooltip: HoveredTooltipState | null) => {
       const currentTooltip = hoveredTooltipRef.current;
@@ -1265,180 +1167,6 @@ export function TimelineCanvas({
 
     return selectedRegion;
   }
-  const axisTickTargets = useMemo(() => {
-    if (width <= pad * 2) {
-      return [] as AxisTickRenderState[];
-    }
-
-    const innerWidth = width - pad * 2;
-    const [preciseRangeStart, preciseRangeEnd] = getVisibleRangePrecise(
-      viewport,
-      innerWidth,
-    );
-    const tickRangeStart = screenToWorldPrecise(
-      -AXIS_TICK_OVERSCAN_PX,
-      viewport,
-      innerWidth,
-    );
-    const tickRangeEnd = screenToWorldPrecise(
-      innerWidth + AXIS_TICK_OVERSCAN_PX,
-      viewport,
-      innerWidth,
-    );
-    const tickStart = Math.max(
-      toApproximateTimelineYear(tickRangeStart),
-      TIMELINE_MIN_YEAR,
-    );
-    const tickEnd = Math.min(
-      toApproximateTimelineYear(tickRangeEnd),
-      TIMELINE_MAX_YEAR,
-    );
-    const visibleSpan = Math.max(
-      Math.abs(
-        subtractPreciseTimelineYears(preciseRangeEnd, preciseRangeStart),
-      ),
-      1e-18,
-    );
-    const earlyUniverseOverlapStart = Math.max(
-      tickStart,
-      EARLY_UNIVERSE_START_YEAR,
-    );
-    const earlyUniverseOverlapEnd = Math.min(tickEnd, EARLY_UNIVERSE_END_YEAR);
-    const earlyUniverseOverlap = Math.max(
-      0,
-      earlyUniverseOverlapEnd - earlyUniverseOverlapStart,
-    );
-    const startsAtBigBang =
-      comparePreciseTimelineYears(
-        preciseRangeStart,
-        splitTimelineYear(TIMELINE_MIN_YEAR),
-      ) === 0;
-    const isFullyZoomedOut =
-      viewport.zoom <=
-      getMinZoomForWidth(innerWidth, viewport.scaleMode ?? "linear") + 0.001;
-    const isPrimordialFocused =
-      !isFullyZoomedOut &&
-      (startsAtBigBang || earlyUniverseOverlap / visibleSpan >= 0.75);
-
-    return resolveAxisTickRenderStates(tickStart, tickEnd, innerWidth, {
-      elapsedReference: isPrimordialFocused ? "after-big-bang" : "ago",
-      elapsedSubYearReference: isPrimordialFocused ? "after-big-bang" : "ago",
-      preciseStartYear: preciseRangeStart,
-      preciseEndYear: preciseRangeEnd,
-      preciseAnchorYear: getViewportCenterYear(viewport),
-      scaleMode: "logarithmic",
-    });
-  }, [pad, viewport, width]);
-  const reserveAxisDateRow = useMemo(
-    () => axisTickTargets.some((tick) => tick.labelStep < 1),
-    [axisTickTargets],
-  );
-  reserveAxisDateRowRef.current = reserveAxisDateRow;
-  const visibleMarkers = useMemo(
-    () =>
-      getVisibleTimelineMarkers(markers, viewport, width, pad, enabledGroupIds),
-    [enabledGroupIds, markers, pad, viewport, width],
-  );
-  const resolvedOverlayBands = useMemo(
-    () =>
-      resolveTimelineOverlayTracks(
-        overlayBands,
-        viewport,
-        width,
-        pad,
-        typeof window === "undefined" ? 1 : window.devicePixelRatio || 1,
-        enabledGroupIds,
-      ),
-    [enabledGroupIds, overlayBands, pad, viewport, width],
-  );
-  const overlayLaneCount = resolvedOverlayBands[0]?.laneCount ?? 0;
-  const overlayInteractionLayout = useMemo(
-    () =>
-      getTimelineLayout(height, overlayLaneCount, overlayScrollOffset, {
-        reserveAxisDateRow,
-        overviewReservedHeight,
-      }),
-    [
-      height,
-      overlayLaneCount,
-      overlayScrollOffset,
-      overviewReservedHeight,
-      reserveAxisDateRow,
-    ],
-  );
-
-  const clampOverlayScrollOffset = useCallback(
-    (requestedOffset: number) =>
-      getTimelineLayout(height, overlayLaneCount, requestedOffset, {
-        reserveAxisDateRow,
-        overviewReservedHeight,
-      }).overlayScrollOffset,
-    [height, overlayLaneCount, overviewReservedHeight, reserveAxisDateRow],
-  );
-
-  const adjustOverlayScrollOffset = useCallback(
-    (deltaY: number) => {
-      if (overlayInteractionLayout.overlayScrollMax <= 0) {
-        return;
-      }
-
-      setOverlayScrollOffset((current) =>
-        clampOverlayScrollOffset(current + deltaY),
-      );
-    },
-    [clampOverlayScrollOffset, overlayInteractionLayout.overlayScrollMax],
-  );
-
-  useEffect(() => {
-    setOverlayScrollOffset((current) => clampOverlayScrollOffset(current));
-  }, [clampOverlayScrollOffset]);
-
-  useEffect(() => {
-    const surface = shellRef.current;
-
-    if (!surface || overlayInteractionLayout.overlayScrollMax <= 0) {
-      return;
-    }
-
-    const handleOverlayWheel = (event: globalThis.WheelEvent) => {
-      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
-        return;
-      }
-
-      const rect = surface.getBoundingClientRect();
-      const localY = event.clientY - rect.top;
-
-      if (
-        localY < overlayInteractionLayout.overlayClipTop ||
-        localY > overlayInteractionLayout.overlayClipBottom
-      ) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      recordVerboseInteractionEvent("overlay-wheel-scroll");
-      adjustOverlayScrollOffset(-event.deltaY);
-    };
-
-    surface.addEventListener("wheel", handleOverlayWheel, {
-      capture: true,
-      passive: false,
-    });
-
-    return () => {
-      surface.removeEventListener("wheel", handleOverlayWheel, {
-        capture: true,
-      });
-    };
-  }, [
-    adjustOverlayScrollOffset,
-    overlayInteractionLayout.overlayClipBottom,
-    overlayInteractionLayout.overlayClipTop,
-    overlayInteractionLayout.overlayScrollMax,
-    recordVerboseInteractionEvent,
-  ]);
-
   const scheduleRedraw = useCallback((reason = "unspecified") => {
     if (drawFrameRef.current) return;
     drawFrameRef.current = requestAnimationFrame(() => {
@@ -1488,44 +1216,7 @@ export function TimelineCanvas({
     };
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-
-    if (!canvas || width <= 0 || height <= 0) {
-      return;
-    }
-
-    const context = canvas.getContext("2d");
-
-    if (!context) {
-      return;
-    }
-
-    const ratio = window.devicePixelRatio || 1;
-    const pixelWidth = Math.floor(width * ratio);
-    const pixelHeight = Math.floor(height * ratio);
-
-    if (canvas.width !== pixelWidth) {
-      canvas.width = pixelWidth;
-    }
-
-    if (canvas.height !== pixelHeight) {
-      canvas.height = pixelHeight;
-    }
-
-    const cssWidth = `${width}px`;
-    const cssHeight = `${height}px`;
-
-    if (canvas.style.width !== cssWidth) {
-      canvas.style.width = cssWidth;
-    }
-
-    if (canvas.style.height !== cssHeight) {
-      canvas.style.height = cssHeight;
-    }
-
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
-  }, [height, width]);
+  useCanvasBackingStore(canvasRef, width, height);
 
   useEffect(() => {
     const nextSceneDiagnostics: TimelineSceneDiagnosticsSnapshot = {
@@ -1611,16 +1302,12 @@ export function TimelineCanvas({
       visibleMarkers,
       resolvedOverlayBands,
       overlayLaneCount,
-      axisTickTargets,
     };
 
     if (drawFrameRef.current) {
       cancelAnimationFrame(drawFrameRef.current);
       drawFrameRef.current = 0;
 
-      if (perfModeRef.current === "verbose") {
-        pendingInvalidateReasonsRef.current.clear();
-      }
     }
 
     drawCanvas(["scene-publish"]);
@@ -2178,95 +1865,6 @@ export function TimelineCanvas({
     }
   };
 
-  const displayedTooltip = renderedTooltip?.tooltipState ?? null;
-  const edgeZoomZoneWidth = pad;
-  const safeViewportInsets =
-    typeof window === "undefined"
-      ? { top: 0, right: 0, bottom: 0, left: 0 }
-      : (() => {
-          const rootStyles = getComputedStyle(document.documentElement);
-          const readInset = (name: string) => {
-            const value = Number.parseFloat(rootStyles.getPropertyValue(name));
-            return Number.isFinite(value) ? value : 0;
-          };
-          const visualViewport = window.visualViewport;
-          const viewportTop = visualViewport?.offsetTop ?? 0;
-          const viewportLeft = visualViewport?.offsetLeft ?? 0;
-          const viewportHeight = visualViewport?.height ?? window.innerHeight;
-          const viewportWidth = visualViewport?.width ?? window.innerWidth;
-
-          return {
-            top: Math.max(readInset("--safe-area-top"), viewportTop) + 10,
-            right:
-              Math.max(
-                readInset("--safe-area-right"),
-                Math.max(window.innerWidth - (viewportLeft + viewportWidth), 0),
-              ) + 10,
-            bottom:
-              Math.max(
-                readInset("--safe-area-bottom"),
-                Math.max(
-                  window.innerHeight - (viewportTop + viewportHeight),
-                  0,
-                ),
-              ) + 10,
-            left: Math.max(readInset("--safe-area-left"), viewportLeft) + 10,
-          };
-        })();
-
-  const tooltipStyle:
-    | (CSSProperties & Record<string, string | number>)
-    | undefined = displayedTooltip
-    ? (() => {
-        const tooltipHorizontalPadding = 10;
-        const tooltipWidth = Math.min(
-          TOOLTIP_MAX_WIDTH,
-          Math.max(
-            width - safeViewportInsets.left - safeViewportInsets.right - 24,
-            220,
-          ),
-        );
-        const centeredMinX = safeViewportInsets.left + tooltipWidth * 0.5;
-        const centeredMaxX =
-          width - safeViewportInsets.right - tooltipWidth * 0.5;
-        const horizontalPlacement =
-          displayedTooltip.anchorX < centeredMinX
-            ? "left"
-            : displayedTooltip.anchorX > centeredMaxX
-              ? "right"
-              : "center";
-        const shouldPlaceBelow =
-          displayedTooltip.anchorY < safeViewportInsets.top + 96 ||
-          (displayedTooltip.placement === "below" &&
-            displayedTooltip.anchorY <=
-              height - safeViewportInsets.bottom - 120);
-
-        return {
-          ...(horizontalPlacement === "right"
-            ? { right: safeViewportInsets.right + tooltipHorizontalPadding }
-            : {
-                left:
-                  horizontalPlacement === "center"
-                    ? displayedTooltip.anchorX
-                    : safeViewportInsets.left + tooltipHorizontalPadding,
-              }),
-          top: Math.min(
-            Math.max(displayedTooltip.anchorY, safeViewportInsets.top + 6),
-            height - safeViewportInsets.bottom - 6,
-          ),
-          width: `${tooltipWidth}px`,
-          maxWidth: `${tooltipWidth}px`,
-          "--tooltip-translate-x":
-            horizontalPlacement === "center" ? "-50%" : "0%",
-          "--tooltip-translate-y": shouldPlaceBelow
-            ? `${TOOLTIP_OFFSET}px`
-            : `calc(-100% - ${TOOLTIP_OFFSET}px)`,
-          "--tooltip-origin": shouldPlaceBelow ? "top center" : "bottom center",
-          "--tooltip-motion-offset-y": shouldPlaceBelow ? "-4px" : "4px",
-        };
-      })()
-    : undefined;
-
   return (
     <div
       className="relative w-full h-full"
@@ -2324,130 +1922,26 @@ export function TimelineCanvas({
         ref={canvasRef}
         tabIndex={0}
       />
-      {(["left", "right"] as const).map((side) => (
-        <div
-          aria-hidden="true"
-          className="timeline-canvas__edge-zoom-zone"
-          data-dragging={draggingEdgeZoomSide === side ? "true" : "false"}
-          data-hovered={hoveredEdgeZoomSide === side ? "true" : "false"}
-          data-pressed={pressedEdgeZoomSide === side ? "true" : "false"}
-          data-side={side}
-          key={side}
-          onLostPointerCapture={() => {
-            stopEdgeRailInteraction();
-          }}
-          onPointerCancel={handleEdgeRailPointerUp}
-          onPointerDown={(event) => {
-            handleEdgeRailPointerDown(event, side);
-          }}
-          onPointerEnter={() => {
-            setHoveredEdgeZoomSide(side);
-          }}
-          onPointerLeave={() => {
-            setHoveredEdgeZoomSide((current) =>
-              current === side ? null : current,
-            );
-          }}
-          onPointerMove={handleEdgeRailPointerMove}
-          onPointerUp={handleEdgeRailPointerUp}
-          style={
-            {
-              width: edgeZoomZoneWidth,
-              "--edge-zone-glow-y": `${
-                edgeZoomGlow?.side === side ? edgeZoomGlow.yPercent : 50
-              }%`,
-              "--edge-zone-glow-opacity": `${
-                edgeZoomGlow?.side === side ? edgeZoomGlow.intensity : 0.18
-              }`,
-            } as CSSProperties
-          }
-        >
-          <div className="timeline-canvas__edge-zoom-hint">
-            <span className="timeline-canvas__edge-zoom-hint-label timeline-canvas__edge-zoom-hint-label--top">
-              Drag to zoom
-            </span>
-            <svg
-              aria-hidden="true"
-              className="timeline-canvas__edge-zoom-hint-icon"
-              viewBox="0 0 16 16"
-            >
-              <path d="M4.5 9 8 5.5 11.5 9" />
-            </svg>
-            <svg
-              aria-hidden="true"
-              className="timeline-canvas__edge-zoom-hint-icon timeline-canvas__edge-zoom-hint-icon--glass"
-              viewBox="0 0 16 16"
-            >
-              <circle cx="7" cy="7" r="3.5" />
-              <path d="M9.7 9.7 13 13" />
-            </svg>
-            <svg
-              aria-hidden="true"
-              className="timeline-canvas__edge-zoom-hint-icon"
-              viewBox="0 0 16 16"
-            >
-              <path d="M4.5 7 8 10.5 11.5 7" />
-            </svg>
-          </div>
-        </div>
-      ))}
+      <EdgeZoomZones
+        draggingSide={draggingEdgeZoomSide}
+        glow={edgeZoomGlow}
+        hoveredSide={hoveredEdgeZoomSide}
+        onHoveredSideChange={setHoveredEdgeZoomSide}
+        onLostPointerCapture={stopEdgeRailInteraction}
+        onPointerCancel={handleEdgeRailPointerUp}
+        onPointerDown={handleEdgeRailPointerDown}
+        onPointerMove={handleEdgeRailPointerMove}
+        onPointerUp={handleEdgeRailPointerUp}
+        pressedSide={pressedEdgeZoomSide}
+        zoneWidth={pad}
+      />
       {renderedTooltip ? (
-        <div
-          className="timeline-tooltip"
-          data-phase={renderedTooltip.phase}
-          style={tooltipStyle}
-        >
-          <div className="timeline-tooltip__header">
-            <OverlayGroupIconSvg
-              className="timeline-tooltip__icon"
-              groupId={renderedTooltip.tooltipState.tooltip.iconGroupId}
-            />
-            <div className="timeline-tooltip__title">
-              {renderedTooltip.tooltipState.tooltip.title}
-            </div>
-          </div>
-          {renderedTooltip.tooltipState.tooltip.regionalScopeLabel ? (
-            <div className="timeline-tooltip__subtitle">
-              {renderedTooltip.tooltipState.tooltip.regionalScopeLabel}
-            </div>
-          ) : null}
-          <div className="timeline-tooltip__time">
-            {renderedTooltip.tooltipState.tooltip.timeLabel}
-          </div>
-          {renderedTooltip.tooltipState.tooltip.description ? (
-            <div className="timeline-tooltip__description">
-              {renderedTooltip.tooltipState.tooltip.description}
-            </div>
-          ) : null}
-          {renderedTooltip.tooltipState.tooltip.sources.length > 0 ? (
-            <div className="timeline-tooltip__sources" ref={tooltipSourcesRef}>
-              <div className="timeline-tooltip__sources-label">Sources</div>
-              <ul className="timeline-tooltip__source-list">
-                {renderedTooltip.tooltipState.tooltip.sources.map((source) => (
-                  <li className="timeline-tooltip__source-item" key={source.id}>
-                    {source.url ? (
-                      <a
-                        className="timeline-tooltip__source-link"
-                        href={source.url}
-                        rel="noreferrer"
-                        target="_blank"
-                      >
-                        {source.shortTitle}
-                      </a>
-                    ) : (
-                      <span className="timeline-tooltip__source-title">
-                        {source.shortTitle}
-                      </span>
-                    )}
-                    <span className="timeline-tooltip__source-org">
-                      {source.organization}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </div>
+        <TimelineTooltip
+          height={height}
+          renderedTooltip={renderedTooltip}
+          sourcesRef={tooltipSourcesRef}
+          width={width}
+        />
       ) : null}
     </div>
   );

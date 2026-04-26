@@ -1,1 +1,1 @@
-export { AvailableSetsPage } from './AvailableSetsPage';
+export { AvailableSetsPage } from "./AvailableSetsPage";

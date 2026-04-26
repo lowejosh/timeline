@@ -1,19 +1,19 @@
 import { useEffect, useRef } from "react";
-import type { ResolvedTimelineOverlayBand } from "../lib/rendering/overlayTracks";
+import type { ResolvedTimelineOverlayBand } from "@/lib/rendering/overlayTracks";
 import {
   getOverlayLaneY,
   getTimelineLayout,
-} from "../lib/rendering/canvas/overlayLayout";
+} from "@/lib/rendering/canvas/overlayLayout";
 import {
   OVERLAY_BAND_FADE_IN_SMOOTHING_MS,
   OVERLAY_BAND_FADE_OUT_SMOOTHING_MS,
   OVERLAY_BAND_POSITION_SMOOTHING_MS,
   OVERLAY_BAND_REFLOW_START_OPACITY,
-} from "../lib/rendering/canvas/constants";
+} from "@/lib/rendering/canvas/constants";
 import {
   type AnimatedOverlayBandState,
   isOverlayBandStateAnimating,
-} from "../lib/rendering/animation/overlayBand";
+} from "@/lib/rendering/animation/overlayBand";
 
 function advanceOverlayBandAnimation(
   animationStates: Map<string, AnimatedOverlayBandState>,

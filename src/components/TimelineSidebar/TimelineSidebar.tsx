@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -8,14 +9,22 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal, flushSync } from "react-dom";
+
+import { OverlayGroupIconSvg } from "@/components/TimelineCanvas/components/OverlayGroupIconSvg";
+import { computeEraObscuredCounts } from "@/lib/catalog/timelineSetMetrics";
+import { useGlobalPointerDrag } from "@/hooks/useGlobalPointerDrag";
+import {
+  REORDER_EASING,
+  REORDER_SETTLE_MS,
+  areOrdersEqual,
+  moveItem,
+} from "@/lib/ui/reorder";
+import type { TimelineSetId } from "@/lib/core/timelineTypes";
+import "./TimelineSidebar.styles.css";
 import type {
   TimelineSidebarChildState,
   TimelineSidebarSetState,
 } from "@/lib/app/sidebarModel";
-import type { TimelineSetId } from "@/lib/core/timelineTypes";
-import { OverlayGroupIconSvg } from "../TimelineCanvas/OverlayGroupIconSvg";
-import { computeEraObscuredCounts } from "../AvailableSets/AvailableSetsPage.utils";
-import "./TimelineSidebar.styles.css";
 
 type TimelineSidebarProps = {
   sets: TimelineSidebarSetState[];
@@ -23,11 +32,7 @@ type TimelineSidebarProps = {
   onReorderSets: (nextSetIds: TimelineSetId[]) => void;
   onToggleSet: (setId: TimelineSetId, nextEnabled: boolean) => void;
   onToggleSetExpanded: (setId: TimelineSetId, nextExpanded: boolean) => void;
-  onToggleEntry: (
-    entryId: string,
-    groupIds: string[],
-    nextEnabled: boolean,
-  ) => void;
+  onToggleEntry: (groupIds: string[], nextEnabled: boolean) => void;
   onOpenSetManager: () => void;
 };
 
@@ -49,34 +54,8 @@ type DragState = {
   layout: SetLayoutSnapshot;
 };
 
-const REORDER_SETTLE_MS = 220;
-const REORDER_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
-
 function pluralize(count: number, singular: string, plural = `${singular}s`) {
   return `${count} ${count === 1 ? singular : plural}`;
-}
-
-function moveItem<T>(
-  items: readonly T[],
-  fromIndex: number,
-  toIndex: number,
-): T[] {
-  const next = [...items];
-  const [moved] = next.splice(fromIndex, 1);
-
-  next.splice(toIndex, 0, moved);
-
-  return next;
-}
-
-function areOrdersEqual(
-  left: readonly TimelineSetId[],
-  right: readonly TimelineSetId[],
-) {
-  return (
-    left.length === right.length &&
-    left.every((setId, index) => setId === right[index])
-  );
 }
 
 function getProjectedIndex(dragState: DragState, nextClientY: number): number {
@@ -322,101 +301,85 @@ export function TimelineSidebar({
     return getPreviewTopBySetId(previewOrder, dragState.layout);
   }, [dragState, previewOrder]);
 
-  useEffect(() => {
-    if (!dragState) {
+  const handleDragPointerMove = useCallback((event: PointerEvent) => {
+    const currentDragState = dragStateRef.current;
+
+    if (!currentDragState || currentDragState.pointerId !== event.pointerId) {
       return;
     }
 
-    const previousCursor = document.body.style.cursor;
-    const previousTouchAction = document.body.style.touchAction;
-    const previousUserSelect = document.body.style.userSelect;
-    const previousWebkitUserSelect = document.body.style.webkitUserSelect;
+    event.preventDefault();
 
-    document.body.style.cursor = "grabbing";
-    document.body.style.touchAction = "none";
-    document.body.style.userSelect = "none";
-    document.body.style.webkitUserSelect = "none";
+    if (
+      !dragMovedRef.current &&
+      Math.abs(event.clientY - currentDragState.startClientY) > 4
+    ) {
+      dragMovedRef.current = true;
 
-    const handlePointerMove = (event: PointerEvent) => {
-      const currentDragState = dragStateRef.current;
+      if (collapseOnDragRef.current) {
+        flushSync(() => {
+          collapseOnDragRef.current!();
+        });
+        collapseOnDragRef.current = null;
 
-      if (!currentDragState || currentDragState.pointerId !== event.pointerId) {
-        return;
-      }
+        // Re-measure with collapsed DOM heights and update drag state.
+        const freshLayout = measureSetLayoutRef.current();
 
-      event.preventDefault();
+        if (freshLayout) {
+          const freshIndex = freshLayout.order.indexOf(currentDragState.setId);
 
-      if (
-        !dragMovedRef.current &&
-        Math.abs(event.clientY - currentDragState.startClientY) > 4
-      ) {
-        dragMovedRef.current = true;
+          if (freshIndex >= 0) {
+            // Compensate startClientY for any layout shift of the dragged
+            // item so the visual position stays continuous.
+            const oldTop =
+              currentDragState.layout.tops.get(currentDragState.setId) ?? 0;
+            const newTop = freshLayout.tops.get(currentDragState.setId) ?? 0;
 
-        if (collapseOnDragRef.current) {
-          flushSync(() => {
-            collapseOnDragRef.current!();
-          });
-          collapseOnDragRef.current = null;
+            const updatedState = {
+              ...currentDragState,
+              startClientY: currentDragState.startClientY + (newTop - oldTop),
+              layout: freshLayout,
+              initialIndex: freshIndex,
+              projectedIndex: freshIndex,
+            };
 
-          // Re-measure with collapsed DOM heights and update drag state.
-          const freshLayout = measureSetLayoutRef.current();
-
-          if (freshLayout) {
-            const freshIndex = freshLayout.order.indexOf(
-              currentDragState.setId,
-            );
-
-            if (freshIndex >= 0) {
-              // Compensate startClientY for any layout shift of the dragged
-              // item so the visual position stays continuous.
-              const oldTop =
-                currentDragState.layout.tops.get(currentDragState.setId) ?? 0;
-              const newTop = freshLayout.tops.get(currentDragState.setId) ?? 0;
-
-              const updatedState = {
-                ...currentDragState,
-                startClientY: currentDragState.startClientY + (newTop - oldTop),
-                layout: freshLayout,
-                initialIndex: freshIndex,
-                projectedIndex: freshIndex,
-              };
-
-              // Update the ref synchronously so the next pointermove event
-              // sees the fresh state before React re-renders.
-              dragStateRef.current = updatedState;
-              setDragState(updatedState);
-              return;
-            }
+            // Update the ref synchronously so the next pointermove event
+            // sees the fresh state before React re-renders.
+            dragStateRef.current = updatedState;
+            setDragState(updatedState);
+            return;
           }
         }
       }
+    }
 
-      const nextProjectedIndex = getProjectedIndex(
-        currentDragState,
-        event.clientY,
-      );
+    const nextProjectedIndex = getProjectedIndex(
+      currentDragState,
+      event.clientY,
+    );
 
-      setDragState((current) => {
-        if (!current || current.pointerId !== event.pointerId) {
-          return current;
-        }
+    setDragState((current) => {
+      if (!current || current.pointerId !== event.pointerId) {
+        return current;
+      }
 
-        if (
-          current.currentClientY === event.clientY &&
-          current.projectedIndex === nextProjectedIndex
-        ) {
-          return current;
-        }
+      if (
+        current.currentClientY === event.clientY &&
+        current.projectedIndex === nextProjectedIndex
+      ) {
+        return current;
+      }
 
-        return {
-          ...current,
-          currentClientY: event.clientY,
-          projectedIndex: nextProjectedIndex,
-        };
-      });
-    };
+      return {
+        ...current,
+        currentClientY: event.clientY,
+        projectedIndex: nextProjectedIndex,
+      };
+    });
+  }, []);
 
-    const finishDrag = (event: PointerEvent) => {
+  const finishDrag = useCallback(
+    (event: PointerEvent) => {
       const currentDragState = dragStateRef.current;
 
       if (!currentDragState || currentDragState.pointerId !== event.pointerId) {
@@ -448,24 +411,15 @@ export function TimelineSidebar({
       if (!areOrdersEqual(nextOrder, currentDragState.layout.order)) {
         onReorderSets(nextOrder);
       }
-    };
+    },
+    [onReorderSets],
+  );
 
-    window.addEventListener("pointermove", handlePointerMove, {
-      passive: false,
-    });
-    window.addEventListener("pointerup", finishDrag);
-    window.addEventListener("pointercancel", finishDrag);
-
-    return () => {
-      document.body.style.cursor = previousCursor;
-      document.body.style.touchAction = previousTouchAction;
-      document.body.style.userSelect = previousUserSelect;
-      document.body.style.webkitUserSelect = previousWebkitUserSelect;
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerup", finishDrag);
-      window.removeEventListener("pointercancel", finishDrag);
-    };
-  }, [dragState, onReorderSets]);
+  useGlobalPointerDrag({
+    active: Boolean(dragState),
+    onPointerEnd: finishDrag,
+    onPointerMove: handleDragPointerMove,
+  });
 
   useLayoutEffect(() => {
     const currentRects = new Map<TimelineSetId, DOMRect>();
@@ -755,7 +709,6 @@ export function TimelineSidebar({
                               disabled={!set.enabled}
                               onChange={(event) => {
                                 onToggleEntry(
-                                  child.id,
                                   child.groupIds,
                                   event.currentTarget.checked,
                                 );

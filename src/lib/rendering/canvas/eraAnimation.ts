@@ -1,4 +1,3 @@
-import type { Era } from "@/lib/catalog/eras";
 import {
   EXPANDED_OVERLAY_CHILD_LANE_STAGGER,
   EXPANDED_OVERLAY_CHILD_REVEAL_DURATION,
@@ -21,13 +20,6 @@ export function getEraBackdropResetAlpha(depth: number, opacity: number) {
   }
 
   return clamp01(opacity);
-}
-
-export function getEraBandAlphaMultiplier(era: Era, depth: number) {
-  void era;
-  void depth;
-
-  return 1;
 }
 
 export function getExpandedOverlayChromeStemRevealProgress(progress: number) {

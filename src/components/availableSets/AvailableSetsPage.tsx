@@ -1,21 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
+
+import { useAvailableSetsDrag } from "./hooks/useAvailableSetsDrag";
 import type { TimelineSetDefinition } from "@/lib/catalog/setSchema";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
-import { useAvailableSetsDrag } from "./AvailableSetsPage.hooks";
+import {
+  computeEraObscuredCounts,
+  computeSetTimeRanges,
+} from "@/lib/catalog/timelineSetMetrics";
+import { REORDER_EASING } from "@/lib/ui/reorder";
 import type {
   AvailableSetsPageProps,
   ColumnId,
   DraftColumns,
 } from "./AvailableSetsPage.types";
 import {
-  computeEraObscuredCounts,
-  computeSetTimeRanges,
   createDraftColumns,
   deriveAvailableTags,
   matchesQuery,
   removeItem,
-  REORDER_EASING,
-} from "./AvailableSetsPage.utils";
+} from "./utils/availableSetsPage";
 import "./AvailableSetsPage.styles.css";
 
 export function AvailableSetsPage({

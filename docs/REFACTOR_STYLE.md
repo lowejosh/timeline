@@ -2,6 +2,10 @@
 
 > **Goal**: Consolidate scattered styles into a single theme, eliminate ad-hoc CSS files, and move every component into its own named folder. Visual output must be pixel-identical after the refactor.
 
+## Import Ordering
+
+Keep imports separated into package imports first, then local imports. Within each section, keep one-line imports sorted by line length descending. Multi-line import blocks come after one-line imports, sorted by the length of their `from` line descending.
+
 ---
 
 ## 1. Current State Audit
@@ -12,7 +16,6 @@
 |---|---|---|
 | `src/App.css` | 955 | Dumps styles for 6+ unrelated components: shell, sidebar toggle, sidebar inner, canvas shell, tooltip, view transitions |
 | `src/components/availableSets/AvailableSetsPage.css` | 512 | Co-located but lowercase folder name, no index barrel |
-| `src/components/TimelineDisclaimer.css` | 169 | Flat in `/components/`, not in its own folder |
 | `src/components/TimelineSettings.css` | 172 | Same problem as above |
 | `src/components/overview/TimelineOverviewRulerStack.css` | 91 | Nested in `overview/`, not its own folder |
 | `src/components/overview/TimelineOverviewRuler.css` | 68 | Same |
@@ -24,10 +27,10 @@ The same raw RGBA values appear 30+ times across all CSS files with no named tok
 
 | Raw value | Role | Appears in |
 |---|---|---|
-| `rgba(77, 61, 47, X)` | Brown ink (borders, muted text) | App.css ×21, Disclaimer.css, Settings.css, AvailableSets.css |
-| `rgba(44, 31, 20, X)` | Shadow base | App.css ×12, Disclaimer.css, Settings.css, AvailableSets.css |
-| `rgba(251, 247, 239, X)` | Paper glass surface | App.css ×5, Disclaimer.css, Settings.css, AvailableSets.css |
-| `rgba(255, 251, 244, X)` | Paper glass hover | App.css ×4, Disclaimer.css, Settings.css |
+| `rgba(77, 61, 47, X)` | Brown ink (borders, muted text) | App.css ×21, Settings.css, AvailableSets.css |
+| `rgba(44, 31, 20, X)` | Shadow base | App.css ×12, Settings.css, AvailableSets.css |
+| `rgba(251, 247, 239, X)` | Paper glass surface | App.css ×5, Settings.css, AvailableSets.css |
+| `rgba(255, 251, 244, X)` | Paper glass hover | App.css ×4, Settings.css |
 | `rgba(124, 92, 59, X)` | Accent / focus | index.css, Settings.css, AvailableSets.css |
 | `rgba(32, 25, 19, X)` | Ink text body | App.css, AvailableSets.css |
 
@@ -37,16 +40,14 @@ A canvas-specific `TimelineCanvasTheme` already exists in `src/lib/rendering/can
 
 ```
 src/components/
-  TimelineDisclaimer.css   ← flat, no folder, no index
-  TimelineDisclaimer.tsx   ← flat, no folder
   TimelineSettings.css     ← flat, no folder, no index
   TimelineSettings.tsx     ← flat, no folder
   availableSets/           ← lowercase, no index barrel
     AvailableSetsPage.css
-    AvailableSetsPage.hooks.ts
     AvailableSetsPage.tsx
     AvailableSetsPage.types.ts
-    AvailableSetsPage.utils.ts
+    hooks/
+    utils/
   canvas/                  ← generic folder, not component-named
     OverlayGroupIconSvg.tsx
     TimelineCanvas.tsx
@@ -252,11 +253,6 @@ The existing `src/lib/rendering/canvas/theme.ts` (`TimelineCanvasTheme`) reads f
 ```
 src/components/
 │
-├── TimelineDisclaimer/
-│   ├── TimelineDisclaimer.tsx
-│   ├── TimelineDisclaimer.styles.css   ← only if needed for ::before/after or complex transitions
-│   └── index.ts
-│
 ├── TimelineSettings/
 │   ├── TimelineSettings.tsx
 │   ├── TimelineSettings.styles.css     ← icon spin transition lives here
@@ -264,15 +260,22 @@ src/components/
 │
 ├── TimelineCanvas/                      ← was canvas/
 │   ├── TimelineCanvas.tsx
-│   ├── OverlayGroupIconSvg.tsx          ← private to TimelineCanvas, stays here
+│   ├── TimelineCanvas.types.ts         ← public/internal feature types
+│   ├── components/                      ← TimelineCanvas-private subcomponents
+│   ├── hooks/                           ← TimelineCanvas-private hooks
+│   ├── utils/                           ← TimelineCanvas-private helpers
+│   └── index.ts
+│
+├── OverlayGroupIconSvg/                 ← shared by canvas tooltip + sidebar
+│   ├── OverlayGroupIconSvg.tsx
 │   └── index.ts
 │
 ├── AvailableSets/                       ← was availableSets/ (lowercase)
 │   ├── AvailableSetsPage.tsx
 │   ├── AvailableSetsPage.styles.css     ← only if needed
-│   ├── AvailableSetsPage.hooks.ts
 │   ├── AvailableSetsPage.types.ts
-│   ├── AvailableSetsPage.utils.ts
+│   ├── hooks/
+│   ├── utils/
 │   └── index.ts
 │
 ├── TimelineOverviewRuler/               ← was overview/
@@ -319,9 +322,9 @@ After decomposition, `App.css` is **deleted**. `App.tsx` imports nothing except 
 | Component folder | `PascalCase/` | `TimelineSidebar/` |
 | Barrel export | `index.ts` | re-exports component |
 | Styles file (CSS-only, if needed) | `PascalCase.styles.css` | `TimelineSettings.styles.css` |
-| Hooks extracted from component | `PascalCase.hooks.ts` | `AvailableSetsPage.hooks.ts` |
+| Hooks extracted from component | `hooks/useThing.ts` | `hooks/useAvailableSetsDrag.ts` |
 | Types extracted from component | `PascalCase.types.ts` | `AvailableSetsPage.types.ts` |
-| Utilities extracted from component | `PascalCase.utils.ts` | `AvailableSetsPage.utils.ts` |
+| Utilities extracted from component | `utils/thing.ts` | `utils/availableSetsPage.ts` |
 | Theme constants | `theme.ts` in `src/lib/ui/` | `src/lib/ui/theme.ts` |
 | Canvas-specific theme | `theme.ts` in `src/lib/rendering/canvas/` | unchanged |
 
@@ -352,11 +355,10 @@ After decomposition, `App.css` is **deleted**. `App.tsx` imports nothing except 
 Move files one component at a time. Update all imports. Run `npm run build` between each move to catch broken imports.
 
 Order (safest first — fewest dependants):
-1. `TimelineDisclaimer` → `components/TimelineDisclaimer/`
-2. `TimelineSettings` → `components/TimelineSettings/`
-3. `canvas/` → `components/TimelineCanvas/` (rename folder, add `index.ts`)
-4. `sidebar/` → `components/TimelineSidebar/` (rename folder, add `index.ts`)
-5. `overview/TimelineOverviewRuler.*` → `components/TimelineOverviewRuler/`
+1. `TimelineSettings` → `components/TimelineSettings/`
+2. `canvas/` → `components/TimelineCanvas/` (rename folder, add `index.ts`)
+3. `sidebar/` → `components/TimelineSidebar/` (rename folder, add `index.ts`)
+4. `overview/TimelineOverviewRuler.*` → `components/TimelineOverviewRuler/`
 6. `overview/TimelineOverviewRulerStack.*` → `components/TimelineOverviewRuler/TimelineOverviewRulerStack/`
 7. `availableSets/` → `components/AvailableSets/` (rename, add `index.ts`)
 
@@ -378,9 +380,8 @@ Migrate one component's styles at a time. Convert CSS classes to Tailwind utilit
 Suggested order (smallest/simplest first):
 1. `TimelineOverviewRuler` (68 lines CSS)
 2. `TimelineOverviewRulerStack` (91 lines CSS)
-3. `TimelineDisclaimer` (169 lines CSS — has `::before`/`::after` icon animation)
-4. `TimelineSettings` (172 lines CSS — has icon rotation transition)
-5. App shell styles from `App.css` (shell, stage, view transitions)
+3. `TimelineSettings` (172 lines CSS — has icon rotation transition)
+4. App shell styles from `App.css` (shell, stage, view transitions)
 6. Sidebar from `App.css` (largest block — ~400 lines)
 7. Canvas shell + tooltip from `App.css`
 8. `AvailableSetsPage` (512 lines CSS — largest single file)
@@ -400,7 +401,7 @@ Move all `@keyframes` from component `.styles.css` files into `index.css`. No fu
 
 - `src/index.css` continues to be the global entry — it just becomes a `@theme` + resets + `@keyframes` file
 - `src/lib/rendering/canvas/theme.ts` stays as-is (`readTimelineCanvasTheme()` still reads CSS properties at runtime)
-- All TypeScript logic files under `src/lib/` are untouched
+- Core rendering/catalog data files are untouched
 - Era/overlay/marker data files are untouched
 - All animation timing values are preserved exactly (no visual regressions)
 
@@ -408,8 +409,7 @@ Move all `@keyframes` from component `.styles.css` files into `index.css`. No fu
 
 ## 8. Open Questions
 
-1. **`OverlayGroupIconSvg.tsx`** — used by both `TimelineCanvas` and `TimelineSidebar`. Should it live in `TimelineCanvas/` (current location) or be promoted to a shared `components/shared/` or `components/icons/` folder?
-   - Recommendation: move to `components/icons/OverlayGroupIconSvg/` once a second consumer exists; for now keep in `TimelineCanvas/` since sidebar imports it from there.
+1. **`OverlayGroupIconSvg.tsx`** — resolved. It is used by both `TimelineCanvas` and `TimelineSidebar`, so it lives in `src/components/OverlayGroupIconSvg/` rather than inside the TimelineCanvas-private tree.
 
 2. **`App.tsx` sidebar toggle** — the Layers toggle button is rendered in `App.tsx` but its styles belong logically to the sidebar. After migration, the toggle's Tailwind classes live in `App.tsx` directly (since the element is there), but any `.styles.css` rules for it go in `TimelineSidebar/TimelineSidebar.styles.css`.
 

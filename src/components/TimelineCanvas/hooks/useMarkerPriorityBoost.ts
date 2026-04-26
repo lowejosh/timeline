@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { MARKER_PRIORITY_BOOST_SMOOTHING_MS } from "../lib/rendering/canvas/constants";
-import type { MarkerPriorityBoostState } from "../lib/rendering/animation/markerPriorityBoost";
+import { MARKER_PRIORITY_BOOST_SMOOTHING_MS } from "@/lib/rendering/canvas/constants";
+import type { MarkerPriorityBoostState } from "@/lib/rendering/animation/markerPriorityBoost";
 
 export function useMarkerPriorityBoost(
   highlightedMarkerId: string | null,

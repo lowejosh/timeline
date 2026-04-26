@@ -4,7 +4,6 @@ import { resolveTextHoverBounds } from "@/lib/rendering/overlayLabelHover";
 import { getEraTooltipContent } from "@/lib/app/tooltipModel";
 import {
   getEraBackdropResetAlpha,
-  getEraBandAlphaMultiplier,
   getEraInlineLabelVisibility,
 } from "../eraAnimation";
 import {
@@ -81,10 +80,7 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
   }
 
   context.globalAlpha =
-    opacity *
-    ERA_BAND_ALPHA *
-    getEraBandAlphaMultiplier(era, layer.depth) *
-    renderState.alphaMultiplier;
+    opacity * ERA_BAND_ALPHA * renderState.alphaMultiplier;
   context.fillStyle = era.color;
   context.fillRect(
     renderState.renderLeft,

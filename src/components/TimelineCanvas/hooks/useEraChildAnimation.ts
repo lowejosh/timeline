@@ -1,16 +1,16 @@
 import { useEffect, useRef } from "react";
-import type { Era } from "../lib/catalog/eras";
-import type { TimelineViewport } from "../lib/core/viewport";
-import { getEraChildOpacityTarget } from "../lib/rendering/childLayers";
+import type { Era } from "@/lib/catalog/eras";
+import type { TimelineViewport } from "@/lib/core/viewport";
+import { getEraChildOpacityTarget } from "@/lib/rendering/childLayers";
 import {
   syncAnimatedEraChildState,
   type AnimatedEraChildState,
-} from "../lib/rendering/animation/eraChild";
-import { smoothstep01 } from "../lib/core/easing";
+} from "@/lib/rendering/animation/eraChild";
+import { smoothstep01 } from "@/lib/core/easing";
 import {
   ERA_CHILD_FADE_IN_DURATION_MS,
   ERA_CHILD_FADE_OUT_DURATION_MS,
-} from "../lib/rendering/canvas/constants";
+} from "@/lib/rendering/canvas/constants";
 
 export type { AnimatedEraChildState };
 

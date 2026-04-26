@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
-import type { AxisTickRenderState } from "../lib/rendering/axisTickStates";
-import { makeAxisTickKey } from "../lib/rendering/canvas/axisLabels";
+import type { AxisTickRenderState } from "@/lib/rendering/axisTickStates";
+import { makeAxisTickKey } from "@/lib/rendering/canvas/axisLabels";
 import {
   AXIS_TICK_ANIMATION_SMOOTHING_MS,
   AXIS_TICK_LABEL_FADE_IN_SMOOTHING_MS,
   AXIS_TICK_LABEL_FADE_OUT_SMOOTHING_MS,
-} from "../lib/rendering/canvas/constants";
-import type { AnimatedAxisTickState } from "../lib/rendering/animation/axisTickState";
+} from "@/lib/rendering/canvas/constants";
+import type { AnimatedAxisTickState } from "@/lib/rendering/animation/axisTickState";
 
 export function useAxisTickAnimation(
   axisTickTargets: AxisTickRenderState[],
