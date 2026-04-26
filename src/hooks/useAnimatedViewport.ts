@@ -26,6 +26,16 @@ const ANIMATION_DURATION = 350;
 const MOMENTUM_FRICTION = 0.94;
 const MOMENTUM_MIN_VELOCITY = 0.5;
 
+function areViewportsEqual(left: TimelineViewport, right: TimelineViewport) {
+  return (
+    left.centerYear === right.centerYear &&
+    left.centerYearWhole === right.centerYearWhole &&
+    left.centerYearFraction === right.centerYearFraction &&
+    left.zoom === right.zoom &&
+    left.scaleMode === right.scaleMode
+  );
+}
+
 export function useAnimatedViewport(initial: TimelineViewport, width: number) {
   const [viewport, setViewport] = useState(initial);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -53,15 +63,16 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
         anim.from.centerYear + (anim.centerYear - anim.from.centerYear) * t;
       const zoom = anim.from.zoom + (anim.zoom - anim.from.zoom) * t;
 
-      setViewport(
-        normalizeViewport(
-          {
-            centerYear,
-            zoom,
-            scaleMode: anim.scaleMode ?? anim.from.scaleMode,
-          },
-          Math.max(width, 1),
-        ),
+      const next = normalizeViewport(
+        {
+          centerYear,
+          zoom,
+          scaleMode: anim.scaleMode ?? anim.from.scaleMode,
+        },
+        Math.max(width, 1),
+      );
+      setViewport((current) =>
+        areViewportsEqual(current, next) ? current : next,
       );
 
       if (rawT >= 1) {
@@ -83,9 +94,11 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
         momentumRef.current = null;
       } else {
         const pixels = momentum.velocity * (dt / 16);
-        setViewport((current) =>
-          panByPixels(current, pixels, Math.max(width, 1)),
-        );
+        setViewport((current) => {
+          const next = panByPixels(current, pixels, Math.max(width, 1));
+
+          return areViewportsEqual(current, next) ? current : next;
+        });
         needsRaf = true;
       }
     }
@@ -113,7 +126,11 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
     const safeWidth = Math.max(width, 1);
 
     cancelTransientMotion();
-    setViewport((current) => normalizeViewport(current, safeWidth));
+    setViewport((current) => {
+      const next = normalizeViewport(current, safeWidth);
+
+      return areViewportsEqual(current, next) ? current : next;
+    });
   }, [cancelTransientMotion, width]);
 
   const startRaf = useCallback(() => {
@@ -126,9 +143,26 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
       const safeWidth = Math.max(width, 1);
 
       cancelTransientMotion();
-      setViewport((current) => normalizeViewport(updater(current), safeWidth));
+      setViewport((current) => {
+        const next = normalizeViewport(updater(current), safeWidth);
+
+        return areViewportsEqual(current, next) ? current : next;
+      });
     },
     [cancelTransientMotion, width],
+  );
+
+  const updateViewportDirect = useCallback(
+    (updater: (current: TimelineViewport) => TimelineViewport) => {
+      const safeWidth = Math.max(width, 1);
+
+      setViewport((current) => {
+        const next = normalizeViewport(updater(current), safeWidth);
+
+        return areViewportsEqual(current, next) ? current : next;
+      });
+    },
+    [width],
   );
 
   const animateToRange = useCallback(
@@ -160,14 +194,16 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
   const animateZoom = useCallback(
     (zoomDelta: number, anchorX: number) => {
       cancelTransientMotion();
-      setViewport((current) =>
-        zoomAtPosition(
+      setViewport((current) => {
+        const next = zoomAtPosition(
           current,
           current.zoom + zoomDelta,
           anchorX,
           Math.max(width, 1),
-        ),
-      );
+        );
+
+        return areViewportsEqual(current, next) ? current : next;
+      });
     },
     [cancelTransientMotion, width],
   );
@@ -212,7 +248,9 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
   return {
     viewport,
     isAnimating,
+    cancelTransientMotion,
     updateViewport,
+    updateViewportDirect,
     animateToRange,
     animateZoom,
     recordDragSample,

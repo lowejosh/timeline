@@ -15,6 +15,57 @@ import {
   isOverlayBandStateAnimating,
 } from "../lib/rendering/animation/overlayBand";
 
+function advanceOverlayBandAnimation(
+  animationStates: Map<string, AnimatedOverlayBandState>,
+  dt: number,
+) {
+  const positionFactor =
+    1 - Math.exp(-dt / OVERLAY_BAND_POSITION_SMOOTHING_MS);
+  const hasVisibleExitingOverlays = [...animationStates.values()].some(
+    (state) =>
+      state.targetOpacity < state.currentOpacity - 0.001 &&
+      state.currentOpacity > OVERLAY_BAND_REFLOW_START_OPACITY,
+  );
+  let hasActiveAnimation = false;
+  let didChange = false;
+
+  for (const [overlayId, state] of [...animationStates.entries()]) {
+    const fadeSmoothingMs =
+      state.targetOpacity < state.currentOpacity
+        ? OVERLAY_BAND_FADE_OUT_SMOOTHING_MS
+        : OVERLAY_BAND_FADE_IN_SMOOTHING_MS;
+    const opacityFactor = 1 - Math.exp(-dt / fadeSmoothingMs);
+    const nextOpacity =
+      state.currentOpacity +
+      (state.targetOpacity - state.currentOpacity) * opacityFactor;
+    const nextY = hasVisibleExitingOverlays
+      ? state.currentY
+      : state.currentY + (state.targetY - state.currentY) * positionFactor;
+    const settled = Math.abs(state.targetOpacity - nextOpacity) < 0.002;
+    const settledY = hasVisibleExitingOverlays
+      ? Math.abs(state.targetY - state.currentY) < 0.2
+      : Math.abs(state.targetY - nextY) < 0.2;
+
+    if (!settled || !settledY) hasActiveAnimation = true;
+    if (Math.abs(nextOpacity - state.currentOpacity) > 0.0005)
+      didChange = true;
+    if (Math.abs(nextY - state.currentY) > 0.05) didChange = true;
+
+    if (state.targetOpacity <= 0.001 && nextOpacity <= 0.003) {
+      animationStates.delete(overlayId);
+      continue;
+    }
+
+    animationStates.set(overlayId, {
+      ...state,
+      currentOpacity: settled ? state.targetOpacity : nextOpacity,
+      currentY: settledY ? state.targetY : nextY,
+    });
+  }
+
+  return { didChange, hasActiveAnimation };
+}
+
 export function useOverlayBandAnimation(
   resolvedOverlayBands: ResolvedTimelineOverlayBand[],
   overlayLaneCount: number,
@@ -34,6 +85,9 @@ export function useOverlayBandAnimation(
   useEffect(() => {
     const animationStates = animationRef.current;
     const activeIds = new Set<string>();
+    const now = performance.now();
+    const lastTime = lastTimeRef.current || now;
+    const dt = Math.max(now - lastTime, 0);
     const baseLayout = getTimelineLayout(
       height,
       overlayLaneCount,
@@ -49,6 +103,13 @@ export function useOverlayBandAnimation(
     const shouldPreserveAnimatedState =
       shouldAnimateVisibilityChange || hasInFlightAnimation;
 
+    if (hasInFlightAnimation && dt > 0) {
+      const { didChange } = advanceOverlayBandAnimation(animationStates, dt);
+
+      if (didChange) invalidateCanvas("overlay-band-animation-sync");
+    }
+
+    lastTimeRef.current = now;
     previousTransitionKeyRef.current = overlayVisibilityTransitionKey;
 
     const targetYById = new Map(
@@ -143,49 +204,10 @@ export function useOverlayBandAnimation(
       const lastTime = lastTimeRef.current || now;
       const dt = Math.max(now - lastTime, 0);
       lastTimeRef.current = now;
-      const positionFactor =
-        1 - Math.exp(-dt / OVERLAY_BAND_POSITION_SMOOTHING_MS);
-      const hasVisibleExitingOverlays = [...animationStates.values()].some(
-        (state) =>
-          state.targetOpacity < state.currentOpacity - 0.001 &&
-          state.currentOpacity > OVERLAY_BAND_REFLOW_START_OPACITY,
+      const { didChange, hasActiveAnimation } = advanceOverlayBandAnimation(
+        animationStates,
+        dt,
       );
-      let hasActiveAnimation = false;
-      let didChange = false;
-
-      for (const [overlayId, state] of [...animationStates.entries()]) {
-        const fadeSmoothingMs =
-          state.targetOpacity < state.currentOpacity
-            ? OVERLAY_BAND_FADE_OUT_SMOOTHING_MS
-            : OVERLAY_BAND_FADE_IN_SMOOTHING_MS;
-        const opacityFactor = 1 - Math.exp(-dt / fadeSmoothingMs);
-        const nextOpacity =
-          state.currentOpacity +
-          (state.targetOpacity - state.currentOpacity) * opacityFactor;
-        const nextY = hasVisibleExitingOverlays
-          ? state.currentY
-          : state.currentY + (state.targetY - state.currentY) * positionFactor;
-        const settled = Math.abs(state.targetOpacity - nextOpacity) < 0.002;
-        const settledY = hasVisibleExitingOverlays
-          ? Math.abs(state.targetY - state.currentY) < 0.2
-          : Math.abs(state.targetY - nextY) < 0.2;
-
-        if (!settled || !settledY) hasActiveAnimation = true;
-        if (Math.abs(nextOpacity - state.currentOpacity) > 0.0005)
-          didChange = true;
-        if (Math.abs(nextY - state.currentY) > 0.05) didChange = true;
-
-        if (state.targetOpacity <= 0.001 && nextOpacity <= 0.003) {
-          animationStates.delete(overlayId);
-          continue;
-        }
-
-        animationStates.set(overlayId, {
-          ...state,
-          currentOpacity: settled ? state.targetOpacity : nextOpacity,
-          currentY: settledY ? state.targetY : nextY,
-        });
-      }
 
       if (didChange) invalidateCanvas("overlay-band-animation");
 

@@ -112,18 +112,23 @@ export function getTimelineLayout(
   },
 ): TimelineCanvasLayout {
   const reserveAxisDateRow = options?.reserveAxisDateRow ?? true;
-  const overviewReservedHeight = Math.max(options?.overviewReservedHeight ?? 0, 0);
+  const overviewReservedHeight = Math.max(
+    options?.overviewReservedHeight ?? 0,
+    0,
+  );
   const effectiveHeight = Math.max(height - overviewReservedHeight, 0);
   const overlayHeight =
     overlayLaneCount > 0
       ? overlayLaneCount * OVERLAY_LANE_HEIGHT +
         Math.max(overlayLaneCount - 1, 0) * OVERLAY_LANE_GAP
       : 0;
-  const compactMarkerStack =
-    effectiveHeight <= COMPACT_MARKER_STACK_MAX_HEIGHT;
+  const compactMarkerStack = effectiveHeight <= COMPACT_MARKER_STACK_MAX_HEIGHT;
   const roomyBottomPadding = Math.round(
     Math.min(
-      Math.max(effectiveHeight - ROOMY_TIMELINE_BOTTOM_PADDING_START_HEIGHT, 0) * 0.06,
+      Math.max(
+        effectiveHeight - ROOMY_TIMELINE_BOTTOM_PADDING_START_HEIGHT,
+        0,
+      ) * 0.06,
       ROOMY_TIMELINE_BOTTOM_PADDING_MAX_EXTRA,
     ),
   );
@@ -141,15 +146,16 @@ export function getTimelineLayout(
   const overlayClipTop =
     breadcrumbY + BREADCRUMB_HEIGHT + BREADCRUMB_TO_OVERLAY_GAP;
   const yearLabelY =
-    height - timelineBottomPadding - overviewReservedHeight - AXIS_YEAR_LABEL_HEIGHT;
+    height -
+    timelineBottomPadding -
+    overviewReservedHeight -
+    AXIS_YEAR_LABEL_HEIGHT;
   const dateLabelY = reserveAxisDateRow
     ? yearLabelY - AXIS_LABEL_ROW_GAP - AXIS_DATE_LABEL_HEIGHT
     : yearLabelY;
   const axisLabelTopY = reserveAxisDateRow ? dateLabelY : yearLabelY;
-  const markerDateY =
-    axisLabelTopY - markerToAxisLabelGap - MARKER_DATE_HEIGHT;
-  const markerLabelY =
-    markerDateY - markerLabelRowGap - MARKER_LABEL_HEIGHT;
+  const markerDateY = axisLabelTopY - markerToAxisLabelGap - MARKER_DATE_HEIGHT;
+  const markerLabelY = markerDateY - markerLabelRowGap - MARKER_LABEL_HEIGHT;
   const axisY = markerLabelY - axisToMarkerLabelGap;
   const majorTickTop = axisY - AXIS_MAJOR_TICK_TOP_OFFSET;
   const majorTickBottom = Math.min(

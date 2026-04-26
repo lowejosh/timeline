@@ -6,112 +6,65 @@ import {
   zoomAtPosition,
 } from "../lib/core/viewport";
 
-const WHEEL_LINE_DELTA_PX = 16;
-const WHEEL_PAGE_DELTA_PX = 320;
-const COARSE_WHEEL_PIXEL_STEP = 100;
-const COARSE_WHEEL_ZOOM_IMPULSE_PER_STEP = 0.11;
-const SMOOTH_WHEEL_ZOOM_IMPULSE_PER_PIXEL = 0.0022;
-const COARSE_WHEEL_PAN_IMPULSE_PER_STEP = 48;
-const SMOOTH_WHEEL_PAN_IMPULSE_PER_PIXEL = 1.1;
-const WHEEL_ZOOM_DAMPING_MS = 120;
-const WHEEL_PAN_DAMPING_MS = 90;
-const MAX_WHEEL_ZOOM_VELOCITY = 0.34;
-const MAX_WHEEL_PAN_VELOCITY = 220;
-const MIN_WHEEL_ZOOM_VELOCITY = 0.0008;
-const MIN_WHEEL_PAN_VELOCITY = 0.08;
+const WHEEL_LINE_PX = 16;
+const WHEEL_PAGE_PX = 320;
 
-type WheelMotionState = {
-  panVelocity: number;
-  zoomVelocity: number;
-  anchorX: number;
-  lastFrameTime: number;
+const TRACKPAD_ZOOM_PER_PX = 0.003;
+const PIXEL_MOUSE_WHEEL_DELTA_THRESHOLD = 80;
+
+const MOUSE_WHEEL_ZOOM_KICK = 0.032;
+const MOUSE_WHEEL_PAN_KICK = 10;
+const MOUSE_WHEEL_MAX_ZOOM_VELOCITY = 0.16;
+const MOUSE_WHEEL_MAX_PAN_VELOCITY = 48;
+const MOUSE_WHEEL_DECAY_MS = 180;
+const MOUSE_WHEEL_MIN_ZOOM_VELOCITY = 0.0006;
+const MOUSE_WHEEL_MIN_PAN_VELOCITY = 0.08;
+const FRAME_MS = 1000 / 60;
+const MAX_FRAME_MS = 34;
+
+type LatestWheelValues = {
+  pad: number;
+  width: number;
+  onViewportChange: (
+    producer: (current: TimelineViewport) => TimelineViewport,
+  ) => void;
+  onContinuousViewportChange: (
+    producer: (current: TimelineViewport) => TimelineViewport,
+  ) => void;
+  onViewportGestureStart: () => void;
+  onViewportGestureEnd: () => void;
+  recordVerboseInteractionEvent: (eventName: string) => void;
+  markViewportInteraction: (reason: string) => void;
 };
 
-function normalizeWheelDeltaPx(delta: number, deltaMode: number) {
-  if (deltaMode === 1) {
-    return delta * WHEEL_LINE_DELTA_PX;
-  }
+type MouseWheelMotion = {
+  frameId: number;
+  lastFrameTime: number;
+  zoomVelocity: number;
+  panVelocity: number;
+  anchorX: number;
+};
 
-  if (deltaMode === 2) {
-    return delta * WHEEL_PAGE_DELTA_PX;
-  }
-
-  return delta;
+function normalizeWheelDelta(value: number, mode: number) {
+  if (mode === WheelEvent.DOM_DELTA_LINE) return value * WHEEL_LINE_PX;
+  if (mode === WheelEvent.DOM_DELTA_PAGE) return value * WHEEL_PAGE_PX;
+  return value;
 }
 
-function clampWheelZoomDelta(value: number, maxAbsDelta: number) {
-  return Math.max(-maxAbsDelta, Math.min(maxAbsDelta, value));
-}
-
-function isLikelyCoarseWheel(
-  event: Pick<globalThis.WheelEvent, "deltaMode" | "deltaX" | "deltaY">,
-) {
-  if (event.deltaMode === 1 || event.deltaMode === 2) {
+function isMouseWheelEvent(event: WheelEvent) {
+  if (event.deltaMode !== WheelEvent.DOM_DELTA_PIXEL) {
     return true;
   }
 
-  const absDeltaX = Math.abs(event.deltaX);
-  const absDeltaY = Math.abs(event.deltaY);
-
   return (
-    absDeltaY >= 24 &&
     Number.isInteger(event.deltaY) &&
-    absDeltaX <= absDeltaY * 0.35
+    Math.abs(event.deltaY) >= PIXEL_MOUSE_WHEEL_DELTA_THRESHOLD &&
+    Math.abs(event.deltaX) <= 2
   );
 }
 
-function clampMagnitude(value: number, maxMagnitude: number) {
-  return Math.max(-maxMagnitude, Math.min(maxMagnitude, value));
-}
-
-function getWheelZoomImpulse(deltaPx: number, coarseWheel: boolean) {
-  const magnitude = Math.abs(deltaPx);
-
-  if (magnitude <= 0.01) {
-    return 0;
-  }
-
-  if (coarseWheel) {
-    const stepCount = Math.max(
-      1,
-      Math.round(magnitude / COARSE_WHEEL_PIXEL_STEP),
-    );
-
-    return clampWheelZoomDelta(
-      -Math.sign(deltaPx) * stepCount * COARSE_WHEEL_ZOOM_IMPULSE_PER_STEP,
-      MAX_WHEEL_ZOOM_VELOCITY,
-    );
-  }
-
-  return clampWheelZoomDelta(
-    -deltaPx * SMOOTH_WHEEL_ZOOM_IMPULSE_PER_PIXEL,
-    MAX_WHEEL_ZOOM_VELOCITY,
-  );
-}
-
-function getWheelPanImpulse(deltaPx: number, coarseWheel: boolean) {
-  const magnitude = Math.abs(deltaPx);
-
-  if (magnitude <= 0.01) {
-    return 0;
-  }
-
-  if (coarseWheel) {
-    const stepCount = Math.max(
-      1,
-      Math.round(magnitude / COARSE_WHEEL_PIXEL_STEP),
-    );
-
-    return clampMagnitude(
-      -Math.sign(deltaPx) * stepCount * COARSE_WHEEL_PAN_IMPULSE_PER_STEP,
-      MAX_WHEEL_PAN_VELOCITY,
-    );
-  }
-
-  return clampMagnitude(
-    -deltaPx * SMOOTH_WHEEL_PAN_IMPULSE_PER_PIXEL,
-    MAX_WHEEL_PAN_VELOCITY,
-  );
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
 }
 
 export function useWheelZoomPan({
@@ -119,6 +72,9 @@ export function useWheelZoomPan({
   pad,
   width,
   onViewportChange,
+  onContinuousViewportChange,
+  onViewportGestureStart,
+  onViewportGestureEnd,
   recordVerboseInteractionEvent,
   markViewportInteraction,
 }: {
@@ -128,69 +84,182 @@ export function useWheelZoomPan({
   onViewportChange: (
     producer: (current: TimelineViewport) => TimelineViewport,
   ) => void;
+  onContinuousViewportChange: (
+    producer: (current: TimelineViewport) => TimelineViewport,
+  ) => void;
+  onViewportGestureStart: () => void;
+  onViewportGestureEnd: () => void;
   recordVerboseInteractionEvent: (eventName: string) => void;
   markViewportInteraction: (reason: string) => void;
 }) {
+  const latestRef = useRef<LatestWheelValues>({
+    pad,
+    width,
+    onViewportChange,
+    onContinuousViewportChange,
+    onViewportGestureStart,
+    onViewportGestureEnd,
+    recordVerboseInteractionEvent,
+    markViewportInteraction,
+  });
   const wheelFrameRef = useRef(0);
-  const wheelMotionRef = useRef<WheelMotionState>({
-    panVelocity: 0,
-    zoomVelocity: 0,
-    anchorX: 0,
+  const pendingWheelPanRef = useRef(0);
+  const pendingWheelZoomRef = useRef(0);
+  const pendingWheelAnchorRef = useRef(0);
+  const mouseWheelRef = useRef<MouseWheelMotion>({
+    frameId: 0,
     lastFrameTime: 0,
+    zoomVelocity: 0,
+    panVelocity: 0,
+    anchorX: 0,
   });
 
-  const flushWheelUpdates = useCallback(() => {
-    wheelFrameRef.current = 0;
-    const wheelMotion = wheelMotionRef.current;
+  useEffect(() => {
+    latestRef.current = {
+      pad,
+      width,
+      onViewportChange,
+      onContinuousViewportChange,
+      onViewportGestureStart,
+      onViewportGestureEnd,
+      recordVerboseInteractionEvent,
+      markViewportInteraction,
+    };
+  }, [
+    markViewportInteraction,
+    onContinuousViewportChange,
+    onViewportChange,
+    onViewportGestureEnd,
+    onViewportGestureStart,
+    pad,
+    recordVerboseInteractionEvent,
+    width,
+  ]);
 
-    if (!width) {
-      wheelMotion.panVelocity = 0;
-      wheelMotion.zoomVelocity = 0;
-      wheelMotion.lastFrameTime = 0;
+  const stopMouseWheelMotion = useCallback((notifyEnd = false) => {
+    const motion = mouseWheelRef.current;
+    const hadActiveMotion =
+      Boolean(motion.frameId) ||
+      Math.abs(motion.zoomVelocity) > 0 ||
+      Math.abs(motion.panVelocity) > 0;
+
+    if (motion.frameId) {
+      cancelAnimationFrame(motion.frameId);
+      motion.frameId = 0;
+    }
+
+    motion.lastFrameTime = 0;
+    motion.zoomVelocity = 0;
+    motion.panVelocity = 0;
+
+    if (notifyEnd && hadActiveMotion) {
+      latestRef.current.recordVerboseInteractionEvent(
+        "mouse-wheel-momentum-end",
+      );
+      latestRef.current.onViewportGestureEnd();
+    }
+  }, []);
+
+  const animateMouseWheelMotion = useCallback(() => {
+    const motion = mouseWheelRef.current;
+    const latest = latestRef.current;
+
+    motion.frameId = 0;
+
+    if (!latest.width) {
+      stopMouseWheelMotion();
       return;
     }
 
     const now = performance.now();
-    const dt = wheelMotion.lastFrameTime
-      ? Math.max(now - wheelMotion.lastFrameTime, 0)
-      : 16;
-    wheelMotion.lastFrameTime = now;
-    const panDecay = Math.exp(-dt / WHEEL_PAN_DAMPING_MS);
-    const zoomDecay = Math.exp(-dt / WHEEL_ZOOM_DAMPING_MS);
-    const frameScale = dt / 16;
+    const frameMs = motion.lastFrameTime
+      ? Math.min(Math.max(now - motion.lastFrameTime, 1), MAX_FRAME_MS)
+      : FRAME_MS;
+    const frameRatio = frameMs / FRAME_MS;
+    const zoomStep = motion.zoomVelocity * frameRatio;
+    const panStep = motion.panVelocity * frameRatio;
+    const innerW = Math.max(latest.width - latest.pad * 2, 1);
 
-    const pendingPan = wheelMotion.panVelocity * frameScale;
-    const pendingZoom = wheelMotion.zoomVelocity * frameScale;
-    const pendingAnchor = wheelMotion.anchorX;
+    motion.lastFrameTime = now;
 
-    if (Math.abs(pendingPan) <= 0.001 && Math.abs(pendingZoom) <= 0.0001) {
-      wheelMotion.panVelocity *= panDecay;
-      wheelMotion.zoomVelocity *= zoomDecay;
+    if (
+      Math.abs(zoomStep) > 0.00001 ||
+      Math.abs(panStep) > 0.001
+    ) {
+      latest.onContinuousViewportChange((current) => {
+        let next = current;
 
-      if (Math.abs(wheelMotion.panVelocity) <= MIN_WHEEL_PAN_VELOCITY) {
-        wheelMotion.panVelocity = 0;
-      }
+        if (Math.abs(panStep) > 0.001) {
+          next = panByPixels(next, panStep, innerW);
+        }
 
-      if (Math.abs(wheelMotion.zoomVelocity) <= MIN_WHEEL_ZOOM_VELOCITY) {
-        wheelMotion.zoomVelocity = 0;
-      }
+        if (Math.abs(zoomStep) > 0.00001) {
+          next = zoomAtPosition(
+            next,
+            next.zoom + zoomStep,
+            motion.anchorX,
+            innerW,
+          );
+        }
 
-      if (
-        Math.abs(wheelMotion.panVelocity) > MIN_WHEEL_PAN_VELOCITY ||
-        Math.abs(wheelMotion.zoomVelocity) > MIN_WHEEL_ZOOM_VELOCITY
-      ) {
-        wheelFrameRef.current = requestAnimationFrame(flushWheelUpdates);
-      } else {
-        wheelMotion.lastFrameTime = 0;
-      }
+        return next;
+      });
+    }
 
+    const decay = Math.exp(-frameMs / MOUSE_WHEEL_DECAY_MS);
+    motion.zoomVelocity *= decay;
+    motion.panVelocity *= decay;
+
+    if (
+      Math.abs(motion.zoomVelocity) <= MOUSE_WHEEL_MIN_ZOOM_VELOCITY &&
+      Math.abs(motion.panVelocity) <= MOUSE_WHEEL_MIN_PAN_VELOCITY
+    ) {
+      motion.lastFrameTime = 0;
+      motion.zoomVelocity = 0;
+      motion.panVelocity = 0;
+      latest.recordVerboseInteractionEvent("mouse-wheel-momentum-end");
+      latest.onViewportGestureEnd();
       return;
     }
 
-    recordVerboseInteractionEvent("wheel-flush");
+    motion.frameId = requestAnimationFrame(animateMouseWheelMotion);
+  }, [stopMouseWheelMotion]);
 
-    const innerW = width - pad * 2;
-    onViewportChange((current) => {
+  const ensureMouseWheelMotion = useCallback(() => {
+    const motion = mouseWheelRef.current;
+
+    if (!motion.frameId) {
+      motion.lastFrameTime = 0;
+      motion.frameId = requestAnimationFrame(animateMouseWheelMotion);
+    }
+  }, [animateMouseWheelMotion]);
+
+  const flushWheelUpdates = useCallback(() => {
+    const latest = latestRef.current;
+
+    wheelFrameRef.current = 0;
+
+    if (!latest.width) {
+      pendingWheelPanRef.current = 0;
+      pendingWheelZoomRef.current = 0;
+      return;
+    }
+
+    const pendingPan = pendingWheelPanRef.current;
+    const pendingZoom = pendingWheelZoomRef.current;
+    const pendingAnchor = pendingWheelAnchorRef.current;
+
+    pendingWheelPanRef.current = 0;
+    pendingWheelZoomRef.current = 0;
+
+    if (Math.abs(pendingPan) <= 0.001 && Math.abs(pendingZoom) <= 0.0001) {
+      return;
+    }
+
+    latest.recordVerboseInteractionEvent("wheel-flush");
+
+    const innerW = latest.width - latest.pad * 2;
+    latest.onViewportChange((current) => {
       let next = current;
 
       if (Math.abs(pendingPan) > 0.001) {
@@ -208,81 +277,90 @@ export function useWheelZoomPan({
 
       return next;
     });
-
-    wheelMotion.panVelocity *= panDecay;
-    wheelMotion.zoomVelocity *= zoomDecay;
-
-    if (Math.abs(wheelMotion.panVelocity) <= MIN_WHEEL_PAN_VELOCITY) {
-      wheelMotion.panVelocity = 0;
-    }
-
-    if (Math.abs(wheelMotion.zoomVelocity) <= MIN_WHEEL_ZOOM_VELOCITY) {
-      wheelMotion.zoomVelocity = 0;
-    }
-
-    if (
-      Math.abs(wheelMotion.panVelocity) > MIN_WHEEL_PAN_VELOCITY ||
-      Math.abs(wheelMotion.zoomVelocity) > MIN_WHEEL_ZOOM_VELOCITY
-    ) {
-      wheelFrameRef.current = requestAnimationFrame(flushWheelUpdates);
-    } else {
-      wheelMotion.lastFrameTime = 0;
-    }
-  }, [onViewportChange, pad, recordVerboseInteractionEvent, width]);
+  }, []);
 
   const handleWheel = useCallback(
     (event: globalThis.WheelEvent, surface: HTMLElement) => {
-      if (!width) return;
+      const latest = latestRef.current;
+
+      if (!latest.width) return;
 
       if (event.cancelable) {
         event.preventDefault();
       }
 
-      markViewportInteraction("wheel");
-
       const rect = surface.getBoundingClientRect();
       const localX = event.clientX - rect.left;
-      const anchorX = getZoomAnchorForCanvasX(localX, width, pad);
-      const deltaX = normalizeWheelDeltaPx(event.deltaX, event.deltaMode);
-      const deltaY = normalizeWheelDeltaPx(event.deltaY, event.deltaMode);
-      const coarseWheel = isLikelyCoarseWheel(event);
-      const horizontalIntent = Math.abs(deltaX) > Math.abs(deltaY);
-      const wheelMotion = wheelMotionRef.current;
+      const anchorX = getZoomAnchorForCanvasX(localX, latest.width, latest.pad);
+      const horizontalIntent = Math.abs(event.deltaX) > Math.abs(event.deltaY);
 
-      wheelMotion.anchorX = anchorX;
+      if (isMouseWheelEvent(event)) {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        const motion = mouseWheelRef.current;
+        const startingMomentum =
+          !motion.frameId &&
+          Math.abs(motion.zoomVelocity) <= MOUSE_WHEEL_MIN_ZOOM_VELOCITY &&
+          Math.abs(motion.panVelocity) <= MOUSE_WHEEL_MIN_PAN_VELOCITY;
+        const normalizedDx = normalizeWheelDelta(
+          event.deltaX,
+          event.deltaMode,
+        );
+        const normalizedDy = normalizeWheelDelta(
+          event.deltaY,
+          event.deltaMode,
+        );
+
+        motion.anchorX = anchorX;
+
+        if (startingMomentum) {
+          latest.recordVerboseInteractionEvent("mouse-wheel-momentum-start");
+          latest.onViewportGestureStart();
+        }
+
+        if (Math.abs(normalizedDx) > Math.abs(normalizedDy)) {
+          motion.panVelocity = clamp(
+            motion.panVelocity - Math.sign(normalizedDx) * MOUSE_WHEEL_PAN_KICK,
+            -MOUSE_WHEEL_MAX_PAN_VELOCITY,
+            MOUSE_WHEEL_MAX_PAN_VELOCITY,
+          );
+        } else {
+          motion.zoomVelocity = clamp(
+            motion.zoomVelocity -
+              Math.sign(normalizedDy) * MOUSE_WHEEL_ZOOM_KICK,
+            -MOUSE_WHEEL_MAX_ZOOM_VELOCITY,
+            MOUSE_WHEEL_MAX_ZOOM_VELOCITY,
+          );
+        }
+
+        ensureMouseWheelMotion();
+        return;
+      }
+
+      stopMouseWheelMotion(true);
+      latest.markViewportInteraction("wheel");
 
       if (horizontalIntent) {
-        recordVerboseInteractionEvent("wheel-pan-intent");
-        wheelMotion.panVelocity = clampMagnitude(
-          wheelMotion.panVelocity + getWheelPanImpulse(deltaX, coarseWheel),
-          MAX_WHEEL_PAN_VELOCITY,
-        );
+        latest.recordVerboseInteractionEvent("wheel-pan-intent");
+        pendingWheelPanRef.current += -event.deltaX;
       } else {
-        recordVerboseInteractionEvent("wheel-zoom-intent");
-        wheelMotion.zoomVelocity = clampWheelZoomDelta(
-          wheelMotion.zoomVelocity + getWheelZoomImpulse(deltaY, coarseWheel),
-          MAX_WHEEL_ZOOM_VELOCITY,
-        );
+        latest.recordVerboseInteractionEvent("wheel-zoom-intent");
+        pendingWheelZoomRef.current += -event.deltaY * TRACKPAD_ZOOM_PER_PX;
+        pendingWheelAnchorRef.current = anchorX;
       }
 
       if (!wheelFrameRef.current) {
         wheelFrameRef.current = requestAnimationFrame(flushWheelUpdates);
       }
     },
-    [
-      flushWheelUpdates,
-      markViewportInteraction,
-      pad,
-      recordVerboseInteractionEvent,
-      width,
-    ],
+    [ensureMouseWheelMotion, flushWheelUpdates, stopMouseWheelMotion],
   );
 
   useEffect(() => {
     const surface = surfaceRef.current;
-    const wheelMotion = wheelMotionRef.current;
 
-    if (!surface || !width) {
+    if (!surface) {
       return;
     }
 
@@ -298,10 +376,7 @@ export function useWheelZoomPan({
         cancelAnimationFrame(wheelFrameRef.current);
         wheelFrameRef.current = 0;
       }
-
-      wheelMotion.panVelocity = 0;
-      wheelMotion.zoomVelocity = 0;
-      wheelMotion.lastFrameTime = 0;
+      stopMouseWheelMotion();
     };
-  }, [handleWheel, surfaceRef, width]);
+  }, [handleWheel, stopMouseWheelMotion, surfaceRef]);
 }

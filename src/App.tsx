@@ -25,7 +25,8 @@ function App() {
   const overviewRulerDockHeight =
     TIMELINE_APP_LAYOUT.overviewRulerTierHeight *
     TIMELINE_APP_LAYOUT.overviewRulerMaxTiers;
-  const overviewRulerDockBottomInset = "calc(env(safe-area-inset-bottom, 0px) + 14px)";
+  const overviewRulerDockBottomInset =
+    "calc(env(safe-area-inset-bottom, 0px) + 14px)";
   const overviewReservedHeight =
     app.isOverviewVisible && !shouldDockOverviewRuler
       ? overviewRulerDockHeight
@@ -58,7 +59,8 @@ function App() {
 
     const root = document.documentElement;
     const updateStandaloneViewportHeight = () => {
-      const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+      const viewportHeight =
+        window.visualViewport?.height ?? window.innerHeight;
 
       root.style.setProperty(
         "--app-standalone-viewport-height",
@@ -185,6 +187,11 @@ function App() {
                     isCosmicCalendarMode={app.isCosmicCalendarMode}
                     isAnimating={app.animated.isAnimating}
                     onViewportChange={app.handleViewportChange}
+                    onContinuousViewportChange={
+                      app.handleContinuousViewportChange
+                    }
+                    onViewportGestureStart={app.handleViewportGestureStart}
+                    onViewportGestureEnd={app.handleViewportGestureEnd}
                     onAnimateZoom={app.handleZoom}
                     onAnimateToRange={app.animated.animateToRange}
                     onDrillIntoEra={app.handleDrillIntoEra}
@@ -210,7 +217,9 @@ function App() {
                   >
                     <TimelineOverviewRulerStack
                       bottomInset={
-                        shouldDockOverviewRuler ? overviewRulerDockBottomInset : 0
+                        shouldDockOverviewRuler
+                          ? overviewRulerDockBottomInset
+                          : 0
                       }
                       eras={app.rootDisplayEras}
                       mainInnerWidth={Math.max(

@@ -143,6 +143,11 @@ type TimelineCanvasProps = {
   onViewportChange: (
     updater: (current: TimelineViewport) => TimelineViewport,
   ) => void;
+  onContinuousViewportChange: (
+    updater: (current: TimelineViewport) => TimelineViewport,
+  ) => void;
+  onViewportGestureStart: () => void;
+  onViewportGestureEnd: () => void;
   onAnimateZoom: (zoomDelta: number, anchorX: number) => void;
   onAnimateToRange: (startYear: number, endYear: number) => void;
   onDrillIntoEra: (era: Era) => void;
@@ -245,6 +250,9 @@ export function TimelineCanvas({
   isCosmicCalendarMode,
   isAnimating,
   onViewportChange,
+  onContinuousViewportChange,
+  onViewportGestureStart,
+  onViewportGestureEnd,
   onAnimateZoom,
   onAnimateToRange,
   onDrillIntoEra,
@@ -1188,7 +1196,13 @@ export function TimelineCanvas({
         zoomAtPosition(current, current.zoom + zoomDelta, anchorX, innerWidth),
       );
     },
-    [markViewportInteraction, onViewportChange, pad, recordVerboseInteractionEvent, width],
+    [
+      markViewportInteraction,
+      onViewportChange,
+      pad,
+      recordVerboseInteractionEvent,
+      width,
+    ],
   );
 
   const handleEdgeRailPointerUp = useCallback(
@@ -1205,6 +1219,9 @@ export function TimelineCanvas({
     pad,
     width,
     onViewportChange,
+    onContinuousViewportChange,
+    onViewportGestureStart,
+    onViewportGestureEnd,
     recordVerboseInteractionEvent,
     markViewportInteraction,
   });
@@ -1809,10 +1826,7 @@ export function TimelineCanvas({
       }
 
       const firstTouch = getTouchById(event.touches, pinchZoom.firstTouchId);
-      const secondTouch = getTouchById(
-        event.touches,
-        pinchZoom.secondTouchId,
-      );
+      const secondTouch = getTouchById(event.touches, pinchZoom.secondTouchId);
 
       if (!firstTouch || !secondTouch) {
         stopPinchZoom();
@@ -1830,7 +1844,8 @@ export function TimelineCanvas({
         return;
       }
 
-      const localX = (firstTouch.clientX + secondTouch.clientX) * 0.5 - rect.left;
+      const localX =
+        (firstTouch.clientX + secondTouch.clientX) * 0.5 - rect.left;
       const anchorX = getZoomAnchorForCanvasX(localX, width, pad);
       const nextZoom = getPinchZoomForScale(
         pinchZoom.startViewport.zoom,

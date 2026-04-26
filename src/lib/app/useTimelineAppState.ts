@@ -668,6 +668,21 @@ export function useTimelineAppState() {
     [animated, scheduleAutoTransitionCheck],
   );
 
+  const handleContinuousViewportChange = useCallback(
+    (updater: (current: TimelineViewport) => TimelineViewport) => {
+      animated.updateViewportDirect(updater);
+    },
+    [animated],
+  );
+
+  const handleViewportGestureStart = useCallback(() => {
+    animated.cancelTransientMotion();
+  }, [animated]);
+
+  const handleViewportGestureEnd = useCallback(() => {
+    scheduleAutoTransitionCheck();
+  }, [scheduleAutoTransitionCheck]);
+
   const handleDrillIntoEra = useCallback(
     (era: Era) => {
       setActiveEraId(era.id);
@@ -794,7 +809,9 @@ export function useTimelineAppState() {
 
   const handleCloseSetManager = useCallback(() => {
     setActiveView("timeline");
-    setIsSidebarOpen(!shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height));
+    setIsSidebarOpen(
+      !shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height),
+    );
   }, [stageSize.height, stageSize.width]);
 
   const handleApplySets = useCallback(
@@ -850,7 +867,14 @@ export function useTimelineAppState() {
         !shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height),
       );
     },
-    [activeEraId, animated, enabledSetIds, prioritizedRootEra, stageSize.height, stageSize.width],
+    [
+      activeEraId,
+      animated,
+      enabledSetIds,
+      prioritizedRootEra,
+      stageSize.height,
+      stageSize.width,
+    ],
   );
 
   const handleReorderSets = useCallback((nextOrder: TimelineSetId[]) => {
@@ -921,6 +945,9 @@ export function useTimelineAppState() {
     // handlers
     handleZoom,
     handleViewportChange,
+    handleContinuousViewportChange,
+    handleViewportGestureStart,
+    handleViewportGestureEnd,
     handleDrillIntoEra,
     handleNavigateUp,
     handleToggleEntry,
