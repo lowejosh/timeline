@@ -12,6 +12,9 @@ export function isTimelineLayerAutoToggleEnabled(
   enabledSetIds?: ReadonlySet<string> | null,
   enabledGroupIds?: ReadonlySet<string> | null,
   visibleGroupIds?: ReadonlySet<string> | null,
+  ownerGroupId?: string | null,
+  visibleOverlayGroupIds?: ReadonlySet<string> | null,
+  hasHigherPrioritySetSpanVisible = false,
 ) {
   if (
     rule.onlyWhenAnySetEnabled &&
@@ -33,6 +36,32 @@ export function isTimelineLayerAutoToggleEnabled(
     rule.onlyWhenAnyGroupVisible &&
     rule.onlyWhenAnyGroupVisible.length > 0 &&
     !rule.onlyWhenAnyGroupVisible.some((groupId) => visibleGroupIds?.has(groupId))
+  ) {
+    return false;
+  }
+
+  if (rule.onlyWhenOtherSetBandsVisible) {
+    if (!ownerGroupId || !visibleOverlayGroupIds) {
+      return false;
+    }
+
+    let hasOtherBandGroupVisible = false;
+
+    for (const groupId of visibleOverlayGroupIds) {
+      if (groupId !== ownerGroupId) {
+        hasOtherBandGroupVisible = true;
+        break;
+      }
+    }
+
+    if (!hasOtherBandGroupVisible) {
+      return false;
+    }
+  }
+
+  if (
+    rule.onlyWhenHigherPrioritySetSpanVisible &&
+    !hasHigherPrioritySetSpanVisible
   ) {
     return false;
   }

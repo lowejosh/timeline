@@ -92,6 +92,8 @@ export type TimelineLayerAutoToggleRule =
       onlyWhenAnySetEnabled?: TimelineSetId[];
       onlyWhenAnyGroupEnabled?: string[];
       onlyWhenAnyGroupVisible?: string[];
+      onlyWhenOtherSetBandsVisible?: boolean;
+      onlyWhenHigherPrioritySetSpanVisible?: boolean;
     }
   | {
       kind: "max-visible-span";
@@ -100,6 +102,8 @@ export type TimelineLayerAutoToggleRule =
       onlyWhenAnySetEnabled?: TimelineSetId[];
       onlyWhenAnyGroupEnabled?: string[];
       onlyWhenAnyGroupVisible?: string[];
+      onlyWhenOtherSetBandsVisible?: boolean;
+      onlyWhenHigherPrioritySetSpanVisible?: boolean;
     };
 
 export type TimelineDecorationContentType = "markers" | "overlays" | "mixed";

@@ -200,6 +200,7 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
       kind: "max-visible-span",
       hideAtOrBelowYears: 10_500_000,
       onlyWhenAnyGroupVisible: ["human-evolution"],
+      onlyWhenHigherPrioritySetSpanVisible: true,
     },
     sourceIds: ["gutenbergHistoricalGeologyMiller1922"],
   },

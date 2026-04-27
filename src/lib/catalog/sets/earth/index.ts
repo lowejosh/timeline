@@ -67,6 +67,7 @@ export const EARTH_SET = normalizeTimelineSetSource({
             kind: "max-visible-span",
             hideAtOrBelowYears: 1_000_000,
             showAboveYears: 2_000_000,
+            onlyWhenHigherPrioritySetSpanVisible: true,
           },
           markers: DEEP_TIME_LIFE_MARKERS,
           overlays: DEEP_TIME_LIFE_OVERLAYS,

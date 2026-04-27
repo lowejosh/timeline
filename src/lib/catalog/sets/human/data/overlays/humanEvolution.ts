@@ -1,6 +1,6 @@
 import { TIMELINE_MAX_YEAR } from "@/lib/core/timelineYears";
 import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
-import { yearsAgo } from "@/lib/core/timelineDateBuilders";
+import { bce, yearsAgo } from "@/lib/core/timelineDateBuilders";
 
 const CURRENT_YEAR = TIMELINE_MAX_YEAR;
 const HUMAN_EVOLUTION_MIN_ZOOM = 8;
@@ -324,8 +324,10 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 76,
     autoToggleRule: {
-      kind: "max-visible-span",
-      hideAtOrBelowYears: 25_000,
+      kind: "coverage-after-year",
+      thresholdYear: bce(10_000),
+      hideCoverage: 0.82,
+      showCoverage: 0.68,
     },
     sourceIds: ["smithsonianHomoSapiens"],
   },

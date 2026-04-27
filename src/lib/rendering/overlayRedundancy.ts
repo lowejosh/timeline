@@ -1,4 +1,7 @@
-import type { TimelineOverlayBand } from "../core/timelineTypes";
+import type {
+  TimelineOverlayBand,
+  TimelineSetId,
+} from "../core/timelineTypes";
 import {
   isTimelineLayerAutoToggleEnabled,
   shouldAutoSuppressTimelineLayer,
@@ -14,6 +17,11 @@ function collectAutoHiddenOverlayIds(
   enabledSetIds?: ReadonlySet<string> | null,
   enabledGroupIds?: ReadonlySet<string> | null,
   visibleGroupIds?: ReadonlySet<string> | null,
+  visibleOverlayGroupIds?: ReadonlySet<string> | null,
+  hasHigherPrioritySetSpanVisible?: (
+    ownerSetId: TimelineSetId | null | undefined,
+    ownerPriority?: number,
+  ) => boolean,
 ) {
   for (const overlay of overlays) {
     const rule = overlay.autoToggleRule;
@@ -25,6 +33,10 @@ function collectAutoHiddenOverlayIds(
         enabledSetIds,
         enabledGroupIds,
         visibleGroupIds,
+        overlay.groupId,
+        visibleOverlayGroupIds,
+        hasHigherPrioritySetSpanVisible?.(overlay.setId, overlay.priority) ??
+          false,
       ) &&
       shouldAutoSuppressTimelineLayer(rule, viewport, width, pad, false)
     ) {
@@ -41,6 +53,8 @@ function collectAutoHiddenOverlayIds(
         enabledSetIds,
         enabledGroupIds,
         visibleGroupIds,
+        visibleOverlayGroupIds,
+        hasHigherPrioritySetSpanVisible,
       );
     }
   }
@@ -54,6 +68,11 @@ export function getAutoHiddenOverlayIds(
   enabledSetIds?: ReadonlySet<string> | null,
   enabledGroupIds?: ReadonlySet<string> | null,
   visibleGroupIds?: ReadonlySet<string> | null,
+  visibleOverlayGroupIds?: ReadonlySet<string> | null,
+  hasHigherPrioritySetSpanVisible?: (
+    ownerSetId: TimelineSetId | null | undefined,
+    ownerPriority?: number,
+  ) => boolean,
 ) {
   if (width <= pad * 2) {
     return new Set<string>();
@@ -70,6 +89,8 @@ export function getAutoHiddenOverlayIds(
     enabledSetIds,
     enabledGroupIds,
     visibleGroupIds,
+    visibleOverlayGroupIds,
+    hasHigherPrioritySetSpanVisible,
   );
 
   return hiddenOverlayIds;
