@@ -207,7 +207,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .timeline-canvas__edge-zoom-hint {
+  .timeline-canvas__edge-zoom-hint-label {
     display: none;
   }
 }
@@ -314,4 +314,3 @@
   color: rgba(77, 61, 47, 0.7);
   font: 0.66rem/1.2 var(--font-sans);
 }
-

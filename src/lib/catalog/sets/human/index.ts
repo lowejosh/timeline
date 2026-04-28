@@ -110,6 +110,7 @@ export const HUMAN_SET = normalizeTimelineSetSource({
             "Archaeological cultures and village worlds before or alongside the rise of early states and cities.",
           contentType: "overlays",
           order: 0,
+          defaultEnabled: false,
           overlays: CULTURE_OVERLAYS,
         },
       ],
