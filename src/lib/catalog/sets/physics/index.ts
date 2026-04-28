@@ -26,7 +26,7 @@ export const PHYSICS_SET = normalizeTimelineSetSource({
       "Ideas, experiments, and theories from ancient natural philosophy to modern particle physics.",
     tags: ["physics", "history", "science"],
     order: 3,
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   sources: PHYSICS_SOURCES,
   categories: [
