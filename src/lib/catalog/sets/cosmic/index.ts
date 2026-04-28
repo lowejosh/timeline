@@ -11,7 +11,7 @@ const COSMIC_SET_DOCUMENT = {
     description:
       "Universe-scale history from the Big Bang through the formation of the Solar System.",
     tags: ["universe", "physics"],
-    order: 0,
+    order: 2,
     defaultEnabled: true,
   },
   sources: {

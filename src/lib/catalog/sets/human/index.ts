@@ -50,7 +50,7 @@ export const HUMAN_SET = normalizeTimelineSetSource({
     description:
       "Hominin evolution, archaeological cultures, civilizations, and recorded history.",
     tags: ["history", "archaeology", "civilization"],
-    order: 2,
+    order: 0,
     defaultEnabled: true,
   },
   sources: HUMAN_SOURCES,
