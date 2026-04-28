@@ -101,6 +101,12 @@ export function AvailableSetsPage({
     [allSets],
   );
 
+  const ensureSetStartsVisible = (setId: TimelineSetId) => {
+    if (!visibleSetIds.has(setId)) {
+      onToggleVisible(setId, true);
+    }
+  };
+
   const {
     dragState,
     enabledColumnRef,
@@ -112,6 +118,9 @@ export function AvailableSetsPage({
     draftColumns,
     visibleAvailableSetIds,
     setDraftColumns,
+    (setId) => {
+      ensureSetStartsVisible(setId);
+    },
     (setId) => {
       if (!visibleSetIds.has(setId)) {
         onToggleVisible(setId, true);
@@ -135,6 +144,10 @@ export function AvailableSetsPage({
   };
 
   const handleToggleDraft = (setId: TimelineSetId, nextEnabled: boolean) => {
+    if (nextEnabled) {
+      ensureSetStartsVisible(setId);
+    }
+
     // When a set is moved to the available column, clear any hidden state
     // immediately so it comes back visible if the user re-adds it.
     if (!nextEnabled && !visibleSetIds.has(setId)) {
