@@ -634,7 +634,7 @@ export function useTimelineAppState() {
       animated.animateToRange(parent.startYear, parent.endYear);
     } else {
       setActiveEraId(prioritizedRootEra.id);
-      animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1]);
+      animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1], 0);
     }
   }, [activeEraId, animated, prioritizedRootEra]);
 
@@ -698,7 +698,7 @@ export function useTimelineAppState() {
 
         if (activeSetId === setId) {
           setActiveEraId(ROOT_ERA.id);
-          animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1]);
+          animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1], 0);
         }
       }
 
@@ -763,7 +763,7 @@ export function useTimelineAppState() {
 
       if (activeSetId && !nextEnabledSetIds.has(activeSetId)) {
         setActiveEraId(ROOT_ERA.id);
-        animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1]);
+        animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1], 0);
       }
 
       // Sync visibleSetIds: remove sets removed from library, add newly

@@ -441,12 +441,17 @@ export function getZoomAnchorForCanvasX(
 ) {
   const safeCanvasWidth = Math.max(canvasWidth, pad * 2 + 1);
   const innerWidth = Math.max(safeCanvasWidth - pad * 2, 1);
+  const edgeAnchorGrace = Math.min(
+    56,
+    Math.max(24, innerWidth * 0.06),
+    innerWidth * 0.16,
+  );
 
-  if (localX <= pad) {
+  if (localX <= pad + edgeAnchorGrace) {
     return 0;
   }
 
-  if (localX >= safeCanvasWidth - pad) {
+  if (localX >= safeCanvasWidth - pad - edgeAnchorGrace) {
     return innerWidth;
   }
 
@@ -568,7 +573,7 @@ export function getHomeViewport(
     HOME_RANGE[0],
     HOME_RANGE[1],
     width,
-    0.12,
+    0,
     scaleMode,
   );
 }
