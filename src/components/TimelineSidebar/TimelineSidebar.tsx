@@ -6,10 +6,18 @@ import {
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
-  type ReactNode,
 } from "react";
-import { createPortal, flushSync } from "react-dom";
+import { flushSync } from "react-dom";
+import { AlertTriangle, ChevronDown, Plus } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Tooltip } from "@/components/ui/tooltip";
 import { OverlayGroupIconSvg } from "@/features/timeline-viewer/canvas";
 import { computeEraObscuredCounts } from "@/lib/catalog/timelineSetMetrics";
 import { useGlobalPointerDrag } from "@/hooks/useGlobalPointerDrag";
@@ -19,8 +27,8 @@ import {
   areOrdersEqual,
   moveItem,
 } from "@/lib/ui/reorder";
+import { cn } from "@/lib/utils";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
-import "./TimelineSidebar.styles.css";
 import type {
   TimelineSidebarChildState,
   TimelineSidebarSetState,
@@ -29,6 +37,7 @@ import type {
 type TimelineSidebarProps = {
   sets: TimelineSidebarSetState[];
   expandedSetIds: ReadonlySet<TimelineSetId>;
+  mode?: "drawer" | "popup";
   onReorderSets: (nextSetIds: TimelineSetId[]) => void;
   onToggleSet: (setId: TimelineSetId, nextEnabled: boolean) => void;
   onToggleSetExpanded: (setId: TimelineSetId, nextExpanded: boolean) => void;
@@ -143,72 +152,10 @@ function formatChildMeta(child: TimelineSidebarChildState) {
   return parts.join(" · ");
 }
 
-function WarnTooltip({
-  content,
-  children,
-}: {
-  content: string;
-  children: ReactNode;
-}) {
-  const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null);
-  const [clampedLeft, setClampedLeft] = useState<number | null>(null);
-  const wrapRef = useRef<HTMLSpanElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    if (!anchor || !tooltipRef.current) {
-      setClampedLeft(null);
-      return;
-    }
-    const { width } = tooltipRef.current.getBoundingClientRect();
-    const PADDING = 8;
-    const centered = anchor.x - width / 2;
-    setClampedLeft(
-      Math.max(
-        PADDING,
-        Math.min(centered, window.innerWidth - width - PADDING),
-      ),
-    );
-  }, [anchor]);
-
-  return (
-    <>
-      <span
-        className="timeline-sidebar__set-warn-wrap"
-        onMouseEnter={() => {
-          const rect = wrapRef.current?.getBoundingClientRect();
-          if (rect) {
-            setAnchor({ x: rect.left + rect.width / 2, y: rect.top });
-          }
-        }}
-        onMouseLeave={() => setAnchor(null)}
-        ref={wrapRef}
-      >
-        {children}
-      </span>
-      {anchor
-        ? createPortal(
-            <div
-              className="sidebar-warn-tooltip"
-              ref={tooltipRef}
-              style={{
-                left: clampedLeft ?? anchor.x,
-                top: anchor.y,
-                visibility: clampedLeft !== null ? "visible" : "hidden",
-              }}
-            >
-              {content}
-            </div>,
-            document.body,
-          )
-        : null}
-    </>
-  );
-}
-
 export function TimelineSidebar({
   sets,
   expandedSetIds,
+  mode = "popup",
   onReorderSets,
   onToggleSet,
   onToggleSetExpanded,
@@ -550,19 +497,35 @@ export function TimelineSidebar({
   };
 
   return (
-    <aside className="timeline-sidebar" aria-label="Timeline layer controls">
-      <div className="timeline-sidebar__inner">
-        <header className="timeline-sidebar__header">
-          <h1 className="timeline-sidebar__title">Layers</h1>
-          <span className="timeline-sidebar__title-meta">
+    <aside
+      aria-label="Timeline layer controls"
+      className={cn(
+        "relative flex max-h-[var(--sidebar-max-height)] w-full flex-col overflow-hidden border border-border bg-card text-card-foreground opacity-[0.98] shadow-panel backdrop-blur-md",
+        mode === "drawer" ? "h-full max-h-full rounded-none" : "rounded-lg",
+      )}
+    >
+      <div
+        className={cn(
+          "min-h-0 flex-1 overflow-y-auto px-2 pb-1 pt-2 [scrollbar-width:thin]",
+          mode === "drawer" && "pl-[calc(env(safe-area-inset-left,0px)+0.6rem)] pt-4",
+        )}
+      >
+        <header className="flex items-baseline justify-between gap-2 px-0.5">
+          <h1 className="m-0 font-display text-base font-semibold leading-none text-foreground">
+            Layers
+          </h1>
+          <span className="shrink-0 text-[0.56rem] font-semibold uppercase leading-none tracking-[0.08em] text-muted-foreground">
             {pluralize(sets.length, "set")}
           </span>
         </header>
-        <span className="timeline-sidebar__drag-instruction">
+        <span className="block px-0.5 py-1 text-[0.54rem] uppercase tracking-[0.08em] text-muted-foreground">
           Drag to reorder
         </span>
         <div
-          className="timeline-sidebar__tree"
+          className={cn(
+            "relative -mx-2 -mb-1 grid gap-0",
+            mode === "drawer" && "ml-[calc(-1*(env(safe-area-inset-left,0px)+0.6rem))]",
+          )}
           data-dragging={dragState ? "true" : "false"}
           ref={treeRef}
         >
@@ -579,7 +542,11 @@ export function TimelineSidebar({
 
             return (
               <section
-                className="timeline-sidebar__set-shell"
+                className={cn(
+                  "grid translate-z-0 will-change-transform",
+                  "border-t border-border/50 first:border-t-0",
+                  isDragged && "drop-shadow-xl",
+                )}
                 data-drag-state={
                   isDragged ? "dragging" : dragState ? "shifting" : "idle"
                 }
@@ -604,137 +571,148 @@ export function TimelineSidebar({
                     : undefined
                 }
               >
-                <div className="timeline-sidebar__set-card">
-                  <div
-                    className="timeline-sidebar__set-row"
-                    onClick={() => {
-                      if (dragMovedRef.current) {
-                        // Consume the flag so the next click works normally.
-                        dragMovedRef.current = false;
-                        return;
-                      }
-
-                      onToggleSetExpanded(set.id, !expanded);
-                    }}
-                    role="button"
-                    tabIndex={0}
-                    aria-expanded={expanded}
-                    aria-label={`${expanded ? "Collapse" : "Expand"} ${set.label}`}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        onToggleSetExpanded(set.id, !expanded);
-                      }
-
-                      if (event.key === "ArrowUp") {
-                        event.preventDefault();
-                        handleMoveSetByKeyboard(set.id, -1);
-                      }
-
-                      if (event.key === "ArrowDown") {
-                        event.preventDefault();
-                        handleMoveSetByKeyboard(set.id, 1);
-                      }
-                    }}
-                    onPointerDown={(event) => {
-                      handlePointerDown(event, set.id);
-                    }}
-                    data-expanded={expanded ? "true" : "false"}
-                  >
-                    <label
-                      className="timeline-sidebar__toggle timeline-sidebar__toggle--set-checkbox"
+                <Collapsible
+                  className={cn(
+                    "grid bg-transparent shadow-none transition-colors",
+                    !set.enabled && "opacity-80",
+                    isDragged && "bg-surface/80 backdrop-blur-md",
+                  )}
+                  onOpenChange={(nextOpen) => {
+                    onToggleSetExpanded(set.id, nextOpen);
+                  }}
+                  open={expanded}
+                >
+                  <CollapsibleTrigger asChild>
+                    <div
+                      aria-label={`${expanded ? "Collapse" : "Expand"} ${set.label}`}
+                      className={cn(
+                        "grid cursor-grab touch-none select-none grid-cols-[auto_1fr_auto] items-center gap-2 rounded-md px-2 py-2 transition-colors duration-150 hover:bg-surface/40",
+                        expanded && "bg-surface/20",
+                        isDragged && "cursor-grabbing",
+                        mode === "drawer" &&
+                          "pl-[calc(env(safe-area-inset-left,0px)+0.62rem)]",
+                      )}
+                      data-expanded={expanded ? "true" : "false"}
+                      role="button"
                       onClick={(event) => {
-                        event.stopPropagation();
+                        if (dragMovedRef.current) {
+                          // Consume the flag so the next click works normally.
+                          dragMovedRef.current = false;
+                          event.preventDefault();
+                        }
                       }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          onToggleSetExpanded(set.id, !expanded);
+                        }
+
+                        if (event.key === "ArrowUp") {
+                          event.preventDefault();
+                          handleMoveSetByKeyboard(set.id, -1);
+                        }
+
+                        if (event.key === "ArrowDown") {
+                          event.preventDefault();
+                          handleMoveSetByKeyboard(set.id, 1);
+                        }
+                      }}
+                      onPointerDown={(event) => {
+                        handlePointerDown(event, set.id);
+                      }}
+                      tabIndex={0}
                     >
-                      <input
-                        checked={set.enabled}
-                        onChange={(event) => {
-                          onToggleSet(set.id, event.currentTarget.checked);
+                      <span
+                        className="inline-flex items-center"
+                        onClick={(event) => {
+                          event.stopPropagation();
                         }}
-                        type="checkbox"
-                      />
-                      <span
-                        aria-hidden="true"
-                        className="timeline-sidebar__checkbox"
-                      />
-                    </label>
-
-                    <span className="timeline-sidebar__set-copy">
-                      <span
-                        className="timeline-sidebar__item-title"
-                        title={set.description}
                       >
-                        {set.label}
-                        {(eraObscuredCounts.get(set.id) ?? 0) > 0 ? (
-                          <WarnTooltip
-                            content={`${eraObscuredCounts.get(set.id)} era${eraObscuredCounts.get(set.id) !== 1 ? "s" : ""} covered by higher-priority sets`}
-                          >
-                            <svg
-                              aria-hidden="true"
-                              className="timeline-sidebar__set-warn"
-                              viewBox="0 0 12 12"
+                        <Checkbox
+                          aria-label={`${set.enabled ? "Hide" : "Show"} ${set.label}`}
+                          checked={set.enabled}
+                          onChange={(event) => {
+                            onToggleSet(set.id, event.currentTarget.checked);
+                          }}
+                        />
+                      </span>
+
+                      <span className="grid min-w-0 gap-0.5">
+                        <span
+                          className="min-w-0 flex-1 text-[0.76rem] font-semibold leading-tight text-foreground"
+                          title={set.description}
+                        >
+                          {set.label}
+                          {(eraObscuredCounts.get(set.id) ?? 0) > 0 ? (
+                            <Tooltip
+                              content={`${eraObscuredCounts.get(set.id)} era${eraObscuredCounts.get(set.id) !== 1 ? "s" : ""} covered by higher-priority sets`}
                             >
-                              <path d="M6 1.5 11 10.5H1L6 1.5z" />
-                              <path d="M6 5v2.5M6 9v.5" strokeLinecap="round" />
-                            </svg>
-                          </WarnTooltip>
-                        ) : null}
+                              <span
+                                aria-hidden="true"
+                                className="ml-1 inline-flex align-middle text-warning"
+                              >
+                                <AlertTriangle className="size-3 fill-warning/20 stroke-[1.8]" />
+                              </span>
+                            </Tooltip>
+                          ) : null}
+                        </span>
+                        <span className="text-[0.6rem] font-semibold leading-tight tracking-[0.01em] text-muted-foreground">
+                          {formatSetMeta(set)}
+                        </span>
                       </span>
-                      <span className="timeline-sidebar__item-meta">
-                        {formatSetMeta(set)}
-                      </span>
-                    </span>
 
-                    <svg
-                      aria-hidden="true"
-                      className="timeline-sidebar__disclosure-glyph"
-                      viewBox="0 0 12 12"
-                    >
-                      <path d="M3 4.5 6 7.5 9 4.5" />
-                    </svg>
-                  </div>
+                      <ChevronDown
+                        aria-hidden="true"
+                        className={cn(
+                          "size-4 text-muted-foreground transition-transform duration-200",
+                          expanded && "rotate-180",
+                        )}
+                      />
+                    </div>
+                  </CollapsibleTrigger>
 
-                  {expanded ? (
-                    <ul className="timeline-sidebar__item-list timeline-sidebar__child-list">
+                  <CollapsibleContent>
+                    <ul className="m-0 grid list-none gap-0 border-t border-border/50 p-0">
                       {set.children.map((child) => (
                         <li
-                          className="timeline-sidebar__item timeline-sidebar__item--child"
+                          className={cn(
+                            "border-t border-border/40 first:border-t-0",
+                            !set.enabled && "opacity-60",
+                          )}
                           data-parent-enabled={set.enabled ? "true" : "false"}
                           key={child.id}
                         >
-                          <label className="timeline-sidebar__toggle timeline-sidebar__toggle--item timeline-sidebar__toggle--child">
-                            <input
+                          <label
+                            className={cn(
+                              "grid w-full min-w-0 cursor-pointer grid-cols-[auto_1fr] items-center gap-2 bg-muted/20 px-2 py-2 transition-colors hover:bg-muted/50",
+                              !set.enabled && "cursor-default",
+                              mode === "drawer"
+                                ? "pl-[calc(env(safe-area-inset-left,0px)+0.62rem)]"
+                                : "pl-8",
+                            )}
+                          >
+                            <Checkbox
                               checked={child.enabled}
                               disabled={!set.enabled}
+                              indeterminate={child.mixed}
                               onChange={(event) => {
                                 onToggleEntry(
                                   child.groupIds,
                                   event.currentTarget.checked,
                                 );
                               }}
-                              ref={(element) => {
-                                if (element) {
-                                  element.indeterminate = child.mixed;
-                                }
-                              }}
-                              type="checkbox"
                             />
-                            <span
-                              className="timeline-sidebar__checkbox"
-                              aria-hidden="true"
-                            />
-                            <span className="timeline-sidebar__toggle-copy">
-                              <span className="timeline-sidebar__item-header">
-                                <span className="timeline-sidebar__item-title">
+                            <span className="grid min-w-0 gap-0.5">
+                              <span className="flex min-w-0 items-center justify-between gap-1.5">
+                                <span className="min-w-0 flex-1 text-[0.76rem] font-semibold leading-tight text-foreground">
                                   {child.label}
                                 </span>
                                 <OverlayGroupIconSvg
-                                  className="timeline-sidebar__item-icon"
+                                  className="size-4 shrink-0 self-center text-muted-foreground opacity-75 empty:hidden"
                                   groupId={child.id}
                                 />
                               </span>
-                              <span className="timeline-sidebar__item-meta">
+                              <span className="text-[0.6rem] font-semibold leading-tight tracking-[0.01em] text-muted-foreground">
                                 {formatChildMeta(child)}
                               </span>
                             </span>
@@ -742,22 +720,33 @@ export function TimelineSidebar({
                         </li>
                       ))}
                     </ul>
-                  ) : null}
-                </div>
+                  </CollapsibleContent>
+                </Collapsible>
               </section>
             );
           })}
         </div>
       </div>
 
-      <footer className="timeline-sidebar__footer">
-        <button
-          className="timeline-sidebar__manage-btn"
+      <footer
+        className={cn(
+          "shrink-0 overflow-hidden border-t border-border/60",
+          mode === "drawer" && "pb-[calc(env(safe-area-inset-bottom,0px)+0.2rem)]",
+        )}
+      >
+        <Button
+          className={cn(
+            "h-auto w-full rounded-none border-0 py-3 text-[0.72rem] text-muted-foreground shadow-none hover:translate-y-0 hover:bg-surface/60 hover:text-foreground",
+            mode === "drawer" &&
+              "pl-[calc(env(safe-area-inset-left,0px)+0.62rem)]",
+          )}
           onClick={onOpenSetManager}
           type="button"
+          variant="ghost"
         >
+          <Plus className="size-3.5" />
           Add or create more
-        </button>
+        </Button>
       </footer>
     </aside>
   );

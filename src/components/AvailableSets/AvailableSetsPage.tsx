@@ -1,5 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  AlertTriangle,
+  ChevronLeft,
+  Eye,
+  EyeOff,
+  Minus,
+  Plus,
+  Search,
+} from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useAvailableSetsDrag } from "./hooks/useAvailableSetsDrag";
 import type { TimelineSetDefinition } from "@/lib/catalog/setSchema";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
@@ -19,7 +32,7 @@ import {
   matchesQuery,
   removeItem,
 } from "./utils/availableSetsPage";
-import "./AvailableSetsPage.styles.css";
+import { cn } from "@/lib/utils";
 
 export function AvailableSetsPage({
   allSets,
@@ -198,7 +211,9 @@ export function AvailableSetsPage({
 
     if (!isCrossColumnTarget) {
       return sets.length === 0 ? (
-        <p className="avsets__empty">{emptyMessage}</p>
+        <p className="mx-auto mb-1 mt-4 justify-self-stretch text-center text-sm leading-snug text-muted-foreground">
+          {emptyMessage}
+        </p>
       ) : (
         cards
       );
@@ -209,10 +224,10 @@ export function AvailableSetsPage({
       <div
         key="drag-ghost"
         aria-hidden="true"
-        className="avsets__drag-ghost"
+        className="rounded-lg border border-dashed border-border/80 bg-muted/30"
         style={
           {
-            "--ghost-height": `${dragState.draggedHeight}px`,
+            height: `${dragState.draggedHeight}px`,
           } as React.CSSProperties
         }
       />
@@ -250,12 +265,15 @@ export function AvailableSetsPage({
         ? dragState.currentClientY - dragState.startClientY
         : shiftY;
 
-    const cardWash = isEnabled && !isVisible
-      ? "opacity-50 grayscale-[0.25] pointer-events-auto"
-      : "";
     return (
       <article
-        className={`avsets__card ${cardWash}`}
+        className={cn(
+          "flex w-full cursor-grab touch-none select-none items-start gap-3 rounded-lg border border-border/60 bg-surface/20 px-3 py-3 transition-[background-color,border-color,box-shadow] duration-150 will-change-transform hover:border-border hover:bg-surface/50",
+          isDragged && "cursor-grabbing bg-surface shadow-panel",
+          isEnabled &&
+            !isVisible &&
+            "pointer-events-auto opacity-50 grayscale-[0.25]",
+        )}
         data-drag-state={
           isDragged ? "dragging" : dragState ? "shifting" : "idle"
         }
@@ -279,160 +297,155 @@ export function AvailableSetsPage({
                   : `transform 180ms ${REORDER_EASING}`,
                 zIndex: isDragged ? 4 : 1,
               }
-            : undefined
+          : undefined
         }
+        role="listitem"
       >
-        <div className="avsets__item-body">
-          <span className="avsets__item-label">{set.metadata.label}</span>
+        <div className="grid min-w-0 flex-1 gap-1">
+          <span className="font-display text-sm font-semibold leading-tight text-foreground">
+            {set.metadata.label}
+          </span>
           {timeRange ? (
-            <span className="avsets__item-meta">{timeRange}</span>
+            <span className="text-[0.6rem] leading-none tracking-[0.015em] text-muted-foreground/70">
+              {timeRange}
+            </span>
           ) : null}
           <div
             aria-hidden={!isEnabled || obscuredCount === 0}
-            className="avsets__item-era-warning"
-            data-visible={isEnabled && obscuredCount > 0 ? "true" : "false"}
+            className={cn(
+              "grid overflow-hidden transition-[grid-template-rows,opacity] duration-200",
+              isEnabled && obscuredCount > 0
+                ? "grid-rows-[1fr] opacity-100"
+                : "grid-rows-[0fr] opacity-0",
+            )}
           >
-            <div className="avsets__item-era-warning-inner">
-              <svg
+            <div className="flex min-h-0 items-center gap-1.5 pt-0.5 text-[0.62rem] font-semibold leading-tight tracking-[0.01em] text-warning">
+              <AlertTriangle
                 aria-hidden="true"
-                className="avsets__item-era-warning-icon"
-                viewBox="0 0 12 12"
-              >
-                <path d="M6 1.5 11 10.5H1L6 1.5z" />
-                <path d="M6 5v2.5M6 9v.5" strokeLinecap="round" />
-              </svg>
+                className="size-3.5 shrink-0 fill-warning/20 stroke-[1.8]"
+              />
               {obscuredCount} era{obscuredCount !== 1 ? "s" : ""} covered by
               higher-priority sets
             </div>
           </div>
           {set.metadata.description ? (
-            <span className="avsets__item-desc">
+            <span className="text-[0.69rem] leading-snug text-muted-foreground">
               {set.metadata.description}
             </span>
           ) : null}
           {set.metadata.tags && set.metadata.tags.length > 0 ? (
-            <span className="avsets__item-tags">
+            <span className="flex flex-wrap gap-1">
               {set.metadata.tags.map((tag) => (
-                <span className="avsets__item-tag" key={tag}>
+                <Badge className="px-1.5 py-0.5 text-[0.56rem]" key={tag}>
                   {tag}
-                </span>
+                </Badge>
               ))}
             </span>
           ) : null}
         </div>
 
         {isEnabled ? (
-          <button
+          <Button
             aria-label={isVisible ? `Hide ${set.metadata.label}` : `Show ${set.metadata.label}`}
             aria-pressed={isVisible}
-            className="avsets__item-visibility"
+            className={cn(
+              "self-center rounded-full text-muted-foreground",
+              isVisible && "text-muted-foreground/90",
+            )}
             data-visible={isVisible ? "true" : "false"}
             onClick={(e) => {
               e.stopPropagation();
               onToggleVisible(setId, !isVisible);
             }}
+            size="icon"
             type="button"
+            variant="glass"
           >
-            {isVisible ? (
-              // Heroicons Eye (solid)
-              <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 4c-4.418 0-8 3.134-8 6s3.582 6 8 6 8-3.134 8-6-3.582-6-8-6Zm0 10c-2.21 0-4-1.567-4-3.5S7.79 7 10 7s4 1.567 4 3.5S12.21 14 10 14Zm0-5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" clipRule="evenodd"/>
-              </svg>
-            ) : (
-              // Heroicons Eye Slash (solid)
-              <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M3.28 2.22a.75.75 0 0 0-1.06 1.06l14.5 14.5a.75.75 0 1 0 1.06-1.06l-1.745-1.745a10.029 10.029 0 0 0 3.3-4.38 1.651 1.651 0 0 0 0-1.185A10.004 10.004 0 0 0 9.999 3a9.956 9.956 0 0 0-4.744 1.194L3.28 2.22ZM7.752 6.69l1.092 1.092a2.5 2.5 0 0 1 3.374 3.373l1.091 1.092a4 4 0 0 0-5.557-5.557Z" clipRule="evenodd"/>
-                <path d="M10.748 13.93a2.5 2.5 0 0 1-3.678-3.678l-.748-.748a4 4 0 0 0 5.424 5.425l-.998-.999ZM15.44 12.576l.392.392a10.048 10.048 0 0 1-2.106 1.564.75.75 0 1 1-.695-1.326 8.549 8.549 0 0 0 2.409-1.63ZM4.508 8.56l-1.5-1.5A9.949 9.949 0 0 0 1.934 9.41a1.651 1.651 0 0 0 0 1.185 10.004 10.004 0 0 0 9.999 5.388c.307-.032.61-.079.908-.138l-1.12-1.12a4 4 0 0 1-4.747-4.747L4.508 8.56Z"/>
-              </svg>
-            )}
-          </button>
+            {isVisible ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+          </Button>
         ) : null}
 
-        <button
+        <Button
           aria-label={
             isEnabled
               ? `Remove ${set.metadata.label}`
               : `Add ${set.metadata.label}`
           }
-          className="avsets__item-toggle"
+          className={cn(
+            "self-center rounded-full text-muted-foreground",
+            !isEnabled && "text-foreground/70",
+          )}
           data-variant={isEnabled ? "remove" : "add"}
           onClick={() => {
             handleToggleDraft(setId, !isEnabled);
           }}
+          size="icon"
           type="button"
+          variant="glass"
         >
-          {isEnabled ? (
-            // Minus icon
-            <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
-              <rect x="4" y="9" width="12" height="2" rx="1" />
-            </svg>
-          ) : (
-            // Plus icon
-            <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
-              <rect x="9" y="4" width="2" height="12" rx="1" />
-              <rect x="4" y="9" width="12" height="2" rx="1" />
-            </svg>
-          )}
-        </button>
+          {isEnabled ? <Minus className="size-4" /> : <Plus className="size-4" />}
+        </Button>
       </article>
     );
   };
 
   return (
-    <div className="avsets">
-      <div className="avsets__surface">
-        <div className="avsets__topbar">
-          <button
+    <div className="flex h-full w-full items-start justify-start overflow-auto p-[calc(env(safe-area-inset-top,0px)+1.2rem)_calc(env(safe-area-inset-right,0px)+1.4rem)_calc(env(safe-area-inset-bottom,0px)+1.2rem)_calc(env(safe-area-inset-left,0px)+1.4rem)] text-foreground overscroll-contain max-sm:p-[calc(env(safe-area-inset-top,0px)+0.84rem)_calc(env(safe-area-inset-right,0px)+0.84rem)_calc(env(safe-area-inset-bottom,0px)+0.84rem)_calc(env(safe-area-inset-left,0px)+0.84rem)]">
+      <Card className="mx-auto grid w-[min(72rem,100%)] content-start gap-3 rounded-lg bg-card p-4 backdrop-blur-xl max-sm:w-full max-sm:p-3">
+        <div className="flex items-center gap-3 max-sm:flex-wrap max-sm:items-start">
+          <Button
             aria-label="Back to layers"
-            className="avsets__back"
+            className="rounded-full"
             onClick={handleApply}
+            size="icon"
             type="button"
+            variant="glass"
           >
-            <svg
-              aria-hidden="true"
-              className="avsets__back-chevron"
-              viewBox="0 0 12 12"
-            >
-              <path d="M7.5 2.5 4 6 7.5 9.5" />
-            </svg>
-          </button>
+            <ChevronLeft className="size-4" />
+          </Button>
 
-          <div className="avsets__heading">
-            <h2 className="avsets__title">Available sets</h2>
-            <p className="avsets__subtitle">
+          <div className="grid min-w-0 gap-1">
+            <h2 className="m-0 font-display text-base font-semibold leading-none text-foreground">
+              Available sets
+            </h2>
+            <p className="m-0 text-[0.69rem] leading-snug text-muted-foreground">
               Drag between columns to add, remove, and set the order of the
               layers.
             </p>
           </div>
 
-          <button
+          <Button
             aria-label="Create a set, coming soon"
-            className="avsets__create"
+            className="ml-auto max-sm:ml-0"
             disabled
+            size="pill"
             title="Create set, coming soon"
             type="button"
+            variant="subtle"
           >
-            <svg
-              aria-hidden="true"
-              className="avsets__create-icon"
-              viewBox="0 0 12 12"
-            >
-              <path d="M6 2.25v7.5M2.25 6h7.5" />
-            </svg>
+            <Plus className="size-3.5" />
             <span>Create</span>
-          </button>
+          </Button>
         </div>
 
-        <div className="avsets__columns">
-          <section className="avsets__column avsets__column--enabled">
-            <header className="avsets__column-header">
+        <div className="grid grid-cols-2 items-start gap-5 max-sm:grid-cols-1">
+          <section className="grid min-w-0 content-start gap-0">
+            <header className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="avsets__column-title">Selected</h3>
-                <p className="avsets__column-meta">Shown in Layers</p>
+                <h3 className="m-0 font-display text-sm font-semibold leading-tight text-foreground">
+                  Selected
+                </h3>
+                <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                  Shown in Layers
+                </p>
               </div>
             </header>
             <div
-              className="avsets__column-list"
+              className={cn(
+                "grid min-h-48 content-start items-start gap-2 overflow-y-auto overflow-x-clip overscroll-contain pb-1 pt-4 [scrollbar-width:thin]",
+                dragState && "max-h-none overflow-visible",
+                !dragState && "max-h-[32rem]",
+              )}
               data-dragging={dragState ? "true" : "false"}
               ref={enabledColumnRef}
               role="list"
@@ -445,26 +458,26 @@ export function AvailableSetsPage({
             </div>
           </section>
 
-          <section className="avsets__column avsets__column--available">
-            <header className="avsets__column-header avsets__column-header--stacked">
+          <section className="grid min-w-0 content-start gap-0 border-l border-border/70 pl-5 max-sm:border-l-0 max-sm:border-t max-sm:pl-0 max-sm:pt-4">
+            <header className="grid gap-2">
               <div>
-                <h3 className="avsets__column-title">Available</h3>
-                <p className="avsets__column-meta">Not currently shown</p>
+                <h3 className="m-0 font-display text-sm font-semibold leading-tight text-foreground">
+                  Available
+                </h3>
+                <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                  Not currently shown
+                </p>
               </div>
 
-              <div className="avsets__controls">
-                <div className="avsets__search-wrap">
-                  <svg
+              <div className="flex flex-col items-start gap-2 max-sm:w-full">
+                <div className="relative w-[min(18rem,100%)] max-sm:w-full">
+                  <Search
                     aria-hidden="true"
-                    className="avsets__search-icon"
-                    viewBox="0 0 16 16"
-                  >
-                    <circle cx="6.5" cy="6.5" r="4" />
-                    <path d="M10 10 14 14" />
-                  </svg>
-                  <input
+                    className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/70"
+                  />
+                  <Input
                     aria-label="Search available sets"
-                    className="avsets__search"
+                    className="pl-9 text-xs"
                     onChange={(event) => {
                       setQuery(event.currentTarget.value);
                     }}
@@ -477,36 +490,38 @@ export function AvailableSetsPage({
                 {availableTags.length > 0 ? (
                   <div
                     aria-label="Filter available sets by tag"
-                    className="avsets__tags"
+                    className="flex flex-wrap gap-1.5"
                     role="group"
                   >
-                    <button
+                    <Button
                       aria-pressed={activeTags.size === 0}
-                      className="avsets__tag"
                       data-active={activeTags.size === 0 ? "true" : "false"}
                       onClick={() => {
                         setActiveTags(new Set());
                       }}
+                      size="pill"
                       type="button"
+                      variant={activeTags.size === 0 ? "outline" : "ghost"}
                     >
                       All
-                    </button>
+                    </Button>
                     {availableTags.map((tag) => {
                       const isActiveTag = activeTags.has(tag.toLowerCase());
 
                       return (
-                        <button
+                        <Button
                           aria-pressed={isActiveTag}
-                          className="avsets__tag"
                           data-active={isActiveTag ? "true" : "false"}
                           key={tag}
                           onClick={() => {
                             handleToggleTag(tag);
                           }}
+                          size="pill"
                           type="button"
+                          variant={isActiveTag ? "outline" : "ghost"}
                         >
                           {tag}
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
@@ -514,7 +529,11 @@ export function AvailableSetsPage({
               </div>
             </header>
             <div
-              className="avsets__column-list"
+              className={cn(
+                "grid min-h-48 content-start items-start gap-2 overflow-y-auto overflow-x-clip overscroll-contain pb-1 pt-4 [scrollbar-width:thin]",
+                dragState && "max-h-none overflow-visible",
+                !dragState && "max-h-[32rem]",
+              )}
               data-dragging={dragState ? "true" : "false"}
               ref={availableColumnRef}
               role="list"
@@ -530,23 +549,24 @@ export function AvailableSetsPage({
           </section>
         </div>
 
-        <div className="avsets__actions">
-          <button
-            className="avsets__action avsets__action--cancel"
+        <div className="flex justify-end gap-2 pt-1 max-sm:justify-stretch">
+          <Button
+            className="max-sm:flex-1"
             onClick={onClose}
             type="button"
+            variant="outline"
           >
             Discard changes
-          </button>
-          <button
-            className="avsets__action avsets__action--save"
+          </Button>
+          <Button
+            className="max-sm:flex-1"
             onClick={handleApply}
             type="button"
           >
             Done
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

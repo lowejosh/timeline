@@ -2,6 +2,7 @@ import type { CSSProperties, RefObject } from "react";
 
 import type { RenderedTooltipState } from "@/lib/rendering/canvas/tooltip";
 import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
+import { cn } from "@/lib/utils";
 import {
   TOOLTIP_MAX_WIDTH,
   TOOLTIP_OFFSET,
@@ -54,7 +55,7 @@ function getTooltipStyle({
   height: number;
   renderedTooltip: RenderedTooltipState;
   width: number;
-}): CSSProperties & Record<string, string | number> {
+}): CSSProperties {
   const displayedTooltip = renderedTooltip.tooltipState;
   const safeViewportInsets = getSafeViewportInsets();
   const tooltipHorizontalPadding = 10;
@@ -77,6 +78,12 @@ function getTooltipStyle({
     displayedTooltip.anchorY < safeViewportInsets.top + 96 ||
     (displayedTooltip.placement === "below" &&
       displayedTooltip.anchorY <= height - safeViewportInsets.bottom - 120);
+  const translateX = horizontalPlacement === "center" ? "-50%" : "0%";
+  const translateY = shouldPlaceBelow
+    ? `${TOOLTIP_OFFSET}px`
+    : `calc(-100% - ${TOOLTIP_OFFSET}px)`;
+  const motionOffset = shouldPlaceBelow ? "-4px" : "4px";
+  const isTransitioning = renderedTooltip.phase !== "present";
 
   return {
     ...(horizontalPlacement === "right"
@@ -93,12 +100,10 @@ function getTooltipStyle({
     ),
     width: `${tooltipWidth}px`,
     maxWidth: `${tooltipWidth}px`,
-    "--tooltip-translate-x": horizontalPlacement === "center" ? "-50%" : "0%",
-    "--tooltip-translate-y": shouldPlaceBelow
-      ? `${TOOLTIP_OFFSET}px`
-      : `calc(-100% - ${TOOLTIP_OFFSET}px)`,
-    "--tooltip-origin": shouldPlaceBelow ? "top center" : "bottom center",
-    "--tooltip-motion-offset-y": shouldPlaceBelow ? "-4px" : "4px",
+    transform: isTransitioning
+      ? `translate(${translateX}, calc(${translateY} + ${motionOffset})) scale(0.965)`
+      : `translate(${translateX}, ${translateY}) scale(1)`,
+    transformOrigin: shouldPlaceBelow ? "top center" : "bottom center",
   };
 }
 
@@ -112,37 +117,49 @@ export function TimelineTooltip({
 
   return (
     <div
-      className="timeline-tooltip"
+      className={cn(
+        "absolute z-[2] rounded-lg border border-border bg-glass p-3 text-foreground shadow-glass backdrop-blur-md transition-[opacity,filter,transform] duration-200 ease-out will-change-[transform,opacity,filter]",
+        "pointer-events-none",
+        renderedTooltip.phase === "present"
+          ? "opacity-100 blur-0"
+          : "opacity-0 blur-[1.5px]",
+      )}
       data-phase={renderedTooltip.phase}
       style={getTooltipStyle({ height, renderedTooltip, width })}
     >
-      <div className="timeline-tooltip__header">
+      <div className="flex items-start gap-2">
         <OverlayGroupIconSvg
-          className="timeline-tooltip__icon"
+          className="mt-0.5 size-4 shrink-0 text-muted-foreground opacity-75"
           groupId={tooltip.iconGroupId}
         />
-        <div className="timeline-tooltip__title">{tooltip.title}</div>
+        <div className="text-sm font-semibold leading-snug text-foreground">
+          {tooltip.title}
+        </div>
       </div>
       {tooltip.regionalScopeLabel ? (
-        <div className="timeline-tooltip__subtitle">
+        <div className="mt-1 text-[0.68rem] font-medium leading-tight text-muted-foreground">
           {tooltip.regionalScopeLabel}
         </div>
       ) : null}
-      <div className="timeline-tooltip__time">{tooltip.timeLabel}</div>
+      <div className="mt-1 text-xs font-medium leading-snug text-foreground/80">
+        {tooltip.timeLabel}
+      </div>
       {tooltip.description ? (
-        <div className="timeline-tooltip__description">
+        <div className="mt-2 text-[0.74rem] leading-snug text-foreground/80">
           {tooltip.description}
         </div>
       ) : null}
       {tooltip.sources.length > 0 ? (
-        <div className="timeline-tooltip__sources" ref={sourcesRef}>
-          <div className="timeline-tooltip__sources-label">Sources</div>
-          <ul className="timeline-tooltip__source-list">
+        <div className="mt-2" ref={sourcesRef}>
+          <div className="mb-1 text-[0.62rem] font-semibold uppercase leading-none tracking-[0.08em] text-muted-foreground">
+            Sources
+          </div>
+          <ul className="m-0 list-none p-0">
             {tooltip.sources.map((source) => (
-              <li className="timeline-tooltip__source-item" key={source.id}>
+              <li className="mt-1 first:mt-0" key={source.id}>
                 {source.url ? (
                   <a
-                    className="timeline-tooltip__source-link"
+                    className="pointer-events-auto block text-[0.71rem] font-medium leading-snug text-foreground/90 no-underline hover:underline"
                     href={source.url}
                     rel="noreferrer"
                     target="_blank"
@@ -150,11 +167,11 @@ export function TimelineTooltip({
                     {source.shortTitle}
                   </a>
                 ) : (
-                  <span className="timeline-tooltip__source-title">
+                  <span className="block text-[0.71rem] font-medium leading-snug text-foreground/90">
                     {source.shortTitle}
                   </span>
                 )}
-                <span className="timeline-tooltip__source-org">
+                <span className="block text-[0.66rem] leading-tight text-muted-foreground">
                   {source.organization}
                 </span>
               </li>

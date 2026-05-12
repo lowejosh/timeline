@@ -2,7 +2,7 @@
  * Single source of truth for all design tokens.
  *
  * Rules:
- * - Raw rgba/hex literals in .tsx or .styles.css must reference THEME.color.*
+ * - Raw rgba/hex literals in .tsx should reference THEME.color.*
  *   (exception: dynamic era/overlay hues generated at runtime)
  * - This object mirrors the @theme block in index.css — keep them in sync
  * - Canvas drawing uses src/lib/rendering/canvas/theme.ts which reads CSS
@@ -139,7 +139,7 @@ export const THEME = {
 
   /**
    * Named easing curves.
-   * Use in inline transition strings or .styles.css files.
+   * Use in inline transition strings.
    */
   easing: {
     /** Natural spring settle — most UI transitions */

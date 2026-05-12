@@ -22,7 +22,6 @@ import { useWheelZoomPan } from "./interactions/useWheelZoomPan";
 import { useTouchGestures } from "./interactions/useTouchGestures";
 import { EdgeZoomZones } from "./ui/EdgeZoomZones";
 import { drawTimelineCanvasFrame } from "./rendering/drawTimelineCanvasFrame";
-import "./TimelineCanvas.styles.css";
 import type {
   HoverRegion,
   OverlayInteractionRegion,

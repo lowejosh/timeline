@@ -141,20 +141,15 @@ export function TimelineOverviewRulerStack({
               height: tierHeight,
               top,
               transition: `top 200ms ${THEME.easing.spring}`,
-              animation: isRoot
-                ? "none"
-                : `timeline-overview-ruler-tier-in 220ms ${THEME.easing.spring}`,
             }}
           >
             {showSideLabels ? (
               <div
                 aria-hidden="true"
-                className="absolute top-0 bottom-0 left-0 z-[1] flex items-center justify-end pr-[0.42rem] pl-[0.28rem] text-right pointer-events-none whitespace-nowrap tabular-nums tracking-[0.01em] text-[0.55rem] leading-none font-medium font-sans text-[rgba(54,41,30,0.42)]"
+                className="pointer-events-none absolute bottom-0 left-0 top-0 z-[1] flex items-center justify-end whitespace-nowrap px-1 text-right font-sans text-[0.55rem] font-medium leading-none tracking-[0.01em] text-muted-foreground/70 tabular-nums"
                 style={{ width: pad }}
               >
-                <span className="text-[rgba(54,41,30,0.46)]">
-                  {tierPercentageLabel}
-                </span>
+                <span>{tierPercentageLabel}</span>
               </div>
             ) : null}
             <TimelineOverviewRuler
@@ -207,12 +202,10 @@ export function TimelineOverviewRulerStack({
             {showSideLabels ? (
               <div
                 aria-hidden="true"
-                className="absolute top-0 right-0 bottom-0 z-[1] flex items-center justify-start gap-[0.22rem] pr-[0.28rem] pl-[0.5rem] text-left pointer-events-none whitespace-nowrap tabular-nums tracking-[0.01em] text-[0.56rem] leading-none font-medium font-sans text-[rgba(54,41,30,0.5)] lowercase"
+                className="pointer-events-none absolute bottom-0 right-0 top-0 z-[1] flex items-center justify-start gap-1 whitespace-nowrap px-1 text-left font-sans text-[0.56rem] font-medium lowercase leading-none tracking-[0.01em] text-muted-foreground tabular-nums"
                 style={{ width: pad }}
               >
-                <span className="text-[rgba(54,41,30,0.54)] font-semibold">
-                  {tierSpanLabel}
-                </span>
+                <span className="font-semibold">{tierSpanLabel}</span>
               </div>
             ) : null}
           </div>

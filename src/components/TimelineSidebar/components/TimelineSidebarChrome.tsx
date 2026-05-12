@@ -1,9 +1,12 @@
 import { useCallback } from "react";
+import { Layers, X } from "lucide-react";
 
 import { useTimelineSidebarEscape } from "../hooks/useTimelineSidebarEscape";
+import { Button } from "@/components/ui/button";
 import type { TimelineSidebarSetState } from "@/lib/app/sidebarModel";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import { TimelineSidebar } from "../TimelineSidebar";
+import { cn } from "@/lib/utils";
 
 type TimelineSidebarChromeProps = {
   activeView: "timeline" | "available-sets";
@@ -47,28 +50,40 @@ export function TimelineSidebarChrome({
 
   return (
     <>
-      <button
+      <Button
         aria-controls="timeline-layers-panel"
         aria-expanded={isOpen}
         aria-label={isOpen ? "Hide layers controls" : "Show layers controls"}
-        className="timeline-sidebar-toggle__wrap absolute top-3 left-3 z-[4] inline-flex items-center gap-[0.45rem] py-[0.46rem] px-[0.68rem] border rounded-full text-[var(--ink)] backdrop-blur-[14px] cursor-pointer bg-[var(--glass-base)] border-[var(--brown-14)] [box-shadow:0_8px_18px_var(--shadow-8)] [transition:background-color_180ms_ease,box-shadow_180ms_ease,border-color_180ms_ease,transform_180ms_ease,opacity_180ms_ease] hover:bg-[var(--glass-hover)] hover:border-[var(--brown-20)] hover:[box-shadow:0_10px_22px_var(--shadow-10)] hover:-translate-y-px data-[open=true]:bg-[var(--glass-active)] data-[open=true]:border-[var(--brown-18)] data-[open=true]:[box-shadow:0_10px_22px_var(--shadow-10)] focus-visible:outline-none focus-visible:[box-shadow:0_0_0_2px_var(--focus)] max-sm:top-[10px] max-sm:left-[10px] max-sm:py-[0.42rem] max-sm:data-[open=true]:opacity-0 max-sm:data-[open=true]:pointer-events-none max-sm:data-[open=true]:-translate-y-1 max-sm:data-[open=true]:scale-[0.98]"
+        className={cn(
+          "absolute left-[calc(env(safe-area-inset-left,0px)+0.75rem)] top-[calc(env(safe-area-inset-top,0px)+0.75rem)] z-[4] h-auto rounded-full px-3 py-2 text-xs",
+          "transition-[background-color,border-color,box-shadow,opacity,transform] duration-200",
+          activeView === "available-sets" && "pointer-events-none opacity-0",
+          mode === "drawer" &&
+            isOpen &&
+            "pointer-events-none -translate-y-1 scale-[0.98] opacity-0",
+          "max-sm:left-[10px] max-sm:top-[10px]",
+        )}
         data-open={isOpen ? "true" : "false"}
         onClick={() => {
           setIsOpen((current) => !current);
         }}
+        size="pill"
         type="button"
+        variant="glass"
       >
-        <span
-          aria-hidden="true"
-          className="timeline-sidebar-toggle__glyph relative w-[0.8rem] h-[0.8rem]"
-        />
-        <span className="font-semibold text-[0.76rem] leading-none tracking-[0.01em] font-sans">
-          Layers
-        </span>
-      </button>
+        {isOpen ? <X className="size-4" /> : <Layers className="size-4" />}
+        <span>Layers</span>
+      </Button>
       <button
         aria-label="Close layers controls"
-        className="timeline-sidebar-backdrop absolute inset-0 z-[2] border-0 bg-transparent p-0"
+        className={cn(
+          "absolute inset-0 z-[2] hidden border-0 bg-transparent p-0 transition-opacity duration-200",
+          mode === "drawer" && "block",
+          isOpen
+            ? "pointer-events-auto bg-[rgba(44,31,20,0.16)] opacity-100 backdrop-blur-md"
+            : "pointer-events-none opacity-0",
+          activeView === "available-sets" && "pointer-events-none opacity-0",
+        )}
         data-open={isOpen ? "true" : "false"}
         onClick={closeSidebar}
         tabIndex={isOpen ? 0 : -1}
@@ -76,13 +91,27 @@ export function TimelineSidebarChrome({
       />
       <div
         aria-hidden={!isOpen}
-        className="timeline-sidebar-shell absolute top-14 left-3 z-[3] w-[min(var(--sidebar-width),calc(100vw-24px))] max-h-[min(calc(100%-68px),var(--sidebar-max-height))] max-sm:top-[50px] max-sm:left-[10px] max-sm:w-[min(var(--sidebar-width),calc(100vw-20px))] max-sm:max-h-[min(calc(100%-60px),var(--sidebar-max-height))]"
+        className={cn(
+          "absolute left-3 top-14 z-[3] w-[min(var(--sidebar-width),calc(100vw-24px))] max-h-[min(calc(100%-68px),var(--sidebar-max-height))] origin-top-left transition-[opacity,transform] duration-300 ease-out",
+          isOpen
+            ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
+            : "pointer-events-none -translate-y-2 scale-[0.985] opacity-0",
+          activeView === "available-sets" && "pointer-events-none opacity-0",
+          "max-sm:left-[10px] max-sm:top-[50px] max-sm:w-[min(var(--sidebar-width),calc(100vw-20px))] max-sm:max-h-[min(calc(100%-60px),var(--sidebar-max-height))]",
+          mode === "drawer" &&
+            "bottom-0 left-0 top-0 w-[min(calc(var(--sidebar-width)+env(safe-area-inset-left,0px)),calc(100vw-18px))] max-h-none origin-left",
+          mode === "drawer" &&
+            (isOpen
+              ? "translate-x-0 translate-y-0"
+              : "translate-x-[calc(-100%-12px)] translate-y-0"),
+        )}
         data-open={isOpen ? "true" : "false"}
         data-mode={mode}
         id="timeline-layers-panel"
       >
         <TimelineSidebar
           expandedSetIds={expandedSetIds}
+          mode={mode}
           onOpenSetManager={onOpenSetManager}
           onReorderSets={onReorderSets}
           onToggleEntry={onToggleEntry}

@@ -4,6 +4,7 @@ import type { useTimelineAppState } from "@/hooks/useTimelineAppState";
 import { TimelineOverviewRulerStack } from "@/components/TimelineOverviewRuler/TimelineOverviewRulerStack";
 import { TIMELINE_APP_LAYOUT } from "@/lib/app/layout";
 import { TimelineCanvas } from "@/features/timeline-viewer/canvas";
+import { cn } from "@/lib/utils";
 
 type TimelineAppLayoutState = ReturnType<typeof getTimelineAppLayoutState>;
 type TimelineAppState = ReturnType<typeof useTimelineAppState>;
@@ -15,7 +16,14 @@ type TimelineViewProps = {
 
 export function TimelineView({ app, layout }: TimelineViewProps) {
   return (
-    <div className="app-view app-view--timeline absolute inset-0 w-full h-full">
+    <div
+      className={cn(
+        "absolute inset-0 h-full w-full transition-[transform,opacity] duration-300 ease-out will-change-[transform,opacity]",
+        app.activeView === "available-sets"
+          ? "pointer-events-none -translate-x-[6%] opacity-0"
+          : "translate-x-0 opacity-100",
+      )}
+    >
       {app.stageSize.width > 0 && app.stageSize.height > 0 ? (
         <div className="relative flex flex-col w-full h-full gap-0">
           <div className="relative flex-1 min-h-0" ref={app.timelineRef}>
