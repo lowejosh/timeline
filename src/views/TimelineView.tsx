@@ -18,9 +18,9 @@ export function TimelineView({ app, layout }: TimelineViewProps) {
   return (
     <div
       className={cn(
-        "absolute inset-0 h-full w-full transition-[transform,opacity] duration-300 ease-out will-change-[transform,opacity]",
+        "absolute inset-0 h-full w-full transition-[transform,opacity] duration-300 ease-out",
         app.activeView === "available-sets"
-          ? "pointer-events-none -translate-x-[6%] opacity-0"
+          ? "pointer-events-none -translate-x-[6%] opacity-0 will-change-[transform,opacity]"
           : "translate-x-0 opacity-100",
       )}
     >

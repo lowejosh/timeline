@@ -15,14 +15,14 @@ export type ResolvedTimelineEraLayer = {
   isActive: boolean;
 };
 
-const ACTIVE_LAYER_FADE_IN_START = 0.18;
-const ACTIVE_LAYER_FADE_IN_END = 0.58;
-const PREVIEW_LAYER_FADE_IN_START = 0.24;
-const PREVIEW_LAYER_FADE_IN_END = 0.64;
-const ACTIVE_LAYER_TRIGGER_IN = 0.36;
-const ACTIVE_LAYER_TRIGGER_OUT = 0.3;
-const PREVIEW_LAYER_TRIGGER_IN = 0.42;
-const PREVIEW_LAYER_TRIGGER_OUT = 0.36;
+const ACTIVE_LAYER_FADE_IN_START = 0.52;
+const ACTIVE_LAYER_FADE_IN_END = 0.82;
+const PREVIEW_LAYER_FADE_IN_START = 0.58;
+const PREVIEW_LAYER_FADE_IN_END = 0.88;
+const ACTIVE_LAYER_TRIGGER_IN = 0.72;
+const ACTIVE_LAYER_TRIGGER_OUT = 0.62;
+const PREVIEW_LAYER_TRIGGER_IN = 0.78;
+const PREVIEW_LAYER_TRIGGER_OUT = 0.68;
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));

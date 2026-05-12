@@ -45,8 +45,6 @@ export function drawPaperOverlayBand({
   height,
   bandColor,
   alpha,
-  borderStyle,
-  drawBorder,
 }: {
   context: CanvasRenderingContext2D;
   x: number;
@@ -55,21 +53,11 @@ export function drawPaperOverlayBand({
   height: number;
   bandColor: string;
   alpha: number;
-  borderStyle: string;
-  drawBorder: boolean;
 }) {
   context.save();
   context.globalAlpha = alpha;
   context.fillStyle = bandColor;
   context.fillRect(x, y, width, height);
-
-  if (drawBorder) {
-    context.globalAlpha = Math.min(alpha * 0.72 + 0.08, 0.86);
-    context.strokeStyle = borderStyle;
-    context.lineWidth = 1;
-    context.strokeRect(x, y, width, height);
-  }
-
   context.restore();
 }
 

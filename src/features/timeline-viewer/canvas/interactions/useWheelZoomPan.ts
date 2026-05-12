@@ -33,6 +33,7 @@ type LatestWheelValues = {
   ) => void;
   onViewportGestureStart: () => void;
   onViewportGestureEnd: () => void;
+  onInteractionStart: () => void;
   recordVerboseInteractionEvent: (eventName: string) => void;
   markViewportInteraction: (reason: string) => void;
 };
@@ -75,6 +76,7 @@ export function useWheelZoomPan({
   onContinuousViewportChange,
   onViewportGestureStart,
   onViewportGestureEnd,
+  onInteractionStart,
   recordVerboseInteractionEvent,
   markViewportInteraction,
 }: {
@@ -89,6 +91,7 @@ export function useWheelZoomPan({
   ) => void;
   onViewportGestureStart: () => void;
   onViewportGestureEnd: () => void;
+  onInteractionStart: () => void;
   recordVerboseInteractionEvent: (eventName: string) => void;
   markViewportInteraction: (reason: string) => void;
 }) {
@@ -99,6 +102,7 @@ export function useWheelZoomPan({
     onContinuousViewportChange,
     onViewportGestureStart,
     onViewportGestureEnd,
+    onInteractionStart,
     recordVerboseInteractionEvent,
     markViewportInteraction,
   });
@@ -122,12 +126,14 @@ export function useWheelZoomPan({
       onContinuousViewportChange,
       onViewportGestureStart,
       onViewportGestureEnd,
+      onInteractionStart,
       recordVerboseInteractionEvent,
       markViewportInteraction,
     };
   }, [
     markViewportInteraction,
     onContinuousViewportChange,
+    onInteractionStart,
     onViewportChange,
     onViewportGestureEnd,
     onViewportGestureStart,
@@ -317,6 +323,7 @@ export function useWheelZoomPan({
         if (startingMomentum) {
           latest.recordVerboseInteractionEvent("mouse-wheel-momentum-start");
           latest.onViewportGestureStart();
+          latest.onInteractionStart();
         }
 
         if (Math.abs(normalizedDx) > Math.abs(normalizedDy)) {
@@ -340,6 +347,7 @@ export function useWheelZoomPan({
 
       stopMouseWheelMotion(true);
       latest.markViewportInteraction("wheel");
+      latest.onInteractionStart();
 
       if (horizontalIntent) {
         latest.recordVerboseInteractionEvent("wheel-pan-intent");

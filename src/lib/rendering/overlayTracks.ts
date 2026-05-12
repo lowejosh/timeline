@@ -6,7 +6,6 @@ import {
 } from "../core/viewport";
 import {
   isDecorationGroupEnabled,
-  isTimelineDecorationVisibleAtZoom,
 } from "./queries/visibility";
 import {
   getAssignedOverlayLanes,
@@ -148,13 +147,17 @@ export function resolveTimelineOverlayTracks(
   const visibleOverlays: ResolvedTimelineOverlayBand[] = [];
 
   for (const { band, laneIndex } of assigned) {
-    if (
-      !isTimelineDecorationVisibleAtZoom(band, viewport.zoom) ||
-      band.endYear < visibleStart ||
-      band.startYear > visibleEnd
-    ) {
+    if (band.endYear < visibleStart || band.startYear > visibleEnd) {
       continue;
     }
+
+    // maxZoom is always respected: don't show when zoomed in past the band's limit
+    if (band.maxZoom !== undefined && viewport.zoom > band.maxZoom) {
+      continue;
+    }
+
+    // minZoom is intentionally NOT checked here: bands only disappear when they
+    // are genuinely sub-pixel on screen (handled by resolveOverlayRenderGeometry).
 
     const x0 = pad + worldToScreen(band.startYear, viewport, innerWidth);
     const x1 = pad + worldToScreen(band.endYear, viewport, innerWidth);

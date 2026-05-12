@@ -8,7 +8,6 @@ import { formatCosmicCalendarLabel } from "../cosmicCalendar";
 import {
   comparePreciseTimelineYears,
   getMinZoomForWidth,
-  getVisibleRangePrecise,
   splitTimelineYear,
   subtractPreciseTimelineYears,
   TIMELINE_MIN_YEAR,
@@ -37,9 +36,7 @@ import {
   subyearPrimaryFont,
   subyearSecondaryFont,
 } from "../constants";
-import { EARLY_UNIVERSE_BAND_EXPANSION_IDS } from "../primordial";
 import {
-  EARLY_UNIVERSE_CHILD_ERA_ORDER,
   EARLY_UNIVERSE_END_YEAR,
   EARLY_UNIVERSE_START_YEAR,
 } from "@/lib/catalog/sets/cosmic/index";
@@ -59,17 +56,9 @@ export function drawAxis(cx: CanvasDrawContext): void {
     resolvedAxisTickStates,
     breadcrumbChain,
     sceneActiveEra,
-    visibleEraLayers,
-    eraScreenSpanById,
-    primordialDetailStripSegments,
-    renderedPrimordialDetailStripSegments,
-    primordialDetailStripOpacity,
-    allowPrimordialSyntheticDetail,
-    sceneMaxZoom,
     toX,
     fromX,
     preferredAxisLabelStepRef,
-    primordialDebugSignatureRef,
     fontSans,
   } = cx;
   const axisY = layout.axisY;
@@ -198,96 +187,6 @@ export function drawAxis(cx: CanvasDrawContext): void {
     (startsAtBigBang ||
       viewportFullyInEarlyUniverse ||
       earlyUniverseOverlap / visibleSpan >= 0.75);
-
-  // --- Primordial debug logging ---
-  const [debugVisibleStart, debugVisibleEnd] = getVisibleRangePrecise(
-    sceneViewport,
-    innerWidth,
-  );
-  const debugEarlyUniverseOverlapStart = Math.max(
-    toApproximateTimelineYear(debugVisibleStart),
-    EARLY_UNIVERSE_START_YEAR,
-  );
-  const debugEarlyUniverseOverlapEnd = Math.min(
-    toApproximateTimelineYear(debugVisibleEnd),
-    EARLY_UNIVERSE_END_YEAR,
-  );
-  const debugFloatOverlapRatio =
-    Math.max(0, debugEarlyUniverseOverlapEnd - debugEarlyUniverseOverlapStart) /
-    visibleSpan;
-  const visiblePrimordialLayerIds = visibleEraLayers
-    .filter((layer) => EARLY_UNIVERSE_BAND_EXPANSION_IDS.has(layer.era.id))
-    .map((layer) => layer.era.id);
-  const primordialSpanDebug = EARLY_UNIVERSE_CHILD_ERA_ORDER.map((eraId) => {
-    const span = eraScreenSpanById.get(eraId);
-
-    return {
-      id: eraId,
-      width: span ? Number((span.x1 - span.x0).toFixed(2)) : null,
-      expanded: span?.usesVisualExpansion === true,
-    };
-  });
-  const primordialDetailStripDebug = primordialDetailStripSegments.map(
-    (segment) => ({
-      id: segment.era.id,
-      width: Number((segment.x1 - segment.x0).toFixed(2)),
-    }),
-  );
-  const renderedPrimordialDetailStripDebug =
-    renderedPrimordialDetailStripSegments.map((segment) => ({
-      id: segment.era.id,
-      width: Number((segment.x1 - segment.x0).toFixed(2)),
-    }));
-  const primordialDebugActive =
-    allowPrimordialSyntheticDetail ||
-    viewportFullyInEarlyUniverse ||
-    sceneViewport.zoom >= sceneMaxZoom - 0.01;
-
-  if (primordialDebugActive) {
-    const debugSnapshot = {
-      activeEraId: sceneActiveEra.id,
-      breadcrumbIds: breadcrumbChain.map((era) => era.id),
-      zoom: Number(sceneViewport.zoom.toFixed(6)),
-      sceneMaxZoom: Number(sceneMaxZoom.toFixed(6)),
-      zoomDeltaToMax: Number((sceneMaxZoom - sceneViewport.zoom).toFixed(6)),
-      allowPrimordialSyntheticDetail,
-      startsAtBigBang,
-      viewportFullyInEarlyUniverse,
-      useBigBangElapsedLabels,
-      edgeLabelStep,
-      fineGrainedAxisMode,
-      visibleSpanYears: Number(visibleSpan.toExponential(6)),
-      floatOverlapRatio: Number(debugFloatOverlapRatio.toFixed(6)),
-      visibleStart: {
-        wholeYear: debugVisibleStart.wholeYear,
-        fraction: Number(debugVisibleStart.fraction.toFixed(12)),
-      },
-      visibleEnd: {
-        wholeYear: debugVisibleEnd.wholeYear,
-        fraction: Number(debugVisibleEnd.fraction.toFixed(12)),
-      },
-      visiblePrimordialLayerIds,
-      primordialSpanDebug,
-      primordialDetailStripDebug,
-      renderedPrimordialDetailStripDebug,
-      primordialDetailStripOpacity: Number(
-        primordialDetailStripOpacity.toFixed(3),
-      ),
-      axisTickSteps: [
-        ...new Set(resolvedAxisTickStates.map((tick) => tick.step)),
-      ]
-        .slice(0, 8)
-        .map((step) => Number(step.toExponential(6))),
-    };
-    const nextSignature = JSON.stringify(debugSnapshot);
-
-    if (primordialDebugSignatureRef.current !== nextSignature) {
-      primordialDebugSignatureRef.current = nextSignature;
-      console.info("[timeline primordial debug]", debugSnapshot);
-    }
-  } else if (primordialDebugSignatureRef.current !== null) {
-    primordialDebugSignatureRef.current = null;
-  }
 
   // --- Axis label formatters ---
   const isCosmicCalendar = cx.isCosmicCalendarMode;

@@ -6,7 +6,6 @@ import type { ResolvedTimelineOverlayBand } from "@/lib/rendering/overlayTracks"
 import type { AnimatedOverlayBandState } from "@/lib/rendering/animation/overlayBand";
 import type { AnimatedAxisTickState } from "@/lib/rendering/animation/axisTickState";
 import type { MarkerPriorityBoostState } from "@/lib/rendering/animation/markerPriorityBoost";
-import type { AnimatedContextBandLabelState } from "@/lib/rendering/contextBands";
 import type { ExpandedOverlayLayoutResult } from "@/lib/rendering/expandedOverlayLayout";
 import type {
   TimelineCanvasLayout,
@@ -51,7 +50,6 @@ export type ExpandedOverlayExpansionState = {
 };
 
 export type CanvasDrawFrameFlags = {
-  hasActiveOverlayLabelAnimation: boolean;
   hasActivePrimordialDetailStripAnimation: boolean;
 };
 
@@ -107,10 +105,6 @@ export type CanvasDrawContext = {
   sceneMaxZoom: number;
 
   // Animation refs (mutable)
-  overlayLabelAnimationRef: RefObject<
-    Map<string, AnimatedContextBandLabelState>
-  >;
-  overlayLabelAnimationInitializedRef: RefObject<boolean>;
   markerPriorityBoostRef: RefObject<Map<string, MarkerPriorityBoostState>>;
   expandedOverlayProgressByIdRef: RefObject<Map<string, number>>;
 
@@ -118,7 +112,6 @@ export type CanvasDrawContext = {
   hoverRegions: HoverRegion[];
   overlayInteractionRegions: OverlayInteractionRegion[];
   overlayOcclusionRects: CanvasOcclusionRect[];
-  activeOverlayLabelKeys: Set<string>;
   frameFlags: CanvasDrawFrameFlags;
 
   // Coordinate helpers
@@ -131,7 +124,6 @@ export type CanvasDrawContext = {
   // Interaction state
   isViewportInteractionActive: boolean;
   preferredAxisLabelStepRef: RefObject<number | undefined>;
-  primordialDebugSignatureRef: RefObject<string | null>;
 
   // Display modes
   isCosmicCalendarMode: boolean;

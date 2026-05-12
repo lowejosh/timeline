@@ -34,7 +34,6 @@ import {
   MARKER_STEM_BOTTOM_OFFSET,
   MARKER_STEM_TO_LABEL_GAP,
   MIN_VISIBLE_OVERLAY_CHILD_WIDTH,
-  NOW_INDICATOR_TOP_OFFSET,
   OVERLAY_LANE_GAP,
   OVERLAY_LANE_HEIGHT,
   OVERLAY_PANEL_GAP,
@@ -60,8 +59,6 @@ export type TimelineCanvasLayout = {
   majorTickBottom: number;
   dateLabelY: number;
   yearLabelY: number;
-  nowTop: number;
-  nowBottom: number;
 };
 
 export type ExpandedOverlayChild = {
@@ -195,8 +192,6 @@ export function getTimelineLayout(
     majorTickBottom,
     dateLabelY,
     yearLabelY,
-    nowTop: majorTickTop - NOW_INDICATOR_TOP_OFFSET,
-    nowBottom: Math.min(majorTickBottom + 12, axisLabelTopY - 4),
   };
 }
 

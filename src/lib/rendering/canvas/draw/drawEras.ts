@@ -12,8 +12,6 @@ import {
   EARLY_UNIVERSE_COMPACT_LABEL_MIN_WIDTH_PX,
   EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX,
   EARLY_UNIVERSE_DETAIL_STRIP_LABELS,
-  EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_MIN_CANVAS_HEIGHT_PX,
-  EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_RESERVED_HEIGHT_PX,
   EARLY_UNIVERSE_EXPANDED_LABEL_FADE_WIDTH_PX,
   EARLY_UNIVERSE_EXPANDED_LABEL_MIN_WIDTH_PX,
   EARLY_UNIVERSE_INLINE_LABELS,
@@ -42,6 +40,8 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     visibleEraLayers,
     sceneViewport,
     devicePixelRatio,
+    renderedPrimordialDetailStripSegments,
+    primordialDetailStripOpacity,
   } = cx;
   const { era, opacity } = layer;
 
@@ -92,6 +92,16 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
 
   const shouldHideInlineLabel = breadcrumbChainIds.has(era.id);
   const isPrimordialEra = EARLY_UNIVERSE_BAND_EXPANSION_IDS.has(era.id);
+
+  // When the primordial detail strip is active and already labels this era,
+  // skip the inline label to avoid doubled text above and below the axis.
+  if (
+    isPrimordialEra &&
+    primordialDetailStripOpacity > 0.01 &&
+    renderedPrimordialDetailStripSegments.some((s) => s.era.id === era.id)
+  ) {
+    return;
+  }
   const visibleEraWidth = Math.max(
     Math.min(x1, sceneWidth - pad) - Math.max(x0, pad),
     0,
@@ -237,10 +247,11 @@ export function drawEras(cx: CanvasDrawContext): void {
     paintOrderedEraLayers,
     renderedPrimordialDetailStripSegments,
     primordialDetailStripOpacity,
-    sceneHeight,
     lineSoft,
     labelColor,
     hoverRegions,
+    fontSans,
+    layout,
   } = cx;
 
   for (const layer of paintOrderedEraLayers) {
@@ -251,24 +262,7 @@ export function drawEras(cx: CanvasDrawContext): void {
     renderedPrimordialDetailStripSegments.length > 0 &&
     primordialDetailStripOpacity > 0.01
   ) {
-    const stripPanelPaddingTop = 14;
-    const stripPanelPaddingBottom = 6;
-    const overviewReservedHeight =
-      sceneHeight >= EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_MIN_CANVAS_HEIGHT_PX
-        ? EARLY_UNIVERSE_DETAIL_STRIP_OVERVIEW_RESERVED_HEIGHT_PX
-        : 0;
-    const stripPanelTop =
-      sceneHeight -
-      overviewReservedHeight -
-      (EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX +
-        stripPanelPaddingTop +
-        stripPanelPaddingBottom);
-    const stripPanelHeight =
-      EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX +
-      stripPanelPaddingTop +
-      stripPanelPaddingBottom;
-    const stripBottomY =
-      stripPanelTop + stripPanelHeight - stripPanelPaddingBottom;
+    const stripBottomY = layout.majorTickTop - 2;
     const stripTopY = stripBottomY - EARLY_UNIVERSE_DETAIL_STRIP_HEIGHT_PX;
     const stripLabelBaselineY = stripTopY - 3;
 
@@ -323,7 +317,7 @@ export function drawEras(cx: CanvasDrawContext): void {
           id: `era:detail-strip:${segment.era.id}`,
           left: segment.x0,
           right: segment.x1,
-          top: stripPanelTop,
+          top: stripLabelBaselineY - 10,
           bottom: stripBottomY + 4,
           anchorX: segment.x0 + segmentWidth / 2,
           anchorY: stripTopY - 2,

@@ -9,12 +9,7 @@ import {
   screenToWorldPrecise,
   worldToScreen,
 } from "@/lib/core/viewport";
-import type { AnimatedContextBandLabelState } from "@/lib/rendering/contextBands";
-import {
-  getInteractiveDescendantEras,
-  getPreviewFocusChain,
-  resolveTimelineEraLayersFromOpacityMap,
-} from "@/lib/rendering/childLayers";
+import type { AnimatedEraChildState } from "../animation/useEraChildAnimation";
 import { resolveExpandedOverlayLayout } from "@/lib/rendering/expandedOverlayLayout";
 import {
   drawBackground,
@@ -23,7 +18,6 @@ import { drawEras } from "@/lib/rendering/canvas/draw/drawEras";
 import { drawOverlays } from "@/lib/rendering/canvas/draw/drawOverlays";
 import { drawAxis } from "@/lib/rendering/canvas/draw/drawAxis";
 import { drawMarkers } from "@/lib/rendering/canvas/draw/drawMarkers";
-import { drawNowIndicator } from "@/lib/rendering/canvas/draw/drawNowIndicator";
 import type {
   CanvasDrawContext,
   HoverRegion,
@@ -68,7 +62,11 @@ import type {
 import type {
   TimelineCanvasScene,
 } from "../model/TimelineCanvas.types";
-import type { AnimatedEraChildState } from "../animation/useEraChildAnimation";
+import {
+  getInteractiveDescendantEras,
+  getPreviewFocusChain,
+  resolveTimelineEraLayersFromOpacityMap,
+} from "@/lib/rendering/childLayers";
 
 type LastPointerState = {
   x: number;
@@ -92,12 +90,7 @@ export type TimelineCanvasFrameRefs = {
   markerPriorityBoostRef: RefObject<Map<string, MarkerPriorityBoostState>>;
   overlayBandAnimationRef: RefObject<Map<string, AnimatedOverlayBandState>>;
   overlayInteractionRegionsRef: MutableRefObject<OverlayInteractionRegion[]>;
-  overlayLabelAnimationInitializedRef: MutableRefObject<boolean>;
-  overlayLabelAnimationRef: MutableRefObject<
-    Map<string, AnimatedContextBandLabelState>
-  >;
   preferredAxisLabelStepRef: MutableRefObject<number | undefined>;
-  primordialDebugSignatureRef: MutableRefObject<string | null>;
   primordialDetailStripAnimationRef: MutableRefObject<
     PrimordialDetailStripAnimationState
   >;
@@ -459,18 +452,13 @@ export function drawTimelineCanvasFrame({
     primordialDetailStripOpacity,
     allowPrimordialSyntheticDetail,
     sceneMaxZoom,
-    overlayLabelAnimationRef: frameRefs.overlayLabelAnimationRef,
-    overlayLabelAnimationInitializedRef:
-      frameRefs.overlayLabelAnimationInitializedRef,
     markerPriorityBoostRef: frameRefs.markerPriorityBoostRef,
     expandedOverlayProgressByIdRef:
       frameRefs.expandedOverlayProgressByIdRef,
     hoverRegions: [],
     overlayInteractionRegions: [],
     overlayOcclusionRects: [],
-    activeOverlayLabelKeys: new Set<string>(),
     frameFlags: {
-      hasActiveOverlayLabelAnimation: false,
       hasActivePrimordialDetailStripAnimation,
     },
     toX,
@@ -478,7 +466,6 @@ export function drawTimelineCanvasFrame({
     markPerf,
     isViewportInteractionActive,
     preferredAxisLabelStepRef: frameRefs.preferredAxisLabelStepRef,
-    primordialDebugSignatureRef: frameRefs.primordialDebugSignatureRef,
     isCosmicCalendarMode,
   };
 
@@ -491,15 +478,7 @@ export function drawTimelineCanvasFrame({
   markPerf("axisMs");
   const resolvedMarkerStates = drawMarkers(cx);
   markPerf("markerMs");
-  drawNowIndicator(cx);
 
-  for (const key of [...frameRefs.overlayLabelAnimationRef.current.keys()]) {
-    if (!cx.activeOverlayLabelKeys.has(key)) {
-      frameRefs.overlayLabelAnimationRef.current.delete(key);
-    }
-  }
-
-  frameRefs.overlayLabelAnimationInitializedRef.current = true;
   frameRefs.hoverRegionsRef.current = cx.hoverRegions;
   frameRefs.overlayInteractionRegionsRef.current =
     cx.overlayInteractionRegions;
@@ -584,7 +563,6 @@ export function drawTimelineCanvasFrame({
 
   return {
     hasActiveFrameAnimation:
-      cx.frameFlags.hasActiveOverlayLabelAnimation ||
       cx.frameFlags.hasActivePrimordialDetailStripAnimation,
   };
 }

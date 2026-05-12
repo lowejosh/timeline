@@ -1,11 +1,4 @@
 import { clamp01, smoothstep01 } from "@/lib/core/easing";
-import {
-  isAnimatedContextBandLabelStateActive,
-  resolveAnimatedContextBandLabelLayers,
-  resolveContextBandLabelVariant,
-  stepAnimatedContextBandLabelState,
-  syncAnimatedContextBandLabelState,
-} from "@/lib/rendering/contextBands";
 import { resolveOverlayLabelHoverBounds } from "@/lib/rendering/overlayLabelHover";
 import {
   drawOverlayGroupIcon,
@@ -33,8 +26,6 @@ import { getExpandedOverlayPanelBounds } from "@/lib/rendering/expandedOverlayLa
 import { parseColor, toCssColor, withAlpha } from "../colors";
 import {
   canExpandOverlayParent,
-  CONTEXT_BAND_LABEL_TRANSITION_DURATION_MS,
-  EXPANDED_OVERLAY_CHILD_BORDER_ALPHA,
   EXPANDED_OVERLAY_CHILD_SLIDE_PX,
   EXPANDED_OVERLAY_CONNECTOR_ALPHA,
   EXPANDED_OVERLAY_CONNECTOR_LINE_WIDTH,
@@ -52,8 +43,7 @@ import {
 import type { TimelineTooltipContent } from "@/lib/app/tooltipModel";
 import type { CanvasDrawContext } from "./drawContext";
 
-type DrawAnimatedOverlayLabelParams = {
-  key: string;
+type DrawOverlayLabelParams = {
   fullLabel: string;
   shortLabel: string;
   renderX: number;
@@ -67,12 +57,11 @@ type DrawAnimatedOverlayLabelParams = {
   tooltip?: TimelineTooltipContent;
 };
 
-function drawAnimatedOverlayLabel(
-  params: DrawAnimatedOverlayLabelParams,
+function drawOverlayLabel(
+  params: DrawOverlayLabelParams,
   cx: CanvasDrawContext,
 ): void {
   const {
-    key,
     fullLabel,
     shortLabel,
     renderX,
@@ -85,76 +74,38 @@ function drawAnimatedOverlayLabel(
     hoverId,
     tooltip,
   } = params;
-  const {
-    context,
-    drawNow,
-    overlayLabelAnimationRef,
-    overlayLabelAnimationInitializedRef,
-    activeOverlayLabelKeys,
-    frameFlags,
-    hoverRegions,
-    fontSans,
-  } = cx;
+  const { context, hoverRegions, fontSans } = cx;
 
-  const overlayLabelAnimationStates = overlayLabelAnimationRef.current;
   const contentLeft = renderX + labelLeftInset;
   const contentRight = renderX + renderWidth - labelRightInset;
   const contentWidth = Math.max(contentRight - contentLeft, 0);
 
   context.font = `11px ${fontSans}`;
   const fullLabelWidth = context.measureText(fullLabel).width;
-  const hasDistinctShortLabel = shortLabel !== fullLabel;
-  const shortLabelWidth = !hasDistinctShortLabel
-    ? fullLabelWidth
-    : context.measureText(shortLabel).width;
-  const existingState = overlayLabelAnimationStates.get(key);
-  const steppedExistingState = existingState
-    ? stepAnimatedContextBandLabelState(existingState, drawNow)
-    : undefined;
-  const currentVariant = steppedExistingState?.toVariant ?? "hidden";
-  const nextVariant = resolveContextBandLabelVariant({
-    availableWidth: contentWidth,
-    fullLabelWidth,
-    shortLabelWidth,
-    currentVariant,
-    hasDistinctShortLabel,
-  });
-  const nextState = syncAnimatedContextBandLabelState({
-    existing: steppedExistingState,
-    nextVariant,
-    now: drawNow,
-    duration: CONTEXT_BAND_LABEL_TRANSITION_DURATION_MS,
-    hasInitialized: overlayLabelAnimationInitializedRef.current,
-  });
-  const layers = resolveAnimatedContextBandLabelLayers(nextState, drawNow)
-    .map((layer) => ({
-      ...layer,
-      text: layer.variant === "full" ? fullLabel : shortLabel,
-      width: layer.variant === "full" ? fullLabelWidth : shortLabelWidth,
-    }))
-    .filter((layer) => layer.opacity > 0.01);
 
-  overlayLabelAnimationStates.set(key, nextState);
-  activeOverlayLabelKeys.add(key);
+  let text: string;
+  let textWidth: number;
 
-  if (isAnimatedContextBandLabelStateActive(nextState, drawNow)) {
-    frameFlags.hasActiveOverlayLabelAnimation = true;
+  if (fullLabelWidth <= contentWidth) {
+    text = fullLabel;
+    textWidth = fullLabelWidth;
+  } else if (shortLabel !== fullLabel) {
+    const shortLabelWidth = context.measureText(shortLabel).width;
+
+    if (shortLabelWidth <= contentWidth) {
+      text = shortLabel;
+      textWidth = shortLabelWidth;
+    } else {
+      return;
+    }
+  } else {
+    return;
   }
 
-  const dominantLayer = layers.reduce<{
-    variant: "short" | "full";
-    opacity: number;
-    text: string;
-    width: number;
-  } | null>(
-    (best, layer) => (!best || layer.opacity > best.opacity ? layer : best),
-    null,
-  );
-
-  if (dominantLayer && hoverId && tooltip) {
+  if (hoverId && tooltip) {
     const hoverBounds = resolveOverlayLabelHoverBounds({
       centerX: contentLeft + contentWidth / 2,
-      labelWidth: dominantLayer.width,
+      labelWidth: textWidth,
       bandLeft: contentLeft,
       bandRight: contentRight,
       bandTop: y,
@@ -175,19 +126,13 @@ function drawAnimatedOverlayLabel(
     });
   }
 
-  for (const layer of layers) {
-    context.save();
-    context.fillStyle = fillStyle;
-    context.globalAlpha = alpha * layer.opacity;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillText(
-      layer.text,
-      contentLeft + contentWidth / 2,
-      y + OVERLAY_LANE_HEIGHT / 2,
-    );
-    context.restore();
-  }
+  context.save();
+  context.fillStyle = fillStyle;
+  context.globalAlpha = alpha;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(text, contentLeft + contentWidth / 2, y + OVERLAY_LANE_HEIGHT / 2);
+  context.restore();
 }
 
 type DrawAnimatedOverlayDisclosureIndicatorParams = {
@@ -234,7 +179,6 @@ export function drawOverlays(cx: CanvasDrawContext): void {
     layout,
     labelColor,
     paper,
-    lineSoft,
     overlayInteractionRegions,
     overlayOcclusionRects,
     expandedOverlayProgressByIdRef,
@@ -308,8 +252,6 @@ export function drawOverlays(cx: CanvasDrawContext): void {
           overlayBandOpacity *
           overlay.renderAlphaMultiplier *
           overlayState.currentOpacity,
-        borderStyle: lineSoft,
-        drawBorder: !overlay.isHairline,
       });
 
       const iconLayout = resolveOverlayGroupIconLayout({
@@ -335,9 +277,8 @@ export function drawOverlays(cx: CanvasDrawContext): void {
 
       const fullLabel = overlay.band.label;
       const shortLabel = overlay.band.shortLabel ?? fullLabel;
-      drawAnimatedOverlayLabel(
+      drawOverlayLabel(
         {
-          key: `overlay:${overlay.band.id}`,
           fullLabel,
           shortLabel,
           renderX: overlay.renderX,
@@ -412,9 +353,6 @@ export function drawOverlays(cx: CanvasDrawContext): void {
     };
     const connectorStroke = toCssColor(
       withAlpha(parentColor, EXPANDED_OVERLAY_CONNECTOR_ALPHA),
-    );
-    const childBorder = toCssColor(
-      withAlpha(parentColor, EXPANDED_OVERLAY_CHILD_BORDER_ALPHA),
     );
     const connectorGeometry = resolveExpandedOverlayConnectorGeometry(
       expandedOverlayDetail.children,
@@ -569,8 +507,6 @@ export function drawOverlays(cx: CanvasDrawContext): void {
         height: OVERLAY_LANE_HEIGHT,
         bandColor: child.band.color,
         alpha: childBandOpacity * childReveal,
-        borderStyle: childBorder,
-        drawBorder: true,
       });
 
       const childIconLayout = resolveOverlayGroupIconLayout({
@@ -597,9 +533,8 @@ export function drawOverlays(cx: CanvasDrawContext): void {
       const shortLabel = child.band.shortLabel ?? fullLabel;
 
       if (childLabelReveal > 0.01) {
-        drawAnimatedOverlayLabel(
+        drawOverlayLabel(
           {
-            key: `overlay:${child.band.id}`,
             fullLabel,
             shortLabel,
             renderX,

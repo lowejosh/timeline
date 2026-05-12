@@ -15,9 +15,15 @@ type TimelineTooltipProps = {
   width: number;
 };
 
+let cachedSafeViewportInsets: { top: number; right: number; bottom: number; left: number } | null = null;
+
 function getSafeViewportInsets() {
   if (typeof window === "undefined") {
     return { top: 0, right: 0, bottom: 0, left: 0 };
+  }
+
+  if (cachedSafeViewportInsets) {
+    return cachedSafeViewportInsets;
   }
 
   const rootStyles = getComputedStyle(document.documentElement);
@@ -31,7 +37,7 @@ function getSafeViewportInsets() {
   const viewportHeight = visualViewport?.height ?? window.innerHeight;
   const viewportWidth = visualViewport?.width ?? window.innerWidth;
 
-  return {
+  cachedSafeViewportInsets = {
     top: Math.max(readInset("--safe-area-top"), viewportTop) + 10,
     right:
       Math.max(
@@ -45,6 +51,11 @@ function getSafeViewportInsets() {
       ) + 10,
     left: Math.max(readInset("--safe-area-left"), viewportLeft) + 10,
   };
+
+  // Invalidate on resize
+  window.addEventListener("resize", () => { cachedSafeViewportInsets = null; }, { once: true });
+
+  return cachedSafeViewportInsets;
 }
 
 function getTooltipStyle({
@@ -118,11 +129,11 @@ export function TimelineTooltip({
   return (
     <div
       className={cn(
-        "absolute z-[2] rounded-lg border border-border bg-glass p-3 text-foreground shadow-glass backdrop-blur-md transition-[opacity,filter,transform] duration-200 ease-out will-change-[transform,opacity,filter]",
+        "absolute z-[2] rounded-lg border border-border bg-glass p-3 text-foreground shadow-glass backdrop-blur-md transition-[opacity,transform] duration-200 ease-out",
         "pointer-events-none",
         renderedTooltip.phase === "present"
-          ? "opacity-100 blur-0"
-          : "opacity-0 blur-[1.5px]",
+          ? "opacity-100"
+          : "opacity-0 will-change-[transform,opacity]",
       )}
       data-phase={renderedTooltip.phase}
       style={getTooltipStyle({ height, renderedTooltip, width })}

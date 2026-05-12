@@ -6,7 +6,6 @@ import {
   type PointerEvent,
 } from "react";
 
-import type { AnimatedContextBandLabelState } from "@/lib/rendering/contextBands";
 import { useExpandedOverlayAnimation } from "./animation/useExpandedOverlayAnimation";
 import { useOverlayBandAnimation } from "./animation/useOverlayBandAnimation";
 import { useMarkerPriorityBoost } from "./animation/useMarkerPriorityBoost";
@@ -126,6 +125,7 @@ export function TimelineCanvas({
   const overlayInteractionRegionsRef = useRef<OverlayInteractionRegion[]>([]);
   const hoveredTooltipRef = useRef<HoveredTooltipState | null>(null);
   const isTouchTooltipPinnedRef = useRef(false);
+  const suppressTooltipUntilMoveRef = useRef(false);
   const tooltipExitTimeoutRef = useRef<number | null>(null);
   const tooltipEnterFrameRef = useRef(0);
   const lastPointerRef = useRef<{
@@ -134,11 +134,6 @@ export function TimelineCanvas({
     pointerType: string;
   } | null>(null);
   const preferredAxisLabelStepRef = useRef<number | undefined>(undefined);
-  const overlayLabelAnimationRef = useRef<
-    Map<string, AnimatedContextBandLabelState>
-  >(new Map());
-  const overlayLabelAnimationInitializedRef = useRef(false);
-  const primordialDebugSignatureRef = useRef<string | null>(null);
   const primordialDetailStripAnimationRef = useRef<{
     opacity: number;
     target: number;
@@ -375,10 +370,7 @@ export function TimelineCanvas({
           markerPriorityBoostRef,
           overlayBandAnimationRef,
           overlayInteractionRegionsRef,
-          overlayLabelAnimationInitializedRef,
-          overlayLabelAnimationRef,
           preferredAxisLabelStepRef,
-          primordialDebugSignatureRef,
           primordialDetailStripAnimationRef,
           renderedExpandedOverlayIdsRef,
         },
@@ -500,6 +492,11 @@ export function TimelineCanvas({
     onContinuousViewportChange,
     onViewportGestureStart,
     onViewportGestureEnd,
+    onInteractionStart: () => {
+      lastPointerRef.current = null;
+      commitHoveredTooltip(null);
+      suppressTooltipUntilMoveRef.current = true;
+    },
     recordVerboseInteractionEvent,
     markViewportInteraction,
   });
@@ -881,6 +878,11 @@ export function TimelineCanvas({
     }
 
     isTouchTooltipPinnedRef.current = false;
+
+    if (suppressTooltipUntilMoveRef.current) {
+      suppressTooltipUntilMoveRef.current = false;
+      return;
+    }
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
