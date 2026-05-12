@@ -3,7 +3,7 @@ import type { useTimelineAppState } from "@/hooks/useTimelineAppState";
 
 import { TimelineOverviewRulerStack } from "@/components/TimelineOverviewRuler/TimelineOverviewRulerStack";
 import { TIMELINE_APP_LAYOUT } from "@/lib/app/layout";
-import { TimelineCanvas } from "@/components/TimelineCanvas";
+import { TimelineCanvas } from "@/features/timeline-viewer/canvas";
 
 type TimelineAppLayoutState = ReturnType<typeof getTimelineAppLayoutState>;
 type TimelineAppState = ReturnType<typeof useTimelineAppState>;

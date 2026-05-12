@@ -139,6 +139,51 @@ export const TIMELINE_SET_ID_BY_FAMILY_ID = new Map(
   ),
 );
 
+export const TIMELINE_SET_ID_BY_GROUP_ID = new Map(
+  TIMELINE_SETS.flatMap((set) =>
+    set.groups.map((group) => [group.id, set.metadata.id] as const),
+  ),
+);
+
 export const TIMELINE_OVERLAY_LANE_BIAS_YEARS = Object.fromEntries(
   TIMELINE_SETS.flatMap((set) => Object.entries(set.overlayLaneBias)),
 ) as Readonly<Record<string, number>>;
+
+function visitTimelineOverlayBands(
+  overlays: readonly TimelineOverlayBand[],
+  visitor: (overlay: TimelineOverlayBand) => void,
+) {
+  for (const overlay of overlays) {
+    visitor(overlay);
+
+    if (overlay.children?.length) {
+      visitTimelineOverlayBands(overlay.children, visitor);
+    }
+  }
+}
+
+export const TIMELINE_SET_SPAN_PRIORITY_BY_ID: ReadonlyMap<
+  TimelineSetId,
+  { startYear: number; endYear: number; priority: number }
+> = new Map(
+  TIMELINE_SETS.map((set) => {
+    const spans = set.families.map((family) => family.root);
+    let startYear = Math.min(...spans.map((span) => span.startYear));
+    let endYear = Math.max(...spans.map((span) => span.endYear));
+    const priority = Math.max(
+      ...set.families.map((family) => family.priority),
+    );
+
+    for (const marker of set.markers) {
+      startYear = Math.min(startYear, marker.year);
+      endYear = Math.max(endYear, marker.year);
+    }
+
+    visitTimelineOverlayBands(set.overlays, (overlay) => {
+      startYear = Math.min(startYear, overlay.startYear);
+      endYear = Math.max(endYear, overlay.endYear);
+    });
+
+    return [set.metadata.id, { startYear, endYear, priority }] as const;
+  }),
+);

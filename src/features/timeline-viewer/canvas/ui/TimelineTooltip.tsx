@@ -1,7 +1,7 @@
 import type { CSSProperties, RefObject } from "react";
 
 import type { RenderedTooltipState } from "@/lib/rendering/canvas/tooltip";
-import { OverlayGroupIconSvg } from "@/components/TimelineCanvas/components/OverlayGroupIconSvg";
+import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
 import {
   TOOLTIP_MAX_WIDTH,
   TOOLTIP_OFFSET,

@@ -50,7 +50,8 @@ import {
   filterOverlaysBySets,
   getSetIdForEraFamily,
   normalizeTimelineSetOrder,
-  TIMELINE_SETS,
+  TIMELINE_SET_ID_BY_GROUP_ID,
+  TIMELINE_SET_SPAN_PRIORITY_BY_ID,
 } from "../lib/catalog/timelineSets";
 import {
   isTimelineLayerAutoToggleEnabled,
@@ -63,22 +64,8 @@ import {
   worldToScreen,
   type TimelineViewport,
 } from "../lib/core/viewport";
-import type { TimelineOverlayBand } from "../lib/core/timelineTypes";
 
 type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
-
-function visitTimelineOverlayBands(
-  overlays: readonly TimelineOverlayBand[],
-  visitor: (overlay: TimelineOverlayBand) => void,
-) {
-  for (const overlay of overlays) {
-    visitor(overlay);
-
-    if (overlay.children?.length) {
-      visitTimelineOverlayBands(overlay.children, visitor);
-    }
-  }
-}
 
 const HUMAN_EVOLUTION_GROUP_ID =
   TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
@@ -155,42 +142,6 @@ export function useTimelineAppState() {
       ),
     [],
   );
-  const autoToggleSetIdByGroupId = useMemo(
-    () =>
-      new Map(
-        TIMELINE_SETS.flatMap((set) =>
-          set.groups.map((group) => [group.id, set.metadata.id] as const),
-        ),
-      ),
-    [],
-  );
-  const timelineSetSpanPriorityById = useMemo(
-    () =>
-      new Map(
-        TIMELINE_SETS.map((set) => {
-          const spans = set.families.map((family) => family.root);
-          let startYear = Math.min(...spans.map((span) => span.startYear));
-          let endYear = Math.max(...spans.map((span) => span.endYear));
-          const priority = Math.max(
-            ...set.families.map((family) => family.priority),
-          );
-
-          for (const marker of set.markers) {
-            startYear = Math.min(startYear, marker.year);
-            endYear = Math.max(endYear, marker.year);
-          }
-
-          visitTimelineOverlayBands(set.overlays, (overlay) => {
-            startYear = Math.min(startYear, overlay.startYear);
-            endYear = Math.max(endYear, overlay.endYear);
-          });
-
-          return [set.metadata.id, { startYear, endYear, priority }] as const;
-        }),
-      ),
-    [],
-  );
-
   const viewportRef = useRef(animated.viewport);
   const viewportWidthRef = useRef(viewportWidth);
   useEffect(() => {
@@ -299,7 +250,7 @@ export function useTimelineAppState() {
     );
     const visibleSetSpanPriorities = new Map<string, number>();
 
-    for (const [setId, span] of timelineSetSpanPriorityById) {
+    for (const [setId, span] of TIMELINE_SET_SPAN_PRIORITY_BY_ID) {
       if (
         visibleSetIds.has(setId) &&
         span.startYear <= visibleEnd &&
@@ -314,7 +265,6 @@ export function useTimelineAppState() {
     animated.viewport,
     canvasPad,
     innerWidth,
-    timelineSetSpanPriorityById,
     viewportWidth,
     visibleSetIds,
   ]);
@@ -330,7 +280,7 @@ export function useTimelineAppState() {
 
       const comparisonPriority =
         ownerPriority ??
-        timelineSetSpanPriorityById.get(ownerSetId)?.priority;
+        TIMELINE_SET_SPAN_PRIORITY_BY_ID.get(ownerSetId)?.priority;
 
       if (comparisonPriority === undefined) {
         return false;
@@ -344,7 +294,7 @@ export function useTimelineAppState() {
 
       return false;
     },
-    [autoToggleVisibleSetSpanPriorities, timelineSetSpanPriorityById],
+    [autoToggleVisibleSetSpanPriorities],
   );
 
   const autoHiddenOverlayIds = useMemo(
@@ -405,7 +355,7 @@ export function useTimelineAppState() {
         groupId,
         autoToggleVisibleOverlayGroupIds,
         hasHigherPrioritySetSpanVisible(
-          autoToggleSetIdByGroupId.get(groupId),
+          TIMELINE_SET_ID_BY_GROUP_ID.get(groupId),
         ),
       );
       const nextSuppressed = isAutoToggleEnabled
@@ -439,7 +389,6 @@ export function useTimelineAppState() {
   }, [
     animated.viewport,
     autoSuppressedGroupIds,
-    autoToggleSetIdByGroupId,
     autoToggleRulesByGroupId,
     autoToggleVisibleOverlayGroupIds,
     autoToggleVisibleGroupIds,

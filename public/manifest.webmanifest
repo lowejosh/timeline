@@ -2,14 +2,14 @@
   "name": "Timeline",
   "short_name": "Timeline",
   "description": "An interactive educational timeline.",
-  "start_url": "/timeline/",
-  "scope": "/timeline/",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#f4ecdd",
   "theme_color": "#f4ecdd",
   "icons": [
     {
-      "src": "/timeline/favicon.svg",
+      "src": "favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

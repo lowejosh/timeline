@@ -1,6 +1,6 @@
 import type { ResolvedTimelineOverlayBand } from "@/lib/rendering/overlayTracks";
 import type { TimelineViewport } from "@/lib/core/viewport";
-import type { EdgeRailSide } from "./utils/edgeInteraction";
+import type { EdgeRailSide } from "../interactions/edgeInteraction";
 import type {
   Era,
   TimelineMarker,

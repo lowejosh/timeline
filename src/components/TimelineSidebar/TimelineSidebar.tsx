@@ -10,7 +10,7 @@ import {
 } from "react";
 import { createPortal, flushSync } from "react-dom";
 
-import { OverlayGroupIconSvg } from "@/components/TimelineCanvas/components/OverlayGroupIconSvg";
+import { OverlayGroupIconSvg } from "@/features/timeline-viewer/canvas";
 import { computeEraObscuredCounts } from "@/lib/catalog/timelineSetMetrics";
 import { useGlobalPointerDrag } from "@/hooks/useGlobalPointerDrag";
 import {

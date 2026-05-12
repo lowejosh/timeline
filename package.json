@@ -6,10 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:local": "VITE_BASE_PATH=/ npm run build",
+    "build:report": "npm run build && npm run perf:bundle",
     "lint": "eslint .",
+    "perf:bundle": "node scripts/bundle-report.mjs",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
-    "preview": "vite preview"
+    "preview": "npm run build:local && vite preview --host 127.0.0.1",
+    "preview:deploy": "npm run build && vite preview --host 127.0.0.1"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.4",

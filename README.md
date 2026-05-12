@@ -1,73 +1,60 @@
-# React + TypeScript + Vite
+# Timeline
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive deep-time timeline built with React, TypeScript, Vite, and canvas.
 
-Currently, two official plugins are available:
+## Commands
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+npm run dev
+npm run build
+npm run build:report
+npm run lint
+npm run preview
+npm run test
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Performance Tracking
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Use `npm run build:report` after performance-sensitive changes. It builds the
+app and prints raw, gzip, and brotli sizes for initial and async chunks.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Optional CI-style budgets can be enabled with environment variables:
+
+```sh
+BUNDLE_INITIAL_GZIP_BUDGET_KB=180 npm run build:report
+BUNDLE_TOTAL_GZIP_BUDGET_KB=250 npm run build:report
 ```
+
+For runtime canvas profiling, run `npm run preview` and open the app with:
+
+```text
+http://127.0.0.1:4173/?timelinePerf=1
+```
+
+Then switch the query string as needed:
+
+```text
+?timelinePerf=1
+?timelinePerf=verbose
+```
+
+`timelinePerf=1` logs slow frames and rolling draw summaries. `verbose` adds
+interaction, scene publish, and label stability diagnostics. You can also set
+`localStorage.timelinePerf` to `1` or `verbose`.
+
+Recommended manual profiling loop:
+
+1. Open DevTools console.
+2. Load `http://127.0.0.1:4173/?timelinePerf=1`.
+3. Pan, zoom, drill into eras, expand overlays, and test mobile-sized viewport.
+4. Compare `avgTotalMs`, `slowFrames`, visible marker counts, overlay counts,
+   and axis tick counts before and after changes.
+5. Use Chrome Performance recordings for suspicious scenarios and correlate
+   long tasks with the console frame summaries.
+
+## Architecture Notes
+
+The timeline viewer canvas lives under
+`src/features/timeline-viewer/canvas`. Public imports should use
+`@/features/timeline-viewer/canvas`; internal rendering, scene, interaction,
+animation, UI, platform, and model concerns stay inside that feature boundary.

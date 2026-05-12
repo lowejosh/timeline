@@ -1,6 +1,6 @@
 import type { CSSProperties, PointerEvent } from "react";
 
-import type { EdgeRailSide } from "../utils/edgeInteraction";
+import type { EdgeRailSide } from "../interactions/edgeInteraction";
 
 type EdgeZoomZonesProps = {
   draggingSide: EdgeRailSide | null;

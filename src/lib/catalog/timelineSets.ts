@@ -1,5 +1,7 @@
 import {
   TIMELINE_SET_ID_BY_FAMILY_ID,
+  TIMELINE_SET_ID_BY_GROUP_ID,
+  TIMELINE_SET_SPAN_PRIORITY_BY_ID,
   TIMELINE_SETS,
   TIMELINE_SETS_BY_ID,
 } from "./timelineRegistry";
@@ -226,4 +228,9 @@ export function filterOverlaysBySets(
   );
 }
 
-export { TIMELINE_SETS, TIMELINE_SETS_BY_ID };
+export {
+  TIMELINE_SETS,
+  TIMELINE_SETS_BY_ID,
+  TIMELINE_SET_ID_BY_GROUP_ID,
+  TIMELINE_SET_SPAN_PRIORITY_BY_ID,
+};

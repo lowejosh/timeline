@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import type { Era } from "@/lib/catalog/eras";
 import type { TimelineViewport } from "@/lib/core/viewport";
 import { getEraChildOpacityTarget } from "@/lib/rendering/childLayers";
@@ -21,7 +21,7 @@ export function useEraChildAnimation(
   width: number,
   pad: number,
   isAnimating: boolean,
-  isViewportInteractionActive: boolean,
+  isViewportInteractionActiveRef: RefObject<boolean>,
   invalidateCanvas: (reason?: string) => void,
 ): React.RefObject<Map<string, AnimatedEraChildState>> {
   const animationRef = useRef<Map<string, AnimatedEraChildState>>(new Map());
@@ -72,7 +72,7 @@ export function useEraChildAnimation(
     visit(siblingEras);
 
     for (const [eraId, state] of [...animationStates.entries()]) {
-      if (!activeIds.has(eraId) && isViewportInteractionActive) {
+      if (!activeIds.has(eraId) && isViewportInteractionActiveRef.current) {
         animationStates.delete(eraId);
       } else if (!activeIds.has(eraId) && state.target !== 0) {
         animationStates.set(eraId, {
@@ -161,7 +161,7 @@ export function useEraChildAnimation(
     activeEraId,
     invalidateCanvas,
     isAnimating,
-    isViewportInteractionActive,
+    isViewportInteractionActiveRef,
     pad,
     siblingEras,
     viewport,
