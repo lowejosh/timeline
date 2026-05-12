@@ -34,8 +34,8 @@ import {
   AXIS_LABEL_OCCUPIED_PADDING,
   CALENDAR_DAY_STEP,
   EDGE_AXIS_LABEL_SNAP_TOLERANCE_PX,
-  SUBYEAR_PRIMARY_FONT,
-  SUBYEAR_SECONDARY_FONT,
+  subyearPrimaryFont,
+  subyearSecondaryFont,
 } from "../constants";
 import { EARLY_UNIVERSE_BAND_EXPANSION_IDS } from "../primordial";
 import {
@@ -70,8 +70,11 @@ export function drawAxis(cx: CanvasDrawContext): void {
     fromX,
     preferredAxisLabelStepRef,
     primordialDebugSignatureRef,
+    fontSans,
   } = cx;
   const axisY = layout.axisY;
+  const SUBYEAR_PRIMARY_FONT = subyearPrimaryFont(fontSans);
+  const SUBYEAR_SECONDARY_FONT = subyearSecondaryFont(fontSans);
 
   // --- Breadcrumb ---
   {
@@ -83,8 +86,8 @@ export function drawAxis(cx: CanvasDrawContext): void {
     const trailText = trailLabel ? ` • ${trailLabel}` : "";
     const breadcrumbFont =
       breadcrumbChain.length > 1
-        ? "600 14px var(--font-sans)"
-        : "500 13px var(--font-sans)";
+        ? `600 14px ${fontSans}`
+        : `500 13px ${fontSans}`;
 
     context.save();
     context.font = breadcrumbFont;
@@ -447,7 +450,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
       }
     } else {
       context.globalAlpha = 1;
-      context.font = "11px var(--font-sans)";
+      context.font = `11px ${fontSans}`;
       context.fillText(
         formatAxisLabel(year, edgeLabelStep),
         x,
@@ -512,7 +515,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
       : (() => {
           context.font = useCalendarSubYearAxis
             ? SUBYEAR_PRIMARY_FONT
-            : "13px var(--font-sans)";
+            : `13px ${fontSans}`;
 
           return context.measureText(labelText).width;
         })();
@@ -622,7 +625,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
       : (() => {
           context.font = useCalendarSubYearAxis
             ? SUBYEAR_PRIMARY_FONT
-            : "13px var(--font-sans)";
+            : `13px ${fontSans}`;
 
           return context.measureText(edgeLabel.text).width;
         })();
@@ -681,7 +684,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
         context.fillText(label.text, label.x, layout.yearLabelY);
       }
     } else {
-      context.font = "13px var(--font-sans)";
+      context.font = `13px ${fontSans}`;
       context.fillText(label.text, label.x, layout.yearLabelY);
     }
 
@@ -690,7 +693,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
 
   // --- Year boundary labels (calendar sub-year mode) ---
   if (useCalendarSubYearAxis && edgeLabelStep >= CALENDAR_DAY_STEP) {
-    context.font = "11px var(--font-sans)";
+    context.font = `11px ${fontSans}`;
 
     const firstVisibleYear = Math.ceil(edgeLeftYear);
     const lastVisibleYear = Math.floor(edgeRightYear);
@@ -770,7 +773,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
     )) {
       context.save();
       context.globalAlpha = label.alpha;
-      context.font = "11px var(--font-sans)";
+      context.font = `11px ${fontSans}`;
       context.fillText(label.text, label.x, layout.yearLabelY);
       context.restore();
     }

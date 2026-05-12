@@ -21,6 +21,7 @@ export function drawMarkers(
     labelColor,
     hoverRegions,
     markerPriorityBoostRef,
+    fontSans,
   } = cx;
   const axisY = layout.axisY;
 
@@ -34,13 +35,13 @@ export function drawMarkers(
     _marker: (typeof sceneVisibleMarkers)[number],
     { fullLabel, shortLabel, dateLabel }: MarkerTextMeasureInput,
   ) => {
-    context.font = "12px var(--font-sans)";
+    context.font = `12px ${fontSans}`;
     const fullLabelWidth = context.measureText(fullLabel).width;
     const shortLabelWidth =
       shortLabel === fullLabel
         ? fullLabelWidth
         : context.measureText(shortLabel).width;
-    context.font = "10px var(--font-sans)";
+    context.font = `10px ${fontSans}`;
 
     return {
       fullLabelWidth,
@@ -146,13 +147,13 @@ export function drawMarkers(
     }
 
     context.save();
-    context.font = "12px var(--font-sans)";
+    context.font = `12px ${fontSans}`;
     context.fillStyle = labelColor;
     context.globalAlpha = 0.78 * labelOpacity;
     context.textAlign = "center";
     context.textBaseline = "top";
     context.fillText(label, x, layout.markerLabelY);
-    context.font = "10px var(--font-sans)";
+    context.font = `10px ${fontSans}`;
     context.globalAlpha = 0.62 * labelOpacity;
     context.fillText(dateLabel, x, layout.markerDateY);
     context.restore();

@@ -1,8 +1,10 @@
-import { resolveOverlayLabelPaint } from "../contextBands";
+import { resolveOverlayLabelPaint, type ResolvedOverlayLabelPaint } from "../contextBands";
 import {
   OVERLAY_BAND_DISCLOSURE_RESERVED_WIDTH,
   OVERLAY_BAND_SIDE_PADDING,
 } from "./constants";
+
+const overlayLabelPaintCache = new Map<string, ResolvedOverlayLabelPaint>();
 
 export type CanvasOcclusionRect = {
   left: number;
@@ -17,12 +19,22 @@ export function getOverlayLabelPaint(
   fallbackLabelColor: string,
   backgroundColor: string,
 ) {
-  return resolveOverlayLabelPaint({
+  const key = `${bandColor}|${bandOpacity}|${fallbackLabelColor}|${backgroundColor}`;
+  const cached = overlayLabelPaintCache.get(key);
+
+  if (cached) {
+    return cached;
+  }
+
+  const result = resolveOverlayLabelPaint({
     bandColor,
     bandOpacity,
     fallbackLabelColor,
     backgroundColor,
   });
+
+  overlayLabelPaintCache.set(key, result);
+  return result;
 }
 
 export function drawPaperOverlayBand({
@@ -48,18 +60,10 @@ export function drawPaperOverlayBand({
 }) {
   context.save();
   context.globalAlpha = alpha;
-  context.shadowColor = "rgba(64, 46, 31, 0.2)";
-  context.shadowBlur = 5;
-  context.shadowOffsetX = 0;
-  context.shadowOffsetY = 1;
   context.fillStyle = bandColor;
   context.fillRect(x, y, width, height);
 
   if (drawBorder) {
-    context.shadowColor = "rgba(0, 0, 0, 0)";
-    context.shadowBlur = 0;
-    context.shadowOffsetX = 0;
-    context.shadowOffsetY = 0;
     context.globalAlpha = Math.min(alpha * 0.72 + 0.08, 0.86);
     context.strokeStyle = borderStyle;
     context.lineWidth = 1;

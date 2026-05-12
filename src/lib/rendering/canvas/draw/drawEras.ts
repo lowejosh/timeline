@@ -131,10 +131,10 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
         ? EARLY_UNIVERSE_COMPACT_LABEL_FADE_WIDTH_PX
         : 120;
   const labelFont = usesForcedPrimordialLabel
-    ? "9px var(--font-sans)"
+    ? `9px ${fontSans}`
     : usesExpandedPrimordialLabel || usesCompactPrimordialLabel
-      ? "10px var(--font-sans)"
-      : "11px var(--font-sans)";
+      ? `10px ${fontSans}`
+      : `11px ${fontSans}`;
 
   if (
     visibleEraWidth > labelMinWidth &&
@@ -299,14 +299,14 @@ export function drawEras(cx: CanvasDrawContext): void {
       context.restore();
 
       context.save();
-      context.font = "8px var(--font-sans)";
+      context.font = `8px ${fontSans}`;
       const labelWidth = context.measureText(labelText).width;
       context.restore();
 
       if (labelWidth + 6 <= segmentWidth) {
         context.save();
         context.globalAlpha = 0.82 * primordialDetailStripOpacity;
-        context.font = "8px var(--font-sans)";
+        context.font = `8px ${fontSans}`;
         context.fillStyle = labelColor;
         context.textAlign = "center";
         context.textBaseline = "bottom";

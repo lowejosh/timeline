@@ -93,6 +93,7 @@ function drawAnimatedOverlayLabel(
     activeOverlayLabelKeys,
     frameFlags,
     hoverRegions,
+    fontSans,
   } = cx;
 
   const overlayLabelAnimationStates = overlayLabelAnimationRef.current;
@@ -100,7 +101,7 @@ function drawAnimatedOverlayLabel(
   const contentRight = renderX + renderWidth - labelRightInset;
   const contentWidth = Math.max(contentRight - contentLeft, 0);
 
-  context.font = "11px var(--font-sans)";
+  context.font = `11px ${fontSans}`;
   const fullLabelWidth = context.measureText(fullLabel).width;
   const hasDistinctShortLabel = shortLabel !== fullLabel;
   const shortLabelWidth = !hasDistinctShortLabel

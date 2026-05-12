@@ -58,11 +58,9 @@ function App() {
       >
         <div className="app-view-stack relative w-full h-full overflow-hidden">
           <TimelineView app={app} layout={layout} />
-          {activeView === "available-sets" ? (
-            <Suspense fallback={null}>
-              <AvailableSetsView app={app} />
-            </Suspense>
-          ) : null}
+          <Suspense fallback={null}>
+            <AvailableSetsView app={app} />
+          </Suspense>
         </div>
       </section>
     </main>

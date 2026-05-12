@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { Layers, X } from "lucide-react";
 
 import { useTimelineSidebarEscape } from "../hooks/useTimelineSidebarEscape";
 import { Button } from "@/components/ui/button";
@@ -71,7 +70,11 @@ export function TimelineSidebarChrome({
         type="button"
         variant="glass"
       >
-        {isOpen ? <X className="size-4" /> : <Layers className="size-4" />}
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden className="size-4 shrink-0">
+          <rect x="2" y="3.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', transform: isOpen ? 'translateY(4px) rotate(45deg)' : 'none', transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
+          <rect x="2" y="7.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', opacity: isOpen ? 0 : 1, transform: isOpen ? 'scaleX(0)' : 'none', transition: 'opacity 160ms ease, transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
+          <rect x="2" y="11.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', transform: isOpen ? 'translateY(-4px) rotate(-45deg)' : 'none', transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
+        </svg>
         <span>Layers</span>
       </Button>
       <button

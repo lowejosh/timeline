@@ -5,7 +5,7 @@ import {
 import type { CanvasDrawContext } from "./drawContext";
 
 export function drawNowIndicator(cx: CanvasDrawContext): void {
-  const { context, toX, fromX, pad, sceneWidth, layout } = cx;
+  const { context, toX, fromX, pad, sceneWidth, layout, fontSans } = cx;
   const edgeRightYear = toApproximateTimelineYear(fromX(sceneWidth - pad));
   const rawNowX = toX(TIMELINE_MAX_YEAR);
   const nowX = edgeRightYear === TIMELINE_MAX_YEAR ? sceneWidth - pad : rawNowX;
@@ -21,7 +21,7 @@ export function drawNowIndicator(cx: CanvasDrawContext): void {
     context.stroke();
     context.setLineDash([]);
     context.fillStyle = "rgba(180, 80, 40, 0.7)";
-    context.font = "10px var(--font-sans)";
+    context.font = `10px ${fontSans}`;
     context.textAlign = "center";
     context.textBaseline = "bottom";
     context.fillText("now", nowX, layout.nowTop - 4);

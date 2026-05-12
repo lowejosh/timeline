@@ -52,8 +52,8 @@ export const AXIS_LABEL_SECONDARY_STEP_RATIO = 0.82;
 export const EDGE_AXIS_LABEL_SNAP_TOLERANCE_PX = 2;
 export const SUBYEAR_EDGE_LABEL_MIN_SPACING_PX = 72;
 export const SUBYEAR_LABEL_MIN_CLEARANCE_PX = 12;
-export const SUBYEAR_PRIMARY_FONT = "11px var(--font-sans)";
-export const SUBYEAR_SECONDARY_FONT = "10px var(--font-sans)";
+export const subyearPrimaryFont = (fontSans: string) => `11px ${fontSans}`;
+export const subyearSecondaryFont = (fontSans: string) => `10px ${fontSans}`;
 
 export const ERA_CHILD_FADE_IN_DURATION_MS = 100;
 export const ERA_CHILD_FADE_OUT_DURATION_MS = 60;
