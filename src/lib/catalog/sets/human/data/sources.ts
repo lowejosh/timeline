@@ -6,6 +6,46 @@ export const HUMAN_SOURCES = {
     citation: 'Apple, "Apple Reinvents the Phone with iPhone."',
     url: "https://www.apple.com/newsroom/2007/01/09Apple-Reinvents-the-Phone-with-iPhone/",
   },
+  achaemenidEmpireWikipedia: {
+    shortTitle: "Wikipedia: Achaemenid Empire",
+    title: "Achaemenid Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Achaemenid Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Achaemenid_Empire",
+  },
+  anLushanRebellionWikipedia: {
+    shortTitle: "Wikipedia: An Lushan Rebellion",
+    title: "An Lushan Rebellion",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "An Lushan Rebellion." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/An_Lushan_Rebellion",
+  },
+  battleOfKadeshWikipedia: {
+    shortTitle: "Wikipedia: Battle of Kadesh",
+    title: "Battle of Kadesh",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Battle of Kadesh." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Battle_of_Kadesh",
+  },
+  battleOfMegiddoWikipedia: {
+    shortTitle: "Wikipedia: Battle of Megiddo",
+    title: "Battle of Megiddo (15th century BC)",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Battle of Megiddo (15th century BC)." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Battle_of_Megiddo_(15th_century_BC)",
+  },
+  battleOfTalasWikipedia: {
+    shortTitle: "Wikipedia: Battle of Talas",
+    title: "Battle of Talas",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Battle of Talas." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Battle_of_Talas",
+  },
   britannicaAkkad: {
     shortTitle: "Britannica: Akkad",
     title: "Akkad",
@@ -154,6 +194,13 @@ export const HUMAN_SOURCES = {
     citation: 'Encyclopaedia Britannica, "Middle East."',
     url: "https://www.britannica.com/place/Middle-East",
   },
+  britannicaOlympicGames: {
+    shortTitle: "Britannica: Olympic Games",
+    title: "Olympic Games",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Olympic Games."',
+    url: "https://www.britannica.com/sports/Olympic-Games",
+  },
   britannicaMongolEmpire: {
     shortTitle: "Britannica: Mongol empire",
     title: "Mongol empire",
@@ -284,6 +331,38 @@ export const HUMAN_SOURCES = {
     citation: 'U.S. Department of Energy, "The History of the Light Bulb."',
     url: "https://www.energy.gov/articles/history-light-bulb",
   },
+  earlyDynasticPeriodEgyptWikipedia: {
+    shortTitle: "Wikipedia: Early Dynastic Egypt",
+    title: "Early Dynastic Period (Egypt)",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Early Dynastic Period (Egypt)." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Early_Dynastic_Period_(Egypt)",
+  },
+  egyptianHittitePeaceTreatyWikipedia: {
+    shortTitle: "Wikipedia: Egyptian-Hittite peace treaty",
+    title: "Egyptian-Hittite peace treaty",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Egyptian-Hittite peace treaty." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Egyptian%E2%80%93Hittite_peace_treaty",
+  },
+  edictOfMilanWikipedia: {
+    shortTitle: "Wikipedia: Edict of Milan",
+    title: "Edict of Milan",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Edict of Milan." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Edict_of_Milan",
+  },
+  fallOfNinevehWikipedia: {
+    shortTitle: "Wikipedia: Fall of Nineveh",
+    title: "Battle of Nineveh (612 BC)",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Battle of Nineveh (612 BC)." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Battle_of_Nineveh_(612_BC)",
+  },
   halafCultureWikipedia: {
     shortTitle: "Wikipedia: Halaf culture",
     title: "Halaf culture",
@@ -361,6 +440,14 @@ export const HUMAN_SOURCES = {
     organization: "HISTORY",
     citation: 'HISTORY.com Editors, "English Civil Wars."',
     url: "https://www.history.com/articles/english-civil-wars",
+  },
+  firstIntermediatePeriodEgyptWikipedia: {
+    shortTitle: "Wikipedia: First Intermediate Period",
+    title: "First Intermediate Period of Egypt",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "First Intermediate Period of Egypt." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/First_Intermediate_Period_of_Egypt",
   },
   historyEnlightenment: {
     shortTitle: "History: Enlightenment",
@@ -445,6 +532,22 @@ export const HUMAN_SOURCES = {
     organization: "HISTORY",
     citation: 'HISTORY.com Editors, "Ming Dynasty."',
     url: "https://www.history.com/topics/china/ming-dynasty",
+  },
+  guptaEmpireWikipedia: {
+    shortTitle: "Wikipedia: Gupta Empire",
+    title: "Gupta Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Gupta Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Gupta_Empire",
+  },
+  latePeriodAncientEgyptWikipedia: {
+    shortTitle: "Wikipedia: Late Period of Egypt",
+    title: "Late Period of ancient Egypt",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Late Period of ancient Egypt." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Late_Period_of_ancient_Egypt",
   },
   historyMoonLanding: {
     shortTitle: "History: 1969 Moon Landing",
@@ -570,6 +673,14 @@ export const HUMAN_SOURCES = {
       'Wikipedia contributors, "Holy Roman Empire." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Holy_Roman_Empire",
   },
+  middleKingdomEgyptWikipedia: {
+    shortTitle: "Wikipedia: Middle Kingdom of Egypt",
+    title: "Middle Kingdom of Egypt",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Middle Kingdom of Egypt." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Middle_Kingdom_of_Egypt",
+  },
   iaeaChernobylFaq: {
     shortTitle: "IAEA: Chernobyl FAQs",
     title: "Frequently Asked Chernobyl Questions",
@@ -600,6 +711,14 @@ export const HUMAN_SOURCES = {
     organization: "Khan Academy",
     citation: 'Khan Academy, "The golden age of Islam."',
     url: "https://www.khanacademy.org/humanities/world-history/medieval-times/islam-medieval/a/the-golden-age-of-islam",
+  },
+  khmerEmpireWikipedia: {
+    shortTitle: "Wikipedia: Khmer Empire",
+    title: "Khmer Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Khmer Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Khmer_Empire",
   },
   khanNeolithicRevolution: {
     shortTitle: "Khan: Neolithic Revolution",
@@ -636,6 +755,30 @@ export const HUMAN_SOURCES = {
     citation: 'Khan Academy, "Prosperity in Song China (960-1279)."',
     url: "https://www.khanacademy.org/humanities/world-history/medieval-times/song-china/v/prosperity-in-song-china-960-1279",
   },
+  kingdomOfAksumWikipedia: {
+    shortTitle: "Wikipedia: Kingdom of Aksum",
+    title: "Kingdom of Aksum",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Kingdom of Aksum." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Kingdom_of_Aksum",
+  },
+  kingdomOfKushWikipedia: {
+    shortTitle: "Wikipedia: Kingdom of Kush",
+    title: "Kingdom of Kush",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Kingdom of Kush." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Kingdom_of_Kush",
+  },
+  kalingaWarWikipedia: {
+    shortTitle: "Wikipedia: Kalinga War",
+    title: "Kalinga War",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Kalinga War." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Kalinga_War",
+  },
   khiamianCultureWikipedia: {
     shortTitle: "Wikipedia: Khiamian culture",
     title: "Khiamian culture",
@@ -651,6 +794,14 @@ export const HUMAN_SOURCES = {
     citation:
       'Wikipedia contributors, "Mali Empire." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Mali_Empire",
+  },
+  mauryaEmpireWikipedia: {
+    shortTitle: "Wikipedia: Maurya Empire",
+    title: "Maurya Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Maurya Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Maurya_Empire",
   },
   mercedesFirstAutomobile: {
     shortTitle: "Mercedes-Benz: first automobile",
@@ -755,6 +906,46 @@ export const HUMAN_SOURCES = {
       'Department of Ancient Near Eastern Art. "Uruk: The First City." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
     url: "https://www.metmuseum.org/toah/hd/uruk/hd_uruk.htm",
   },
+  minoanCivilizationWikipedia: {
+    shortTitle: "Wikipedia: Minoan civilization",
+    title: "Minoan civilization",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Minoan civilization." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Minoan_civilization",
+  },
+  minoanEruptionWikipedia: {
+    shortTitle: "Wikipedia: Minoan eruption",
+    title: "Minoan eruption",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Minoan eruption." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Minoan_eruption",
+  },
+  mughalEmpireWikipedia: {
+    shortTitle: "Wikipedia: Mughal Empire",
+    title: "Mughal Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Mughal Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Mughal_Empire",
+  },
+  newKingdomEgyptWikipedia: {
+    shortTitle: "Wikipedia: New Kingdom of Egypt",
+    title: "New Kingdom of Egypt",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "New Kingdom of Egypt." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/New_Kingdom_of_Egypt",
+  },
+  oldKingdomEgyptWikipedia: {
+    shortTitle: "Wikipedia: Old Kingdom of Egypt",
+    title: "Old Kingdom of Egypt",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Old Kingdom of Egypt." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Old_Kingdom_of_Egypt",
+  },
   mureybetWikipedia: {
     shortTitle: "Wikipedia: Mureybet",
     title: "Mureybet",
@@ -815,6 +1006,14 @@ export const HUMAN_SOURCES = {
     citation: 'OpenAI, "Introducing ChatGPT."',
     url: "https://openai.com/index/chatgpt/",
   },
+  olmecsWikipedia: {
+    shortTitle: "Wikipedia: Olmecs",
+    title: "Olmecs",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Olmecs." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Olmecs",
+  },
   originsOfAgricultureInWestAsiaWikipedia: {
     shortTitle: "Wikipedia: West Asian agriculture origins",
     title: "Origins of agriculture in West Asia",
@@ -847,6 +1046,22 @@ export const HUMAN_SOURCES = {
       'Wikipedia contributors, "Preclassic Maya." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Preclassic_Maya",
   },
+  ptolemaicKingdomWikipedia: {
+    shortTitle: "Wikipedia: Ptolemaic Kingdom",
+    title: "Ptolemaic Kingdom",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Ptolemaic Kingdom." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Ptolemaic_Kingdom",
+  },
+  battleOfQarqarWikipedia: {
+    shortTitle: "Wikipedia: Battle of Qarqar",
+    title: "Battle of Qarqar",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Battle of Qarqar." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Battle_of_Qarqar",
+  },
   qinDynastyWikipedia: {
     shortTitle: "Wikipedia: Qin dynasty",
     title: "Qin dynasty",
@@ -863,6 +1078,14 @@ export const HUMAN_SOURCES = {
       'Wikipedia contributors, "Qing dynasty." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Qing_dynasty",
   },
+  rashidunCaliphateWikipedia: {
+    shortTitle: "Wikipedia: Rashidun Caliphate",
+    title: "Rashidun Caliphate",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Rashidun Caliphate." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Rashidun_Caliphate",
+  },
   samarraCultureWikipedia: {
     shortTitle: "Wikipedia: Samarra culture",
     title: "Samarra culture",
@@ -870,6 +1093,30 @@ export const HUMAN_SOURCES = {
     citation:
       'Wikipedia contributors, "Samarra culture." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Samarra_culture",
+  },
+  safavidIranWikipedia: {
+    shortTitle: "Wikipedia: Safavid Iran",
+    title: "Safavid Iran",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Safavid Iran." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Safavid_Iran",
+  },
+  secondIntermediatePeriodEgyptWikipedia: {
+    shortTitle: "Wikipedia: Second Intermediate Period",
+    title: "Second Intermediate Period of Egypt",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Second Intermediate Period of Egypt." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Second_Intermediate_Period_of_Egypt",
+  },
+  siegeOfJerusalem587Wikipedia: {
+    shortTitle: "Wikipedia: Siege of Jerusalem",
+    title: "Siege of Jerusalem (587 BC)",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Siege of Jerusalem (587 BC)." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Siege_of_Jerusalem_(587_BC)",
   },
   sasanianEmpireWikipedia: {
     shortTitle: "Wikipedia: Sasanian Empire",
@@ -1075,6 +1322,22 @@ export const HUMAN_SOURCES = {
       'Smithsonian Institution, Human Origins Program, "Sahelanthropus tchadensis."',
     url: "https://humanorigins.si.edu/evidence/human-fossils/species/sahelanthropus-tchadensis",
   },
+  songhaiEmpireWikipedia: {
+    shortTitle: "Wikipedia: Songhai Empire",
+    title: "Songhai Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Songhai Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Songhai_Empire",
+  },
+  thirdIntermediatePeriodEgyptWikipedia: {
+    shortTitle: "Wikipedia: Third Intermediate Period",
+    title: "Third Intermediate Period of Egypt",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Third Intermediate Period of Egypt." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Third_Intermediate_Period_of_Egypt",
+  },
   tangDynastyWikipedia: {
     shortTitle: "Wikipedia: Tang dynasty",
     title: "Tang dynasty",
@@ -1088,6 +1351,14 @@ export const HUMAN_SOURCES = {
     title: "Trust me bro",
     organization: "Personal bias",
     citation: '"Trust me bro."',
+  },
+  umayyadCaliphateWikipedia: {
+    shortTitle: "Wikipedia: Umayyad Caliphate",
+    title: "Umayyad Caliphate",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Umayyad Caliphate." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Umayyad_Caliphate",
   },
   ubaidPeriodWikipedia: {
     shortTitle: "Wikipedia: Ubaid period",
@@ -1204,6 +1475,22 @@ export const HUMAN_SOURCES = {
       'World Health Organization, "WHO commemorates the 40th anniversary of smallpox eradication."',
     url: "https://www.who.int/news/item/13-12-2019-who-commemorates-the-40th-anniversary-of-smallpox-eradication",
   },
+  worldHistoryLatePeriodAncientEgypt: {
+    shortTitle: "WHE: Late Period of Egypt",
+    title: "Late Period of Ancient Egypt",
+    organization: "World History Encyclopedia",
+    citation:
+      'Mark, Joshua J. "Late Period of Ancient Egypt." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Late_Period_of_Ancient_Egypt/",
+  },
+  worldHistoryNewKingdomEgypt: {
+    shortTitle: "WHE: New Kingdom of Egypt",
+    title: "New Kingdom of Egypt",
+    organization: "World History Encyclopedia",
+    citation:
+      'Mark, Joshua J. "New Kingdom of Egypt." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/New_Kingdom_of_Egypt/",
+  },
   worldHistoryGreatPyramidGiza: {
     shortTitle: "WHE: Great Pyramid",
     title: "Great Pyramid of Giza",
@@ -1219,6 +1506,29 @@ export const HUMAN_SOURCES = {
     citation:
       'Mark, Joshua J. "Neo-Assyrian Empire." World History Encyclopedia.',
     url: "https://www.worldhistory.org/Neo-Assyrian_Empire/",
+  },
+  worldHistoryPtolemaicDynasty: {
+    shortTitle: "WHE: Ptolemaic Dynasty",
+    title: "Ptolemaic Dynasty",
+    organization: "World History Encyclopedia",
+    citation: 'King, Arienne. "Ptolemaic Dynasty." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Ptolemaic_Dynasty/",
+  },
+  worldHistorySecondIntermediatePeriodEgypt: {
+    shortTitle: "WHE: Second Intermediate Period",
+    title: "Second Intermediate Period of Egypt",
+    organization: "World History Encyclopedia",
+    citation:
+      'Mark, Joshua J. "Second Intermediate Period of Egypt." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Second_Intermediate_Period_of_Egypt/",
+  },
+  worldHistoryThirdIntermediatePeriodEgypt: {
+    shortTitle: "WHE: Third Intermediate Period",
+    title: "Third Intermediate Period of Egypt",
+    organization: "World History Encyclopedia",
+    citation:
+      'Mark, Joshua J. "Third Intermediate Period of Egypt." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Third_Intermediate_Period_of_Egypt/",
   },
   yuanDynastyWikipedia: {
     shortTitle: "Wikipedia: Yuan dynasty",

@@ -55,6 +55,31 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     sourceIds: ["britannicaHammurabi", "britannicaBabylonia"],
   },
   {
+    id: "battle-of-megiddo",
+    label: "Battle of Megiddo",
+    shortLabel: "Megiddo",
+    description:
+      "Thutmose III defeated a Canaanite coalition at Megiddo, one of the earliest battles recorded in substantial detail.",
+    year: bce(1_457),
+    regionalScopeLabel: "Levant",
+    minZoom: 18,
+    priority: 78,
+    sourceIds: ["battleOfMegiddoWikipedia"],
+  },
+  {
+    id: "minoan-eruption-of-thera",
+    label: "Minoan eruption of Thera",
+    shortLabel: "Thera Erupts",
+    description:
+      "A major volcanic eruption on Thera, around 1600 BC, devastated the island and became one of the largest eruptions in recorded human history.",
+    year: bce(1_600),
+    regionalScopeLabel: "Aegean",
+    approximate: true,
+    minZoom: 18,
+    priority: 77,
+    sourceIds: ["minoanEruptionWikipedia"],
+  },
+  {
     id: "earliest-attested-chinese-writing",
     label: "Earliest attested Chinese writing",
     shortLabel: "Chinese Writing",
@@ -66,5 +91,30 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     minZoom: 18,
     priority: 77,
     sourceIds: ["unescoYinXu"],
+  },
+  {
+    id: "egyptian-hittite-peace-treaty",
+    label: "Egyptian-Hittite peace treaty",
+    shortLabel: "Kadesh Treaty",
+    description:
+      "Ramesses II of Egypt and Hattusili III of the Hittites concluded the Egyptian-Hittite peace treaty, one of the earliest surviving peace treaties.",
+    year: bce(1_259),
+    regionalScopeLabel: "Egypt and Anatolia",
+    minZoom: 18,
+    approximate: true,
+    priority: 79,
+    sourceIds: ["egyptianHittitePeaceTreatyWikipedia"],
+  },
+  {
+    id: "battle-of-kadesh",
+    label: "Battle of Kadesh",
+    shortLabel: "Kadesh",
+    description:
+      "Egyptian and Hittite armies fought a major battle near Kadesh on the Orontes River, one of the great-power clashes of the Late Bronze Age.",
+    year: bce(1_274),
+    regionalScopeLabel: "Levant",
+    minZoom: 18,
+    priority: 78,
+    sourceIds: ["battleOfKadeshWikipedia"],
   },
 ];

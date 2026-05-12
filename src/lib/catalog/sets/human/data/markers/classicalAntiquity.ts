@@ -1,5 +1,5 @@
 import type { TimelineMarker } from "@/lib/core/timelineTypes";
-import { bce } from "@/lib/core/timelineDateBuilders";
+import { bce, ce } from "@/lib/core/timelineDateBuilders";
 
 export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
   {
@@ -35,5 +35,42 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     minZoom: 19,
     priority: 74,
     sourceIds: ["historyAncientRome"],
+  },
+  {
+    id: "qin-unifies-china",
+    label: "Qin unifies China",
+    shortLabel: "Qin Unifies China",
+    description:
+      "Qin completed the conquest of the rival states in 221 BCE, unifying China under Qin Shi Huang and ending the Warring States period.",
+    year: bce(221),
+    regionalScopeLabel: "China",
+    minZoom: 18,
+    priority: 80,
+    sourceIds: ["qinDynastyWikipedia"],
+  },
+  {
+    id: "kalinga-war",
+    label: "Kalinga War",
+    shortLabel: "Kalinga War",
+    description:
+      "Ashoka's Mauryan Empire fought Kalinga in one of ancient India's largest and deadliest wars.",
+    year: bce(261),
+    regionalScopeLabel: "Indian subcontinent",
+    approximate: true,
+    minZoom: 18,
+    priority: 77,
+    sourceIds: ["kalingaWarWikipedia"],
+  },
+  {
+    id: "edict-of-milan",
+    label: "Edict of Milan",
+    shortLabel: "Edict of Milan",
+    description:
+      "Constantine I and Licinius agreed at Milan to treat Christians benevolently, giving Christianity legal status in the Roman Empire.",
+    year: ce(313),
+    regionalScopeLabel: "Roman Empire",
+    minZoom: 18,
+    priority: 76,
+    sourceIds: ["edictOfMilanWikipedia"],
   },
 ];

@@ -369,7 +369,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   },
   {
     id: "age-of-industry-and-empire",
-    name: "Age of Industry & Empire",
+    name: "Industrial Age",
     startYear: ce(1800),
     endYear: ce(1945),
     color: HUMAN_HISTORY_COLORS.ageOfIndustryAndEmpire,

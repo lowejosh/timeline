@@ -4,6 +4,7 @@ export { CLASSICAL_ANTIQUITY_MARKERS } from "./markers/classicalAntiquity";
 export { EPIPALEOLITHIC_MARKERS } from "./markers/epipaleolithic";
 export { HISTORICAL_TURNING_POINT_MARKERS } from "./markers/historicalTurningPoints";
 export { HUMAN_EVOLUTION_MARKERS } from "./markers/humanEvolution";
+export { IRON_AGE_MARKERS } from "./markers/ironAge";
 export { NEOLITHIC_MARKERS } from "./markers/neolithic";
 export { PALEOLITHIC_MARKERS } from "./markers/paleolithic";
 export { POST_CLASSICAL_MARKERS } from "./markers/postClassical";
