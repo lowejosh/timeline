@@ -153,18 +153,40 @@ export function filterHiddenOverlayBands(
   overlays: TimelineOverlayBand[],
   hiddenOverlayIds: ReadonlySet<string>,
 ): TimelineOverlayBand[] {
-  return overlays.flatMap((overlay) => {
+  if (hiddenOverlayIds.size === 0) {
+    return overlays;
+  }
+
+  let didChange = false;
+  const filtered: TimelineOverlayBand[] = [];
+
+  for (const overlay of overlays) {
     if (hiddenOverlayIds.has(overlay.id)) {
-      return [];
+      didChange = true;
+      continue;
     }
 
-    return [
-      {
-        ...overlay,
-        children: overlay.children
-          ? filterHiddenOverlayBands(overlay.children, hiddenOverlayIds)
-          : undefined,
-      },
-    ];
-  });
+    if (!overlay.children) {
+      filtered.push(overlay);
+      continue;
+    }
+
+    const children = filterHiddenOverlayBands(
+      overlay.children,
+      hiddenOverlayIds,
+    );
+
+    if (children === overlay.children) {
+      filtered.push(overlay);
+      continue;
+    }
+
+    didChange = true;
+    filtered.push({
+      ...overlay,
+      children,
+    });
+  }
+
+  return didChange ? filtered : overlays;
 }

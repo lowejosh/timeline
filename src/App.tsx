@@ -1,11 +1,18 @@
+import { lazy, Suspense } from "react";
+
 import { useStandaloneViewportHeight } from "./hooks/useStandaloneViewportHeight";
 import { getTimelineAppLayoutState } from "./lib/app/layout";
 import { TimelineSidebarChrome } from "./components/TimelineSidebar";
-import { AvailableSetsView } from "./views/AvailableSetsView";
 import { useTimelineAppState } from "./hooks/useTimelineAppState";
 import { TimelineSettings } from "./components/TimelineSettings";
 import { TimelineView } from "./views/TimelineView";
 import "./App.styles.css";
+
+const AvailableSetsView = lazy(() =>
+  import("./views/AvailableSetsView").then((module) => ({
+    default: module.AvailableSetsView,
+  })),
+);
 
 function App() {
   const app = useTimelineAppState();
@@ -52,7 +59,11 @@ function App() {
       >
         <div className="app-view-stack relative w-full h-full overflow-hidden">
           <TimelineView app={app} layout={layout} />
-          <AvailableSetsView app={app} />
+          {activeView === "available-sets" ? (
+            <Suspense fallback={null}>
+              <AvailableSetsView app={app} />
+            </Suspense>
+          ) : null}
         </div>
       </section>
     </main>

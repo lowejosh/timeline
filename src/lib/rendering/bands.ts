@@ -1,4 +1,3 @@
-import { ticks, tickStep } from "d3-array";
 import {
   splitTimelineYear,
   toApproximateTimelineYear,
@@ -41,12 +40,6 @@ export type TimelineElapsedAxisLabelFormatOptions = {
 
 export type TimelineElapsedReference = "ago" | "after-big-bang";
 export type TimelineDateReference = "calendar" | "elapsed";
-
-export type TimelineTicks = {
-  major: number[];
-  minor: number[];
-  majorStep: number;
-};
 
 const numberFormatter = new Intl.NumberFormat("en-US");
 const AVERAGE_DAYS_PER_YEAR = 365.2425;
@@ -889,36 +882,6 @@ export function formatTimelineDateLabel(
   }
 
   return `${millisecondsLabel}${pad3(dateParts.microsecond)}`;
-}
-
-function isMajorTick(value: number, majorStep: number) {
-  const safeStep = Math.max(Math.abs(majorStep), 1e-9);
-  const ratio = value / safeStep;
-
-  return Math.abs(ratio - Math.round(ratio)) < 1e-6;
-}
-
-export function getTimelineTicks(
-  startYear: number,
-  endYear: number,
-  width: number,
-): TimelineTicks {
-  const safeWidth = Math.max(width, 1);
-  const majorCount = Math.max(2, Math.floor(safeWidth / 280));
-  const minorCount = Math.max(majorCount * 5, 10);
-  const major = ticks(startYear, endYear, majorCount).filter(
-    (v) => v >= TIMELINE_MIN_YEAR && v <= TIMELINE_MAX_YEAR,
-  );
-
-  const majorStep = Math.abs(tickStep(startYear, endYear, majorCount));
-  const minor = ticks(startYear, endYear, minorCount).filter(
-    (v) =>
-      v >= TIMELINE_MIN_YEAR &&
-      v <= TIMELINE_MAX_YEAR &&
-      !isMajorTick(v, majorStep),
-  );
-
-  return { major, minor, majorStep };
 }
 
 export function formatTimelineYear(

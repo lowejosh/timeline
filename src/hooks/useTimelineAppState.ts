@@ -241,11 +241,20 @@ export function useTimelineAppState() {
     return next;
   }, [defaultEnabledGroupIds, humanEvolutionToggleMode, manualEnabledGroupIds]);
 
+  const visibleSetMarkers = useMemo(
+    () => filterMarkersBySets(TIMELINE_DISPLAY.markers, visibleSetIds),
+    [visibleSetIds],
+  );
+  const visibleSetOverlays = useMemo(
+    () => filterOverlaysBySets(TIMELINE_DISPLAY.overlays, visibleSetIds),
+    [visibleSetIds],
+  );
+
   const autoToggleVisibleGroupIds = useMemo(
     () =>
       getVisibleTimelineGroupIds(
-        filterMarkersBySets(TIMELINE_DISPLAY.markers, visibleSetIds),
-        filterOverlaysBySets(TIMELINE_DISPLAY.overlays, visibleSetIds),
+        visibleSetMarkers,
+        visibleSetOverlays,
         animated.viewport,
         innerWidth,
         canvasPad,
@@ -255,15 +264,16 @@ export function useTimelineAppState() {
       animated.viewport,
       baseEnabledGroupIds,
       canvasPad,
-      visibleSetIds,
       innerWidth,
+      visibleSetMarkers,
+      visibleSetOverlays,
     ],
   );
 
   const autoToggleVisibleOverlayGroupIds = useMemo(
     () =>
       getVisibleTimelineOverlayGroupIdsWithViewportEdges(
-        filterOverlaysBySets(TIMELINE_DISPLAY.overlays, visibleSetIds),
+        visibleSetOverlays,
         animated.viewport,
         innerWidth,
         canvasPad,
@@ -273,8 +283,8 @@ export function useTimelineAppState() {
       animated.viewport,
       baseEnabledGroupIds,
       canvasPad,
-      visibleSetIds,
       innerWidth,
+      visibleSetOverlays,
     ],
   );
 
@@ -340,7 +350,7 @@ export function useTimelineAppState() {
   const autoHiddenOverlayIds = useMemo(
     () =>
       getAutoHiddenOverlayIds(
-        filterOverlaysBySets(TIMELINE_DISPLAY.overlays, visibleSetIds),
+        visibleSetOverlays,
         animated.viewport,
         innerWidth,
         canvasPad,
@@ -359,6 +369,7 @@ export function useTimelineAppState() {
       hasHigherPrioritySetSpanVisible,
       visibleSetIds,
       innerWidth,
+      visibleSetOverlays,
     ],
   );
 
@@ -477,22 +488,12 @@ export function useTimelineAppState() {
   );
 
   const setFilteredMarkers = useMemo(() => {
-    const filteredMarkers = filterMarkersBySets(
-      TIMELINE_DISPLAY.markers,
-      visibleSetIds,
-    );
-
-    return applyTimelineSetOrderToMarkers(filteredMarkers, orderedSetIds);
-  }, [visibleSetIds, orderedSetIds]);
+    return applyTimelineSetOrderToMarkers(visibleSetMarkers, orderedSetIds);
+  }, [visibleSetMarkers, orderedSetIds]);
 
   const setFilteredOverlays = useMemo(() => {
-    const filteredOverlays = filterOverlaysBySets(
-      TIMELINE_DISPLAY.overlays,
-      visibleSetIds,
-    );
-
-    return applyTimelineSetOrderToOverlays(filteredOverlays, orderedSetIds);
-  }, [visibleSetIds, orderedSetIds]);
+    return applyTimelineSetOrderToOverlays(visibleSetOverlays, orderedSetIds);
+  }, [visibleSetOverlays, orderedSetIds]);
 
   const visibleFilteredOverlays = useMemo(
     () => filterHiddenOverlayBands(setFilteredOverlays, autoHiddenOverlayIds),

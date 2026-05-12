@@ -8,7 +8,10 @@ import {
   isDecorationGroupEnabled,
   isTimelineDecorationVisibleAtZoom,
 } from "./queries/visibility";
-import { getAssignedOverlayLanes } from "./layout/laneAssignment";
+import {
+  getAssignedOverlayLanes,
+  type AssignedTimelineOverlayBand,
+} from "./layout/laneAssignment";
 
 export type ResolvedTimelineOverlayBand = {
   band: TimelineOverlayBand;
@@ -27,6 +30,59 @@ export type ResolvedTimelineOverlayBand = {
 };
 
 const OVERLAY_MIN_VISIBLE_WIDTH_DEVICE_PX = 0.5;
+const ALL_GROUPS_CACHE_KEY = "__all__";
+
+type CachedLaneAssignment = {
+  assigned: AssignedTimelineOverlayBand[];
+  laneCount: number;
+};
+
+const enabledOverlayLaneCache = new WeakMap<
+  TimelineOverlayBand[],
+  Map<string, CachedLaneAssignment>
+>();
+
+function getEnabledGroupCacheKey(
+  enabledGroupIds?: ReadonlySet<string> | null,
+) {
+  if (!enabledGroupIds) {
+    return ALL_GROUPS_CACHE_KEY;
+  }
+
+  return Array.from(enabledGroupIds).sort().join("\u001f");
+}
+
+function getAssignedEnabledOverlayLanes(
+  overlays: TimelineOverlayBand[],
+  enabledGroupIds?: ReadonlySet<string> | null,
+) {
+  const cacheKey = getEnabledGroupCacheKey(enabledGroupIds);
+  let cacheByGroupSignature = enabledOverlayLaneCache.get(overlays);
+
+  if (!cacheByGroupSignature) {
+    cacheByGroupSignature = new Map();
+    enabledOverlayLaneCache.set(overlays, cacheByGroupSignature);
+  }
+
+  const cached = cacheByGroupSignature.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  const enabledOverlays = enabledGroupIds
+    ? overlays.filter((overlay) =>
+        isDecorationGroupEnabled(overlay, enabledGroupIds),
+      )
+    : overlays;
+  const computed =
+    enabledOverlays === overlays
+      ? getAssignedOverlayLanes(overlays)
+      : getAssignedOverlayLanes(enabledOverlays);
+
+  cacheByGroupSignature.set(cacheKey, computed);
+  return computed;
+}
 
 function resolveOverlayRenderGeometry(
   clippedX0: number,
@@ -79,22 +135,23 @@ export function resolveTimelineOverlayTracks(
   enabledGroupIds?: ReadonlySet<string> | null,
 ): ResolvedTimelineOverlayBand[] {
   const innerWidth = Math.max(width - pad * 2, 1);
-  const [visibleStart] = getVisibleRange(viewport, innerWidth);
-  const enabledOverlays = overlays.filter((overlay) =>
-    isDecorationGroupEnabled(overlay, enabledGroupIds),
-  );
+  const [visibleStart, visibleEnd] = getVisibleRange(viewport, innerWidth);
 
-  if (enabledOverlays.length === 0) {
+  if (overlays.length === 0) {
     return [];
   }
 
-  const { assigned, laneCount } = getAssignedOverlayLanes(enabledOverlays);
+  const { assigned, laneCount } = getAssignedEnabledOverlayLanes(
+    overlays,
+    enabledGroupIds,
+  );
   const visibleOverlays: ResolvedTimelineOverlayBand[] = [];
 
   for (const { band, laneIndex } of assigned) {
     if (
       !isTimelineDecorationVisibleAtZoom(band, viewport.zoom) ||
-      band.endYear < visibleStart
+      band.endYear < visibleStart ||
+      band.startYear > visibleEnd
     ) {
       continue;
     }
