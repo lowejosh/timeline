@@ -1,4 +1,7 @@
-import { resolveOverlayLabelPaint, type ResolvedOverlayLabelPaint } from "../contextBands";
+import {
+  resolveOverlayLabelPaint,
+  type ResolvedOverlayLabelPaint,
+} from "../contextBands";
 import {
   OVERLAY_BAND_DISCLOSURE_RESERVED_WIDTH,
   OVERLAY_BAND_SIDE_PADDING,

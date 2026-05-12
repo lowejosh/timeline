@@ -188,10 +188,7 @@ export function useWheelZoomPan({
 
     motion.lastFrameTime = now;
 
-    if (
-      Math.abs(zoomStep) > 0.00001 ||
-      Math.abs(panStep) > 0.001
-    ) {
+    if (Math.abs(zoomStep) > 0.00001 || Math.abs(panStep) > 0.001) {
       latest.onContinuousViewportChange((current) => {
         let next = current;
 
@@ -309,14 +306,8 @@ export function useWheelZoomPan({
           !motion.frameId &&
           Math.abs(motion.zoomVelocity) <= MOUSE_WHEEL_MIN_ZOOM_VELOCITY &&
           Math.abs(motion.panVelocity) <= MOUSE_WHEEL_MIN_PAN_VELOCITY;
-        const normalizedDx = normalizeWheelDelta(
-          event.deltaX,
-          event.deltaMode,
-        );
-        const normalizedDy = normalizeWheelDelta(
-          event.deltaY,
-          event.deltaMode,
-        );
+        const normalizedDx = normalizeWheelDelta(event.deltaX, event.deltaMode);
+        const normalizedDy = normalizeWheelDelta(event.deltaY, event.deltaMode);
 
         motion.anchorX = anchorX;
 

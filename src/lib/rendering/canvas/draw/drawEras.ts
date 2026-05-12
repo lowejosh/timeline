@@ -79,8 +79,7 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     );
   }
 
-  context.globalAlpha =
-    opacity * ERA_BAND_ALPHA * renderState.alphaMultiplier;
+  context.globalAlpha = opacity * ERA_BAND_ALPHA * renderState.alphaMultiplier;
   context.fillStyle = era.color;
   context.fillRect(
     renderState.renderLeft,

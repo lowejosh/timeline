@@ -131,7 +131,11 @@ function drawOverlayLabel(
   context.globalAlpha = alpha;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.fillText(text, contentLeft + contentWidth / 2, y + OVERLAY_LANE_HEIGHT / 2);
+  context.fillText(
+    text,
+    contentLeft + contentWidth / 2,
+    y + OVERLAY_LANE_HEIGHT / 2,
+  );
   context.restore();
 }
 

@@ -15,7 +15,12 @@ type TimelineTooltipProps = {
   width: number;
 };
 
-let cachedSafeViewportInsets: { top: number; right: number; bottom: number; left: number } | null = null;
+let cachedSafeViewportInsets: {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+} | null = null;
 
 function getSafeViewportInsets() {
   if (typeof window === "undefined") {
@@ -53,7 +58,13 @@ function getSafeViewportInsets() {
   };
 
   // Invalidate on resize
-  window.addEventListener("resize", () => { cachedSafeViewportInsets = null; }, { once: true });
+  window.addEventListener(
+    "resize",
+    () => {
+      cachedSafeViewportInsets = null;
+    },
+    { once: true },
+  );
 
   return cachedSafeViewportInsets;
 }

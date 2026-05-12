@@ -680,7 +680,6 @@ export function TimelineCanvas({
     if (drawFrameRef.current) {
       cancelAnimationFrame(drawFrameRef.current);
       drawFrameRef.current = 0;
-
     }
 
     drawCanvas(["scene-publish"]);

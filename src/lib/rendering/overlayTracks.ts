@@ -4,9 +4,7 @@ import {
   worldToScreen,
   type TimelineViewport,
 } from "../core/viewport";
-import {
-  isDecorationGroupEnabled,
-} from "./queries/visibility";
+import { isDecorationGroupEnabled } from "./queries/visibility";
 import {
   getAssignedOverlayLanes,
   type AssignedTimelineOverlayBand,
@@ -41,9 +39,7 @@ const enabledOverlayLaneCache = new WeakMap<
   Map<string, CachedLaneAssignment>
 >();
 
-function getEnabledGroupCacheKey(
-  enabledGroupIds?: ReadonlySet<string> | null,
-) {
+function getEnabledGroupCacheKey(enabledGroupIds?: ReadonlySet<string> | null) {
   if (!enabledGroupIds) {
     return ALL_GROUPS_CACHE_KEY;
   }

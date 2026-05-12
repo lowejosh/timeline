@@ -11,9 +11,7 @@ import {
 } from "@/lib/core/viewport";
 import type { AnimatedEraChildState } from "../animation/useEraChildAnimation";
 import { resolveExpandedOverlayLayout } from "@/lib/rendering/expandedOverlayLayout";
-import {
-  drawBackground,
-} from "@/lib/rendering/canvas/draw/drawBackground";
+import { drawBackground } from "@/lib/rendering/canvas/draw/drawBackground";
 import { drawEras } from "@/lib/rendering/canvas/draw/drawEras";
 import { drawOverlays } from "@/lib/rendering/canvas/draw/drawOverlays";
 import { drawAxis } from "@/lib/rendering/canvas/draw/drawAxis";
@@ -56,12 +54,8 @@ import {
   shouldPrioritizeTooltipRetention,
   shouldRetainTooltipAtPoint,
 } from "@/lib/rendering/tooltipRetention";
-import type {
-  HoveredTooltipState,
-} from "@/lib/rendering/canvas/tooltip";
-import type {
-  TimelineCanvasScene,
-} from "../model/TimelineCanvas.types";
+import type { HoveredTooltipState } from "@/lib/rendering/canvas/tooltip";
+import type { TimelineCanvasScene } from "../model/TimelineCanvas.types";
 import {
   getInteractiveDescendantEras,
   getPreviewFocusChain,
@@ -91,9 +85,7 @@ export type TimelineCanvasFrameRefs = {
   overlayBandAnimationRef: RefObject<Map<string, AnimatedOverlayBandState>>;
   overlayInteractionRegionsRef: MutableRefObject<OverlayInteractionRegion[]>;
   preferredAxisLabelStepRef: MutableRefObject<number | undefined>;
-  primordialDetailStripAnimationRef: MutableRefObject<
-    PrimordialDetailStripAnimationState
-  >;
+  primordialDetailStripAnimationRef: MutableRefObject<PrimordialDetailStripAnimationState>;
   renderedExpandedOverlayIdsRef: RefObject<string[]>;
 };
 
@@ -323,14 +315,9 @@ export function drawTimelineCanvasFrame({
   const resolvedAxisTickStates = [
     ...frameRefs.axisTickAnimationRef.current.values(),
   ]
-    .filter(
-      (tick) => tick.visibleProgress > 0.01 || tick.labelOpacity > 0.01,
-    )
+    .filter((tick) => tick.visibleProgress > 0.01 || tick.labelOpacity > 0.01)
     .sort((left, right) => left.step - right.step || left.year - right.year);
-  const sceneMaxZoom = getMaxZoomForTimelineViewport(
-    sceneViewport,
-    innerWidth,
-  );
+  const sceneMaxZoom = getMaxZoomForTimelineViewport(sceneViewport, innerWidth);
   const allowPrimordialSyntheticDetail =
     sceneViewport.zoom >=
     sceneMaxZoom - PRIMORDIAL_SYNTHETIC_DETAIL_MAX_ZOOM_WINDOW;
@@ -453,8 +440,7 @@ export function drawTimelineCanvasFrame({
     allowPrimordialSyntheticDetail,
     sceneMaxZoom,
     markerPriorityBoostRef: frameRefs.markerPriorityBoostRef,
-    expandedOverlayProgressByIdRef:
-      frameRefs.expandedOverlayProgressByIdRef,
+    expandedOverlayProgressByIdRef: frameRefs.expandedOverlayProgressByIdRef,
     hoverRegions: [],
     overlayInteractionRegions: [],
     overlayOcclusionRects: [],
@@ -480,8 +466,7 @@ export function drawTimelineCanvasFrame({
   markPerf("markerMs");
 
   frameRefs.hoverRegionsRef.current = cx.hoverRegions;
-  frameRefs.overlayInteractionRegionsRef.current =
-    cx.overlayInteractionRegions;
+  frameRefs.overlayInteractionRegionsRef.current = cx.overlayInteractionRegions;
 
   if (lastPointer && !isTouchTooltipPinned) {
     const currentTooltip = hoveredTooltipRef.current;
