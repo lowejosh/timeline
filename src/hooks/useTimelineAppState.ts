@@ -63,9 +63,22 @@ import {
   getVisibleRange,
   getHomeViewport,
   HOME_RANGE,
+  panByPixels,
+  TIMELINE_MAX_YEAR,
+  TIMELINE_MIN_YEAR,
   worldToScreen,
   type TimelineViewport,
 } from "../lib/core/viewport";
+import {
+  allocateTimelineLayerShortcuts,
+  getChildLayerShortcutId,
+  getSetLayerShortcutId,
+} from "@/lib/app/timelineKeyboard";
+import {
+  computeGroupYearRanges,
+  computeSetYearRanges,
+  type TimelineYearRange,
+} from "@/lib/catalog/timelineSetMetrics";
 
 type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
 
@@ -629,6 +642,54 @@ export function useTimelineAppState() {
     ],
   );
 
+  const layerShortcuts = useMemo(
+    () => allocateTimelineLayerShortcuts(sidebarTree),
+    [sidebarTree],
+  );
+
+  const layerRangeByShortcutId = useMemo(() => {
+    const setRanges = computeSetYearRanges(sidebarTree.map((set) => set.id));
+    const childGroupIds = sidebarTree.flatMap((set) =>
+      set.children.flatMap((child) => child.groupIds),
+    );
+    const groupRanges = computeGroupYearRanges(childGroupIds);
+    const ranges = new Map<string, TimelineYearRange>();
+
+    for (const [setId, range] of setRanges) {
+      ranges.set(getSetLayerShortcutId(setId), range);
+    }
+
+    for (const set of sidebarTree) {
+      for (const child of set.children) {
+        let childRange: TimelineYearRange | null = null;
+
+        for (const groupId of child.groupIds) {
+          const groupRange = groupRanges.get(groupId);
+
+          if (!groupRange) {
+            continue;
+          }
+
+          childRange = childRange
+            ? {
+                startYear: Math.min(
+                  childRange.startYear,
+                  groupRange.startYear,
+                ),
+                endYear: Math.max(childRange.endYear, groupRange.endYear),
+              }
+            : groupRange;
+        }
+
+        if (childRange) {
+          ranges.set(getChildLayerShortcutId(child), childRange);
+        }
+      }
+    }
+
+    return ranges;
+  }, [sidebarTree]);
+
   const handleToggleEntry = useCallback(
     (groupIds: string[], nextEnabled: boolean) => {
       if (groupIds.includes(HUMAN_EVOLUTION_GROUP_ID)) {
@@ -699,6 +760,127 @@ export function useTimelineAppState() {
       });
     },
     [],
+  );
+
+  const handleHomeRange = useCallback(() => {
+    setActiveEraId(prioritizedRootEra.id);
+    animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1], 0);
+    scheduleAutoTransitionCheck();
+  }, [animated, prioritizedRootEra.id, scheduleAutoTransitionCheck]);
+
+  const handleFullTimelineRange = useCallback(() => {
+    setActiveEraId(prioritizedRootEra.id);
+    animated.animateToRange(TIMELINE_MIN_YEAR, TIMELINE_MAX_YEAR, 0);
+    scheduleAutoTransitionCheck();
+  }, [animated, prioritizedRootEra.id, scheduleAutoTransitionCheck]);
+
+  const handleKeyboardPan = useCallback(
+    (deltaPixels: number) => {
+      animated.updateViewport((current) =>
+        panByPixels(current, deltaPixels, viewportWidthRef.current),
+      );
+      scheduleAutoTransitionCheck();
+    },
+    [animated, scheduleAutoTransitionCheck],
+  );
+
+  const handleKeyboardZoom = useCallback(
+    (zoomDelta: number) => {
+      animated.animateZoom(zoomDelta, viewportWidthRef.current / 2);
+      scheduleAutoTransitionCheck();
+    },
+    [animated, scheduleAutoTransitionCheck],
+  );
+
+  const handleLayerShortcut = useCallback(
+    (normalizedKey: string) => {
+      const shortcut = layerShortcuts.find(
+        (candidate) => candidate.normalizedKey === normalizedKey,
+      );
+
+      if (!shortcut) {
+        return false;
+      }
+
+      const range = layerRangeByShortcutId.get(shortcut.id);
+
+      if (shortcut.kind === "set") {
+        setExpandedSetIds((current) => {
+          if (current.has(shortcut.setId)) {
+            return current;
+          }
+
+          const next = new Set(current);
+          next.add(shortcut.setId);
+          return next;
+        });
+
+        setVisibleSetIds((current) => {
+          if (current.has(shortcut.setId)) {
+            return current;
+          }
+
+          const next = new Set(current);
+          next.add(shortcut.setId);
+          return next;
+        });
+      } else {
+        setExpandedSetIds((current) => {
+          if (current.has(shortcut.parentSetId)) {
+            return current;
+          }
+
+          const next = new Set(current);
+          next.add(shortcut.parentSetId);
+          return next;
+        });
+
+        setVisibleSetIds((current) => {
+          if (current.has(shortcut.parentSetId)) {
+            return current;
+          }
+
+          const next = new Set(current);
+          next.add(shortcut.parentSetId);
+          return next;
+        });
+
+        if (shortcut.groupIds.includes(HUMAN_EVOLUTION_GROUP_ID)) {
+          setHumanEvolutionToggleMode("manual-on");
+        }
+
+        setManualEnabledGroupIds((current) => {
+          let changed = false;
+          const next = new Set(current);
+
+          for (const groupId of shortcut.groupIds) {
+            if (!next.has(groupId)) {
+              next.add(groupId);
+              changed = true;
+            }
+          }
+
+          return changed ? next : current;
+        });
+      }
+
+      setOverlayVisibilityTransitionSeed((current) => current + 1);
+      setActiveEraId(prioritizedRootEra.id);
+
+      if (range) {
+        animated.animateToRange(range.startYear, range.endYear);
+        scheduleAutoTransitionCheck();
+      }
+
+      return true;
+    },
+    [
+      animated,
+      layerRangeByShortcutId,
+      layerShortcuts,
+      prioritizedRootEra.id,
+      scheduleAutoTransitionCheck,
+    ],
   );
 
   const handleOpenSetManager = useCallback(() => {
@@ -834,6 +1016,7 @@ export function useTimelineAppState() {
     setIsCosmicCalendarMode,
     sidebarTree,
     expandedSetIds,
+    layerShortcuts,
     enabledSetIds,
     visibleSetIds,
     orderedSetIds,
@@ -852,6 +1035,11 @@ export function useTimelineAppState() {
     handleToggleEntry,
     handleToggleSet,
     handleToggleSetExpanded,
+    handleHomeRange,
+    handleFullTimelineRange,
+    handleKeyboardPan,
+    handleKeyboardZoom,
+    handleLayerShortcut,
     handleReorderSets,
     handleOpenSetManager,
     handleCloseSetManager,

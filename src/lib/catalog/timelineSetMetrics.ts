@@ -9,13 +9,32 @@ import type {
   TimelineSetId,
 } from "@/lib/core/timelineTypes";
 
+export type TimelineYearRange = {
+  startYear: number;
+  endYear: number;
+};
+
+function expandRange(
+  range: TimelineYearRange | null,
+  startYear: number,
+  endYear: number,
+): TimelineYearRange {
+  if (!range) {
+    return { startYear, endYear };
+  }
+
+  return {
+    startYear: Math.min(range.startYear, startYear),
+    endYear: Math.max(range.endYear, endYear),
+  };
+}
+
 function getDisplayErasForSet(setId: TimelineSetId): Era[] {
   return getRootDisplayErasBySets(ROOT_ERA, new Set([setId]));
 }
 
 function getDecorationExtentForSet(setId: TimelineSetId) {
-  let startYear = Number.POSITIVE_INFINITY;
-  let endYear = Number.NEGATIVE_INFINITY;
+  let range: TimelineYearRange | null = null;
 
   for (const marker of TIMELINE_MARKERS) {
     const markerSetId = marker.setId ?? resolveDecorationSetId(marker);
@@ -24,8 +43,7 @@ function getDecorationExtentForSet(setId: TimelineSetId) {
       continue;
     }
 
-    startYear = Math.min(startYear, marker.year);
-    endYear = Math.max(endYear, marker.year);
+    range = expandRange(range, marker.year, marker.year);
   }
 
   const visitOverlays = (overlays: readonly TimelineOverlayBand[]) => {
@@ -33,8 +51,7 @@ function getDecorationExtentForSet(setId: TimelineSetId) {
       const overlaySetId = overlay.setId ?? resolveDecorationSetId(overlay);
 
       if (overlaySetId === setId) {
-        startYear = Math.min(startYear, overlay.startYear);
-        endYear = Math.max(endYear, overlay.endYear);
+        range = expandRange(range, overlay.startYear, overlay.endYear);
       }
 
       if (overlay.children?.length) {
@@ -45,11 +62,7 @@ function getDecorationExtentForSet(setId: TimelineSetId) {
 
   visitOverlays(TIMELINE_OVERLAYS);
 
-  if (!Number.isFinite(startYear) || !Number.isFinite(endYear)) {
-    return null;
-  }
-
-  return { startYear, endYear };
+  return range;
 }
 
 /**
@@ -99,6 +112,79 @@ function formatSetEndpointYear(year: number, span: number): string {
   return formatTimelineYear(year, span);
 }
 
+export function computeSetYearRanges(
+  setIds: readonly TimelineSetId[],
+): Map<TimelineSetId, TimelineYearRange> {
+  const ranges = new Map<TimelineSetId, TimelineYearRange>();
+
+  for (const setId of setIds) {
+    const eras = getDisplayErasForSet(setId);
+    let range: TimelineYearRange | null =
+      eras.length > 0
+        ? {
+            startYear: Math.min(...eras.map((era) => era.startYear)),
+            endYear: Math.max(...eras.map((era) => era.endYear)),
+          }
+        : null;
+    const decorationRange = getDecorationExtentForSet(setId);
+
+    if (decorationRange) {
+      range = expandRange(
+        range,
+        decorationRange.startYear,
+        decorationRange.endYear,
+      );
+    }
+
+    if (range) {
+      ranges.set(setId, range);
+    }
+  }
+
+  return ranges;
+}
+
+export function computeGroupYearRanges(
+  groupIds: readonly string[],
+): Map<string, TimelineYearRange> {
+  const requestedGroupIds = new Set(groupIds);
+  const ranges = new Map<string, TimelineYearRange>();
+
+  for (const marker of TIMELINE_MARKERS) {
+    if (!marker.groupId || !requestedGroupIds.has(marker.groupId)) {
+      continue;
+    }
+
+    ranges.set(
+      marker.groupId,
+      expandRange(ranges.get(marker.groupId) ?? null, marker.year, marker.year),
+    );
+  }
+
+  const visitOverlays = (overlays: readonly TimelineOverlayBand[]) => {
+    for (const overlay of overlays) {
+      if (overlay.groupId && requestedGroupIds.has(overlay.groupId)) {
+        ranges.set(
+          overlay.groupId,
+          expandRange(
+            ranges.get(overlay.groupId) ?? null,
+            overlay.startYear,
+            overlay.endYear,
+          ),
+        );
+      }
+
+      if (overlay.children?.length) {
+        visitOverlays(overlay.children);
+      }
+    }
+  };
+
+  visitOverlays(TIMELINE_OVERLAYS);
+
+  return ranges;
+}
+
 /**
  * Computes a human-readable time range string for each set based on its root
  * display eras, falling back to decoration extents when a set has no eras.
@@ -107,22 +193,9 @@ export function computeSetTimeRanges(
   setIds: readonly TimelineSetId[],
 ): Map<TimelineSetId, string> {
   const ranges = new Map<TimelineSetId, string>();
+  const yearRanges = computeSetYearRanges(setIds);
 
-  for (const setId of setIds) {
-    const eras = getDisplayErasForSet(setId);
-
-    const range =
-      eras.length > 0
-        ? {
-            startYear: Math.min(...eras.map((era) => era.startYear)),
-            endYear: Math.max(...eras.map((era) => era.endYear)),
-          }
-        : getDecorationExtentForSet(setId);
-
-    if (!range) {
-      continue;
-    }
-
+  for (const [setId, range] of yearRanges) {
     const span = Math.abs(range.endYear - range.startYear);
     const start = formatSetEndpointYear(range.startYear, span);
     const end = formatSetEndpointYear(range.endYear, span);

@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { useTimelineSidebarEscape } from "../hooks/useTimelineSidebarEscape";
 import { Button } from "@/components/ui/button";
 import type { TimelineSidebarSetState } from "@/lib/app/sidebarModel";
+import type { TimelineLayerShortcutTarget } from "@/lib/app/timelineKeyboard";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import { TimelineSidebar } from "../TimelineSidebar";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,7 @@ type TimelineSidebarChromeProps = {
   activeView: "timeline" | "available-sets";
   expandedSetIds: ReadonlySet<TimelineSetId>;
   isOpen: boolean;
+  layerShortcuts: readonly TimelineLayerShortcutTarget[];
   mode: "drawer" | "popup";
   onOpenSetManager: () => void;
   onReorderSets: (nextSetIds: TimelineSetId[]) => void;
@@ -21,6 +23,7 @@ type TimelineSidebarChromeProps = {
     nextExpanded: boolean,
   ) => void;
   setIsOpen: (updater: boolean | ((current: boolean) => boolean)) => void;
+  showShortcuts?: boolean;
   sets: TimelineSidebarSetState[];
 };
 
@@ -28,6 +31,7 @@ export function TimelineSidebarChrome({
   activeView,
   expandedSetIds,
   isOpen,
+  layerShortcuts,
   mode,
   onOpenSetManager,
   onReorderSets,
@@ -35,6 +39,7 @@ export function TimelineSidebarChrome({
   onToggleSet,
   onToggleSetExpanded,
   setIsOpen,
+  showShortcuts = true,
   sets,
 }: TimelineSidebarChromeProps) {
   const closeSidebar = useCallback(() => {
@@ -114,12 +119,14 @@ export function TimelineSidebarChrome({
       >
         <TimelineSidebar
           expandedSetIds={expandedSetIds}
+          layerShortcuts={layerShortcuts}
           mode={mode}
           onOpenSetManager={onOpenSetManager}
           onReorderSets={onReorderSets}
           onToggleEntry={onToggleEntry}
           onToggleSet={onToggleSet}
           onToggleSetExpanded={onToggleSetExpanded}
+          showShortcuts={showShortcuts}
           sets={sets}
         />
       </div>

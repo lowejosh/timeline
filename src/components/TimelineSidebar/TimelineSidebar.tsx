@@ -33,16 +33,23 @@ import type {
   TimelineSidebarChildState,
   TimelineSidebarSetState,
 } from "@/lib/app/sidebarModel";
+import {
+  getChildLayerShortcutId,
+  getSetLayerShortcutId,
+  type TimelineLayerShortcutTarget,
+} from "@/lib/app/timelineKeyboard";
 
 type TimelineSidebarProps = {
   sets: TimelineSidebarSetState[];
   expandedSetIds: ReadonlySet<TimelineSetId>;
+  layerShortcuts: readonly TimelineLayerShortcutTarget[];
   mode?: "drawer" | "popup";
   onReorderSets: (nextSetIds: TimelineSetId[]) => void;
   onToggleSet: (setId: TimelineSetId, nextEnabled: boolean) => void;
   onToggleSetExpanded: (setId: TimelineSetId, nextExpanded: boolean) => void;
   onToggleEntry: (groupIds: string[], nextEnabled: boolean) => void;
   onOpenSetManager: () => void;
+  showShortcuts?: boolean;
 };
 
 type SetLayoutSnapshot = {
@@ -152,15 +159,25 @@ function formatChildMeta(child: TimelineSidebarChildState) {
   return parts.join(" · ");
 }
 
+function HotkeyBadge({ value }: { value: string }) {
+  return (
+    <kbd className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded border border-border/70 bg-surface/70 px-1.5 font-mono text-[0.62rem] font-semibold leading-none text-muted-foreground shadow-[inset_0_-1px_0_rgba(77,61,47,0.08)]">
+      {value}
+    </kbd>
+  );
+}
+
 export function TimelineSidebar({
   sets,
   expandedSetIds,
+  layerShortcuts,
   mode = "popup",
   onReorderSets,
   onToggleSet,
   onToggleSetExpanded,
   onToggleEntry,
   onOpenSetManager,
+  showShortcuts = true,
 }: TimelineSidebarProps) {
   const treeRef = useRef<HTMLDivElement | null>(null);
   const setShellRefs = useRef(new Map<TimelineSetId, HTMLElement>());
@@ -178,6 +195,13 @@ export function TimelineSidebar({
   const orderedEnabledSetIds = useMemo(
     () => sets.filter((set) => set.enabled).map((set) => set.id),
     [sets],
+  );
+  const shortcutById = useMemo(
+    () =>
+      new Map(
+        layerShortcuts.map((shortcut) => [shortcut.id, shortcut.key] as const),
+      ),
+    [layerShortcuts],
   );
   const eraObscuredCounts = useMemo(
     () => computeEraObscuredCounts(orderedEnabledSetIds),
@@ -532,6 +556,7 @@ export function TimelineSidebar({
           {sets.map((set) => {
             const expanded = expandedSetIds.has(set.id);
             const isDragged = dragState?.setId === set.id;
+            const setShortcut = shortcutById.get(getSetLayerShortcutId(set.id));
             const previewTop = previewTopBySetId?.get(set.id);
             const originalTop = dragState?.layout.tops.get(set.id);
             const translateY = dragState
@@ -661,64 +686,82 @@ export function TimelineSidebar({
                         </span>
                       </span>
 
-                      <ChevronDown
-                        aria-hidden="true"
-                        className={cn(
-                          "size-4 text-muted-foreground transition-transform duration-200",
-                          expanded && "rotate-180",
-                        )}
-                      />
+                      <span className="inline-flex shrink-0 items-center gap-1.5">
+                        {showShortcuts && setShortcut ? (
+                          <HotkeyBadge value={setShortcut} />
+                        ) : null}
+                        <ChevronDown
+                          aria-hidden="true"
+                          className={cn(
+                            "size-4 text-muted-foreground transition-transform duration-200",
+                            expanded && "rotate-180",
+                          )}
+                        />
+                      </span>
                     </div>
                   </CollapsibleTrigger>
 
                   <CollapsibleContent>
                     <ul className="m-0 grid list-none gap-0 border-t border-border/50 p-0">
-                      {set.children.map((child) => (
-                        <li
-                          className={cn(
-                            "border-t border-border/40 first:border-t-0",
-                            !set.enabled && "opacity-60",
-                          )}
-                          data-parent-enabled={set.enabled ? "true" : "false"}
-                          key={child.id}
-                        >
-                          <label
+                      {set.children.map((child) => {
+                        const childShortcut = shortcutById.get(
+                          getChildLayerShortcutId(child),
+                        );
+
+                        return (
+                          <li
                             className={cn(
-                              "grid w-full min-w-0 cursor-pointer grid-cols-[auto_1fr] items-center gap-2 bg-muted/20 px-2 py-2 transition-colors hover:bg-muted/50",
-                              !set.enabled && "cursor-default",
-                              mode === "drawer"
-                                ? "pl-[calc(env(safe-area-inset-left,0px)+0.62rem)]"
-                                : "pl-8",
+                              "border-t border-border/40 first:border-t-0",
+                              !set.enabled && "opacity-60",
                             )}
+                            data-parent-enabled={
+                              set.enabled ? "true" : "false"
+                            }
+                            key={child.id}
                           >
-                            <Checkbox
-                              checked={child.enabled}
-                              disabled={!set.enabled}
-                              indeterminate={child.mixed}
-                              onChange={(event) => {
-                                onToggleEntry(
-                                  child.groupIds,
-                                  event.currentTarget.checked,
-                                );
-                              }}
-                            />
-                            <span className="grid min-w-0 gap-0.5">
-                              <span className="flex min-w-0 items-center justify-between gap-1.5">
-                                <span className="min-w-0 flex-1 text-[0.76rem] font-semibold leading-tight text-foreground">
-                                  {child.label}
+                            <label
+                              className={cn(
+                                "grid w-full min-w-0 cursor-pointer grid-cols-[auto_1fr] items-center gap-2 bg-muted/20 px-2 py-2 transition-colors hover:bg-muted/50",
+                                !set.enabled && "cursor-default",
+                                mode === "drawer"
+                                  ? "pl-[calc(env(safe-area-inset-left,0px)+0.62rem)]"
+                                  : "pl-8",
+                              )}
+                            >
+                              <Checkbox
+                                checked={child.enabled}
+                                disabled={!set.enabled}
+                                indeterminate={child.mixed}
+                                onChange={(event) => {
+                                  onToggleEntry(
+                                    child.groupIds,
+                                    event.currentTarget.checked,
+                                  );
+                                }}
+                              />
+                              <span className="grid min-w-0 gap-0.5">
+                                <span className="flex min-w-0 items-center justify-between gap-1.5">
+                                  <span className="min-w-0 flex-1 text-[0.76rem] font-semibold leading-tight text-foreground">
+                                    {child.label}
+                                  </span>
+                                  <span className="inline-flex shrink-0 items-center gap-1.5">
+                                    <OverlayGroupIconSvg
+                                      className="size-4 shrink-0 self-center text-muted-foreground opacity-75 empty:hidden"
+                                      groupId={child.id}
+                                    />
+                                    {showShortcuts && childShortcut ? (
+                                      <HotkeyBadge value={childShortcut} />
+                                    ) : null}
+                                  </span>
                                 </span>
-                                <OverlayGroupIconSvg
-                                  className="size-4 shrink-0 self-center text-muted-foreground opacity-75 empty:hidden"
-                                  groupId={child.id}
-                                />
+                                <span className="text-[0.6rem] font-semibold leading-tight tracking-[0.01em] text-muted-foreground">
+                                  {formatChildMeta(child)}
+                                </span>
                               </span>
-                              <span className="text-[0.6rem] font-semibold leading-tight tracking-[0.01em] text-muted-foreground">
-                                {formatChildMeta(child)}
-                              </span>
-                            </span>
-                          </label>
-                        </li>
-                      ))}
+                            </label>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </CollapsibleContent>
                 </Collapsible>
