@@ -6,7 +6,10 @@ import {
   type PointerEvent,
 } from "react";
 
-import { useExpandedOverlayAnimation } from "./animation/useExpandedOverlayAnimation";
+import {
+  deriveExpandedOverlayIds,
+  useExpandedOverlayAnimation,
+} from "./animation/useExpandedOverlayAnimation";
 import { useOverlayBandAnimation } from "./animation/useOverlayBandAnimation";
 import { useMarkerPriorityBoost } from "./animation/useMarkerPriorityBoost";
 import type { Era } from "@/lib/catalog/eras";
@@ -580,6 +583,32 @@ export function TimelineCanvas({
     progressByIdRef: expandedOverlayProgressByIdRef,
     renderedIdsRef: renderedExpandedOverlayIdsRef,
   } = useExpandedOverlayAnimation(expandedOverlayIds, scheduleRedraw);
+
+  useEffect(() => {
+    setExpandedOverlayIds((current) => {
+      const derived = deriveExpandedOverlayIds(current, resolvedOverlayBands);
+
+      if (derived === current) return current;
+
+      // Snap animation to 0 immediately for zoom-collapsed IDs so there's no
+      // glitchy in-progress transition while the viewport is also moving.
+      for (const id of current) {
+        if (!derived.includes(id)) {
+          expandedOverlayProgressByIdRef.current.delete(id);
+        }
+      }
+      renderedExpandedOverlayIdsRef.current =
+        renderedExpandedOverlayIdsRef.current.filter((id) =>
+          derived.includes(id),
+        );
+
+      return derived;
+    });
+  }, [
+    resolvedOverlayBands,
+    expandedOverlayProgressByIdRef,
+    renderedExpandedOverlayIdsRef,
+  ]);
 
   useEffect(() => {
     return () => {

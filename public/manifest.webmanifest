@@ -1,6 +1,6 @@
 {
-  "name": "Timeline",
-  "short_name": "Timeline",
+  "name": "a timeline project",
+  "short_name": "timeline",
   "description": "An interactive educational timeline.",
   "start_url": ".",
   "scope": ".",

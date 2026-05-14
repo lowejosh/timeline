@@ -17,10 +17,12 @@ import {
 import {
   readStoredEnabledSetIds,
   readStoredExpandedSetIds,
+  readStoredSidebarOpen,
   readStoredTimelineSetOrder,
   readStoredVisibleSetIds,
   writeStoredEnabledSetIds,
   writeStoredExpandedSetIds,
+  writeStoredSidebarOpen,
   writeStoredTimelineSetOrder,
   writeStoredVisibleSetIds,
 } from "../lib/app/timelineSetStorage";
@@ -71,6 +73,12 @@ const HUMAN_EVOLUTION_GROUP_ID =
   TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
 
 function shouldStartWithSidebarOpen() {
+  const stored = readStoredSidebarOpen();
+
+  if (stored !== null) {
+    return stored;
+  }
+
   if (typeof window === "undefined") {
     return true;
   }
@@ -159,10 +167,17 @@ export function useTimelineAppState() {
     }
 
     hasResolvedInitialSidebarVisibilityRef.current = true;
-    setIsSidebarOpen(
-      !shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height),
-    );
+
+    if (readStoredSidebarOpen() === null) {
+      setIsSidebarOpen(
+        !shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height),
+      );
+    }
   }, [stageSize.height, stageSize.width]);
+
+  useEffect(() => {
+    writeStoredSidebarOpen(isSidebarOpen);
+  }, [isSidebarOpen]);
 
   useEffect(() => {
     writeStoredTimelineSetOrder(orderedSetIds);

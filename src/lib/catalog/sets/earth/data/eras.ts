@@ -405,6 +405,45 @@ const QUATERNARY_SERIES: EraDefinition[] = [
   },
 ];
 
+const ARCHEAN_ERA_DEFINITIONS: EraDefinition[] = [
+  {
+    id: "eoarchean",
+    name: "Eoarchean",
+    startYear: yearsAgo(4_031_000_000),
+    endYear: yearsAgo(3_600_000_000),
+    color: icsHex("#DA037F"),
+    scheme: "chronostratigraphic",
+    sourceIds: chartRef(),
+  },
+  {
+    id: "paleoarchean",
+    name: "Paleoarchean",
+    startYear: yearsAgo(3_600_000_000),
+    endYear: yearsAgo(3_200_000_000),
+    color: icsHex("#F4449F"),
+    scheme: "chronostratigraphic",
+    sourceIds: chartRef(),
+  },
+  {
+    id: "mesoarchean",
+    name: "Mesoarchean",
+    startYear: yearsAgo(3_200_000_000),
+    endYear: yearsAgo(2_800_000_000),
+    color: icsHex("#F768A9"),
+    scheme: "chronostratigraphic",
+    sourceIds: chartRef(),
+  },
+  {
+    id: "neoarchean",
+    name: "Neoarchean",
+    startYear: yearsAgo(2_800_000_000),
+    endYear: yearsAgo(2_500_000_000),
+    color: icsHex("#F99BC1"),
+    scheme: "chronostratigraphic",
+    sourceIds: chartRef(),
+  },
+];
+
 const PROTEROZOIC_SUBDIVISIONS: EraDefinition[] = [
   {
     id: "siderian",
@@ -658,24 +697,14 @@ export const GEOLOGICAL_ERA_DEFINITIONS: EraDefinition[] = [
     id: "hadean",
     name: "Hadean",
     startYear: yearsAgo(4_567_000_000),
-    endYear: yearsAgo(4_000_000_000),
-    color: icsColor(174, 2, 126),
+    endYear: yearsAgo(4_031_000_000),
+    color: icsHex("#AE027E"),
     description:
       "Earth's crust cools and solidifies, but no life is yet known from this interval.",
     scheme: "chronostratigraphic",
     sourceIds: chartAndGuideRefs(),
   },
-  {
-    id: "archean",
-    name: "Archean",
-    startYear: yearsAgo(4_000_000_000),
-    endYear: yearsAgo(2_500_000_000),
-    color: icsColor(240, 4, 127),
-    description:
-      "Earth's earliest known life appears, largely microbial, while photosynthesis begins the long oxygenation of the atmosphere.",
-    scheme: "chronostratigraphic",
-    sourceIds: chartAndGuideRefs(),
-  },
+  ...ARCHEAN_ERA_DEFINITIONS,
   ...PROTEROZOIC_SUBDIVISIONS,
   ...PALEOZOIC_SYSTEMS,
   ...MESOZOIC_SYSTEMS,

@@ -9,6 +9,7 @@ const TIMELINE_SET_ORDER_STORAGE_KEY = "timeline:set-order:v1";
 const TIMELINE_ENABLED_SET_IDS_STORAGE_KEY = "timeline:enabled-set-ids:v1";
 const TIMELINE_EXPANDED_SET_IDS_STORAGE_KEY = "timeline:expanded-set-ids:v1";
 const TIMELINE_VISIBLE_SET_IDS_STORAGE_KEY = "timeline:visible-set-ids:v1";
+const TIMELINE_SIDEBAR_OPEN_STORAGE_KEY = "timeline:sidebar-open:v1";
 
 function readTimelineSetIdSet(
   key: string,
@@ -115,4 +116,28 @@ export function writeStoredTimelineSetOrder(setIds: readonly TimelineSetId[]) {
     TIMELINE_SET_ORDER_STORAGE_KEY,
     normalizeTimelineSetOrder(setIds),
   );
+}
+
+export function readStoredSidebarOpen(): boolean | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const storedValue = window.localStorage.getItem(
+      TIMELINE_SIDEBAR_OPEN_STORAGE_KEY,
+    );
+
+    if (storedValue === null) {
+      return null;
+    }
+
+    return storedValue === "true";
+  } catch {
+    return null;
+  }
+}
+
+export function writeStoredSidebarOpen(value: boolean) {
+  writeJsonToStorage(TIMELINE_SIDEBAR_OPEN_STORAGE_KEY, value);
 }
