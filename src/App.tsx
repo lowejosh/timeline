@@ -1,32 +1,30 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { useStandaloneViewportHeight } from "./hooks/useStandaloneViewportHeight";
+import { useTimelineKeyboardShortcuts } from "./hooks/useTimelineKeyboardShortcuts";
 import { getTimelineAppLayoutState } from "./lib/app/layout";
 import { TimelineSidebarChrome } from "./components/TimelineSidebar";
-import { TimelineKeyboardHelp } from "./components/TimelineKeyboardHelp/TimelineKeyboardHelp";
+import {
+  TimelineKeyboardHelp,
+  TimelineKeyboardHelpButton,
+} from "./components/TimelineKeyboardHelp/TimelineKeyboardHelp";
 import { useTimelineAppState } from "./hooks/useTimelineAppState";
 import { TimelineSettings } from "./components/TimelineSettings";
 import { TimelineView } from "./views/TimelineView";
-import {
-  getPrimaryShortcutModifierLabel,
-  isPrimaryShortcutModifier,
-} from "./lib/app/timelineKeyboard";
+import { getPrimaryShortcutModifierLabel } from "./lib/app/timelineKeyboard";
 
 const AvailableSetsView = lazy(() =>
   import("./views/AvailableSetsView").then((module) => ({
     default: module.AvailableSetsView,
   })),
 );
-
-function isEditableShortcutTarget(target: EventTarget | null) {
-  if (!(target instanceof HTMLElement)) {
-    return false;
-  }
-
-  return Boolean(
-    target.closest('input, textarea, select, [contenteditable="true"]'),
-  );
-}
 
 function App() {
   const app = useTimelineAppState();
@@ -43,6 +41,12 @@ function App() {
     () => getPrimaryShortcutModifierLabel(),
     [],
   );
+  const closeKeyboardHelp = useCallback(() => {
+    setIsKeyboardHelpOpen(false);
+  }, []);
+  const toggleKeyboardHelp = useCallback(() => {
+    setIsKeyboardHelpOpen((current) => !current);
+  }, []);
 
   useStandaloneViewportHeight();
 
@@ -54,110 +58,19 @@ function App() {
     setIsKeyboardHelpOpen(false);
   }, [shortcutUiEnabled]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.defaultPrevented || !shortcutUiEnabled) {
-        return;
-      }
-
-      const key = event.key;
-      const normalizedKey = key.toLowerCase();
-      const primaryModified = isPrimaryShortcutModifier(event);
-
-      if (primaryModified && normalizedKey === "/") {
-        event.preventDefault();
-        setIsKeyboardHelpOpen((current) => !current);
-        return;
-      }
-
-      if (isKeyboardHelpOpen) {
-        if (key === "Escape") {
-          event.preventDefault();
-          setIsKeyboardHelpOpen(false);
-        }
-
-        return;
-      }
-
-      if (isEditableShortcutTarget(event.target)) {
-        return;
-      }
-
-      if (primaryModified && normalizedKey === "k") {
-        event.preventDefault();
-        setIsKeyboardHelpOpen(true);
-        return;
-      }
-
-      if (event.altKey || event.metaKey || event.ctrlKey) {
-        return;
-      }
-
-      if (normalizedKey === "l") {
-        event.preventDefault();
-        setIsSidebarOpen((current) => !current);
-        return;
-      }
-
-      if (key === "+" || key === "=" || key === "ArrowUp") {
-        event.preventDefault();
-        app.handleKeyboardZoom(1);
-        return;
-      }
-
-      if (key === "-" || key === "_" || key === "ArrowDown") {
-        event.preventDefault();
-        app.handleKeyboardZoom(-1);
-        return;
-      }
-
-      if (key === "ArrowLeft") {
-        event.preventDefault();
-        app.handleKeyboardPan(event.shiftKey ? 360 : 120);
-        return;
-      }
-
-      if (key === "ArrowRight") {
-        event.preventDefault();
-        app.handleKeyboardPan(event.shiftKey ? -360 : -120);
-        return;
-      }
-
-      if (key === "Home") {
-        event.preventDefault();
-        app.handleHomeRange();
-        return;
-      }
-
-      if (key === "0") {
-        event.preventDefault();
-        app.handleFullTimelineRange();
-        return;
-      }
-
-      if (key === "Escape" && isSidebarOpen) {
-        event.preventDefault();
-        setIsSidebarOpen(false);
-        return;
-      }
-
-      if (app.handleLayerShortcut(normalizedKey)) {
-        event.preventDefault();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [
-    app,
-    isKeyboardHelpOpen,
+  useTimelineKeyboardShortcuts({
+    enabled: shortcutUiEnabled,
+    isHelpOpen: isKeyboardHelpOpen,
     isSidebarOpen,
-    setIsSidebarOpen,
-    shortcutUiEnabled,
-  ]);
+    onCloseHelp: closeKeyboardHelp,
+    onFullTimelineRange: app.handleFullTimelineRange,
+    onHelpOpenChange: setIsKeyboardHelpOpen,
+    onHomeRange: app.handleHomeRange,
+    onLayerShortcut: app.handleLayerShortcut,
+    onNavigationEnd: app.handleKeyboardNavigationEnd,
+    onNavigationFrame: app.handleKeyboardNavigationFrame,
+    onSidebarOpenChange: setIsSidebarOpen,
+  });
 
   return (
     <main
@@ -167,12 +80,21 @@ function App() {
       data-sidebar-open={isSidebarOpen ? "true" : "false"}
     >
       {activeView === "timeline" ? (
-        <TimelineSettings
-          isCosmicCalendarMode={app.isCosmicCalendarMode}
-          onToggleCosmicCalendarMode={() => {
-            app.setIsCosmicCalendarMode((current) => !current);
-          }}
-        />
+        <>
+          {shortcutUiEnabled ? (
+            <TimelineKeyboardHelpButton
+              isOpen={isKeyboardHelpOpen}
+              modifierLabel={shortcutModifierLabel}
+              onClick={toggleKeyboardHelp}
+            />
+          ) : null}
+          <TimelineSettings
+            isCosmicCalendarMode={app.isCosmicCalendarMode}
+            onToggleCosmicCalendarMode={() => {
+              app.setIsCosmicCalendarMode((current) => !current);
+            }}
+          />
+        </>
       ) : null}
       <TimelineSidebarChrome
         activeView={activeView}
@@ -204,9 +126,7 @@ function App() {
         isOpen={isKeyboardHelpOpen && shortcutUiEnabled}
         layerShortcuts={app.layerShortcuts}
         modifierLabel={shortcutModifierLabel}
-        onClose={() => {
-          setIsKeyboardHelpOpen(false);
-        }}
+        onClose={closeKeyboardHelp}
       />
     </main>
   );

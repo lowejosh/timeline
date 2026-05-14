@@ -1,6 +1,7 @@
-import { X } from "lucide-react";
+import { Keyboard, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ShortcutChord } from "@/components/ui/shortcut-key";
 import type { TimelineLayerShortcutTarget } from "@/lib/app/timelineKeyboard";
 
 type TimelineKeyboardHelpProps = {
@@ -10,19 +11,17 @@ type TimelineKeyboardHelpProps = {
   onClose: () => void;
 };
 
+type TimelineKeyboardHelpButtonProps = {
+  isOpen: boolean;
+  modifierLabel: string;
+  onClick: () => void;
+};
+
 type ShortcutHelpRow = {
   label: string;
   keys: string[];
   note?: string;
 };
-
-function Keycap({ value }: { value: string }) {
-  return (
-    <kbd className="inline-flex min-h-6 min-w-6 items-center justify-center rounded border border-border bg-surface/80 px-1.5 font-mono text-[0.68rem] font-semibold leading-none text-foreground shadow-[inset_0_-1px_0_rgba(77,61,47,0.1)]">
-      {value}
-    </kbd>
-  );
-}
 
 function ShortcutRow({ row }: { row: ShortcutHelpRow }) {
   return (
@@ -35,12 +34,38 @@ function ShortcutRow({ row }: { row: ShortcutHelpRow }) {
           </span>
         ) : null}
       </span>
-      <span className="flex shrink-0 items-center gap-1">
-        {row.keys.map((key) => (
-          <Keycap key={key} value={key} />
-        ))}
-      </span>
+      <ShortcutChord keys={row.keys} />
     </li>
+  );
+}
+
+export function TimelineKeyboardHelpButton({
+  isOpen,
+  modifierLabel,
+  onClick,
+}: TimelineKeyboardHelpButtonProps) {
+  return (
+    <div className="absolute right-[96px] top-3 z-[4] max-sm:hidden">
+      <Button
+        aria-expanded={isOpen}
+        aria-label={
+          isOpen ? "Hide keyboard shortcuts" : "Show keyboard shortcuts"
+        }
+        className="group rounded-full px-2.5"
+        data-state={isOpen ? "open" : "closed"}
+        onClick={onClick}
+        size="pill"
+        type="button"
+        variant="glass"
+      >
+        <Keyboard className="size-4 transition-transform duration-200 group-data-[state=open]:-rotate-6" />
+        <ShortcutChord
+          className="text-muted-foreground"
+          keys={[modifierLabel, "/"]}
+          size="sm"
+        />
+      </Button>
+    </div>
   );
 }
 
@@ -58,12 +83,13 @@ export function TimelineKeyboardHelp({
     { label: "Show Keyboard Shortcuts", keys: [modifierLabel, "/"] },
     { label: "Toggle Layers", keys: ["L"] },
     { label: "Search", keys: [modifierLabel, "K"], note: "(soon)" },
-    { label: "Zoom In", keys: ["+"] },
-    { label: "Zoom Out", keys: ["-"] },
+    { label: "Zoom In", keys: ["+", "↑"] },
+    { label: "Zoom Out", keys: ["-", "↓"] },
+    { label: "Fast Zoom", keys: ["Shift", "+/-"] },
     { label: "Pan Left / Right", keys: ["←", "→"] },
     { label: "Fast Pan", keys: ["Shift", "←/→"] },
-    { label: "Home: 5000 BCE to Present", keys: ["Home"] },
-    { label: "Full Timeline", keys: ["0"] },
+    { label: "Home", keys: ["H", "Home"] },
+    { label: "Full Timeline", keys: ["O"] },
     { label: "Close", keys: ["Esc"] },
   ];
 
@@ -71,7 +97,7 @@ export function TimelineKeyboardHelp({
     <div
       aria-label="Keyboard shortcuts"
       aria-modal="true"
-      className="absolute inset-0 z-[60] flex items-start justify-center bg-[rgba(44,31,20,0.16)] px-3 pt-[calc(env(safe-area-inset-top,0px)+4.5rem)] backdrop-blur-sm"
+      className="absolute inset-0 z-[60] flex animate-[shortcut-overlay-in_180ms_ease-out] items-start justify-center bg-[rgba(44,31,20,0.16)] px-3 pt-[calc(env(safe-area-inset-top,0px)+4.5rem)] backdrop-blur-sm"
       role="dialog"
     >
       <button
@@ -80,7 +106,7 @@ export function TimelineKeyboardHelp({
         onClick={onClose}
         type="button"
       />
-      <section className="relative grid max-h-[min(78svh,620px)] w-[min(34rem,calc(100vw-24px))] grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-panel">
+      <section className="relative grid max-h-[min(78svh,620px)] w-[min(34rem,calc(100vw-24px))] animate-[shortcut-dialog-in_220ms_cubic-bezier(0.22,1,0.36,1)] grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-panel">
         <header className="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-3">
           <h2 className="m-0 font-display text-base font-semibold leading-none text-foreground">
             Keyboard Shortcuts
@@ -120,7 +146,6 @@ export function TimelineKeyboardHelp({
                     row={{
                       label: shortcut.label,
                       keys: [shortcut.key],
-                      note: shortcut.kind === "set" ? "(open + travel)" : "(show + travel)",
                     }}
                   />
                 ))}
@@ -132,4 +157,3 @@ export function TimelineKeyboardHelp({
     </div>
   );
 }
-

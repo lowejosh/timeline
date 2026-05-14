@@ -43,7 +43,6 @@ const LAYER_SHORTCUT_KEYS = [
   "J",
   "M",
   "N",
-  "O",
   "P",
   "Q",
   "R",
@@ -124,4 +123,3 @@ export function allocateTimelineLayerShortcuts(
 
   return shortcuts;
 }
-

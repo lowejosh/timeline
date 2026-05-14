@@ -12,6 +12,7 @@ import { AlertTriangle, ChevronDown, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ShortcutKey } from "@/components/ui/shortcut-key";
 import {
   Collapsible,
   CollapsibleContent,
@@ -157,14 +158,6 @@ function formatChildMeta(child: TimelineSidebarChildState) {
   }
 
   return parts.join(" · ");
-}
-
-function HotkeyBadge({ value }: { value: string }) {
-  return (
-    <kbd className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded border border-border/70 bg-surface/70 px-1.5 font-mono text-[0.62rem] font-semibold leading-none text-muted-foreground shadow-[inset_0_-1px_0_rgba(77,61,47,0.08)]">
-      {value}
-    </kbd>
-  );
 }
 
 export function TimelineSidebar({
@@ -688,7 +681,12 @@ export function TimelineSidebar({
 
                       <span className="inline-flex shrink-0 items-center gap-1.5">
                         {showShortcuts && setShortcut ? (
-                          <HotkeyBadge value={setShortcut} />
+                          <ShortcutKey
+                            className="border-border/70 bg-surface/70 text-muted-foreground"
+                            size="sm"
+                          >
+                            {setShortcut}
+                          </ShortcutKey>
                         ) : null}
                         <ChevronDown
                           aria-hidden="true"
@@ -750,7 +748,12 @@ export function TimelineSidebar({
                                       groupId={child.id}
                                     />
                                     {showShortcuts && childShortcut ? (
-                                      <HotkeyBadge value={childShortcut} />
+                                      <ShortcutKey
+                                        className="border-border/70 bg-surface/70 text-muted-foreground"
+                                        size="sm"
+                                      >
+                                        {childShortcut}
+                                      </ShortcutKey>
                                     ) : null}
                                   </span>
                                 </span>

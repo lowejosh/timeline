@@ -67,6 +67,7 @@ import {
   TIMELINE_MAX_YEAR,
   TIMELINE_MIN_YEAR,
   worldToScreen,
+  zoomAtPosition,
   type TimelineViewport,
 } from "../lib/core/viewport";
 import {
@@ -774,23 +775,41 @@ export function useTimelineAppState() {
     scheduleAutoTransitionCheck();
   }, [animated, prioritizedRootEra.id, scheduleAutoTransitionCheck]);
 
-  const handleKeyboardPan = useCallback(
-    (deltaPixels: number) => {
-      animated.updateViewport((current) =>
-        panByPixels(current, deltaPixels, viewportWidthRef.current),
-      );
-      scheduleAutoTransitionCheck();
+  const handleKeyboardNavigationFrame = useCallback(
+    ({
+      panPixels,
+      zoomAnchorRatio,
+      zoomDelta,
+    }: {
+      panPixels: number;
+      zoomAnchorRatio: number;
+      zoomDelta: number;
+    }) => {
+      if (panPixels === 0 && zoomDelta === 0) {
+        return;
+      }
+
+      animated.updateViewportDirect((current) => {
+        const width = viewportWidthRef.current;
+        const zoomed =
+          zoomDelta !== 0
+            ? zoomAtPosition(
+                current,
+                current.zoom + zoomDelta,
+                width * zoomAnchorRatio,
+                width,
+              )
+            : current;
+
+        return panPixels !== 0 ? panByPixels(zoomed, panPixels, width) : zoomed;
+      });
     },
-    [animated, scheduleAutoTransitionCheck],
+    [animated],
   );
 
-  const handleKeyboardZoom = useCallback(
-    (zoomDelta: number) => {
-      animated.animateZoom(zoomDelta, viewportWidthRef.current / 2);
-      scheduleAutoTransitionCheck();
-    },
-    [animated, scheduleAutoTransitionCheck],
-  );
+  const handleKeyboardNavigationEnd = useCallback(() => {
+    scheduleAutoTransitionCheck();
+  }, [scheduleAutoTransitionCheck]);
 
   const handleLayerShortcut = useCallback(
     (normalizedKey: string) => {
@@ -1037,8 +1056,8 @@ export function useTimelineAppState() {
     handleToggleSetExpanded,
     handleHomeRange,
     handleFullTimelineRange,
-    handleKeyboardPan,
-    handleKeyboardZoom,
+    handleKeyboardNavigationFrame,
+    handleKeyboardNavigationEnd,
     handleLayerShortcut,
     handleReorderSets,
     handleOpenSetManager,
