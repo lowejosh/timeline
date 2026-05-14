@@ -3,6 +3,19 @@ import { bce } from "@/lib/core/timelineDateBuilders";
 
 export const IRON_AGE_MARKERS: TimelineMarker[] = [
   {
+    id: "battle-of-the-delta",
+    label: "Battle of the Delta",
+    shortLabel: "Delta Battle",
+    description:
+      "Ramesses III repelled a major Sea Peoples invasion in fighting around the eastern Nile Delta.",
+    year: bce(1_175),
+    regionalScopeLabel: "Egypt and eastern Mediterranean",
+    approximate: true,
+    minZoom: 18,
+    priority: 78,
+    sourceIds: ["battleOfTheDeltaWikipedia"],
+  },
+  {
     id: "battle-of-qarqar",
     label: "Battle of Qarqar",
     shortLabel: "Qarqar",
@@ -27,6 +40,57 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     sourceIds: ["britannicaOlympicGames"],
   },
   {
+    id: "black-obelisk-erected",
+    label: "Black Obelisk of Shalmaneser III erected",
+    shortLabel: "Black Obelisk",
+    description:
+      "The Black Obelisk commemorated Shalmaneser III's deeds in relief and inscriptions, including its famous tribute scene of Jehu.",
+    year: bce(827),
+    regionalScopeLabel: "Assyria",
+    approximate: true,
+    minZoom: 18,
+    priority: 75,
+    sourceIds: ["blackObeliskWikipedia"],
+  },
+  {
+    id: "gezer-calendar-inscribed",
+    label: "Gezer calendar inscribed",
+    shortLabel: "Gezer Calendar",
+    description:
+      "A small limestone tablet from Gezer preserved an early Canaanite agricultural calendar.",
+    year: bce(1_000),
+    regionalScopeLabel: "Levant",
+    approximate: true,
+    minZoom: 18,
+    priority: 74,
+    sourceIds: ["gezerCalendarWikipedia"],
+  },
+  {
+    id: "siloam-inscription-carved",
+    label: "Siloam inscription carved",
+    shortLabel: "Siloam Inscription",
+    description:
+      "The Siloam inscription recorded the cutting of Jerusalem's water tunnel from the Gihon Spring to the Pool of Siloam.",
+    year: bce(700),
+    regionalScopeLabel: "Judah",
+    approximate: true,
+    minZoom: 18,
+    priority: 75,
+    sourceIds: ["siloamInscriptionWikipedia"],
+  },
+  {
+    id: "siege-of-lachish",
+    label: "Siege of Lachish",
+    shortLabel: "Lachish",
+    description:
+      "Assyrian forces took Lachish in 701 BC, a conquest later memorialized in Sennacherib's palace reliefs.",
+    year: bce(701),
+    regionalScopeLabel: "Levant",
+    minZoom: 18,
+    priority: 77,
+    sourceIds: ["siegeOfLachishWikipedia"],
+  },
+  {
     id: "nineveh-falls",
     label: "Nineveh falls",
     shortLabel: "Nineveh Falls",
@@ -49,6 +113,19 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     minZoom: 18,
     priority: 78,
     sourceIds: ["siegeOfJerusalem587Wikipedia"],
+  },
+  {
+    id: "battle-of-carchemish",
+    label: "Battle of Carchemish",
+    shortLabel: "Carchemish",
+    description:
+      "Babylon defeated Egyptian and Assyrian forces at Carchemish, ending Egyptian influence in the Levant and opening the way for Babylonian expansion.",
+    year: bce(605),
+    regionalScopeLabel: "Levant",
+    approximate: true,
+    minZoom: 18,
+    priority: 79,
+    sourceIds: ["battleOfCarchemishWikipedia"],
   },
   {
     id: "cyrus-captures-babylon",

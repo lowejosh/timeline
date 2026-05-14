@@ -30,6 +30,14 @@ export const HUMAN_SOURCES = {
       'Wikipedia contributors, "Battle of Kadesh." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Battle_of_Kadesh",
   },
+  battleOfCarchemishWikipedia: {
+    shortTitle: "Wikipedia: Battle of Carchemish",
+    title: "Battle of Carchemish",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Battle of Carchemish." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Battle_of_Carchemish",
+  },
   battleOfMegiddoWikipedia: {
     shortTitle: "Wikipedia: Battle of Megiddo",
     title: "Battle of Megiddo (15th century BC)",
@@ -37,6 +45,14 @@ export const HUMAN_SOURCES = {
     citation:
       'Wikipedia contributors, "Battle of Megiddo (15th century BC)." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Battle_of_Megiddo_(15th_century_BC)",
+  },
+  battleOfTheDeltaWikipedia: {
+    shortTitle: "Wikipedia: Battle of the Delta",
+    title: "Battle of the Delta",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Battle of the Delta." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Battle_of_the_Delta",
   },
   battleOfTalasWikipedia: {
     shortTitle: "Wikipedia: Battle of Talas",
@@ -115,6 +131,14 @@ export const HUMAN_SOURCES = {
     organization: "Encyclopaedia Britannica",
     citation: 'Encyclopaedia Britannica, "German Empire."',
     url: "https://www.britannica.com/place/German-Empire",
+  },
+  blackObeliskWikipedia: {
+    shortTitle: "Wikipedia: Black Obelisk",
+    title: "Black Obelisk of Shalmaneser III",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Black Obelisk of Shalmaneser III." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Black_Obelisk_of_Shalmaneser_III",
   },
   britannicaHammurabi: {
     shortTitle: "Britannica: Hammurabi",
@@ -448,6 +472,14 @@ export const HUMAN_SOURCES = {
     citation:
       'Wikipedia contributors, "First Intermediate Period of Egypt." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/First_Intermediate_Period_of_Egypt",
+  },
+  gezerCalendarWikipedia: {
+    shortTitle: "Wikipedia: Gezer calendar",
+    title: "Gezer calendar",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Gezer calendar." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Gezer_calendar",
   },
   historyEnlightenment: {
     shortTitle: "History: Enlightenment",
@@ -930,6 +962,14 @@ export const HUMAN_SOURCES = {
       'Wikipedia contributors, "Mughal Empire." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Mughal_Empire",
   },
+  mursiliIWikipedia: {
+    shortTitle: "Wikipedia: Mursili I",
+    title: "Mursili I",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Mursili I." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Mursili_I",
+  },
   newKingdomEgyptWikipedia: {
     shortTitle: "Wikipedia: New Kingdom of Egypt",
     title: "New Kingdom of Egypt",
@@ -937,6 +977,14 @@ export const HUMAN_SOURCES = {
     citation:
       'Wikipedia contributors, "New Kingdom of Egypt." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/New_Kingdom_of_Egypt",
+  },
+  nebraSkyDiscWikipedia: {
+    shortTitle: "Wikipedia: Nebra sky disc",
+    title: "Nebra sky disc",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Nebra sky disc." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Nebra_sky_disc",
   },
   oldKingdomEgyptWikipedia: {
     shortTitle: "Wikipedia: Old Kingdom of Egypt",
@@ -1110,6 +1158,14 @@ export const HUMAN_SOURCES = {
       'Wikipedia contributors, "Second Intermediate Period of Egypt." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Second_Intermediate_Period_of_Egypt",
   },
+  siegeOfLachishWikipedia: {
+    shortTitle: "Wikipedia: Siege of Lachish",
+    title: "Siege of Lachish",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Siege of Lachish." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Siege_of_Lachish",
+  },
   siegeOfJerusalem587Wikipedia: {
     shortTitle: "Wikipedia: Siege of Jerusalem",
     title: "Siege of Jerusalem (587 BC)",
@@ -1117,6 +1173,14 @@ export const HUMAN_SOURCES = {
     citation:
       'Wikipedia contributors, "Siege of Jerusalem (587 BC)." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Siege_of_Jerusalem_(587_BC)",
+  },
+  siloamInscriptionWikipedia: {
+    shortTitle: "Wikipedia: Siloam inscription",
+    title: "Siloam inscription",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Siloam inscription." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Siloam_inscription",
   },
   sasanianEmpireWikipedia: {
     shortTitle: "Wikipedia: Sasanian Empire",
@@ -1359,6 +1423,14 @@ export const HUMAN_SOURCES = {
     citation:
       'Wikipedia contributors, "Umayyad Caliphate." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Umayyad_Caliphate",
+  },
+  urNammuWikipedia: {
+    shortTitle: "Wikipedia: Ur-Nammu",
+    title: "Ur-Nammu",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Ur-Nammu." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Ur-Nammu",
   },
   ubaidPeriodWikipedia: {
     shortTitle: "Wikipedia: Ubaid period",
