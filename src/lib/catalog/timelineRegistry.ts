@@ -7,6 +7,7 @@ import type {
   TimelineSetId,
 } from "../core/timelineTypes";
 import type { TimelineSetDefinition } from "./setSchema";
+import { COMPUTING_SET } from "./sets/computing/index";
 import { COSMIC_SET } from "./sets/cosmic/index";
 import { EARTH_SET } from "./sets/earth/index";
 import { HUMAN_SET } from "./sets/human/index";
@@ -73,6 +74,7 @@ function assertUniqueRegistryKeys(entries: readonly string[], label: string) {
 }
 
 export const TIMELINE_SETS: readonly TimelineSetDefinition[] = [
+  COMPUTING_SET,
   COSMIC_SET,
   EARTH_SET,
   HUMAN_SET,
