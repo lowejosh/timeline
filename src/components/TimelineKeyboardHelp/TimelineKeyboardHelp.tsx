@@ -49,7 +49,11 @@ export function TimelineKeyboardHelpButton({
   onClick,
 }: TimelineKeyboardHelpButtonProps) {
   return (
-    <div className={cn(className ?? "absolute right-[148px] top-3 z-[4] max-sm:hidden")}>
+    <div
+      className={cn(
+        className ?? "absolute right-[148px] top-3 z-[4] max-sm:hidden",
+      )}
+    >
       <Button
         aria-expanded={isOpen}
         aria-label={
@@ -96,7 +100,7 @@ export function TimelineKeyboardHelp({
   const navigationRows: ShortcutHelpRow[] = [
     { label: "Show Keyboard Shortcuts", keys: [modifierLabel, "/"] },
     { label: "Toggle Layers", keys: ["L"] },
-    { label: "Search", keys: [modifierLabel, "K"], note: "(soon)" },
+    { label: "Search", keys: [modifierLabel, "K"] },
     { label: "Zoom In", keys: ["+", "↑"] },
     { label: "Zoom Out", keys: ["-", "↓"] },
     { label: "Fast Zoom", keys: ["Shift", "+/-"] },
