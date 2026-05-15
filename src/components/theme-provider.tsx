@@ -32,6 +32,8 @@ const themeVariables: Record<`--${string}`, string> = {
   "--border": THEME.color.brown[14],
   "--input": THEME.color.brown[14],
   "--ring": THEME.color.focus,
+  "--focus-ring": THEME.color.focusRing,
+  "--focus-ring-soft": THEME.color.focusRingSoft,
   "--surface": THEME.color.paperLight,
   "--surface-deep": THEME.color.surfaceDeep,
   "--glass": THEME.color.glass.base,

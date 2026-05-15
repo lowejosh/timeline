@@ -2,6 +2,7 @@ import { useCallback } from "react";
 
 import { useTimelineSidebarEscape } from "../hooks/useTimelineSidebarEscape";
 import { Button } from "@/components/ui/button";
+import { ShortcutKey } from "@/components/ui/shortcut-key";
 import type { TimelineSidebarSetState } from "@/lib/app/sidebarModel";
 import type { TimelineLayerShortcutTarget } from "@/lib/app/timelineKeyboard";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
@@ -59,13 +60,12 @@ export function TimelineSidebarChrome({
         aria-expanded={isOpen}
         aria-label={isOpen ? "Hide layers controls" : "Show layers controls"}
         className={cn(
-          "absolute left-[calc(env(safe-area-inset-left,0px)+0.75rem)] top-[calc(env(safe-area-inset-top,0px)+0.75rem)] z-[4] h-auto rounded-full px-3 py-2 text-xs",
+          "absolute left-[var(--app-chrome-left)] top-[var(--app-chrome-top)] z-[4] h-auto rounded-full px-3 py-2 text-xs",
           "transition-[background-color,border-color,box-shadow,opacity,transform] duration-200",
           activeView === "available-sets" && "pointer-events-none opacity-0",
           mode === "drawer" &&
             isOpen &&
             "pointer-events-none -translate-y-1 scale-[0.98] opacity-0",
-          "max-sm:left-[10px] max-sm:top-[10px]",
         )}
         data-open={isOpen ? "true" : "false"}
         onClick={() => {
@@ -81,11 +81,20 @@ export function TimelineSidebarChrome({
           <rect x="2" y="11.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', transform: isOpen ? 'translateY(-4px) rotate(-45deg)' : 'none', transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
         </svg>
         <span>Layers</span>
+        {showShortcuts ? (
+          <ShortcutKey
+            aria-hidden="true"
+            className="border-border/70 bg-surface/70 text-muted-foreground"
+            size="sm"
+          >
+            L
+          </ShortcutKey>
+        ) : null}
       </Button>
       <button
         aria-label="Close layers controls"
         className={cn(
-          "absolute inset-0 hidden border-0 bg-transparent p-0 transition-opacity duration-200",
+          "focus-ring-none absolute inset-0 hidden border-0 bg-transparent p-0 transition-opacity duration-200",
           mode === "drawer" && "z-[6] block",
           mode !== "drawer" && "z-[2]",
           isOpen

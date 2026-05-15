@@ -1010,7 +1010,7 @@ export function TimelineCanvas({
     >
       <canvas
         aria-label="Interactive timeline canvas"
-        className="absolute inset-0 w-full h-full block border-0 outline-none touch-none cursor-grab overscroll-none active:cursor-grabbing focus-visible:[box-shadow:inset_0_0_0_2px_var(--focus)]"
+        className="absolute inset-0 w-full h-full block border-0 outline-none touch-none cursor-grab overscroll-none active:cursor-grabbing"
         onKeyDown={(event) => {
           if (!width) return;
 

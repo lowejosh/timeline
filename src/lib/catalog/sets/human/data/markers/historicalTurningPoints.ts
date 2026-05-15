@@ -185,19 +185,6 @@ const PARIS_AGREEMENT_ADOPTED_AT = createExactCalendarTimestamp({
 
 export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
   {
-    id: "gobekli-tepe-monuments",
-    label: "Göbekli Tepe monuments",
-    shortLabel: "Göbekli Tepe",
-    description:
-      "Hunter-gatherer communities at Göbekli Tepe raised monumental T-shaped stone enclosures, among the earliest known ritual architecture.",
-    year: bce(9_600),
-    regionalScopeLabel: "Southeastern Anatolia",
-    approximate: true,
-    minZoom: 19,
-    priority: 69,
-    sourceIds: ["unescoGobekliTepe"],
-  },
-  {
     id: "agriculture-emerges-in-southwest-asia",
     label: "Agriculture emerges in Southwest Asia",
     shortLabel: "Early Agriculture",
@@ -212,19 +199,6 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
       "originsOfAgricultureInWestAsiaWikipedia",
       "prePotteryNeolithicAWikipedia",
     ],
-  },
-  {
-    id: "catalhoyuk-settled-farming-community",
-    label: "Çatalhöyük settled farming community",
-    shortLabel: "Çatalhöyük",
-    description:
-      "Çatalhöyük was a densely settled farming community of mud-brick houses entered from the roof, reflecting early agricultural town life.",
-    year: bce(7_400),
-    regionalScopeLabel: "Anatolia",
-    approximate: true,
-    minZoom: 19,
-    priority: 68,
-    sourceIds: ["unescoCatalhoyuk"],
   },
   {
     id: "jericho-ritual-community",
@@ -245,7 +219,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     shortLabel: "Stonehenge",
     description:
       "Stonehenge began within a vast ceremonial landscape whose earthworks and stone settings were built over many centuries.",
-    year: bce(3_000),
+    year: bce(3_700),
     regionalScopeLabel: "Southern Britain",
     approximate: true,
     minZoom: 19,

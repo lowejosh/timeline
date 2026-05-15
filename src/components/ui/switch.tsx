@@ -14,7 +14,7 @@ export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
     <button
       aria-checked={checked}
       className={cn(
-        "relative inline-flex h-[1.12rem] w-8 shrink-0 cursor-pointer rounded-full border border-transparent p-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+        "relative inline-flex h-[1.12rem] w-8 shrink-0 cursor-pointer rounded-full border border-transparent p-0 transition-colors disabled:cursor-not-allowed disabled:opacity-50",
         checked ? "bg-primary" : "bg-muted",
         className,
       )}

@@ -604,7 +604,7 @@ export function TimelineSidebar({
                     <div
                       aria-label={`${expanded ? "Collapse" : "Expand"} ${set.label}`}
                       className={cn(
-                        "grid cursor-grab touch-none select-none grid-cols-[auto_1fr_auto] items-center gap-2 rounded-md px-2 py-2 transition-colors duration-150 hover:bg-surface/40",
+                        "focus-ring-none grid cursor-grab touch-none select-none grid-cols-[auto_1fr_auto] items-center gap-2 rounded-md px-2 py-2 transition-colors duration-150 hover:bg-surface/40",
                         expanded && "bg-surface/20",
                         isDragged && "cursor-grabbing",
                         mode === "drawer" &&

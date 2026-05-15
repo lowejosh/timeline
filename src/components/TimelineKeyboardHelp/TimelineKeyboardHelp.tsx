@@ -145,7 +145,7 @@ export function TimelineKeyboardHelp({
         </header>
         <div
           aria-labelledby="timeline-keyboard-help-title"
-          className="min-h-0 overflow-y-auto px-4 py-3 outline-none [scrollbar-width:thin] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          className="min-h-0 overflow-y-auto px-4 py-3 outline-none [scrollbar-width:thin]"
           ref={scrollRef}
           role="document"
           tabIndex={0}

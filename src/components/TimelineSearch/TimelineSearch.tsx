@@ -1,6 +1,7 @@
 import { Search, X } from "lucide-react";
 import {
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -61,6 +62,8 @@ export function TimelineSearch({
 }: TimelineSearchProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const resultButtonRefs = useRef(new Map<string, HTMLButtonElement>());
+  const dialogTitleId = useId();
+  const resultsId = useId();
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const searchIndex = useMemo(() => buildTimelineSearchIndex(), []);
@@ -220,7 +223,7 @@ export function TimelineSearch({
           >
             <button
               className={cn(
-                "grid w-full grid-cols-[1fr_auto] gap-3 rounded-md border-0 bg-transparent px-2.5 py-2 text-left transition-colors duration-150",
+                "focus-ring-none grid w-full grid-cols-[1fr_auto] gap-3 rounded-md border-0 bg-transparent px-2.5 py-2 text-left transition-colors duration-150",
                 index === activeIndex
                   ? "bg-surface/75 text-foreground shadow-[inset_0_0_0_1px_rgba(77,61,47,0.08)]"
                   : "hover:bg-surface/55",
@@ -292,11 +295,14 @@ export function TimelineSearch({
         </div>
         {isOpen ? (
           <div
-            aria-label="Search timeline"
+            aria-labelledby={dialogTitleId}
             aria-modal="true"
             className="fixed inset-0 z-[60] grid grid-rows-[auto_1fr] bg-popover/95 text-popover-foreground backdrop-blur-md"
             role="dialog"
           >
+            <h2 className="sr-only" id={dialogTitleId}>
+              Search timeline
+            </h2>
             <div className="flex items-center gap-2 border-b border-border/70 px-3 pb-3 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)]">
               <div className="flex h-10 min-w-0 flex-1 items-center overflow-hidden rounded-full border border-border/80 bg-surface/70 shadow-glass">
                 <Search className="ml-3 size-4 shrink-0 text-muted-foreground" />
@@ -307,7 +313,7 @@ export function TimelineSearch({
                       : undefined
                   }
                   aria-autocomplete="list"
-                  aria-controls="timeline-search-results"
+                  aria-controls={resultsId}
                   aria-expanded={hasResultsPanel}
                   aria-label="Search timeline markers and bands"
                   className="min-w-0 flex-1 border-0 bg-transparent px-2 py-1 text-base font-semibold text-foreground outline-none placeholder:text-muted-foreground/70"
@@ -336,7 +342,7 @@ export function TimelineSearch({
             </div>
             <div
               className="min-h-0 overflow-hidden px-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-2"
-              id="timeline-search-results"
+              id={resultsId}
               role="listbox"
             >
               {hasQuery ? (
@@ -379,7 +385,7 @@ export function TimelineSearch({
                     : undefined
                 }
                 aria-autocomplete="list"
-                aria-controls="timeline-search-results"
+                aria-controls={resultsId}
                 aria-expanded={hasResultsPanel}
                 aria-label="Search timeline markers and bands"
                 className="min-w-0 flex-1 border-0 bg-transparent px-2 py-1 text-sm font-semibold text-foreground outline-none placeholder:text-muted-foreground/70"
@@ -429,7 +435,7 @@ export function TimelineSearch({
         {hasResultsPanel ? (
           <div
             className="timeline-search-results absolute right-0 top-10 grid max-h-[min(28rem,calc(100svh-124px))] w-full overflow-hidden rounded-lg border border-border/80 bg-card/95 text-card-foreground shadow-panel backdrop-blur-md"
-            id="timeline-search-results"
+            id={resultsId}
             role="listbox"
           >
             {renderResults("max-h-[inherit]")}

@@ -32,8 +32,12 @@ export const THEME = {
     /** Timeline axis rule line — subtle variant */
     lineSoft: "rgba(71, 55, 39, 0.18)",
 
-    /** Keyboard focus ring */
+    /** Legacy keyboard focus ring */
     focus: "rgba(124, 92, 59, 0.45)",
+    /** Keyboard focus ring */
+    focusRing: "rgba(124, 92, 59, 0.28)",
+    /** Outer keyboard focus glow */
+    focusRingSoft: "rgba(124, 92, 59, 0.16)",
     /** Toggle-active / accent fill */
     accent: "rgba(110, 82, 54, 0.68)",
     /** Accent background chip */
