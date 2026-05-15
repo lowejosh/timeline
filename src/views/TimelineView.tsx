@@ -73,11 +73,7 @@ export function TimelineView({ app, layout }: TimelineViewProps) {
               }
             >
               <TimelineOverviewRulerStack
-                bottomInset={
-                  layout.shouldDockOverviewRuler
-                    ? layout.overviewRulerDockBottomInset
-                    : 0
-                }
+                bottomInset={0}
                 eras={app.rootDisplayEras}
                 mainInnerWidth={Math.max(
                   app.stageSize.width - app.canvasPad * 2,

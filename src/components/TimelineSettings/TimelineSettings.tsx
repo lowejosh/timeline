@@ -10,6 +10,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
+const APP_VERSION = "v0.1.7";
+
 type TimelineSettingsProps = {
   className?: string;
   isCosmicCalendarMode: boolean;
@@ -78,6 +80,10 @@ export function TimelineSettings({
             checked={isCosmicCalendarMode}
             onClick={onToggleCosmicCalendarMode}
           />
+        </div>
+
+        <div className="mt-3 border-t border-border/60 pt-2 text-right font-mono text-[0.62rem] font-semibold leading-none text-muted-foreground/70">
+          {APP_VERSION}
         </div>
       </PopoverContent>
     </Popover>

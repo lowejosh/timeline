@@ -2,11 +2,10 @@ import { TIMELINE_CANVAS_PAD } from "@/lib/rendering/layout/padding";
 
 const OVERVIEW_RULER_TIER_HEIGHT = 18;
 const OVERVIEW_RULER_MAX_TIERS = 3;
-const PORTRAIT_DOCKED_OVERVIEW_CANVAS_CLEARANCE =
+const DOCKED_OVERVIEW_CANVAS_CLEARANCE =
   OVERVIEW_RULER_TIER_HEIGHT * OVERVIEW_RULER_MAX_TIERS + 42;
 export const MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER = 480;
-export const OVERVIEW_RULER_DOCK_BOTTOM_INSET =
-  "calc(env(safe-area-inset-bottom, 0px) + 14px)";
+export const OVERVIEW_RULER_DOCK_BOTTOM_INSET = "0px";
 
 export const TIMELINE_APP_LAYOUT = {
   overviewRulerTierHeight: OVERVIEW_RULER_TIER_HEIGHT,
@@ -38,13 +37,12 @@ export function getTimelineAppLayoutState({
   const overviewReservedHeight =
     isOverviewVisible && !shouldDockOverviewRuler
       ? overviewRulerDockHeight
-      : shouldDockOverviewRuler && shouldHideOverviewSideLabels
-        ? PORTRAIT_DOCKED_OVERVIEW_CANVAS_CLEARANCE
+      : shouldDockOverviewRuler
+        ? DOCKED_OVERVIEW_CANVAS_CLEARANCE
         : 0;
-  const overviewRulerDockBottomInset =
-    shouldDockOverviewRuler && shouldHideOverviewSideLabels
-      ? 0
-      : OVERVIEW_RULER_DOCK_BOTTOM_INSET;
+  const overviewRulerDockBottomInset = shouldDockOverviewRuler
+    ? OVERVIEW_RULER_DOCK_BOTTOM_INSET
+    : 0;
 
   return {
     overviewReservedHeight,

@@ -338,7 +338,7 @@ export function TimelineSearch({
                   aria-controls={resultsId}
                   aria-expanded={hasResultsPanel}
                   aria-label="Search timeline markers and bands"
-                  className="min-w-0 flex-1 border-0 bg-transparent px-2 py-1 text-base font-semibold text-foreground outline-none placeholder:text-muted-foreground/70"
+                  className="min-w-0 flex-1 border-0 bg-transparent px-2 py-1 text-[16px] font-semibold text-foreground outline-none placeholder:text-muted-foreground/70"
                   onChange={(event) => {
                     setQuery(event.currentTarget.value);
                   }}

@@ -106,6 +106,8 @@
   --safe-area-right: env(safe-area-inset-right, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-left: env(safe-area-inset-left, 0px);
+  --app-safe-area-top-px: env(safe-area-inset-top, 0px);
+  --app-safe-area-bottom-px: env(safe-area-inset-bottom, 0px);
 
   color: var(--ink);
   background: var(--app-page-background);
@@ -159,7 +161,7 @@ body {
   overflow-x: hidden;
   overflow-y: hidden;
   overscroll-behavior: none;
-  background: var(--app-page-background);
+  background: var(--timeline-surface);
 }
 
 html,

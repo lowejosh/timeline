@@ -1,13 +1,29 @@
 import { useEffect } from "react";
 
-function readPixelCustomProperty(root: HTMLElement, propertyName: string) {
-  const value = window
-    .getComputedStyle(root)
-    .getPropertyValue(propertyName)
-    .trim();
+function createSafeAreaProbe(propertyName: "bottom" | "top") {
+  const probe = document.createElement("div");
+
+  probe.setAttribute("aria-hidden", "true");
+  probe.style.pointerEvents = "none";
+  probe.style.position = "fixed";
+  probe.style.visibility = "hidden";
+  probe.style[propertyName] = "0";
+  probe.style.paddingBottom =
+    propertyName === "bottom" ? "env(safe-area-inset-bottom, 0px)" : "0px";
+  probe.style.paddingTop =
+    propertyName === "top" ? "env(safe-area-inset-top, 0px)" : "0px";
+  document.body.appendChild(probe);
+
+  return probe;
+}
+
+function readSafeAreaInset(probe: HTMLElement, propertyName: "bottom" | "top") {
+  const computed = window.getComputedStyle(probe);
+  const value =
+    propertyName === "bottom" ? computed.paddingBottom : computed.paddingTop;
   const parsed = Number.parseFloat(value);
 
-  return Number.isFinite(parsed) ? parsed : 0;
+  return Number.isFinite(parsed) ? Math.max(parsed, 0) : 0;
 }
 
 export function useStandaloneViewportHeight() {
@@ -17,14 +33,22 @@ export function useStandaloneViewportHeight() {
     }
 
     const root = document.documentElement;
+    const bottomInsetProbe = createSafeAreaProbe("bottom");
+    const topInsetProbe = createSafeAreaProbe("top");
     const updateStandaloneViewportHeight = () => {
-      const viewportHeight =
-        window.visualViewport?.height ?? window.innerHeight;
-      const bottomInset = readPixelCustomProperty(root, "--safe-area-bottom");
+      const visualViewportHeight = window.visualViewport?.height ?? 0;
+      const bottomInset = readSafeAreaInset(bottomInsetProbe, "bottom");
+      const topInset = readSafeAreaInset(topInsetProbe, "top");
+      const viewportHeight = Math.max(
+        window.innerHeight,
+        visualViewportHeight,
+      );
 
+      root.style.setProperty("--app-safe-area-bottom-px", `${bottomInset}px`);
+      root.style.setProperty("--app-safe-area-top-px", `${topInset}px`);
       root.style.setProperty(
         "--app-standalone-viewport-height",
-        `${viewportHeight + bottomInset}px`,
+        `${viewportHeight}px`,
       );
     };
 
@@ -51,6 +75,10 @@ export function useStandaloneViewportHeight() {
         "resize",
         updateStandaloneViewportHeight,
       );
+      bottomInsetProbe.remove();
+      topInsetProbe.remove();
+      root.style.removeProperty("--app-safe-area-bottom-px");
+      root.style.removeProperty("--app-safe-area-top-px");
       root.style.removeProperty("--app-standalone-viewport-height");
     };
   }, []);

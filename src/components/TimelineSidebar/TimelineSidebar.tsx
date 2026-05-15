@@ -518,14 +518,16 @@ export function TimelineSidebar({
       aria-label="Timeline layer controls"
       className={cn(
         "relative flex max-h-[var(--sidebar-max-height)] w-full flex-col overflow-hidden border border-border bg-card text-card-foreground opacity-[0.98] shadow-panel backdrop-blur-md",
-        mode === "drawer" ? "h-full max-h-full rounded-none" : "rounded-lg",
+        mode === "drawer"
+          ? "h-full max-h-full rounded-none pt-[var(--app-drawer-content-top)]"
+          : "rounded-lg",
       )}
     >
       <div
         className={cn(
           "min-h-0 flex-1 overflow-y-auto px-2 pb-1 pt-2 [scrollbar-width:thin]",
           mode === "drawer" &&
-            "pl-[calc(env(safe-area-inset-left,0px)+0.6rem)] pt-[calc(env(safe-area-inset-top,0px)+1rem)]",
+            "pl-[calc(env(safe-area-inset-left,0px)+0.6rem)] pt-0",
         )}
       >
         <header className="flex items-baseline justify-between gap-2 px-0.5">
