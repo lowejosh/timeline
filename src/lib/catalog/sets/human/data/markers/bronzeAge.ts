@@ -1,5 +1,6 @@
 import type { TimelineMarker } from "@/lib/core/timelineTypes";
 import { bce } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
   {
@@ -13,6 +14,15 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 79,
+    image: {
+      src: commonsTooltipImage(
+        "P1150884 Louvre Uruk III tablette écriture précunéiforme AO19936 rwk.jpg",
+      ),
+      alt: "Uruk III tablet with pre-cuneiform writing from the late fourth millennium BCE",
+      width: 1500,
+      height: 1349,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaMesopotamia", "britannicaBabylonia"],
   },
   {
@@ -26,6 +36,13 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 83,
+    image: {
+      src: commonsTooltipImage("Great Pyramid of Giza, Giza, Egypt4.jpg"),
+      alt: "Great Pyramid of Giza viewed from the desert",
+      width: 3888,
+      height: 2592,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["worldHistoryGreatPyramidGiza"],
   },
   {
@@ -39,6 +56,13 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 80,
+    image: {
+      src: commonsTooltipImage("Sargon of Akkad.jpg"),
+      alt: "Bronze head often associated with an Akkadian ruler",
+      width: 537,
+      height: 599,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaAkkad"],
   },
   {
@@ -52,6 +76,15 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 81,
+    image: {
+      src: commonsTooltipImage(
+        "F0182 Louvre Code Hammourabi Bas-relief Sb8 rwk.jpg",
+      ),
+      alt: "Bas-relief at the top of the Code of Hammurabi stele",
+      width: 3170,
+      height: 3500,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaHammurabi", "britannicaBabylonia"],
   },
   {
@@ -65,6 +98,13 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 80,
+    image: {
+      src: commonsTooltipImage("Ziggurat of ur.jpg"),
+      alt: "Reconstructed terraces of the Great Ziggurat of Ur",
+      width: 1000,
+      height: 666,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["urNammuWikipedia", "metUrZiggurat"],
   },
   {
@@ -78,6 +118,13 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 76,
+    image: {
+      src: commonsTooltipImage("Nebra sky disk.png"),
+      alt: "Bronze Nebra sky disc with gold astronomical symbols",
+      width: 1527,
+      height: 1488,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["nebraSkyDiscWikipedia"],
   },
   {
@@ -102,6 +149,13 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Levant",
     minZoom: 18,
     priority: 78,
+    image: {
+      src: commonsTooltipImage("Thutmose III at Karnak.jpg"),
+      alt: "Karnak inscription recording campaigns of Thutmose III",
+      width: 2048,
+      height: 1536,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["battleOfMegiddoWikipedia"],
   },
   {
@@ -115,6 +169,13 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 77,
+    image: {
+      src: commonsTooltipImage("Santorini Landsat.jpg"),
+      alt: "Satellite view of Santorini's volcanic caldera",
+      width: 1421,
+      height: 1000,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["minoanEruptionWikipedia"],
   },
   {
@@ -128,6 +189,15 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 77,
+    image: {
+      src: commonsTooltipImage(
+        "Shang Oracle Bone (Museum Photo) (45868930051).jpg",
+      ),
+      alt: "Oracle bone from the late Shang dynasty",
+      width: 4000,
+      height: 6000,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["unescoYinXu"],
   },
   {
@@ -141,6 +211,13 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     minZoom: 18,
     approximate: true,
     priority: 79,
+    image: {
+      src: commonsTooltipImage("Treaty of Kadesh.jpg"),
+      alt: "Clay tablet preserving the Hittite version of the Treaty of Kadesh",
+      width: 2048,
+      height: 1536,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["egyptianHittitePeaceTreatyWikipedia"],
   },
   {
@@ -153,6 +230,13 @@ export const BRONZE_AGE_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Levant",
     minZoom: 18,
     priority: 78,
+    image: {
+      src: commonsTooltipImage("Relief Kadesh Breasted.jpg"),
+      alt: "Ancient Egyptian relief scene depicting the Battle of Kadesh",
+      width: 754,
+      height: 502,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["battleOfKadeshWikipedia"],
   },
 ];

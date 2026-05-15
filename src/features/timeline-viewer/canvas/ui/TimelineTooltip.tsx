@@ -1,4 +1,4 @@
-import type { CSSProperties, RefObject } from "react";
+import { useEffect, useState, type CSSProperties, type RefObject } from "react";
 
 import type { RenderedTooltipState } from "@/lib/rendering/canvas/tooltip";
 import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
@@ -10,10 +10,57 @@ import {
 
 type TimelineTooltipProps = {
   height: number;
+  interactiveContentRef: RefObject<HTMLDivElement | null>;
   renderedTooltip: RenderedTooltipState;
-  sourcesRef: RefObject<HTMLDivElement | null>;
   width: number;
 };
+
+const TOOLTIP_IMAGE_DELAY_MS = 420;
+const MAX_TRACKED_TOOLTIP_IMAGE_SRCS = 160;
+
+const loadedTooltipImageSrcs = new Set<string>();
+const erroredTooltipImageSrcs = new Set<string>();
+
+function getFullTooltipImageUrl(src: string) {
+  try {
+    const url = new URL(src);
+
+    if (
+      url.hostname === "commons.wikimedia.org" &&
+      url.pathname.includes("/wiki/Special:FilePath/")
+    ) {
+      url.search = "";
+      url.hash = "";
+      return url.toString();
+    }
+  } catch {
+    return src;
+  }
+
+  return src;
+}
+
+type DelayedTooltipImageStatus =
+  | "idle"
+  | "waiting"
+  | "loading"
+  | "loaded"
+  | "error";
+
+function rememberTooltipImageSrc(cache: Set<string>, src: string) {
+  cache.delete(src);
+  cache.add(src);
+
+  if (cache.size <= MAX_TRACKED_TOOLTIP_IMAGE_SRCS) {
+    return;
+  }
+
+  const oldestSrc = cache.values().next().value;
+
+  if (oldestSrc) {
+    cache.delete(oldestSrc);
+  }
+}
 
 let cachedSafeViewportInsets: {
   top: number;
@@ -67,6 +114,67 @@ function getSafeViewportInsets() {
   );
 
   return cachedSafeViewportInsets;
+}
+
+function useDelayedTooltipImage({
+  enabled,
+  src,
+  tooltipId,
+}: {
+  enabled: boolean;
+  src?: string;
+  tooltipId: string;
+}) {
+  const [status, setStatus] =
+    useState<DelayedTooltipImageStatus>("idle");
+
+  useEffect(() => {
+    if (!src || !enabled) {
+      setStatus("idle");
+      return;
+    }
+
+    if (loadedTooltipImageSrcs.has(src)) {
+      setStatus("loaded");
+      return;
+    }
+
+    if (erroredTooltipImageSrcs.has(src)) {
+      setStatus("error");
+      return;
+    }
+
+    setStatus("waiting");
+
+    const timeout = window.setTimeout(() => {
+      setStatus((current) =>
+        current === "waiting" ? "loading" : current,
+      );
+    }, TOOLTIP_IMAGE_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [enabled, src, tooltipId]);
+
+  return {
+    markErrored: () => {
+      if (src) {
+        rememberTooltipImageSrc(erroredTooltipImageSrcs, src);
+      }
+
+      setStatus("error");
+    },
+    markLoaded: () => {
+      if (src) {
+        rememberTooltipImageSrc(loadedTooltipImageSrcs, src);
+      }
+
+      setStatus("loaded");
+    },
+    shouldRenderImage: status === "loading" || status === "loaded",
+    showSkeleton: status === "waiting" || status === "loading",
+  };
 }
 
 function getTooltipStyle({
@@ -131,11 +239,22 @@ function getTooltipStyle({
 
 export function TimelineTooltip({
   height,
+  interactiveContentRef,
   renderedTooltip,
-  sourcesRef,
   width,
 }: TimelineTooltipProps) {
   const tooltip = renderedTooltip.tooltipState.tooltip;
+  const tooltipImage = tooltip.image;
+  const {
+    markErrored,
+    markLoaded,
+    shouldRenderImage,
+    showSkeleton,
+  } = useDelayedTooltipImage({
+    enabled: renderedTooltip.phase === "present",
+    src: tooltipImage?.src,
+    tooltipId: renderedTooltip.tooltipState.id,
+  });
 
   return (
     <div
@@ -171,34 +290,89 @@ export function TimelineTooltip({
           {tooltip.description}
         </div>
       ) : null}
-      {tooltip.sources.length > 0 ? (
-        <div className="mt-2" ref={sourcesRef}>
-          <div className="mb-1 text-[0.62rem] font-semibold uppercase leading-none tracking-[0.08em] text-muted-foreground">
-            Sources
-          </div>
-          <ul className="m-0 list-none p-0">
-            {tooltip.sources.map((source) => (
-              <li className="mt-1 first:mt-0" key={source.id}>
-                {source.url ? (
-                  <a
-                    className="pointer-events-auto block text-[0.71rem] font-medium leading-snug text-foreground/90 no-underline hover:underline"
-                    href={source.url}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    {source.shortTitle}
-                  </a>
-                ) : (
-                  <span className="block text-[0.71rem] font-medium leading-snug text-foreground/90">
-                    {source.shortTitle}
-                  </span>
+      {tooltipImage ? (
+        <figure className="mt-2">
+          <div className="relative aspect-video overflow-hidden rounded-md border border-border/60 bg-surface/45">
+            {showSkeleton ? (
+              <div
+                aria-hidden="true"
+                className="timeline-tooltip-image-skeleton absolute inset-0"
+              />
+            ) : null}
+            {shouldRenderImage ? (
+              <img
+                alt={tooltipImage.alt}
+                className={cn(
+                  "h-full w-full object-cover transition-opacity duration-200",
+                  showSkeleton ? "opacity-0" : "opacity-100",
                 )}
-                <span className="block text-[0.66rem] leading-tight text-muted-foreground">
-                  {source.organization}
+                decoding="async"
+                fetchPriority="low"
+                height={tooltipImage.height}
+                loading="lazy"
+                onError={markErrored}
+                onLoad={markLoaded}
+                referrerPolicy="no-referrer"
+                src={tooltipImage.src}
+                width={tooltipImage.width}
+              />
+            ) : null}
+          </div>
+        </figure>
+      ) : null}
+      {tooltipImage || tooltip.sources.length > 0 ? (
+        <div ref={interactiveContentRef}>
+          {tooltipImage ? (
+            <div
+              className="mt-1 text-[0.64rem] font-medium leading-tight text-muted-foreground"
+              title={`${tooltipImage.alt} - open full image`}
+            >
+              <a
+                className="pointer-events-auto text-muted-foreground underline decoration-border underline-offset-2 transition-colors hover:text-foreground"
+                href={getFullTooltipImageUrl(tooltipImage.src)}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {tooltipImage.alt}
+              </a>
+              {tooltipImage.credit ? (
+                <span className="text-muted-foreground/75">
+                  {" "}
+                  ({tooltipImage.credit})
                 </span>
-              </li>
-            ))}
-          </ul>
+              ) : null}
+            </div>
+          ) : null}
+          {tooltip.sources.length > 0 ? (
+            <div className="mt-2">
+              <div className="mb-1 text-[0.62rem] font-semibold uppercase leading-none tracking-[0.08em] text-muted-foreground">
+                Sources
+              </div>
+              <ul className="m-0 list-none p-0">
+                {tooltip.sources.map((source) => (
+                  <li className="mt-1 first:mt-0" key={source.id}>
+                    {source.url ? (
+                      <a
+                        className="pointer-events-auto block text-[0.71rem] font-medium leading-snug text-foreground/90 no-underline hover:underline"
+                        href={source.url}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        {source.shortTitle}
+                      </a>
+                    ) : (
+                      <span className="block text-[0.71rem] font-medium leading-snug text-foreground/90">
+                        {source.shortTitle}
+                      </span>
+                    )}
+                    <span className="block text-[0.66rem] leading-tight text-muted-foreground">
+                      {source.organization}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>

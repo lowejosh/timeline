@@ -10,6 +10,7 @@ import {
 import { TIMELINE_SOURCES_BY_ID } from "../catalog/timelineRegistry";
 import type {
   Era,
+  TimelineTooltipImage,
   TimelineMarker,
   TimelineOverlayBand,
 } from "../core/timelineTypes";
@@ -30,6 +31,7 @@ export type TimelineTooltipContent = {
   iconGroupId?: string;
   regionalScopeLabel?: string;
   description?: string;
+  image?: TimelineTooltipImage;
   sources: TimelineTooltipSource[];
 };
 
@@ -105,6 +107,7 @@ export function getMarkerTooltipContent(
     ),
     regionalScopeLabel: marker.regionalScopeLabel,
     description: marker.description,
+    image: marker.image,
     sources: resolveTooltipSources(marker.sourceIds),
   };
 }
@@ -126,6 +129,7 @@ export function getOverlayTooltipContent(
           }),
     regionalScopeLabel: overlay.regionalScopeLabel,
     description: overlay.description,
+    image: overlay.image,
     sources: resolveTooltipSources(overlay.sourceIds),
   };
 }
@@ -149,6 +153,7 @@ export function getEraTooltipContent(era: Era): TimelineTooltipContent {
           }),
     regionalScopeLabel: era.regionalScopeLabel,
     description: era.description,
+    image: era.image,
     sources: resolveTooltipSources(era.sourceIds),
   };
 }

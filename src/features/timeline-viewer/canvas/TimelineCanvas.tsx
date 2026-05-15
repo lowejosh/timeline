@@ -106,7 +106,7 @@ export function TimelineCanvas({
 }: TimelineCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
-  const tooltipSourcesRef = useRef<HTMLDivElement | null>(null);
+  const tooltipInteractiveContentRef = useRef<HTMLDivElement | null>(null);
   const themeRef = useRef<TimelineCanvasTheme>(DEFAULT_TIMELINE_THEME);
   const perfModeRef = useRef<TimelinePerfMode>("off");
   const perfStatsRef = useRef<TimelinePerfStats>(createTimelinePerfStats());
@@ -393,7 +393,7 @@ export function TimelineCanvas({
         scene: sceneRef.current,
         shellElement: shellRef.current,
         theme: themeRef.current,
-        tooltipSourcesElement: tooltipSourcesRef.current,
+        tooltipInteractiveContentElement: tooltipInteractiveContentRef.current,
         verbosePerfStats: verbosePerfStatsRef.current,
       });
 
@@ -916,7 +916,7 @@ export function TimelineCanvas({
     const y = event.clientY - rect.top;
     const currentTooltip = hoveredTooltipRef.current;
     const stickyRect =
-      tooltipSourcesRef.current?.getBoundingClientRect() ?? null;
+      tooltipInteractiveContentRef.current?.getBoundingClientRect() ?? null;
 
     lastPointerRef.current = {
       x,
@@ -1074,8 +1074,8 @@ export function TimelineCanvas({
       {renderedTooltip ? (
         <TimelineTooltip
           height={height}
+          interactiveContentRef={tooltipInteractiveContentRef}
           renderedTooltip={renderedTooltip}
-          sourcesRef={tooltipSourcesRef}
           width={width}
         />
       ) : null}

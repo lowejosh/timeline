@@ -110,7 +110,7 @@ export type DrawTimelineCanvasFrameArgs = {
   scene: TimelineCanvasScene | null;
   shellElement: HTMLDivElement | null;
   theme: TimelineCanvasTheme;
-  tooltipSourcesElement: HTMLDivElement | null;
+  tooltipInteractiveContentElement: HTMLDivElement | null;
   hoveredTooltipRef: MutableRefObject<HoveredTooltipState | null>;
   perfMode: TimelinePerfMode;
   perfStats: TimelinePerfStats;
@@ -134,7 +134,7 @@ export function drawTimelineCanvasFrame({
   scene,
   shellElement,
   theme,
-  tooltipSourcesElement,
+  tooltipInteractiveContentElement,
   hoveredTooltipRef,
   perfMode,
   perfStats,
@@ -470,7 +470,8 @@ export function drawTimelineCanvasFrame({
 
   if (lastPointer && !isTouchTooltipPinned) {
     const currentTooltip = hoveredTooltipRef.current;
-    const stickyRect = tooltipSourcesElement?.getBoundingClientRect() ?? null;
+    const stickyRect =
+      tooltipInteractiveContentElement?.getBoundingClientRect() ?? null;
 
     if (
       currentTooltip &&

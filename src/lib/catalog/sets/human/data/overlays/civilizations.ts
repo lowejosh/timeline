@@ -1,5 +1,6 @@
 import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
 import { bce, ce } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 const POST_CLASSICAL_MIN_ZOOM = 15;
 
@@ -60,6 +61,13 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(190, 120, 92)",
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Victory stele of Naram Sin 9071.jpg"),
+      alt: "Victory Stele of Naram-Sin from the Akkadian period",
+      width: 1272,
+      height: 1875,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["metAkkadianPeriod"],
   },
   {
@@ -89,6 +97,15 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     color: "rgb(168, 132, 88)",
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage(
+        "F0182 Louvre Code Hammourabi Bas-relief Sb8 rwk.jpg",
+      ),
+      alt: "Bas-relief at the top of the Code of Hammurabi stele",
+      width: 3170,
+      height: 3500,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["metIsinLarsaOldBabylonian"],
   },
   {
@@ -131,6 +148,13 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Northern Mesopotamia",
     color: "rgb(129, 106, 154)",
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Map of the Assyrian Empire.svg"),
+      alt: "Map of the Neo-Assyrian Empire at its greatest extent",
+      width: 1000,
+      height: 716,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["worldHistoryNeoAssyrianEmpire"],
   },
   {
@@ -144,6 +168,13 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Babylonia",
     color: "rgb(153, 114, 172)",
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Neo-Babylonian Empire (greatest extent).svg"),
+      alt: "Map of the Neo-Babylonian Empire at its greatest extent",
+      width: 1000,
+      height: 645,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["metBabylon"],
   },
 ];
@@ -188,6 +219,13 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "China",
     color: "rgb(93, 126, 112)",
     subGroup: "east-asia",
+    image: {
+      src: commonsTooltipImage("Terracotta Army Pit 1 - 11.jpg"),
+      alt: "Terracotta warriors from the mausoleum of Qin Shi Huang",
+      width: 3504,
+      height: 2336,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["qinDynastyWikipedia"],
   },
   {
@@ -217,6 +255,13 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
     subGroup: "east-asia",
+    image: {
+      src: commonsTooltipImage("Establishment of the Tang Dynasty.svg"),
+      alt: "Map of China during the transition from Sui to Tang rule",
+      width: 1053,
+      height: 621,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["tangDynastyWikipedia"],
   },
   {
@@ -232,6 +277,13 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 74,
     subGroup: "east-asia",
+    image: {
+      src: commonsTooltipImage("Map of the Song Dynasty.png"),
+      alt: "Map of the Song Dynasty in China",
+      width: 3196,
+      height: 1840,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["khanSongChina"],
   },
   {
@@ -470,6 +522,15 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     priority: 95,
     subGroup: "near-east",
     children: MESOPOTAMIA_SUB_BANDS,
+    image: {
+      src: commonsTooltipImage(
+        "Myths of Babylonia and Assyria - Map of Babylonia and Assyria.png",
+      ),
+      alt: "Historical map of Babylonia and Assyria with major Mesopotamian cities",
+      width: 5937,
+      height: 4511,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaSumer", "metBabylon"],
   },
   {
@@ -487,6 +548,15 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 90,
     subGroup: "south-asia",
+    image: {
+      src: commonsTooltipImage(
+        "Indus Valley Civilization, Mature Phase (2600-1900 BCE).png",
+      ),
+      alt: "Map of the mature Indus Valley Civilization and major sites",
+      width: 2011,
+      height: 1732,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaIndusCivilization"],
   },
   {
@@ -503,6 +573,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     priority: 92,
     subGroup: "nile-valley",
     children: EGYPT_SUB_BANDS,
+    image: {
+      src: commonsTooltipImage("Ancient Egypt map-en.svg"),
+      alt: "Map showing the Nile valley and major regions of ancient Egypt",
+      width: 863,
+      height: 1140,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaAncientEgypt"],
   },
   {
@@ -537,6 +614,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 89,
     subGroup: "mediterranean",
+    image: {
+      src: commonsTooltipImage("Map Hittite rule en.svg"),
+      alt: "Map of Hittite rule in Anatolia and northern Syria",
+      width: 1000,
+      height: 782,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaHittiteEmpire"],
   },
   {
@@ -554,6 +638,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 88,
     subGroup: "mediterranean",
+    image: {
+      src: commonsTooltipImage("Map Minoan Crete-en.svg"),
+      alt: "Map of Minoan palatial sites and settlements on Crete",
+      width: 1001,
+      height: 601,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["minoanCivilizationWikipedia"],
   },
   {
@@ -571,6 +662,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 88,
     subGroup: "mediterranean",
+    image: {
+      src: commonsTooltipImage("Mycenaean World en.png"),
+      alt: "Map of Mycenaean Greece and the wider Late Bronze Age Aegean",
+      width: 1549,
+      height: 1410,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["unescoMycenaeTiryns"],
   },
   {
@@ -622,6 +720,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 88,
     subGroup: "mediterranean",
+    image: {
+      src: commonsTooltipImage("Ancient Regions Greece and Asia-en.svg"),
+      alt: "Map of ancient Greek regions in Greece and western Anatolia",
+      width: 6033,
+      height: 4840,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaAncientGreece"],
   },
   {
@@ -638,6 +743,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 87,
     subGroup: "mediterranean",
+    image: {
+      src: commonsTooltipImage("Punic Ruins, Carthage.jpg"),
+      alt: "Punic ruins at Carthage in North Africa",
+      width: 1280,
+      height: 825,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaCarthage"],
   },
   {
@@ -653,6 +765,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 86,
     subGroup: "iranian-world",
+    image: {
+      src: commonsTooltipImage("Achaemenid Empire 500 BCE.jpg"),
+      alt: "Map of the Achaemenid Empire near its greatest extent",
+      width: 3070,
+      height: 1637,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyPersianEmpire"],
   },
   {
@@ -683,6 +802,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 84,
     subGroup: "mediterranean",
+    image: {
+      src: commonsTooltipImage("Roman republic, territory 44 BC.svg"),
+      alt: "Map of Roman Republic territory in 44 BCE",
+      width: 1786,
+      height: 1025,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyAncientRome", "khanRomanRepublic"],
   },
   {
@@ -714,6 +840,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 78,
     subGroup: "mediterranean",
+    image: {
+      src: commonsTooltipImage("RomanEmpire 117.svg"),
+      alt: "Map of the Roman Empire at its maximum extent in 117 CE",
+      width: 512,
+      height: 376,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyAncientRome", "khanRomanEmpire"],
   },
   {
@@ -731,6 +864,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 79,
     subGroup: "south-asia",
+    image: {
+      src: commonsTooltipImage("Map of the Gupta Empire.png"),
+      alt: "Map of the Gupta Empire in South Asia",
+      width: 2324,
+      height: 2151,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["guptaEmpireWikipedia"],
   },
   {
@@ -765,6 +905,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 79,
     subGroup: "iranian-world",
+    image: {
+      src: commonsTooltipImage("Sasanian Empire (greatest extent).svg"),
+      alt: "Map of the Sasanian Empire at its greatest extent",
+      width: 553,
+      height: 553,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["sasanianEmpireWikipedia"],
   },
   {
@@ -780,6 +927,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
     subGroup: "mediterranean",
+    image: {
+      src: commonsTooltipImage("Map Byzantine Empire 1025-en.svg"),
+      alt: "Map of the Byzantine Empire in 1025 CE",
+      width: 1963,
+      height: 1104,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["metByzantium", "historyByzantineEmpire"],
   },
   {
@@ -795,6 +949,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Rashidun Caliphate (greatest extent).svg"),
+      alt: "Map of the Rashidun Caliphate at its greatest extent",
+      width: 553,
+      height: 553,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["rashidunCaliphateWikipedia"],
   },
   {
@@ -810,6 +971,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Umayyad-caliphate.svg"),
+      alt: "Map of the Umayyad Caliphate",
+      width: 1209,
+      height: 635,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["umayyadCaliphateWikipedia"],
   },
   {
@@ -825,6 +993,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 75,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Abbasid Caliphate 900-es.svg"),
+      alt: "Map of the Abbasid Caliphate around 900 CE",
+      width: 1934,
+      height: 1200,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["humanKhanGoldenAgeOfIslam"],
   },
   {
@@ -840,6 +1015,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 74,
     subGroup: "southeast-asia",
+    image: {
+      src: commonsTooltipImage("Angkor Wat (6201911987).jpg"),
+      alt: "Angkor Wat temple complex in Cambodia",
+      width: 4288,
+      height: 2848,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["khmerEmpireWikipedia"],
   },
   {
@@ -855,6 +1037,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 74,
     subGroup: "central-europe",
+    image: {
+      src: commonsTooltipImage("Holy Roman Empire 1000CE.svg"),
+      alt: "Map of the Holy Roman Empire around 1000 CE",
+      width: 485,
+      height: 340,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["holyRomanEmpireWikipedia"],
   },
   {
@@ -870,6 +1059,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 78,
     subGroup: "steppe",
+    image: {
+      src: commonsTooltipImage("Great Mongol Empire map.svg"),
+      alt: "Map of the Mongol Empire across Eurasia",
+      width: 3100,
+      height: 1600,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaMongolEmpire", "historyGenghisKhan"],
   },
   {
@@ -887,6 +1083,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 73,
     subGroup: "west-africa",
+    image: {
+      src: commonsTooltipImage("MALI empire map.PNG"),
+      alt: "Map of the Mali Empire in West Africa",
+      width: 1580,
+      height: 994,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["maliEmpireWikipedia"],
   },
   {
@@ -902,6 +1105,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 77,
     subGroup: "mediterranean",
+    image: {
+      src: commonsTooltipImage("Ottoman empire.svg"),
+      alt: "Map of the Ottoman Empire from 1481 to 1683",
+      width: 900,
+      height: 750,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyOttomanEmpire"],
   },
   {

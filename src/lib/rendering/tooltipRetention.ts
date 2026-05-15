@@ -13,6 +13,7 @@ export type TooltipRetentionAnchor = {
 
 export type TooltipRetentionCandidate = {
   tooltip: {
+    image?: unknown;
     sources: readonly unknown[];
   };
 };
@@ -24,7 +25,10 @@ const STICKY_RECT_PADDING_BOTTOM = 4;
 export function shouldPrioritizeTooltipRetention(
   tooltip: TooltipRetentionCandidate | null | undefined,
 ) {
-  return (tooltip?.tooltip.sources.length ?? 0) > 0;
+  return (
+    Boolean(tooltip?.tooltip.image) ||
+    (tooltip?.tooltip.sources.length ?? 0) > 0
+  );
 }
 
 function clamp(value: number, min: number, max: number) {

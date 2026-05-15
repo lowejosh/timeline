@@ -17,6 +17,7 @@ import type {
   TimelineDecorationCategory,
   TimelineDecorationGroup,
   TimelineLayerAutoToggleRule,
+  TimelineTooltipImage,
   TimelineMarker,
   TimelineOverlayBand,
   TimelineSetConfig,
@@ -96,6 +97,7 @@ type TimelineRawDecorationBase = {
   priority?: number;
   groupId?: string;
   subGroup?: string;
+  image?: TimelineTooltipImage;
   sourceIds?: string[];
   minZoom?: number;
   maxZoom?: number;
@@ -137,6 +139,7 @@ export type TimelineRawEraNode = {
   scheme?: EraDefinition["scheme"];
   priority?: number;
   isFamilyRoot?: boolean;
+  image?: TimelineTooltipImage;
   sourceIds?: string[];
   approximateStart?: boolean;
   approximateEnd?: boolean;
@@ -455,6 +458,7 @@ function normalizeMarker(
     groupId: marker.groupId,
     setId,
     subGroup: marker.subGroup,
+    image: marker.image,
     sourceIds: marker.sourceIds,
     minZoom: marker.minZoom,
     maxZoom: marker.maxZoom,
@@ -503,6 +507,7 @@ function normalizeOverlay(
     groupId,
     setId,
     subGroup: overlay.subGroup,
+    image: overlay.image,
     sourceIds: overlay.sourceIds,
     minZoom: overlay.minZoom,
     maxZoom: overlay.maxZoom,
@@ -565,6 +570,7 @@ function normalizeEraNode(
     familyId,
     priority: era.priority,
     isFamilyRoot: era.isFamilyRoot,
+    image: era.image,
     sourceIds: era.sourceIds,
     approximateStart: era.approximateStart,
     approximateEnd: era.approximateEnd,

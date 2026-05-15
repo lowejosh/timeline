@@ -4,6 +4,7 @@ import {
   getTimelineYearFromExactTimestamp,
 } from "@/lib/core/exactTimestamp";
 import { bce, ce } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 const TITANIC_SINKS_AT = createExactCalendarTimestamp({
   era: "ce",
@@ -224,6 +225,13 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 66,
+    image: {
+      src: commonsTooltipImage("Stonehenge2007 07 30.jpg"),
+      alt: "Stonehenge stone circle in southern Britain",
+      width: 2816,
+      height: 2112,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["unescoStonehenge", "khanNeolithicRevolution"],
   },
   {
@@ -248,6 +256,13 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: bce(27),
     minZoom: 18,
     priority: 83,
+    image: {
+      src: commonsTooltipImage("Statue-Augustus.jpg"),
+      alt: "Augustus of Prima Porta statue depicting Augustus Caesar",
+      width: 1500,
+      height: 2250,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyAncientRome", "khanRomanEmpire"],
   },
   {
@@ -270,6 +285,15 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(622),
     minZoom: 18,
     priority: 82,
+    image: {
+      src: commonsTooltipImage(
+        "Map of the Hijrah route from Mecca to Medina.svg",
+      ),
+      alt: "Map of the Hijrah route from Mecca to Medina",
+      width: 900,
+      height: 700,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyIslam"],
   },
   {
@@ -281,6 +305,13 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(800),
     minZoom: 18,
     priority: 81,
+    image: {
+      src: commonsTooltipImage("Coronation of Charlemagne.jpg"),
+      alt: "Raphael workshop fresco of the coronation of Charlemagne",
+      width: 3817,
+      height: 2433,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyCharlemagne"],
   },
   {
@@ -292,6 +323,13 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1206),
     minZoom: 18,
     priority: 83,
+    image: {
+      src: commonsTooltipImage("YuanEmperorAlbumGenghisPortrait.jpg"),
+      alt: "Portrait of Genghis Khan from a Yuan-era album",
+      width: 3180,
+      height: 4040,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyGenghisKhan"],
   },
   {
@@ -303,6 +341,15 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1347),
     minZoom: 18,
     priority: 80,
+    image: {
+      src: commonsTooltipImage(
+        "1346-1353 spread of the Black Death in Europe map.svg",
+      ),
+      alt: "Map showing the spread of the Black Death across Europe",
+      width: 992,
+      height: 866,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyBlackDeath"],
   },
   {
@@ -314,6 +361,13 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1453),
     minZoom: 18,
     priority: 82,
+    image: {
+      src: commonsTooltipImage("Constantinople 1453.jpg"),
+      alt: "Medieval depiction of the Ottoman attack on Constantinople in 1453",
+      width: 2549,
+      height: 3846,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyByzantineEmpire"],
   },
   {
@@ -325,6 +379,13 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     year: ce(1450),
     minZoom: 20,
     priority: 72,
+    image: {
+      src: commonsTooltipImage("Gutenberg Bible WDL4102.jpg"),
+      alt: "Page from the Gutenberg Bible",
+      width: 1024,
+      height: 1369,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyPrintingPress"],
   },
   {

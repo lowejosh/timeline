@@ -1,5 +1,6 @@
 import type { TimelineMarker } from "@/lib/core/timelineTypes";
 import { bce, ce } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
   {
@@ -11,6 +12,13 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     year: bce(323),
     minZoom: 18,
     priority: 76,
+    image: {
+      src: commonsTooltipImage("Alexandermosaic.jpg"),
+      alt: "Alexander Mosaic showing Alexander in battle against Darius III",
+      width: 3440,
+      height: 2236,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyAlexanderGreat", "britannicaHellenisticAge"],
   },
   {
@@ -23,6 +31,13 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "North Africa",
     minZoom: 18,
     priority: 75,
+    image: {
+      src: commonsTooltipImage("Punic Ruins, Carthage.jpg"),
+      alt: "Punic ruins at Carthage in North Africa",
+      width: 1280,
+      height: 825,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaCarthage"],
   },
   {
@@ -34,6 +49,13 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     year: bce(49),
     minZoom: 19,
     priority: 74,
+    image: {
+      src: commonsTooltipImage("Julius Caesar.jpg"),
+      alt: "Marble bust traditionally identified as Julius Caesar",
+      width: 2848,
+      height: 4288,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyAncientRome"],
   },
   {
@@ -46,6 +68,13 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "China",
     minZoom: 18,
     priority: 80,
+    image: {
+      src: commonsTooltipImage("Terracotta Army Pit 1 - 11.jpg"),
+      alt: "Terracotta warriors from the mausoleum of Qin Shi Huang",
+      width: 3504,
+      height: 2336,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["qinDynastyWikipedia"],
   },
   {
@@ -59,6 +88,13 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 77,
+    image: {
+      src: commonsTooltipImage("Rock edicts of Ashoka at Dhauli.jpg"),
+      alt: "Ashoka's rock edicts at Dhauli in Odisha",
+      width: 6016,
+      height: 4000,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["kalingaWarWikipedia"],
   },
   {
@@ -71,6 +107,15 @@ export const CLASSICAL_ANTIQUITY_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Roman Empire",
     minZoom: 18,
     priority: 76,
+    image: {
+      src: commonsTooltipImage(
+        "Colossal head of Constantine (M.C. inv. 1072), August 24, 2021.jpg",
+      ),
+      alt: "Colossal bronze head of Constantine",
+      width: 5449,
+      height: 8173,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["edictOfMilanWikipedia"],
   },
 ];

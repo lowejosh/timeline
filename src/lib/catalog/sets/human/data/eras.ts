@@ -5,6 +5,7 @@ import {
   getTimelineYearFromExactTimestamp,
 } from "@/lib/core/exactTimestamp";
 import { bce, ce, yearsAgo } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 const CURRENT_YEAR = TIMELINE_MAX_YEAR;
 const COLD_WAR_DIGITAL_AGE_HANDOFF_AT = createExactCalendarTimestamp({
@@ -184,6 +185,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Cities, kingdoms, bronze metallurgy, and long-distance trade tie the ancient Near East into a shared world.",
     scheme: "archaeological",
+    image: {
+      src: commonsTooltipImage("Mesopotamia location map.svg"),
+      alt: "Map locating the Bronze Age heartlands of Mesopotamia and the ancient Near East",
+      width: 1000,
+      height: 1200,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaBronzeAge", "britannicaMiddleEast"],
     children: [
       {
@@ -198,6 +206,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "First cities and fortified towns rise as urban life expands across the region.",
         scheme: "archaeological",
+        image: {
+          src: commonsTooltipImage("Sumer map.jpg"),
+          alt: "Map of Sumerian cities in southern Mesopotamia",
+          width: 512,
+          height: 599,
+          credit: "Wikimedia Commons",
+        },
         sourceIds: ["britannicaBronzeAge"],
       },
       {
@@ -212,6 +227,15 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Palace kingdoms, chariot warfare, and walled cities define a world of rival courts.",
         scheme: "archaeological",
+        image: {
+          src: commonsTooltipImage(
+            "F0182 Louvre Code Hammourabi Bas-relief Sb8 rwk.jpg",
+          ),
+          alt: "Bas-relief at the top of the Code of Hammurabi stele",
+          width: 3170,
+          height: 3500,
+          credit: "Wikimedia Commons",
+        },
         sourceIds: ["britannicaBronzeAge"],
       },
       {
@@ -226,6 +250,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Great-power diplomacy and palace trade link Egypt, Anatolia, Mesopotamia, and the Levant.",
         scheme: "archaeological",
+        image: {
+          src: commonsTooltipImage("Map Hittite rule en.svg"),
+          alt: "Map of Late Bronze Age Hittite rule in Anatolia and northern Syria",
+          width: 1000,
+          height: 782,
+          credit: "Wikimedia Commons",
+        },
         sourceIds: ["britannicaBronzeAge"],
       },
     ],
@@ -241,6 +272,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Era when iron smelting and forging spread widely enough for iron tools and weapons to overtake bronze.",
     scheme: "archaeological",
+    image: {
+      src: commonsTooltipImage("Map of the Assyrian Empire.svg"),
+      alt: "Map of the Neo-Assyrian Empire during the Iron Age",
+      width: 1000,
+      height: 716,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: [
       "britannicaIronAge",
       "britannicaMetallurgy",
@@ -259,6 +297,15 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Transition phase when ironworking spreads quickly but smiths still labor to turn bloom iron into reliable tools and blades.",
         scheme: "archaeological",
+        image: {
+          src: commonsTooltipImage(
+            "Philistine captives at Medinet Habu.jpg",
+          ),
+          alt: "Relief of Philistine captives at Medinet Habu after Ramesses III's campaigns",
+          width: 653,
+          height: 575,
+          credit: "Wikimedia Commons",
+        },
         sourceIds: ["britannicaIronAge", "britannicaMetallurgy"],
       },
       {
@@ -273,6 +320,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Ironworking becomes more dependable and widespread, supplying tougher farm tools, fittings, and more common weapons.",
         scheme: "archaeological",
+        image: {
+          src: commonsTooltipImage("Map of the Assyrian Empire.svg"),
+          alt: "Map of the Neo-Assyrian Empire at its greatest extent",
+          width: 1000,
+          height: 716,
+          credit: "Wikimedia Commons",
+        },
         sourceIds: ["britannicaMetallurgy", "britannicaIronAge"],
       },
       {
@@ -286,6 +340,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "By this final phase, iron tools and weapons are established parts of everyday production rather than a newer experiment.",
         scheme: "archaeological",
+        image: {
+          src: commonsTooltipImage("Cyrus Cylinder.jpg"),
+          alt: "The Cyrus Cylinder with Akkadian cuneiform inscription",
+          width: 1024,
+          height: 683,
+          credit: "Wikimedia Commons",
+        },
         sourceIds: ["britannicaMetallurgy", "historyPersianEmpire"],
       },
     ],
@@ -299,6 +360,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Greco-Roman age that shaped Mediterranean law, architecture, philosophy, and urban life.",
     scheme: "world-history",
+    image: {
+      src: commonsTooltipImage("The Parthenon in Athens.jpg"),
+      alt: "The Parthenon on the Acropolis of Athens",
+      width: 1144,
+      height: 804,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaClassicalAntiquity"],
   },
   {
@@ -311,6 +379,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Major religions, caravan routes, and maritime trade bind Afro-Eurasia more tightly.",
     scheme: "world-history",
+    image: {
+      src: commonsTooltipImage("Silk Road.svg"),
+      alt: "Map of Silk Road routes across Eurasia",
+      width: 1104,
+      height: 717,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyIslam", "khanSongChina", "britannicaMongolEmpire"],
   },
   {

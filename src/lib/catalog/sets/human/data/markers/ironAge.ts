@@ -1,5 +1,6 @@
 import type { TimelineMarker } from "@/lib/core/timelineTypes";
 import { bce } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 export const IRON_AGE_MARKERS: TimelineMarker[] = [
   {
@@ -13,6 +14,15 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 78,
+    image: {
+      src: commonsTooltipImage(
+        "Philistine captives at Medinet Habu.jpg",
+      ),
+      alt: "Relief of Philistine captives at Medinet Habu after Ramesses III's campaigns",
+      width: 653,
+      height: 575,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["battleOfTheDeltaWikipedia"],
   },
   {
@@ -25,6 +35,15 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Levant",
     minZoom: 18,
     priority: 77,
+    image: {
+      src: commonsTooltipImage(
+        "Kurkh stele of Shalmaneser III. From Diyarbakır, southern Turkey. British Museum.jpg",
+      ),
+      alt: "Kurkh Monolith of Shalmaneser III, whose inscription mentions Qarqar",
+      width: 3530,
+      height: 5758,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["battleOfQarqarWikipedia"],
   },
   {
@@ -37,6 +56,13 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Greece",
     minZoom: 18,
     priority: 76,
+    image: {
+      src: commonsTooltipImage("Olympia-stadion.jpg"),
+      alt: "The ancient stadium at Olympia",
+      width: 699,
+      height: 344,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaOlympicGames"],
   },
   {
@@ -50,6 +76,13 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 75,
+    image: {
+      src: commonsTooltipImage("Black-obelisk.jpg"),
+      alt: "Black Obelisk of Shalmaneser III",
+      width: 800,
+      height: 513,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["blackObeliskWikipedia"],
   },
   {
@@ -63,6 +96,13 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 74,
+    image: {
+      src: commonsTooltipImage("Gezer calendar close up.jpg"),
+      alt: "Close view of the Gezer calendar inscription",
+      width: 435,
+      height: 577,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["gezerCalendarWikipedia"],
   },
   {
@@ -76,6 +116,13 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 75,
+    image: {
+      src: commonsTooltipImage("Siloam inscription.jpg"),
+      alt: "Siloam inscription from Hezekiah's tunnel in Jerusalem",
+      width: 516,
+      height: 256,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["siloamInscriptionWikipedia"],
   },
   {
@@ -88,6 +135,13 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Levant",
     minZoom: 18,
     priority: 77,
+    image: {
+      src: commonsTooltipImage("Lachish Relief, British Museum.jpg"),
+      alt: "Assyrian palace relief depicting the siege of Lachish",
+      width: 2048,
+      height: 1536,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["siegeOfLachishWikipedia"],
   },
   {
@@ -100,6 +154,13 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Mesopotamia",
     minZoom: 18,
     priority: 79,
+    image: {
+      src: commonsTooltipImage("Nergal gate in Nineveh.JPG"),
+      alt: "Remains of the Nergal Gate at Nineveh in Iraq",
+      width: 2742,
+      height: 3444,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["fallOfNinevehWikipedia"],
   },
   {
@@ -125,6 +186,13 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 79,
+    image: {
+      src: commonsTooltipImage("Battle of Carchemish.png"),
+      alt: "Early twentieth-century illustration of the Battle of Carchemish",
+      width: 1000,
+      height: 682,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["battleOfCarchemishWikipedia"],
   },
   {
@@ -137,6 +205,13 @@ export const IRON_AGE_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Mesopotamia",
     minZoom: 18,
     priority: 80,
+    image: {
+      src: commonsTooltipImage("Cyrus Cylinder.jpg"),
+      alt: "The Cyrus Cylinder with Akkadian cuneiform inscription",
+      width: 1024,
+      height: 683,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyPersianEmpire"],
   },
 ];

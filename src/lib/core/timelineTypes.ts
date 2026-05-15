@@ -25,6 +25,14 @@ export type EraFamilyId = string;
 
 export type TimelineSetId = string;
 
+export type TimelineTooltipImage = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  credit?: string;
+};
+
 export type EraSource = {
   shortTitle: string;
   title: string;
@@ -69,6 +77,7 @@ export type Era = TimelineRegionalScope &
     priority?: number;
     setPriorityBoost?: number;
     isFamilyRoot?: boolean;
+    image?: TimelineTooltipImage;
     sourceIds?: string[];
     children?: Era[];
   };
@@ -137,6 +146,7 @@ type TimelineDecorationBase = TimelineZoomVisibility &
     groupId?: string;
     setId?: TimelineSetId;
     subGroup?: string;
+    image?: TimelineTooltipImage;
     sourceIds?: string[];
   };
 
