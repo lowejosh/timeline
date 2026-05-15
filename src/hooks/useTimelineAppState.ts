@@ -57,6 +57,7 @@ import {
   getSetIdForEraFamily,
   normalizeTimelineSetOrder,
   TIMELINE_SET_ID_BY_GROUP_ID,
+  TIMELINE_SETS_BY_ID,
   TIMELINE_SET_SPAN_PRIORITY_BY_ID,
 } from "../lib/catalog/timelineSets";
 import {
@@ -90,6 +91,18 @@ type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
 
 const HUMAN_EVOLUTION_GROUP_ID =
   TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
+
+function getDefaultGroupIdsForSet(setId: TimelineSetId): string[] {
+  const set = TIMELINE_SETS_BY_ID[setId];
+
+  if (!set) {
+    return [];
+  }
+
+  return set.groups
+    .filter((group) => group.defaultEnabled !== false)
+    .map((group) => group.id);
+}
 
 function shouldStartWithSidebarOpen() {
   const stored = readStoredSidebarOpen();
@@ -211,6 +224,25 @@ export function useTimelineAppState() {
   useEffect(() => {
     writeStoredEnabledGroupIds(manualEnabledGroupIds);
   }, [manualEnabledGroupIds]);
+
+  useEffect(() => {
+    if (
+      !enabledSetIds.has("computing") ||
+      manualEnabledGroupIds.has("computer-models")
+    ) {
+      return;
+    }
+
+    setManualEnabledGroupIds((current) => {
+      if (current.has("computer-models")) {
+        return current;
+      }
+
+      const next = new Set(current);
+      next.add("computer-models");
+      return next;
+    });
+  }, [enabledSetIds, manualEnabledGroupIds]);
 
   useEffect(() => {
     writeStoredGroupToggleMode(
@@ -1012,6 +1044,28 @@ export function useTimelineAppState() {
         }
         return next;
       });
+
+      const addedSetIds = Array.from(nextEnabledSetIds).filter(
+        (setId) => !enabledSetIds.has(setId),
+      );
+
+      if (addedSetIds.length > 0) {
+        setManualEnabledGroupIds((current) => {
+          const next = new Set(current);
+          let changed = false;
+
+          for (const setId of addedSetIds) {
+            for (const groupId of getDefaultGroupIdsForSet(setId)) {
+              if (!next.has(groupId)) {
+                next.add(groupId);
+                changed = true;
+              }
+            }
+          }
+
+          return changed ? next : current;
+        });
+      }
 
       setEnabledSetIds(new Set(nextEnabledSetIds));
       setOrderedSetIds((current) => {

@@ -2,6 +2,7 @@ import { normalizeTimelineSetSource } from "@/lib/catalog/setSource";
 import { TIMELINE_MAX_YEAR } from "@/lib/core/timelineYears";
 import { COMPUTING_HISTORY_ERA_DEFINITIONS } from "./data/eras";
 import { COMPUTING_HISTORY_MARKERS } from "./data/markers";
+import { COMPUTER_MODEL_OVERLAYS } from "./data/overlays";
 import { COMPUTING_SOURCES } from "./data/sources";
 
 const computingFamilyRoot = {
@@ -40,10 +41,21 @@ export const COMPUTING_SET = normalizeTimelineSetSource({
           id: "computing-history",
           label: "Computing Milestones",
           description:
-            "Milestones from early machine designs through the web and mobile computing.",
+            "Milestones in computation theory, networking, and the rise of the web.",
           contentType: "markers",
           order: 0,
+          defaultEnabled: true,
           markers: COMPUTING_HISTORY_MARKERS,
+        },
+        {
+          id: "computer-models",
+          label: "Computer Models",
+          description:
+            "Notable machines, systems, and consumer computer models from early electronic computers to the smartphone era.",
+          contentType: "overlays",
+          order: 1,
+          defaultEnabled: true,
+          overlays: COMPUTER_MODEL_OVERLAYS,
         },
       ],
     },

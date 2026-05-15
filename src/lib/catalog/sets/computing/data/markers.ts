@@ -1,29 +1,13 @@
-import { getTimelineYearFromExactTimestamp } from "@/lib/core/exactTimestamp";
 import { createExactCalendarTimestamp } from "@/lib/core/exactTimestamp";
+import { getTimelineYearFromExactTimestamp } from "@/lib/core/exactTimestamp";
 import { ce } from "@/lib/core/timelineDateBuilders";
 import type { TimelineMarker } from "@/lib/core/timelineTypes";
-
-const ENIAC_ANNOUNCED_AT = createExactCalendarTimestamp({
-  era: "ce",
-  year: 1946,
-  month: 2,
-  day: 14,
-  precision: "day",
-});
 
 const ARPANET_FIRST_NODE_AT = createExactCalendarTimestamp({
   era: "ce",
   year: 1969,
   month: 9,
   precision: "month",
-});
-
-const IBM_PC_UNVEILED_AT = createExactCalendarTimestamp({
-  era: "ce",
-  year: 1981,
-  month: 8,
-  day: 12,
-  precision: "day",
 });
 
 const TCP_IP_FLAG_DAY_AT = createExactCalendarTimestamp({
@@ -52,6 +36,61 @@ const IPHONE_INTRODUCED_AT = createExactCalendarTimestamp({
 
 export const COMPUTING_HISTORY_MARKERS: TimelineMarker[] = [
   {
+    id: "napier-logarithms-published",
+    label: "Napier publishes logarithms",
+    shortLabel: "Logarithms",
+    year: ce(1614),
+    minZoom: 15,
+    priority: 84,
+    description:
+      "Napier publishes logarithms, a major step in reducing complex calculation to more manageable operations.",
+    sourceIds: ["computingLogarithmWikipedia"],
+  },
+  {
+    id: "pascaline-invented",
+    label: "Pascal invents the Pascaline",
+    shortLabel: "Pascaline",
+    year: ce(1642),
+    minZoom: 15,
+    priority: 85,
+    description:
+      "Pascal's mechanical calculator shows that arithmetic work can be delegated to a machine.",
+    sourceIds: ["computingPascalineWikipedia"],
+  },
+  {
+    id: "stepped-reckoner-demonstrated",
+    label: "Leibniz demonstrates the Stepped Reckoner",
+    shortLabel: "Stepped Reckoner",
+    year: ce(1673),
+    minZoom: 15,
+    priority: 85,
+    description:
+      "Leibniz demonstrates a mechanical calculator designed to extend machine arithmetic beyond simple addition and subtraction.",
+    sourceIds: ["computingSteppedReckonerWikipedia"],
+  },
+  {
+    id: "leibniz-binary-arithmetic-published",
+    label: "Leibniz publishes binary arithmetic",
+    shortLabel: "Binary Arithmetic",
+    year: ce(1703),
+    minZoom: 15,
+    priority: 87,
+    description:
+      "Leibniz publishes a binary numeral system, a conceptual foundation for later digital computation.",
+    sourceIds: ["computingBinaryNumberWikipedia"],
+  },
+  {
+    id: "jacquard-loom-punched-cards",
+    label: "Jacquard loom uses punched cards",
+    shortLabel: "Jacquard Cards",
+    year: ce(1804),
+    minZoom: 15,
+    priority: 89,
+    description:
+      "The Jacquard loom shows how punched cards can encode and automate a sequence of operations.",
+    sourceIds: ["computingJacquardWikipedia"],
+  },
+  {
     id: "difference-engine-designed",
     label: "Babbage designs the Difference Engine",
     shortLabel: "Difference Engine",
@@ -65,6 +104,17 @@ export const COMPUTING_HISTORY_MARKERS: TimelineMarker[] = [
     sourceIds: ["computingOxfordImaginingAi"],
   },
   {
+    id: "analytical-engine-conceived",
+    label: "Babbage conceives the Analytical Engine",
+    shortLabel: "Analytical Engine",
+    year: ce(1837),
+    minZoom: 15,
+    priority: 90,
+    description:
+      "Babbage's Analytical Engine introduces the design of a programmable general-purpose mechanical computer.",
+    sourceIds: ["computingAnalyticalEngineWikipedia"],
+  },
+  {
     id: "ada-lovelace-describes-analytical-engine",
     label: "Ada Lovelace describes the Analytical Engine",
     shortLabel: "Ada Lovelace",
@@ -74,6 +124,63 @@ export const COMPUTING_HISTORY_MARKERS: TimelineMarker[] = [
     description:
       "Lovelace collaborates on a description of Babbage's unbuilt Analytical Engine and lays out a step-by-step calculation.",
     sourceIds: ["computingOxfordImaginingAi"],
+  },
+  {
+    id: "boolean-algebra-published",
+    label: "Boole publishes Boolean algebra",
+    shortLabel: "Boolean Algebra",
+    year: ce(1847),
+    dateLabel: "1847, 1854",
+    approximate: true,
+    minZoom: 15,
+    priority: 91,
+    description:
+      "George Boole publishes the algebraic logic that later becomes fundamental to digital circuits and computation.",
+    sourceIds: ["computingBooleanAlgebraWikipedia"],
+  },
+  {
+    id: "hollerith-tabulation-breakthrough",
+    label: "Hollerith tabulation scales data processing",
+    shortLabel: "Punched-Card Tabulation",
+    year: ce(1890),
+    minZoom: 15,
+    priority: 88,
+    description:
+      "Hollerith's punched-card tabulating system shows how large-scale information processing can be mechanized.",
+    sourceIds: ["computingHollerithWikipedia"],
+  },
+  {
+    id: "differential-analyzer-built",
+    label: "Differential analyzer built",
+    shortLabel: "Differential Analyzer",
+    year: ce(1931),
+    minZoom: 15,
+    priority: 86,
+    description:
+      "Vannevar Bush's differential analyzer becomes a landmark analog machine for automated mathematical calculation.",
+    sourceIds: ["computingDifferentialAnalyzerWikipedia"],
+  },
+  {
+    id: "godel-incompleteness-published",
+    label: "Gödel publishes incompleteness theorems",
+    shortLabel: "Gödel",
+    year: ce(1931),
+    minZoom: 15,
+    priority: 88,
+    description:
+      "Gödel's incompleteness theorems redefine the limits of formal systems, a deep result for logic and computation.",
+    sourceIds: ["computingGodelWikipedia"],
+  },
+  {
+    id: "lambda-calculus-formulated",
+    label: "Lambda calculus formulated",
+    shortLabel: "Lambda Calculus",
+    year: ce(1936),
+    minZoom: 15,
+    priority: 88,
+    description:
+      "Lambda calculus gives computation a compact formal language for functions, substitution, and evaluation.",
+    sourceIds: ["computingLambdaCalculusWikipedia"],
   },
   {
     id: "turing-computability-paper",
@@ -89,16 +196,69 @@ export const COMPUTING_HISTORY_MARKERS: TimelineMarker[] = [
     sourceIds: ["computingAlanTuringSep"],
   },
   {
-    id: "eniac-announced",
-    label: "ENIAC announced",
-    shortLabel: "ENIAC",
-    year: getTimelineYearFromExactTimestamp(ENIAC_ANNOUNCED_AT),
-    exactTime: ENIAC_ANNOUNCED_AT,
-    dateLabel: "Feb 14, 1946",
-    minZoom: 16,
-    priority: 93,
+    id: "shannon-relay-thesis",
+    label: "Shannon links logic to switching circuits",
+    shortLabel: "Shannon Thesis",
+    year: ce(1937),
+    minZoom: 15,
+    priority: 90,
     description:
-      "ENIAC is announced as the first general-purpose electronic computer.",
+      "Shannon shows that Boolean logic can be implemented with relay and switching circuits, a key bridge to digital hardware.",
+    sourceIds: ["computingShannonThesisWikipedia"],
+  },
+  {
+    id: "z1-completed",
+    label: "Zuse completes the Z1",
+    shortLabel: "Z1",
+    year: ce(1938),
+    minZoom: 15,
+    priority: 86,
+    description:
+      "Konrad Zuse completes the Z1, an early programmable mechanical binary computer.",
+    sourceIds: ["computingZ1Wikipedia"],
+  },
+  {
+    id: "z3-operational",
+    label: "Zuse's Z3 becomes operational",
+    shortLabel: "Z3",
+    year: ce(1941),
+    minZoom: 15,
+    priority: 88,
+    description:
+      "The Z3 becomes an early programmable automatic digital computer, built with electromechanical relays.",
+    sourceIds: ["computingZ3Wikipedia"],
+  },
+  {
+    id: "colossus-operational",
+    label: "Colossus becomes operational",
+    shortLabel: "Colossus",
+    year: ce(1944),
+    minZoom: 15,
+    priority: 89,
+    description:
+      "Colossus enters wartime service as an early programmable electronic digital computer for codebreaking.",
+    sourceIds: ["computingColossusWikipedia"],
+  },
+  {
+    id: "stored-program-architecture-described",
+    label: "Stored-program architecture described",
+    shortLabel: "Stored Program",
+    year: ce(1945),
+    minZoom: 15,
+    priority: 90,
+    description:
+      "The von Neumann architecture describes a stored-program computer design that becomes the dominant model.",
+    sourceIds: ["computingVonNeumannArchitectureWikipedia"],
+  },
+  {
+    id: "eniac-unveiled",
+    label: "ENIAC unveiled",
+    shortLabel: "ENIAC",
+    year: ce(1946),
+    minZoom: 16,
+    priority: 90,
+    description:
+      "ENIAC is unveiled as a large-scale electronic general-purpose computer, signaling a new computing era.",
     sourceIds: ["computingPennEniac"],
   },
   {
@@ -113,15 +273,37 @@ export const COMPUTING_HISTORY_MARKERS: TimelineMarker[] = [
     sourceIds: ["computingEthwTransistor"],
   },
   {
-    id: "manchester-baby-first-program",
+    id: "information-theory-founded",
+    label: "Shannon founds information theory",
+    shortLabel: "Information Theory",
+    year: ce(1948),
+    minZoom: 16,
+    priority: 91,
+    description:
+      "Claude Shannon lays the foundations of information theory and modern digital communication.",
+    sourceIds: ["computingShannonWikipedia"],
+  },
+  {
+    id: "manchester-baby-runs-program",
     label: "Manchester Baby runs a stored program",
     shortLabel: "Manchester Baby",
     year: ce(1948),
     minZoom: 16,
-    priority: 94,
+    priority: 90,
     description:
-      "The Manchester Baby runs the first computer program stored in electronic memory.",
-    sourceIds: ["computingChmTimeline"],
+      "The Manchester Baby performs one of the first successful runs of a stored program on an electronic computer.",
+    sourceIds: ["computingManchesterBabyWikipedia"],
+  },
+  {
+    id: "fortran-released",
+    label: "Fortran released",
+    shortLabel: "Fortran",
+    year: ce(1957),
+    minZoom: 16,
+    priority: 87,
+    description:
+      "Fortran helps establish high-level compiled programming for scientific and engineering work.",
+    sourceIds: ["computingFortranWikipedia"],
   },
   {
     id: "first-integrated-circuit-invented",
@@ -135,15 +317,92 @@ export const COMPUTING_HISTORY_MARKERS: TimelineMarker[] = [
     sourceIds: ["computingTiIntegratedCircuit"],
   },
   {
-    id: "ibm-system-360-introduced",
-    label: "IBM System/360 introduced",
-    shortLabel: "System/360",
+    id: "lisp-created",
+    label: "Lisp created",
+    shortLabel: "Lisp",
+    year: ce(1958),
+    minZoom: 16,
+    priority: 88,
+    description:
+      "Lisp introduces a highly influential language family for symbolic processing, recursion, and AI research.",
+    sourceIds: ["computingLispWikipedia"],
+  },
+  {
+    id: "cobol-created",
+    label: "COBOL created",
+    shortLabel: "COBOL",
+    year: ce(1959),
+    minZoom: 16,
+    priority: 85,
+    description:
+      "COBOL standardizes a business-oriented programming language for commercial data processing.",
+    sourceIds: ["computingCobolWikipedia"],
+  },
+  {
+    id: "mosfet-invented",
+    label: "MOSFET invented",
+    shortLabel: "MOSFET",
+    year: ce(1959),
+    minZoom: 16,
+    priority: 88,
+    description:
+      "The MOSFET introduces the transistor design that becomes the workhorse of modern microelectronics.",
+    sourceIds: ["computingMosfetWikipedia"],
+  },
+  {
+    id: "algol-60-published",
+    label: "ALGOL 60 published",
+    shortLabel: "ALGOL 60",
+    year: ce(1960),
+    minZoom: 16,
+    priority: 86,
+    description:
+      "ALGOL 60 helps define modern language syntax and block-structured programming.",
+    sourceIds: ["computingAlgolWikipedia"],
+  },
+  {
+    id: "basic-created",
+    label: "BASIC created at Dartmouth",
+    shortLabel: "BASIC",
     year: ce(1964),
     minZoom: 17,
-    priority: 90,
+    priority: 85,
     description:
-      "IBM unifies a family of computers under a single architecture and platform model.",
-    sourceIds: ["computingIbmSystem360"],
+      "BASIC is designed to make interactive programming more accessible to students and non-specialists.",
+    sourceIds: ["computingBasicWikipedia"],
+  },
+  {
+    id: "simula-introduced",
+    label: "Simula introduced",
+    shortLabel: "Simula",
+    year: ce(1967),
+    minZoom: 17,
+    priority: 86,
+    description:
+      "Simula becomes a foundational object-oriented language, introducing classes and objects into programming practice.",
+    sourceIds: ["computingSimulaWikipedia"],
+  },
+  {
+    id: "structured-programming-debate",
+    label: "Structured programming reshapes software practice",
+    shortLabel: "Structured Programming",
+    year: ce(1968),
+    minZoom: 17,
+    priority: 85,
+    description:
+      "Structured programming pushes software design toward clearer control flow and away from sprawling goto-based code.",
+    sourceIds: ["computingStructuredProgrammingWikipedia"],
+  },
+  {
+    id: "unix-created",
+    label: "Unix created",
+    shortLabel: "Unix",
+    year: ce(1969),
+    minZoom: 17,
+    priority: 88,
+    description:
+      "Unix begins as a small multiuser operating system and grows into one of computing's most influential software lineages.",
+    sourceIds: ["computingUnixWikipedia"],
   },
   {
     id: "arpanet-first-node-installed",
@@ -159,39 +418,114 @@ export const COMPUTING_HISTORY_MARKERS: TimelineMarker[] = [
     sourceIds: ["computingInternetSocietyBriefHistory"],
   },
   {
-    id: "altair-8800-appears",
-    label: "Altair 8800 appears",
-    shortLabel: "Altair 8800",
-    year: ce(1975),
+    id: "relational-model-proposed",
+    label: "Relational database model proposed",
+    shortLabel: "Relational Model",
+    year: ce(1970),
     minZoom: 17,
-    priority: 90,
+    priority: 87,
     description:
-      "The Altair 8800 kit kicks off the early microcomputer boom.",
-    sourceIds: ["computingChmTimeline"],
+      "Edgar F. Codd proposes the relational model, reshaping how structured data is organized and queried.",
+    sourceIds: ["computingRelationalModelWikipedia"],
   },
   {
-    id: "apple-ii-introduced",
-    label: "Apple II introduced",
-    shortLabel: "Apple II",
-    year: ce(1977),
+    id: "pascal-created",
+    label: "Pascal created",
+    shortLabel: "Pascal",
+    year: ce(1970),
+    minZoom: 17,
+    priority: 84,
+    description:
+      "Pascal becomes a major teaching language for structured programming and compiler design.",
+    sourceIds: ["computingPascalWikipedia"],
+  },
+  {
+    id: "email-invented",
+    label: "Network email takes shape",
+    shortLabel: "Email",
+    year: ce(1971),
+    minZoom: 17,
+    priority: 85,
+    description:
+      "Network email emerges as one of the earliest widely used digital communication tools.",
+    sourceIds: ["computingEmailWikipedia"],
+  },
+  {
+    id: "intel-4004-released",
+    label: "Intel 4004 released",
+    shortLabel: "Intel 4004",
+    year: ce(1971),
     minZoom: 17,
     priority: 88,
     description:
-      "Apple II pushes personal computing well beyond the hobbyist community.",
-    sourceIds: ["computingChmTimeline"],
+      "Intel releases the 4004, a landmark early microprocessor.",
+    sourceIds: ["computingIntel4004Wikipedia"],
   },
   {
-    id: "ibm-pc-unveiled",
-    label: "IBM PC unveiled",
-    shortLabel: "IBM PC",
-    year: getTimelineYearFromExactTimestamp(IBM_PC_UNVEILED_AT),
-    exactTime: IBM_PC_UNVEILED_AT,
-    dateLabel: "Aug 12, 1981",
-    minZoom: 18,
-    priority: 91,
+    id: "smalltalk-emerges",
+    label: "Smalltalk emerges at Xerox PARC",
+    shortLabel: "Smalltalk",
+    year: ce(1972),
+    minZoom: 17,
+    priority: 86,
     description:
-      "IBM unveils the IBM PC, helping move personal computing into the mainstream.",
-    sourceIds: ["computingIbmPc"],
+      "Smalltalk helps define object-oriented programming as a full software environment rather than just a language feature list.",
+    sourceIds: ["computingSmalltalkWikipedia"],
+  },
+  {
+    id: "c-language-created",
+    label: "C programming language created",
+    shortLabel: "C Language",
+    year: ce(1972),
+    minZoom: 17,
+    priority: 86,
+    description:
+      "C becomes one of the defining systems languages of modern computing.",
+    sourceIds: ["computingCLanguageWikipedia"],
+  },
+  {
+    id: "ethernet-developed",
+    label: "Ethernet developed at Xerox PARC",
+    shortLabel: "Ethernet",
+    year: ce(1973),
+    minZoom: 17,
+    priority: 88,
+    description:
+      "Ethernet emerges from Xerox PARC as a practical local-area networking technology.",
+    sourceIds: ["computingEthernetWikipedia"],
+  },
+  {
+    id: "cpm-released",
+    label: "CP/M released",
+    shortLabel: "CP/M",
+    year: ce(1974),
+    minZoom: 17,
+    priority: 84,
+    description:
+      "CP/M becomes a widely used operating system across early microcomputer platforms.",
+    sourceIds: ["computingCpmWikipedia"],
+  },
+  {
+    id: "sql-developed",
+    label: "SQL developed",
+    shortLabel: "SQL",
+    year: ce(1974),
+    minZoom: 17,
+    priority: 85,
+    description:
+      "SQL gives relational databases a durable query language that becomes central to data systems.",
+    sourceIds: ["computingSqlWikipedia"],
+  },
+  {
+    id: "public-key-cryptography-published",
+    label: "Public-key cryptography published",
+    shortLabel: "Public-Key Crypto",
+    year: ce(1976),
+    minZoom: 17,
+    priority: 84,
+    description:
+      "Public-key cryptography opens the door to modern secure communication over open networks.",
+    sourceIds: ["computingPublicKeyCryptographyWikipedia"],
   },
   {
     id: "arpanet-adopts-tcp-ip",
@@ -207,6 +541,39 @@ export const COMPUTING_HISTORY_MARKERS: TimelineMarker[] = [
     sourceIds: ["computingInternetSocietyBriefHistory"],
   },
   {
+    id: "dns-created",
+    label: "Domain Name System created",
+    shortLabel: "DNS",
+    year: ce(1983),
+    minZoom: 18,
+    priority: 84,
+    description:
+      "DNS introduces a scalable naming system for the growing internet.",
+    sourceIds: ["computingDnsWikipedia"],
+  },
+  {
+    id: "gnu-project-announced",
+    label: "GNU Project announced",
+    shortLabel: "GNU Project",
+    year: ce(1983),
+    minZoom: 18,
+    priority: 84,
+    description:
+      "Richard Stallman launches the GNU Project to build a free Unix-like software system.",
+    sourceIds: ["computingGnuProjectWikipedia"],
+  },
+  {
+    id: "cpp-named-and-released",
+    label: "C++ takes shape",
+    shortLabel: "C++",
+    year: ce(1985),
+    minZoom: 18,
+    priority: 84,
+    description:
+      "C++ extends the C lineage with classes and other abstractions that become major in systems and application software.",
+    sourceIds: ["computingCppWikipedia"],
+  },
+  {
     id: "world-wide-web-invented",
     label: "World Wide Web invented at CERN",
     shortLabel: "Web Invented",
@@ -216,6 +583,50 @@ export const COMPUTING_HISTORY_MARKERS: TimelineMarker[] = [
     description:
       "Tim Berners-Lee invents the World Wide Web while working at CERN.",
     sourceIds: ["computingCernBirthWeb"],
+  },
+  {
+    id: "windows-3-released",
+    label: "Windows 3.0 released",
+    shortLabel: "Windows 3.0",
+    year: ce(1990),
+    minZoom: 18,
+    priority: 84,
+    description:
+      "Windows 3.0 helps bring the graphical desktop into mainstream PC use.",
+    sourceIds: ["computingWindowsWikipedia"],
+  },
+  {
+    id: "linux-announced",
+    label: "Linux announced",
+    shortLabel: "Linux",
+    year: ce(1991),
+    minZoom: 18,
+    priority: 87,
+    description:
+      "Linus Torvalds announces Linux, starting a kernel that becomes central to servers, embedded systems, and cloud infrastructure.",
+    sourceIds: ["computingLinuxWikipedia"],
+  },
+  {
+    id: "python-released",
+    label: "Python released",
+    shortLabel: "Python",
+    year: ce(1991),
+    minZoom: 18,
+    priority: 83,
+    description:
+      "Python begins its long rise as a general-purpose language prized for readability and breadth.",
+    sourceIds: ["computingPythonWikipedia"],
+  },
+  {
+    id: "mosaic-browser-released",
+    label: "NCSA Mosaic released",
+    shortLabel: "Mosaic",
+    year: ce(1993),
+    minZoom: 19,
+    priority: 86,
+    description:
+      "NCSA Mosaic helps turn the web into a mass-use graphical medium.",
+    sourceIds: ["computingMosaicWikipedia"],
   },
   {
     id: "world-wide-web-public-domain",
@@ -229,6 +640,83 @@ export const COMPUTING_HISTORY_MARKERS: TimelineMarker[] = [
     description:
       "CERN places the World Wide Web software in the public domain.",
     sourceIds: ["computingCernBirthWeb"],
+  },
+  {
+    id: "php-created",
+    label: "PHP created",
+    shortLabel: "PHP",
+    year: ce(1995),
+    minZoom: 19,
+    priority: 82,
+    description:
+      "PHP becomes a major language of the early dynamic web and server-side scripting boom.",
+    sourceIds: ["computingPhpWikipedia"],
+  },
+  {
+    id: "javascript-created",
+    label: "JavaScript created",
+    shortLabel: "JavaScript",
+    year: ce(1995),
+    minZoom: 19,
+    priority: 84,
+    description:
+      "JavaScript brings a widely used scripting language into the web browser.",
+    sourceIds: ["computingJavascriptWikipedia"],
+  },
+  {
+    id: "java-released",
+    label: "Java released",
+    shortLabel: "Java",
+    year: ce(1995),
+    minZoom: 19,
+    priority: 83,
+    description:
+      "Java arrives as a major cross-platform programming language for networked and enterprise software.",
+    sourceIds: ["computingJavaWikipedia"],
+  },
+  {
+    id: "ruby-created",
+    label: "Ruby created",
+    shortLabel: "Ruby",
+    year: ce(1995),
+    minZoom: 19,
+    priority: 81,
+    description:
+      "Ruby becomes an influential language in developer culture, especially for expressive scripting and later web frameworks.",
+    sourceIds: ["computingRubyWikipedia"],
+  },
+  {
+    id: "usb-released",
+    label: "USB 1.0 released",
+    shortLabel: "USB",
+    year: ce(1996),
+    minZoom: 19,
+    priority: 83,
+    description:
+      "USB begins the long simplification of how peripherals connect to personal computers.",
+    sourceIds: ["computingUsbWikipedia"],
+  },
+  {
+    id: "wifi-standard-ratified",
+    label: "IEEE 802.11 ratified",
+    shortLabel: "Wi-Fi Standard",
+    year: ce(1997),
+    minZoom: 19,
+    priority: 83,
+    description:
+      "The first 802.11 standard establishes the foundation of modern Wi-Fi networking.",
+    sourceIds: ["computingWifiWikipedia"],
+  },
+  {
+    id: "aws-launched",
+    label: "Amazon Web Services launched",
+    shortLabel: "AWS",
+    year: ce(2006),
+    minZoom: 20,
+    priority: 82,
+    description:
+      "AWS helps turn cloud computing into a mainstream platform model.",
+    sourceIds: ["computingAwsWikipedia"],
   },
   {
     id: "iphone-introduced-computing",

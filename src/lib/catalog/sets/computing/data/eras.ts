@@ -5,8 +5,8 @@ import { TIMELINE_MAX_YEAR } from "@/lib/core/timelineYears";
 export const COMPUTING_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   {
     id: "computing-foundations",
-    name: "Foundations of Computation",
-    startYear: ce(1822),
+    name: "Foundations",
+    startYear: ce(1614),
     endYear: ce(1936),
     approximateStart: true,
     approximateEnd: true,
@@ -16,7 +16,7 @@ export const COMPUTING_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   },
   {
     id: "electromechanical-wartime-computing",
-    name: "Electromechanical and Wartime Computing",
+    name: "Wartime Computing",
     startYear: ce(1936),
     endYear: ce(1948),
     approximateStart: true,
@@ -37,7 +37,7 @@ export const COMPUTING_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   },
   {
     id: "semiconductor-computing",
-    name: "Semiconductor Computing",
+    name: "Semiconductor",
     startYear: ce(1958),
     endYear: ce(1971),
     approximateEnd: true,
@@ -47,7 +47,7 @@ export const COMPUTING_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   },
   {
     id: "personal-computing",
-    name: "Personal Computing",
+    name: "Personal",
     startYear: ce(1971),
     endYear: ce(1989),
     approximateEnd: true,
@@ -57,7 +57,7 @@ export const COMPUTING_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   },
   {
     id: "web-mobile-cloud",
-    name: "Web, Mobile, and Cloud",
+    name: "Web Era",
     startYear: ce(1989),
     endYear: TIMELINE_MAX_YEAR,
     description:
