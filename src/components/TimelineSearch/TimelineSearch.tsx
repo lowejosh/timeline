@@ -1,5 +1,6 @@
 import { Search, X } from "lucide-react";
 import {
+  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -27,6 +28,7 @@ type TimelineSearchProps = {
   modifierLabel: string;
   onOpenChange: (nextOpen: boolean) => void;
   onSelectResult: (result: TimelineSearchResult) => void;
+  showShortcutHint?: boolean;
   variant?: "desktop" | "mobile";
 };
 
@@ -58,6 +60,7 @@ export function TimelineSearch({
   modifierLabel,
   onOpenChange,
   onSelectResult,
+  showShortcutHint = true,
   variant = "desktop",
 }: TimelineSearchProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -80,6 +83,19 @@ export function TimelineSearch({
   );
   const hasQuery = query.trim().length > 0;
   const hasResultsPanel = isOpen && hasQuery;
+  const focusSearchInput = useCallback(() => {
+    inputRef.current?.focus({ preventScroll: true });
+  }, []);
+  const setInputRef = useCallback(
+    (element: HTMLInputElement | null) => {
+      inputRef.current = element;
+
+      if (element && isOpen) {
+        element.focus({ preventScroll: true });
+      }
+    },
+    [isOpen],
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -88,8 +104,14 @@ export function TimelineSearch({
       return;
     }
 
-    requestAnimationFrame(() => inputRef.current?.focus());
-  }, [isOpen]);
+    const frame = requestAnimationFrame(focusSearchInput);
+    const timer = window.setTimeout(focusSearchInput, 40);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+    };
+  }, [focusSearchInput, isOpen]);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -322,7 +344,7 @@ export function TimelineSearch({
                   }}
                   onKeyDown={handleInputKeyDown}
                   placeholder="Search timeline"
-                  ref={inputRef}
+                  ref={setInputRef}
                   role="combobox"
                   value={query}
                 />
@@ -360,11 +382,12 @@ export function TimelineSearch({
   }
 
   return (
-    <div className={cn("max-sm:hidden", className)}>
+    <div className={cn(className)}>
       <div
         className={cn(
           "relative flex items-center justify-end transition-[width] duration-300 ease-out",
           isOpen ? "w-[min(34rem,calc(100vw-13rem))]" : "w-[6.4rem]",
+          !isOpen && !showShortcutHint && "w-8",
         )}
       >
         <div
@@ -394,7 +417,7 @@ export function TimelineSearch({
                 }}
                 onKeyDown={handleInputKeyDown}
                 placeholder="Search markers and bands"
-                ref={inputRef}
+                ref={setInputRef}
                 role="combobox"
                 value={query}
               />
@@ -423,11 +446,13 @@ export function TimelineSearch({
               variant="ghost"
             >
               <Search className="size-4" />
-              <ShortcutChord
-                className="text-muted-foreground"
-                keys={[modifierLabel, "K"]}
-                size="sm"
-              />
+              {showShortcutHint ? (
+                <ShortcutChord
+                  className="text-muted-foreground"
+                  keys={[modifierLabel, "K"]}
+                  size="sm"
+                />
+              ) : null}
             </Button>
           )}
         </div>

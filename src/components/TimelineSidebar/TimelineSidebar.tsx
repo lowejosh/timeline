@@ -524,7 +524,8 @@ export function TimelineSidebar({
       <div
         className={cn(
           "min-h-0 flex-1 overflow-y-auto px-2 pb-1 pt-2 [scrollbar-width:thin]",
-          mode === "drawer" && "pl-[calc(env(safe-area-inset-left,0px)+0.6rem)] pt-4",
+          mode === "drawer" &&
+            "pl-[calc(env(safe-area-inset-left,0px)+0.6rem)] pt-[calc(env(safe-area-inset-top,0px)+1rem)]",
         )}
       >
         <header className="flex items-baseline justify-between gap-2 px-0.5">

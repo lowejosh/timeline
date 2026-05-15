@@ -40,6 +40,7 @@ function App() {
   });
   const shortcutUiEnabled =
     activeView === "timeline" && !layout.shouldUseMobileDrawer;
+  const shouldUseMobileSearchDialog = layout.shouldUsePortraitMobileLayout;
   const shortcutModifierLabel = useMemo(
     () => getPrimaryShortcutModifierLabel(),
     [],
@@ -78,8 +79,15 @@ function App() {
     }
 
     setIsKeyboardHelpOpen(false);
-    setIsSearchOpen(false);
   }, [shortcutUiEnabled]);
+
+  useEffect(() => {
+    if (activeView === "timeline") {
+      return;
+    }
+
+    setIsSearchOpen(false);
+  }, [activeView]);
 
   useTimelineKeyboardShortcuts({
     enabled: shortcutUiEnabled,
@@ -98,7 +106,7 @@ function App() {
 
   return (
     <main
-      className="fixed inset-0 flex h-[max(var(--app-standalone-viewport-height,100dvh),100dvh)] min-h-[max(var(--app-standalone-viewport-height,100svh),100svh)] w-full items-stretch overflow-hidden overscroll-none bg-background pt-[env(safe-area-inset-top,0px)] text-foreground [--app-chrome-left:calc(env(safe-area-inset-left,0px)+0.75rem)] [--app-chrome-right:calc(env(safe-area-inset-right,0px)+0.75rem)] [--app-chrome-top:calc(env(safe-area-inset-top,0px)+0.75rem)] [--sidebar-max-height:min(calc(100svh-80px),540px)] [--sidebar-width:268px] max-[980px]:[--sidebar-width:252px] max-sm:[--app-chrome-left:calc(env(safe-area-inset-left,0px)+0.625rem)] max-sm:[--app-chrome-right:calc(env(safe-area-inset-right,0px)+0.625rem)] max-sm:[--app-chrome-top:calc(env(safe-area-inset-top,0px)+0.625rem)] max-[720px]:[--sidebar-max-height:100%] max-[720px]:[--sidebar-width:min(320px,calc(100vw-28px))] data-[sidebar-mode=drawer]:[--sidebar-max-height:100%] data-[sidebar-mode=drawer]:[--sidebar-width:min(320px,calc(100vw-env(safe-area-inset-left,0px)-28px))]"
+      className="fixed inset-0 flex h-[max(var(--app-standalone-viewport-height,100dvh),100dvh,100lvh)] min-h-[max(var(--app-standalone-viewport-height,100svh),100svh,100lvh)] w-full items-stretch overflow-hidden overscroll-none bg-background pt-[env(safe-area-inset-top,0px)] text-foreground [--app-chrome-left:calc(env(safe-area-inset-left,0px)+0.75rem)] [--app-chrome-right:calc(env(safe-area-inset-right,0px)+0.75rem)] [--app-chrome-top:calc(env(safe-area-inset-top,0px)+0.75rem)] [--sidebar-max-height:min(calc(100svh-80px),540px)] [--sidebar-width:268px] max-[980px]:[--sidebar-width:252px] max-sm:[--app-chrome-left:calc(env(safe-area-inset-left,0px)+0.625rem)] max-sm:[--app-chrome-right:calc(env(safe-area-inset-right,0px)+0.625rem)] max-sm:[--app-chrome-top:calc(env(safe-area-inset-top,0px)+0.625rem)] max-[720px]:[--sidebar-max-height:100%] max-[720px]:[--sidebar-width:min(320px,calc(100vw-28px))] data-[sidebar-mode=drawer]:[--sidebar-max-height:100%] data-[sidebar-mode=drawer]:[--sidebar-width:min(320px,calc(100vw-env(safe-area-inset-left,0px)-28px))]"
       data-active-view={activeView}
       data-sidebar-mode={layout.shouldUseMobileDrawer ? "drawer" : "popup"}
       data-sidebar-open={isSidebarOpen ? "true" : "false"}
@@ -144,7 +152,8 @@ function App() {
                   setIsSearchOpen(nextOpen);
                 }}
                 onSelectResult={app.handleSearchResultSelect}
-                variant="mobile"
+                showShortcutHint={false}
+                variant={shouldUseMobileSearchDialog ? "mobile" : "desktop"}
               />
             ) : null}
             <TimelineSettings

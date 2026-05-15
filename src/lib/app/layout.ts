@@ -28,7 +28,8 @@ export function getTimelineAppLayoutState({
   width: number;
 }) {
   const shouldUseMobileDrawer = shouldUseMobileTimelineDrawer(width, height);
-  const shouldHideOverviewSideLabels = width <= 720 && height > width;
+  const shouldUsePortraitMobileLayout = width <= 720 && height > width;
+  const shouldHideOverviewSideLabels = shouldUsePortraitMobileLayout;
   const shouldDockOverviewRuler =
     shouldUseMobileDrawer && isOverviewVisible;
   const overviewRulerDockHeight =
@@ -51,6 +52,7 @@ export function getTimelineAppLayoutState({
     overviewRulerDockHeight,
     shouldDockOverviewRuler,
     shouldHideOverviewSideLabels,
+    shouldUsePortraitMobileLayout,
     shouldUseMobileDrawer,
   };
 }

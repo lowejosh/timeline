@@ -1,5 +1,15 @@
 import { useEffect } from "react";
 
+function readPixelCustomProperty(root: HTMLElement, propertyName: string) {
+  const value = window
+    .getComputedStyle(root)
+    .getPropertyValue(propertyName)
+    .trim();
+  const parsed = Number.parseFloat(value);
+
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 export function useStandaloneViewportHeight() {
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -10,10 +20,11 @@ export function useStandaloneViewportHeight() {
     const updateStandaloneViewportHeight = () => {
       const viewportHeight =
         window.visualViewport?.height ?? window.innerHeight;
+      const bottomInset = readPixelCustomProperty(root, "--safe-area-bottom");
 
       root.style.setProperty(
         "--app-standalone-viewport-height",
-        `${viewportHeight}px`,
+        `${viewportHeight + bottomInset}px`,
       );
     };
 
