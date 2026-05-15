@@ -25,7 +25,7 @@ export const COMPUTING_SET = normalizeTimelineSetSource({
     label: "Computing & Information",
     description:
       "Computation, machines, platforms, and networked information systems from Babbage to the web and smartphones.",
-    tags: ["computing", "internet", "technology"],
+    tags: ["history", "technology", "science"],
     order: 4,
     defaultEnabled: false,
   },
@@ -34,7 +34,8 @@ export const COMPUTING_SET = normalizeTimelineSetSource({
     {
       id: "computing-history",
       label: "Computing History",
-      description: "Computing-history milestones across machines, platforms, and networked systems.",
+      description:
+        "Computing-history milestones across machines, platforms, and networked systems.",
       order: 8,
       groups: [
         {
@@ -64,7 +65,8 @@ export const COMPUTING_SET = normalizeTimelineSetSource({
     {
       id: "computing-history",
       label: "Computing History",
-      description: "Broad eras across the history of computation and digital systems.",
+      description:
+        "Broad eras across the history of computation and digital systems.",
       order: 4,
       priority: 340,
       defaultEnabled: false,
