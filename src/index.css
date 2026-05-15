@@ -191,6 +191,40 @@ select,
   }
 }
 
+/* ── App layout shell ─────────────────────────────────────────────────────── */
+.app-shell {
+  padding-top: env(safe-area-inset-top, 0px);
+  --app-chrome-left: calc(env(safe-area-inset-left, 0px) + 0.75rem);
+  --app-chrome-right: calc(env(safe-area-inset-right, 0px) + 1.25rem);
+  --app-chrome-top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+  --app-drawer-content-top: calc(env(safe-area-inset-top, 0px) + 1rem);
+  --sidebar-max-height: min(calc(100svh - 80px), 540px);
+  --sidebar-width: 268px;
+}
+
+@media (max-width: 980px) {
+  .app-shell { --sidebar-width: 252px; }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    --sidebar-max-height: 100%;
+    --sidebar-width: min(320px, calc(100vw - 28px));
+  }
+}
+
+@media (width < 640px) {
+  .app-shell {
+    --app-chrome-left: calc(env(safe-area-inset-left, 0px) + 0.625rem);
+    --app-chrome-top: calc(env(safe-area-inset-top, 0px) + 0.625rem);
+  }
+}
+
+.app-shell[data-sidebar-mode="drawer"] {
+  --sidebar-max-height: 100%;
+  --sidebar-width: min(320px, calc(100vw - env(safe-area-inset-left, 0px) - 28px));
+}
+
 @keyframes collapsible-down {
   from {
     height: 0;
