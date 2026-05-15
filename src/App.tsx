@@ -20,6 +20,7 @@ import { useTimelineAppState } from "./hooks/useTimelineAppState";
 import { TimelineSettings } from "./components/TimelineSettings";
 import { TimelineView } from "./views/TimelineView";
 import { getPrimaryShortcutModifierLabel } from "./lib/app/timelineKeyboard";
+import { PwaInstallPrompt } from "./components/PwaInstallPrompt";
 
 const AvailableSetsView = lazy(() =>
   import("./views/AvailableSetsView").then((module) => ({
@@ -188,6 +189,7 @@ function App() {
         modifierLabel={shortcutModifierLabel}
         onClose={closeKeyboardHelp}
       />
+      <PwaInstallPrompt />
     </main>
   );
 }
