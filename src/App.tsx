@@ -129,6 +129,23 @@ function App() {
               />
             </>
           ) : null}
+          {!shortcutUiEnabled ? (
+            <TimelineSearch
+              className="order-2"
+              enabledGroupIds={app.searchEnabledGroupIds}
+              enabledSetIds={app.visibleSetIds}
+              isOpen={isSearchOpen}
+              modifierLabel={shortcutModifierLabel}
+              onOpenChange={(nextOpen) => {
+                if (nextOpen) {
+                  setIsKeyboardHelpOpen(false);
+                }
+                setIsSearchOpen(nextOpen);
+              }}
+              onSelectResult={app.handleSearchResultSelect}
+              variant="mobile"
+            />
+          ) : null}
           <TimelineSettings
             className="order-3"
             isCosmicCalendarMode={app.isCosmicCalendarMode}

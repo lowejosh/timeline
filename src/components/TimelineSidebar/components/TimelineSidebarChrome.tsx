@@ -85,8 +85,9 @@ export function TimelineSidebarChrome({
       <button
         aria-label="Close layers controls"
         className={cn(
-          "absolute inset-0 z-[2] hidden border-0 bg-transparent p-0 transition-opacity duration-200",
-          mode === "drawer" && "block",
+          "absolute inset-0 hidden border-0 bg-transparent p-0 transition-opacity duration-200",
+          mode === "drawer" && "z-[6] block",
+          mode !== "drawer" && "z-[2]",
           isOpen
             ? "pointer-events-auto bg-[rgba(44,31,20,0.16)] opacity-100 backdrop-blur-md"
             : "pointer-events-none opacity-0",
@@ -100,14 +101,15 @@ export function TimelineSidebarChrome({
       <div
         aria-hidden={!isOpen}
         className={cn(
-          "absolute left-3 top-14 z-[3] w-[min(var(--sidebar-width),calc(100vw-24px))] max-h-[min(calc(100%-68px),var(--sidebar-max-height))] origin-top-left transition-[opacity,transform] duration-300 ease-out",
+          "absolute origin-top-left transition-[opacity,transform] duration-300 ease-out",
+          mode === "drawer" ? "z-[7]" : "z-[3]",
           isOpen
             ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
             : "pointer-events-none -translate-y-2 scale-[0.985] opacity-0",
           activeView === "available-sets" && "pointer-events-none opacity-0",
-          "max-sm:left-[10px] max-sm:top-[50px] max-sm:w-[min(var(--sidebar-width),calc(100vw-20px))] max-sm:max-h-[min(calc(100%-60px),var(--sidebar-max-height))]",
-          mode === "drawer" &&
-            "bottom-0 left-0 top-0 w-[min(calc(var(--sidebar-width)+env(safe-area-inset-left,0px)),calc(100vw-18px))] max-h-none origin-left",
+          mode === "drawer"
+            ? "bottom-0 left-0 top-0 h-full max-h-none w-[min(calc(var(--sidebar-width)+env(safe-area-inset-left,0px)),calc(100vw-18px))] origin-left"
+            : "left-3 top-14 w-[min(var(--sidebar-width),calc(100vw-24px))] max-h-[min(calc(100%-68px),var(--sidebar-max-height))] max-sm:left-[10px] max-sm:top-[50px] max-sm:w-[min(var(--sidebar-width),calc(100vw-20px))] max-sm:max-h-[min(calc(100%-60px),var(--sidebar-max-height))]",
           mode === "drawer" &&
             (isOpen
               ? "translate-x-0 translate-y-0"
