@@ -1,42 +1,66 @@
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
+import { getDefaultEnabledTimelineGroupIds } from "@/lib/catalog/decorations";
 import {
   getDefaultEnabledTimelineSetIds,
   getDefaultTimelineSetOrder,
   normalizeTimelineSetOrder,
 } from "@/lib/catalog/timelineSets";
 
-const TIMELINE_SET_ORDER_STORAGE_KEY = "timeline:set-order:v1";
-const TIMELINE_ENABLED_SET_IDS_STORAGE_KEY = "timeline:enabled-set-ids:v1";
-const TIMELINE_EXPANDED_SET_IDS_STORAGE_KEY = "timeline:expanded-set-ids:v1";
-const TIMELINE_VISIBLE_SET_IDS_STORAGE_KEY = "timeline:visible-set-ids:v1";
-const TIMELINE_SIDEBAR_OPEN_STORAGE_KEY = "timeline:sidebar-open:v1";
+export type StoredLayerToggleMode = "auto" | "manual-on" | "manual-off";
 
-function readTimelineSetIdSet(
-  key: string,
-  fallback: () => Set<TimelineSetId>,
-) {
+type TimelineLayerStorageState = {
+  version: 2;
+  enabledIdsByScope?: Record<string, string[]>;
+  expandedIdsByScope?: Record<string, string[]>;
+  orderedIdsByScope?: Record<string, string[]>;
+  toggleModesByScope?: Record<string, Record<string, StoredLayerToggleMode>>;
+  ui?: Record<string, unknown>;
+};
+
+const TIMELINE_LAYER_STATE_STORAGE_KEY = "timeline:layer-state:v2";
+const SET_COLLECTION_SCOPE = "timeline-sets:collection";
+const SET_VISIBLE_SCOPE = "timeline-sets:visible";
+const SET_EXPANDED_SCOPE = "timeline-sets:expanded";
+const SET_ORDER_SCOPE = "timeline-sets:order";
+const GROUP_ENABLED_SCOPE = "timeline-groups:enabled";
+const GROUP_AUTO_TOGGLE_SCOPE = "timeline-groups:auto-toggle";
+const SIDEBAR_OPEN_UI_KEY = "sidebarOpen";
+
+const LEGACY_STORAGE_KEYS = {
+  enabledGroups: "timeline:enabled-group-ids:v1",
+  enabledSets: "timeline:enabled-set-ids:v1",
+  expandedSets: "timeline:expanded-set-ids:v1",
+  humanEvolutionToggleMode: "timeline:human-evolution-toggle-mode:v1",
+  setOrder: "timeline:set-order:v1",
+  sidebarOpen: "timeline:sidebar-open:v1",
+  visibleSets: "timeline:visible-set-ids:v1",
+} as const;
+
+const LEGACY_HUMAN_EVOLUTION_GROUP_ID = "human-evolution";
+
+function isStoredLayerToggleMode(value: unknown): value is StoredLayerToggleMode {
+  return value === "auto" || value === "manual-on" || value === "manual-off";
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function dedupeStrings(values: readonly string[]) {
+  return Array.from(new Set(values));
+}
+
+function readJsonFromStorage(key: string): unknown {
   if (typeof window === "undefined") {
-    return fallback();
+    return null;
   }
 
   try {
     const storedValue = window.localStorage.getItem(key);
 
-    if (!storedValue) {
-      return fallback();
-    }
-
-    const parsed = JSON.parse(storedValue);
-
-    if (!Array.isArray(parsed)) {
-      return fallback();
-    }
-
-    return new Set(
-      parsed.filter((id): id is TimelineSetId => typeof id === "string"),
-    );
+    return storedValue ? JSON.parse(storedValue) : null;
   } catch {
-    return fallback();
+    return null;
   }
 }
 
@@ -52,92 +76,268 @@ function writeJsonToStorage(key: string, value: unknown) {
   }
 }
 
-export function readStoredTimelineSetOrder() {
+function readLegacyStringArray(key: string) {
+  const parsed = readJsonFromStorage(key);
+
+  return isStringArray(parsed) ? dedupeStrings(parsed) : null;
+}
+
+function readLegacySidebarOpen() {
   if (typeof window === "undefined") {
-    return getDefaultTimelineSetOrder();
+    return undefined;
   }
 
   try {
     const storedValue = window.localStorage.getItem(
-      TIMELINE_SET_ORDER_STORAGE_KEY,
+      LEGACY_STORAGE_KEYS.sidebarOpen,
     );
 
-    if (!storedValue) {
-      return getDefaultTimelineSetOrder();
+    if (storedValue === "true") {
+      return true;
     }
 
-    const parsed = JSON.parse(storedValue);
-
-    return normalizeTimelineSetOrder(
-      Array.isArray(parsed)
-        ? parsed.filter((value): value is string => typeof value === "string")
-        : undefined,
-    );
+    if (storedValue === "false") {
+      return false;
+    }
   } catch {
-    return getDefaultTimelineSetOrder();
+    // Fall through to undefined.
   }
+
+  return undefined;
+}
+
+function createEmptyLayerStorageState(): TimelineLayerStorageState {
+  return {
+    version: 2,
+    enabledIdsByScope: {},
+    expandedIdsByScope: {},
+    orderedIdsByScope: {},
+    toggleModesByScope: {},
+    ui: {},
+  };
+}
+
+function migrateLegacyLayerStorageState(): TimelineLayerStorageState {
+  const state = createEmptyLayerStorageState();
+  const enabledSets = readLegacyStringArray(LEGACY_STORAGE_KEYS.enabledSets);
+  const visibleSets = readLegacyStringArray(LEGACY_STORAGE_KEYS.visibleSets);
+  const expandedSets = readLegacyStringArray(LEGACY_STORAGE_KEYS.expandedSets);
+  const enabledGroups = readLegacyStringArray(LEGACY_STORAGE_KEYS.enabledGroups);
+  const setOrder = readLegacyStringArray(LEGACY_STORAGE_KEYS.setOrder);
+  const sidebarOpen = readLegacySidebarOpen();
+
+  if (enabledSets) {
+    state.enabledIdsByScope![SET_COLLECTION_SCOPE] = enabledSets;
+  }
+
+  if (visibleSets) {
+    state.enabledIdsByScope![SET_VISIBLE_SCOPE] = visibleSets;
+  }
+
+  if (expandedSets) {
+    state.expandedIdsByScope![SET_EXPANDED_SCOPE] = expandedSets;
+  }
+
+  if (enabledGroups) {
+    state.enabledIdsByScope![GROUP_ENABLED_SCOPE] = enabledGroups;
+  }
+
+  if (setOrder) {
+    state.orderedIdsByScope![SET_ORDER_SCOPE] = setOrder;
+  }
+
+  const legacyHumanEvolutionToggleMode =
+    typeof window === "undefined"
+      ? null
+      : window.localStorage.getItem(
+          LEGACY_STORAGE_KEYS.humanEvolutionToggleMode,
+        );
+
+  if (isStoredLayerToggleMode(legacyHumanEvolutionToggleMode)) {
+    state.toggleModesByScope![GROUP_AUTO_TOGGLE_SCOPE] = {
+      [LEGACY_HUMAN_EVOLUTION_GROUP_ID]: legacyHumanEvolutionToggleMode,
+    };
+  }
+
+  if (sidebarOpen !== undefined) {
+    state.ui![SIDEBAR_OPEN_UI_KEY] = sidebarOpen;
+  }
+
+  return state;
+}
+
+function normalizeLayerStorageState(
+  candidate: unknown,
+): TimelineLayerStorageState | null {
+  if (!candidate || typeof candidate !== "object") {
+    return null;
+  }
+
+  const value = candidate as Partial<TimelineLayerStorageState>;
+
+  if (value.version !== 2) {
+    return null;
+  }
+
+  return {
+    version: 2,
+    enabledIdsByScope: value.enabledIdsByScope ?? {},
+    expandedIdsByScope: value.expandedIdsByScope ?? {},
+    orderedIdsByScope: value.orderedIdsByScope ?? {},
+    toggleModesByScope: value.toggleModesByScope ?? {},
+    ui: value.ui ?? {},
+  };
+}
+
+function readLayerStorageState() {
+  return (
+    normalizeLayerStorageState(
+      readJsonFromStorage(TIMELINE_LAYER_STATE_STORAGE_KEY),
+    ) ?? migrateLegacyLayerStorageState()
+  );
+}
+
+function writeLayerStorageState(state: TimelineLayerStorageState) {
+  writeJsonToStorage(TIMELINE_LAYER_STATE_STORAGE_KEY, state);
+}
+
+function readScopedIds(
+  kind: "enabledIdsByScope" | "expandedIdsByScope" | "orderedIdsByScope",
+  scope: string,
+  fallback: () => readonly string[],
+) {
+  const state = readLayerStorageState();
+  const storedIds = state[kind]?.[scope];
+
+  return dedupeStrings(isStringArray(storedIds) ? storedIds : fallback());
+}
+
+function writeScopedIds(
+  kind: "enabledIdsByScope" | "expandedIdsByScope" | "orderedIdsByScope",
+  scope: string,
+  ids: readonly string[],
+) {
+  const state = readLayerStorageState();
+
+  state[kind] = {
+    ...(state[kind] ?? {}),
+    [scope]: dedupeStrings(ids),
+  };
+
+  writeLayerStorageState(state);
+}
+
+export function readStoredTimelineSetOrder() {
+  return normalizeTimelineSetOrder(
+    readScopedIds(
+      "orderedIdsByScope",
+      SET_ORDER_SCOPE,
+      getDefaultTimelineSetOrder,
+    ),
+  );
 }
 
 export function readStoredEnabledSetIds() {
-  return readTimelineSetIdSet(
-    TIMELINE_ENABLED_SET_IDS_STORAGE_KEY,
-    getDefaultEnabledTimelineSetIds,
+  return new Set(
+    readScopedIds(
+      "enabledIdsByScope",
+      SET_COLLECTION_SCOPE,
+      () => Array.from(getDefaultEnabledTimelineSetIds()),
+    ),
+  ) as Set<TimelineSetId>;
+}
+
+export function readStoredEnabledGroupIds() {
+  return new Set(
+    readScopedIds(
+      "enabledIdsByScope",
+      GROUP_ENABLED_SCOPE,
+      () => Array.from(getDefaultEnabledTimelineGroupIds()),
+    ),
   );
+}
+
+export function readStoredGroupToggleMode(
+  groupId: string,
+): StoredLayerToggleMode {
+  const mode =
+    readLayerStorageState().toggleModesByScope?.[GROUP_AUTO_TOGGLE_SCOPE]?.[
+      groupId
+    ];
+
+  return isStoredLayerToggleMode(mode) ? mode : "auto";
 }
 
 export function readStoredExpandedSetIds() {
-  return readTimelineSetIdSet(
-    TIMELINE_EXPANDED_SET_IDS_STORAGE_KEY,
-    () => new Set(),
-  );
+  return new Set(
+    readScopedIds("expandedIdsByScope", SET_EXPANDED_SCOPE, () => []),
+  ) as Set<TimelineSetId>;
 }
 
 export function readStoredVisibleSetIds() {
-  return readTimelineSetIdSet(
-    TIMELINE_VISIBLE_SET_IDS_STORAGE_KEY,
-    readStoredEnabledSetIds,
-  );
+  return new Set(
+    readScopedIds(
+      "enabledIdsByScope",
+      SET_VISIBLE_SCOPE,
+      () => Array.from(readStoredEnabledSetIds()),
+    ),
+  ) as Set<TimelineSetId>;
 }
 
 export function writeStoredEnabledSetIds(setIds: ReadonlySet<TimelineSetId>) {
-  writeJsonToStorage(TIMELINE_ENABLED_SET_IDS_STORAGE_KEY, Array.from(setIds));
+  writeScopedIds("enabledIdsByScope", SET_COLLECTION_SCOPE, Array.from(setIds));
+}
+
+export function writeStoredEnabledGroupIds(groupIds: ReadonlySet<string>) {
+  writeScopedIds("enabledIdsByScope", GROUP_ENABLED_SCOPE, Array.from(groupIds));
+}
+
+export function writeStoredGroupToggleMode(
+  groupId: string,
+  mode: StoredLayerToggleMode,
+) {
+  const state = readLayerStorageState();
+
+  state.toggleModesByScope = {
+    ...(state.toggleModesByScope ?? {}),
+    [GROUP_AUTO_TOGGLE_SCOPE]: {
+      ...(state.toggleModesByScope?.[GROUP_AUTO_TOGGLE_SCOPE] ?? {}),
+      [groupId]: mode,
+    },
+  };
+
+  writeLayerStorageState(state);
 }
 
 export function writeStoredExpandedSetIds(setIds: ReadonlySet<TimelineSetId>) {
-  writeJsonToStorage(TIMELINE_EXPANDED_SET_IDS_STORAGE_KEY, Array.from(setIds));
+  writeScopedIds("expandedIdsByScope", SET_EXPANDED_SCOPE, Array.from(setIds));
 }
 
 export function writeStoredVisibleSetIds(setIds: ReadonlySet<TimelineSetId>) {
-  writeJsonToStorage(TIMELINE_VISIBLE_SET_IDS_STORAGE_KEY, Array.from(setIds));
+  writeScopedIds("enabledIdsByScope", SET_VISIBLE_SCOPE, Array.from(setIds));
 }
 
 export function writeStoredTimelineSetOrder(setIds: readonly TimelineSetId[]) {
-  writeJsonToStorage(
-    TIMELINE_SET_ORDER_STORAGE_KEY,
+  writeScopedIds(
+    "orderedIdsByScope",
+    SET_ORDER_SCOPE,
     normalizeTimelineSetOrder(setIds),
   );
 }
 
 export function readStoredSidebarOpen(): boolean | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
+  const value = readLayerStorageState().ui?.[SIDEBAR_OPEN_UI_KEY];
 
-  try {
-    const storedValue = window.localStorage.getItem(
-      TIMELINE_SIDEBAR_OPEN_STORAGE_KEY,
-    );
-
-    if (storedValue === null) {
-      return null;
-    }
-
-    return storedValue === "true";
-  } catch {
-    return null;
-  }
+  return typeof value === "boolean" ? value : null;
 }
 
 export function writeStoredSidebarOpen(value: boolean) {
-  writeJsonToStorage(TIMELINE_SIDEBAR_OPEN_STORAGE_KEY, value);
+  const state = readLayerStorageState();
+
+  state.ui = {
+    ...(state.ui ?? {}),
+    [SIDEBAR_OPEN_UI_KEY]: value,
+  };
+
+  writeLayerStorageState(state);
 }

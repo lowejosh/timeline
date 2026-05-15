@@ -16,12 +16,16 @@ import {
 } from "../lib/app/timelineVisibility";
 import {
   readStoredEnabledSetIds,
+  readStoredEnabledGroupIds,
   readStoredExpandedSetIds,
+  readStoredGroupToggleMode,
   readStoredSidebarOpen,
   readStoredTimelineSetOrder,
   readStoredVisibleSetIds,
   writeStoredEnabledSetIds,
+  writeStoredEnabledGroupIds,
   writeStoredExpandedSetIds,
+  writeStoredGroupToggleMode,
   writeStoredSidebarOpen,
   writeStoredTimelineSetOrder,
   writeStoredVisibleSetIds,
@@ -80,6 +84,7 @@ import {
   computeSetYearRanges,
   type TimelineYearRange,
 } from "@/lib/catalog/timelineSetMetrics";
+import type { TimelineSearchResult } from "@/lib/app/timelineSearch";
 
 type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
 
@@ -127,7 +132,7 @@ export function useTimelineAppState() {
   );
   const [manualEnabledGroupIds, setManualEnabledGroupIds] = useState<
     Set<string>
-  >(() => getDefaultEnabledTimelineGroupIds());
+  >(() => readStoredEnabledGroupIds());
   const [enabledSetIds, setEnabledSetIds] = useState<Set<TimelineSetId>>(() =>
     readStoredEnabledSetIds(),
   );
@@ -146,7 +151,9 @@ export function useTimelineAppState() {
     readStoredExpandedSetIds(),
   );
   const [humanEvolutionToggleMode, setHumanEvolutionToggleMode] =
-    useState<LayerAutoToggleMode>("auto");
+    useState<LayerAutoToggleMode>(() =>
+      readStoredGroupToggleMode(HUMAN_EVOLUTION_GROUP_ID),
+    );
   const [autoSuppressedGroupIds, setAutoSuppressedGroupIds] = useState<
     Set<string>
   >(() => new Set());
@@ -200,6 +207,17 @@ export function useTimelineAppState() {
   useEffect(() => {
     writeStoredEnabledSetIds(enabledSetIds);
   }, [enabledSetIds]);
+
+  useEffect(() => {
+    writeStoredEnabledGroupIds(manualEnabledGroupIds);
+  }, [manualEnabledGroupIds]);
+
+  useEffect(() => {
+    writeStoredGroupToggleMode(
+      HUMAN_EVOLUTION_GROUP_ID,
+      humanEvolutionToggleMode,
+    );
+  }, [humanEvolutionToggleMode]);
 
   useEffect(() => {
     writeStoredExpandedSetIds(expandedSetIds);
@@ -902,6 +920,55 @@ export function useTimelineAppState() {
     ],
   );
 
+  const handleSearchResultSelect = useCallback(
+    (result: TimelineSearchResult) => {
+      if (result.setId) {
+        setVisibleSetIds((current) => {
+          if (current.has(result.setId!)) {
+            return current;
+          }
+
+          const next = new Set(current);
+          next.add(result.setId!);
+          return next;
+        });
+      }
+
+      if (result.groupId) {
+        if (result.groupId === HUMAN_EVOLUTION_GROUP_ID) {
+          setHumanEvolutionToggleMode("manual-on");
+        }
+
+        setManualEnabledGroupIds((current) => {
+          if (current.has(result.groupId!)) {
+            return current;
+          }
+
+          const next = new Set(current);
+          next.add(result.groupId!);
+          return next;
+        });
+      }
+
+      setOverlayVisibilityTransitionSeed((current) => current + 1);
+      setActiveEraId(prioritizedRootEra.id);
+
+      if (Math.abs(result.startYear - result.endYear) < 1e-9) {
+        const markerFocusSpan = Math.max(10, Math.abs(result.startYear) * 2e-6);
+
+        animated.animateToRange(
+          result.startYear - markerFocusSpan / 2,
+          result.endYear + markerFocusSpan / 2,
+        );
+      } else {
+        animated.animateToRange(result.startYear, result.endYear);
+      }
+
+      scheduleAutoTransitionCheck();
+    },
+    [animated, prioritizedRootEra.id, scheduleAutoTransitionCheck],
+  );
+
   const handleOpenSetManager = useCallback(() => {
     setIsSidebarOpen(false);
     setActiveView("available-sets");
@@ -1039,6 +1106,7 @@ export function useTimelineAppState() {
     enabledSetIds,
     visibleSetIds,
     orderedSetIds,
+    searchEnabledGroupIds: baseEnabledGroupIds,
 
     // view
     activeView,
@@ -1059,6 +1127,7 @@ export function useTimelineAppState() {
     handleKeyboardNavigationFrame,
     handleKeyboardNavigationEnd,
     handleLayerShortcut,
+    handleSearchResultSelect,
     handleReorderSets,
     handleOpenSetManager,
     handleCloseSetManager,

@@ -1,8 +1,10 @@
 import { Keyboard, X } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ShortcutChord } from "@/components/ui/shortcut-key";
 import type { TimelineLayerShortcutTarget } from "@/lib/app/timelineKeyboard";
+import { cn } from "@/lib/utils";
 
 type TimelineKeyboardHelpProps = {
   isOpen: boolean;
@@ -12,6 +14,7 @@ type TimelineKeyboardHelpProps = {
 };
 
 type TimelineKeyboardHelpButtonProps = {
+  className?: string;
   isOpen: boolean;
   modifierLabel: string;
   onClick: () => void;
@@ -40,12 +43,13 @@ function ShortcutRow({ row }: { row: ShortcutHelpRow }) {
 }
 
 export function TimelineKeyboardHelpButton({
+  className,
   isOpen,
   modifierLabel,
   onClick,
 }: TimelineKeyboardHelpButtonProps) {
   return (
-    <div className="absolute right-[96px] top-3 z-[4] max-sm:hidden">
+    <div className={cn(className ?? "absolute right-[148px] top-3 z-[4] max-sm:hidden")}>
       <Button
         aria-expanded={isOpen}
         aria-label={
@@ -75,6 +79,16 @@ export function TimelineKeyboardHelp({
   modifierLabel,
   onClose,
 }: TimelineKeyboardHelpProps) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    requestAnimationFrame(() => scrollRef.current?.focus());
+  }, [isOpen]);
+
   if (!isOpen) {
     return null;
   }
@@ -108,7 +122,10 @@ export function TimelineKeyboardHelp({
       />
       <section className="relative grid max-h-[min(78svh,620px)] w-[min(34rem,calc(100vw-24px))] animate-[shortcut-dialog-in_220ms_cubic-bezier(0.22,1,0.36,1)] grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-panel">
         <header className="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-3">
-          <h2 className="m-0 font-display text-base font-semibold leading-none text-foreground">
+          <h2
+            className="m-0 font-display text-base font-semibold leading-none text-foreground"
+            id="timeline-keyboard-help-title"
+          >
             Keyboard Shortcuts
           </h2>
           <Button
@@ -122,7 +139,13 @@ export function TimelineKeyboardHelp({
             <X className="size-4" />
           </Button>
         </header>
-        <div className="min-h-0 overflow-y-auto px-4 py-3 [scrollbar-width:thin]">
+        <div
+          aria-labelledby="timeline-keyboard-help-title"
+          className="min-h-0 overflow-y-auto px-4 py-3 outline-none [scrollbar-width:thin] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          ref={scrollRef}
+          role="document"
+          tabIndex={0}
+        >
           <section>
             <h3 className="m-0 pb-1 text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
               Timeline

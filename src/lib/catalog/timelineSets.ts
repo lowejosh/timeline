@@ -46,10 +46,6 @@ export function normalizeTimelineSetOrder(
   const seen = new Set<TimelineSetId>();
 
   for (const candidateId of candidateOrder ?? []) {
-    if (!(candidateId in TIMELINE_SETS_BY_ID)) {
-      continue;
-    }
-
     const setId = candidateId as TimelineSetId;
 
     if (seen.has(setId)) {

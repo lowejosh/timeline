@@ -19,6 +19,7 @@ type UseTimelineKeyboardShortcutsOptions = {
   onLayerShortcut: (normalizedKey: string) => boolean;
   onNavigationEnd: () => void;
   onNavigationFrame: (frame: KeyboardNavigationFrame) => void;
+  onSearchToggle: () => void;
   onSidebarOpenChange: (updater: boolean | ((current: boolean) => boolean)) => void;
 };
 
@@ -112,6 +113,7 @@ export function useTimelineKeyboardShortcuts({
   onLayerShortcut,
   onNavigationEnd,
   onNavigationFrame,
+  onSearchToggle,
   onSidebarOpenChange,
 }: UseTimelineKeyboardShortcutsOptions) {
   const latestRef = useRef<UseTimelineKeyboardShortcutsOptions>({
@@ -125,6 +127,7 @@ export function useTimelineKeyboardShortcuts({
     onLayerShortcut,
     onNavigationEnd,
     onNavigationFrame,
+    onSearchToggle,
     onSidebarOpenChange,
   });
   const pressedKeysRef = useRef(new Set<string>());
@@ -147,6 +150,7 @@ export function useTimelineKeyboardShortcuts({
       onLayerShortcut,
       onNavigationEnd,
       onNavigationFrame,
+      onSearchToggle,
       onSidebarOpenChange,
     };
   }, [
@@ -160,6 +164,7 @@ export function useTimelineKeyboardShortcuts({
     onLayerShortcut,
     onNavigationEnd,
     onNavigationFrame,
+    onSearchToggle,
     onSidebarOpenChange,
   ]);
 
@@ -317,6 +322,12 @@ export function useTimelineKeyboardShortcuts({
         return;
       }
 
+      if (primaryModified && normalizedKey === "k") {
+        claimKeyboardEvent(event);
+        latest.onSearchToggle();
+        return;
+      }
+
       if (latest.isHelpOpen) {
         if (normalizedKey === "escape") {
           claimKeyboardEvent(event);
@@ -327,12 +338,6 @@ export function useTimelineKeyboardShortcuts({
       }
 
       if (isEditableShortcutTarget(event.target)) {
-        return;
-      }
-
-      if (primaryModified && normalizedKey === "k") {
-        claimKeyboardEvent(event);
-        latest.onHelpOpenChange(true);
         return;
       }
 

@@ -15,6 +15,7 @@ import {
   TimelineKeyboardHelp,
   TimelineKeyboardHelpButton,
 } from "./components/TimelineKeyboardHelp/TimelineKeyboardHelp";
+import { TimelineSearch } from "./components/TimelineSearch/TimelineSearch";
 import { useTimelineAppState } from "./hooks/useTimelineAppState";
 import { TimelineSettings } from "./components/TimelineSettings";
 import { TimelineView } from "./views/TimelineView";
@@ -30,6 +31,7 @@ function App() {
   const app = useTimelineAppState();
   const { activeView, isSidebarOpen, setIsSidebarOpen } = app;
   const [isKeyboardHelpOpen, setIsKeyboardHelpOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const layout = getTimelineAppLayoutState({
     height: app.stageSize.height,
     isOverviewVisible: app.isOverviewVisible,
@@ -45,7 +47,26 @@ function App() {
     setIsKeyboardHelpOpen(false);
   }, []);
   const toggleKeyboardHelp = useCallback(() => {
-    setIsKeyboardHelpOpen((current) => !current);
+    setIsKeyboardHelpOpen((current) => {
+      const nextOpen = !current;
+
+      if (nextOpen) {
+        setIsSearchOpen(false);
+      }
+
+      return nextOpen;
+    });
+  }, []);
+  const toggleSearch = useCallback(() => {
+    setIsSearchOpen((current) => {
+      const nextOpen = !current;
+
+      if (nextOpen) {
+        setIsKeyboardHelpOpen(false);
+      }
+
+      return nextOpen;
+    });
   }, []);
 
   useStandaloneViewportHeight();
@@ -56,6 +77,7 @@ function App() {
     }
 
     setIsKeyboardHelpOpen(false);
+    setIsSearchOpen(false);
   }, [shortcutUiEnabled]);
 
   useTimelineKeyboardShortcuts({
@@ -69,6 +91,7 @@ function App() {
     onLayerShortcut: app.handleLayerShortcut,
     onNavigationEnd: app.handleKeyboardNavigationEnd,
     onNavigationFrame: app.handleKeyboardNavigationFrame,
+    onSearchToggle: toggleSearch,
     onSidebarOpenChange: setIsSidebarOpen,
   });
 
@@ -81,19 +104,39 @@ function App() {
     >
       {activeView === "timeline" ? (
         <>
+          <div className="absolute right-3 top-3 z-[5] flex items-start justify-end gap-2 max-sm:right-[10px] max-sm:top-[10px]">
           {shortcutUiEnabled ? (
-            <TimelineKeyboardHelpButton
-              isOpen={isKeyboardHelpOpen}
-              modifierLabel={shortcutModifierLabel}
-              onClick={toggleKeyboardHelp}
-            />
+            <>
+              <TimelineKeyboardHelpButton
+                className="order-1"
+                isOpen={isKeyboardHelpOpen}
+                modifierLabel={shortcutModifierLabel}
+                onClick={toggleKeyboardHelp}
+              />
+              <TimelineSearch
+                className="order-2"
+                enabledGroupIds={app.searchEnabledGroupIds}
+                enabledSetIds={app.visibleSetIds}
+                isOpen={isSearchOpen}
+                modifierLabel={shortcutModifierLabel}
+                onOpenChange={(nextOpen) => {
+                  if (nextOpen) {
+                    setIsKeyboardHelpOpen(false);
+                  }
+                  setIsSearchOpen(nextOpen);
+                }}
+                onSelectResult={app.handleSearchResultSelect}
+              />
+            </>
           ) : null}
           <TimelineSettings
+            className="order-3"
             isCosmicCalendarMode={app.isCosmicCalendarMode}
             onToggleCosmicCalendarMode={() => {
               app.setIsCosmicCalendarMode((current) => !current);
             }}
           />
+          </div>
         </>
       ) : null}
       <TimelineSidebarChrome

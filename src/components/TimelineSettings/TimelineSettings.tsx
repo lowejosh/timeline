@@ -8,13 +8,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 type TimelineSettingsProps = {
+  className?: string;
   isCosmicCalendarMode: boolean;
   onToggleCosmicCalendarMode: () => void;
 };
 
 export function TimelineSettings({
+  className,
   isCosmicCalendarMode,
   onToggleCosmicCalendarMode,
 }: TimelineSettingsProps) {
@@ -22,7 +25,7 @@ export function TimelineSettings({
 
   return (
     <Popover onOpenChange={setIsOpen} open={isOpen}>
-      <div className="absolute right-[52px] top-3 z-[4] max-sm:right-[50px] max-sm:top-[10px]">
+      <div className={cn(className ?? "absolute right-[52px] top-3 z-[4] max-sm:right-[50px] max-sm:top-[10px]")}>
         <PopoverTrigger asChild>
           <Button
             aria-label={isOpen ? "Hide settings" : "Show settings"}
