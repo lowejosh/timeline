@@ -39,8 +39,15 @@ function douglasPeucker(points, tolerance) {
   let maxDist = 0;
   let maxIdx = 0;
   for (let i = 1; i < points.length - 1; i++) {
-    const d = perpendicularDist(points[i], points[0], points[points.length - 1]);
-    if (d > maxDist) { maxDist = d; maxIdx = i; }
+    const d = perpendicularDist(
+      points[i],
+      points[0],
+      points[points.length - 1],
+    );
+    if (d > maxDist) {
+      maxDist = d;
+      maxIdx = i;
+    }
   }
   if (maxDist > tolerance) {
     const left = douglasPeucker(points.slice(0, maxIdx + 1), tolerance);
@@ -55,8 +62,11 @@ function ringToPath(ring) {
   const simplified = douglasPeucker(projected, TOLERANCE);
   if (simplified.length < 3) return "";
   const [[x0, y0], ...rest] = simplified;
-  return `M${x0.toFixed(2)} ${y0.toFixed(2)}` +
-    rest.map(([x, y]) => `L${x.toFixed(2)} ${y.toFixed(2)}`).join("") + "Z";
+  return (
+    `M${x0.toFixed(2)} ${y0.toFixed(2)}` +
+    rest.map(([x, y]) => `L${x.toFixed(2)} ${y.toFixed(2)}`).join("") +
+    "Z"
+  );
 }
 
 function geometryToPath(geometry) {

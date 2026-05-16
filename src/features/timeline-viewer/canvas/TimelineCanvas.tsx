@@ -166,7 +166,9 @@ export function TimelineCanvas({
   const [renderedTooltip, setRenderedTooltip] =
     useState<RenderedTooltipState | null>(null);
   const [expandedOverlayIds, setExpandedOverlayIds] = useState<string[]>([]);
-  const [mapPreviewOverrideX, setMapPreviewOverrideX] = useState<number | null>(null);
+  const [mapPreviewOverrideX, setMapPreviewOverrideX] = useState<number | null>(
+    null,
+  );
   const viewportRef = useRef(viewport);
   const reserveAxisDateRowRef = useRef(true);
   useEffect(() => {
@@ -524,24 +526,21 @@ export function TimelineCanvas({
   function resolveHoveredTooltip(x: number, y: number, pointerType: string) {
     return resolveTooltipAtPoint(x, y, { pointerType });
   }
-  const publishCurrentMapPreviewYear = useCallback(
-    () => {
-      if (!isMapPreviewEnabled) {
-        publishMapPreviewYear(null);
-        return;
-      }
+  const publishCurrentMapPreviewYear = useCallback(() => {
+    if (!isMapPreviewEnabled) {
+      publishMapPreviewYear(null);
+      return;
+    }
 
-      const innerW = Math.max(width - pad * 2, 1);
-      const nextYear =
-        mapPreviewOverrideX !== null
-          ? screenToWorld(mapPreviewOverrideX - pad, viewport, innerW)
-          : viewport.centerYear;
-      const shouldShowMap = nextYear >= -400_000_000 && nextYear <= 2_100;
+    const innerW = Math.max(width - pad * 2, 1);
+    const nextYear =
+      mapPreviewOverrideX !== null
+        ? screenToWorld(mapPreviewOverrideX - pad, viewport, innerW)
+        : viewport.centerYear;
+    const shouldShowMap = nextYear >= -400_000_000 && nextYear <= 2_100;
 
-      publishMapPreviewYear(shouldShowMap ? nextYear : null);
-    },
-    [isMapPreviewEnabled, mapPreviewOverrideX, pad, viewport, width],
-  );
+    publishMapPreviewYear(shouldShowMap ? nextYear : null);
+  }, [isMapPreviewEnabled, mapPreviewOverrideX, pad, viewport, width]);
   function resolveOverlayInteractionRegion(x: number, y: number) {
     const rolePriority = {
       child: 0,
@@ -1164,7 +1163,11 @@ export function TimelineCanvas({
         <div
           aria-hidden="true"
           className="absolute top-16 z-[2] touch-none cursor-ew-resize"
-          style={{ left: mapPreviewDashedLineX - 6, width: 13, bottom: overviewReservedHeight }}
+          style={{
+            left: mapPreviewDashedLineX - 6,
+            width: 13,
+            bottom: overviewReservedHeight,
+          }}
           onPointerDown={(event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -1177,10 +1180,17 @@ export function TimelineCanvas({
             event.stopPropagation();
             const rect = shellRef.current?.getBoundingClientRect();
             if (!rect) return;
-            const screenX = Math.max(0, Math.min(width, event.clientX - rect.left));
+            const screenX = Math.max(
+              0,
+              Math.min(width, event.clientX - rect.left),
+            );
             setMapPreviewOverrideX(screenX);
             const innerW = Math.max(width - pad * 2, 1);
-            const year = screenToWorld(screenX - pad, viewportRef.current, innerW);
+            const year = screenToWorld(
+              screenX - pad,
+              viewportRef.current,
+              innerW,
+            );
             publishMapPreviewYear(year);
           }}
           onPointerUp={(event) => {

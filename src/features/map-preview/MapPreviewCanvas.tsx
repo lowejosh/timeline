@@ -1,7 +1,4 @@
-import {
-  ensureWorldLandLoaded,
-  getWorldLandPath2D,
-} from "./worldLandLoader";
+import { ensureWorldLandLoaded, getWorldLandPath2D } from "./worldLandLoader";
 import {
   memo,
   useCallback,
@@ -138,7 +135,9 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
 
       if (cachedPaths?.sliceId !== currentSlice.id) {
         const sourcePaths = currentSlice.features
-          .filter((feature) => !isHistorical || feature.label !== "Historical region")
+          .filter(
+            (feature) => !isHistorical || feature.label !== "Historical region",
+          )
           .map((feature) => ({
             feature,
             path: new Path2D(feature.d),
@@ -265,7 +264,10 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
     const cachedPaths = pathCacheRef.current;
 
     if (!context || !mapPoint || !cachedPaths) {
-      latestDrawStateRef.current = { ...latestDrawStateRef.current, hoveredFeatureLabel: null };
+      latestDrawStateRef.current = {
+        ...latestDrawStateRef.current,
+        hoveredFeatureLabel: null,
+      };
       onHoverFeature(null);
       return;
     }
@@ -284,7 +286,10 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       context.restore();
 
       if (isHit) {
-        latestDrawStateRef.current = { ...latestDrawStateRef.current, hoveredFeatureLabel: feature.label };
+        latestDrawStateRef.current = {
+          ...latestDrawStateRef.current,
+          hoveredFeatureLabel: feature.label,
+        };
         onHoverFeature({
           detail: feature.detail,
           label: feature.label,
@@ -295,7 +300,10 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       }
     }
 
-    latestDrawStateRef.current = { ...latestDrawStateRef.current, hoveredFeatureLabel: null };
+    latestDrawStateRef.current = {
+      ...latestDrawStateRef.current,
+      hoveredFeatureLabel: null,
+    };
     onHoverFeature(null);
   };
   const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
@@ -379,7 +387,10 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       onPointerCancel={handlePointerEnd}
       onPointerDown={handlePointerDown}
       onPointerLeave={() => {
-        latestDrawStateRef.current = { ...latestDrawStateRef.current, hoveredFeatureLabel: null };
+        latestDrawStateRef.current = {
+          ...latestDrawStateRef.current,
+          hoveredFeatureLabel: null,
+        };
         scheduleDrawMap();
         onHoverFeature(null);
       }}
