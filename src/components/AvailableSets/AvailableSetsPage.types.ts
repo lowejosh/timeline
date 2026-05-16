@@ -24,7 +24,6 @@ export type DraftColumns = {
 
 export type ColumnLayoutSnapshot = {
   order: TimelineSetId[];
-  baseTop: number;
   rect: DOMRect;
   tops: Map<TimelineSetId, number>;
   heights: Map<TimelineSetId, number>;
@@ -35,6 +34,7 @@ export type DragLayouts = Record<ColumnId, ColumnLayoutSnapshot | null>;
 export type DragState = {
   pointerId: number;
   captureElement: HTMLElement;
+  scrollContainer: HTMLElement | null;
   setId: TimelineSetId;
   sourceColumn: ColumnId;
   targetColumn: ColumnId;
@@ -44,7 +44,10 @@ export type DragState = {
   startClientY: number;
   currentClientX: number;
   currentClientY: number;
+  pointerOffsetX: number;
   pointerOffsetY: number;
+  draggedWidth: number;
   draggedHeight: number;
+  currentScrollTop: number;
   layouts: DragLayouts;
 };

@@ -451,6 +451,7 @@ export function drawOverlays(cx: CanvasDrawContext): void {
         expandedOverlayProgress,
         child.laneIndex,
       );
+      const childTooltip = getOverlayTooltipContent(child.band);
       const childRenderY =
         childY - (1 - childReveal) * EXPANDED_OVERLAY_CHILD_SLIDE_PX;
       const childConnectorX = renderX + renderWidth / 2;
@@ -478,6 +479,7 @@ export function drawOverlays(cx: CanvasDrawContext): void {
           bottom: childRenderY + OVERLAY_LANE_HEIGHT + 3,
           role: "child",
           parentId: expandedOverlayDetail.parent.band.id,
+          tooltip: childTooltip,
         });
       }
 
@@ -549,7 +551,7 @@ export function drawOverlays(cx: CanvasDrawContext): void {
             fillStyle: childLabelPaint.fillStyle,
             alpha: 0.8 * childReveal * childLabelReveal,
             hoverId: child.band.id,
-            tooltip: getOverlayTooltipContent(child.band),
+            tooltip: childTooltip,
           },
           cx,
         );

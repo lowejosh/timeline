@@ -40,6 +40,7 @@ export type OverlayInteractionRegion = {
   bottom: number;
   role: "parent" | "child" | "panel";
   parentId?: string;
+  tooltip?: TimelineTooltipContent;
 };
 
 export type ExpandedOverlayExpansionState = {

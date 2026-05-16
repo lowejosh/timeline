@@ -33,6 +33,7 @@ import {
   AXIS_LABEL_OCCUPIED_PADDING,
   CALENDAR_DAY_STEP,
   EDGE_AXIS_LABEL_SNAP_TOLERANCE_PX,
+  PROJECT_LABEL_TOP,
   subyearPrimaryFont,
   subyearSecondaryFont,
 } from "../constants";
@@ -67,6 +68,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
 
   // --- Breadcrumb ---
   {
+    const projectLabel = "a timeline project";
     const rootLabel = breadcrumbChain[0]?.name ?? sceneActiveEra.name;
     const trailLabel = breadcrumbChain
       .slice(1)
@@ -79,6 +81,13 @@ export function drawAxis(cx: CanvasDrawContext): void {
         : `500 13px ${fontSans}`;
 
     context.save();
+    context.font = `600 9px ${fontSans}`;
+    context.fillStyle = labelColor;
+    context.textAlign = "center";
+    context.textBaseline = "top";
+    context.globalAlpha = 0.42;
+    context.fillText(projectLabel, sceneWidth / 2, PROJECT_LABEL_TOP);
+
     context.font = breadcrumbFont;
     context.fillStyle = labelColor;
     context.textAlign = "left";

@@ -1,55 +1,80 @@
 import {
   type Dispatch,
   type PointerEvent as ReactPointerEvent,
+  type RefObject,
   type SetStateAction,
   useCallback,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import { useGlobalPointerDrag } from "@/hooks/useGlobalPointerDrag";
-import {
-  REORDER_EASING,
-  REORDER_SETTLE_MS,
-  moveItem,
-} from "@/lib/ui/reorder";
+import { REORDER_EASING, REORDER_SETTLE_MS } from "@/lib/ui/reorder";
 import type {
   ColumnId,
   ColumnLayoutSnapshot,
+  DragLayouts,
   DragState,
   DraftColumns,
 } from "../AvailableSetsPage.types";
 import {
-  estimateGap,
   getDropColumn,
-  getPreviewTopBySetId,
   getProjectedIndex,
   insertIntoFilteredColumn,
   insertItem,
+  moveItemToProjectedIndex,
   removeItem,
-  reorderVisibleSubset,
+  reorderVisibleSubsetToProjectedIndex,
 } from "../utils/availableSetsPage";
+
+const AUTO_SCROLL_EDGE_PX = 84;
+const AUTO_SCROLL_MAX_PX = 18;
+
+function getAutoScrollDelta(container: HTMLElement, clientY: number) {
+  const rect = container.getBoundingClientRect();
+  const distanceToTop = clientY - rect.top;
+  const distanceToBottom = rect.bottom - clientY;
+
+  if (distanceToTop < AUTO_SCROLL_EDGE_PX) {
+    const intensity = 1 - Math.max(0, distanceToTop) / AUTO_SCROLL_EDGE_PX;
+
+    return -Math.ceil(intensity * AUTO_SCROLL_MAX_PX);
+  }
+
+  if (distanceToBottom < AUTO_SCROLL_EDGE_PX) {
+    const intensity = 1 - Math.max(0, distanceToBottom) / AUTO_SCROLL_EDGE_PX;
+
+    return Math.ceil(intensity * AUTO_SCROLL_MAX_PX);
+  }
+
+  return 0;
+}
 
 export function useAvailableSetsDrag(
   draftColumns: DraftColumns,
   visibleAvailableSetIds: readonly TimelineSetId[],
+  scrollContainerRef: RefObject<HTMLElement | null>,
   setDraftColumns: Dispatch<SetStateAction<DraftColumns>>,
   onMovedToEnabled: (setId: TimelineSetId) => void,
   onMovedToAvailable: (setId: TimelineSetId) => void,
 ) {
-  const enabledColumnRef = useRef<HTMLDivElement | null>(null);
-  const availableColumnRef = useRef<HTMLDivElement | null>(null);
+  const enabledColumnRef = useRef<HTMLUListElement | null>(null);
+  const availableColumnRef = useRef<HTMLUListElement | null>(null);
   const itemRefs = useRef(new Map<TimelineSetId, HTMLElement>());
   const previousRectsRef = useRef(new Map<TimelineSetId, DOMRect>());
   const previousSignatureRef = useRef<string | null>(null);
   const dragStateRef = useRef<DragState | null>(null);
+  const autoScrollFrameRef = useRef<number | null>(null);
   const [dragState, setDragState] = useState<DragState | null>(null);
 
   const visibleSignature = `${draftColumns.enabled.join("|")}::${visibleAvailableSetIds.join("|")}`;
+  const layoutSignature = dragState
+    ? `${visibleSignature}::${dragState.setId}:${dragState.sourceColumn}:${dragState.targetColumn}:${dragState.targetIndex}`
+    : visibleSignature;
+  const isDragging = Boolean(dragState);
 
   // Keep a ref in sync so pointer event callbacks always see the latest state
   // without being re-registered on every state change.
@@ -57,7 +82,7 @@ export function useAvailableSetsDrag(
     dragStateRef.current = dragState;
   }, [dragState]);
 
-  const measureColumnLayout = (
+  const measureColumnLayout = useCallback((
     columnId: ColumnId,
     order: readonly TimelineSetId[],
   ): ColumnLayoutSnapshot | null => {
@@ -73,7 +98,6 @@ export function useAvailableSetsDrag(
     const rect = columnElement.getBoundingClientRect();
     const tops = new Map<TimelineSetId, number>();
     const heights = new Map<TimelineSetId, number>();
-    let baseTop = Number.POSITIVE_INFINITY;
 
     for (const setId of order) {
       const element = itemRefs.current.get(setId);
@@ -87,17 +111,31 @@ export function useAvailableSetsDrag(
 
       tops.set(setId, top);
       heights.set(setId, itemRect.height);
-      baseTop = Math.min(baseTop, top);
     }
 
     return {
       order: [...order],
-      baseTop: Number.isFinite(baseTop) ? baseTop : 0,
       rect,
       tops,
       heights,
     };
-  };
+  }, []);
+
+  const updateDragLayoutRects = useCallback((layouts: DragLayouts) => {
+    const enabledRect = enabledColumnRef.current?.getBoundingClientRect();
+    const availableRect = availableColumnRef.current?.getBoundingClientRect();
+
+    return {
+      enabled:
+        layouts.enabled && enabledRect
+          ? { ...layouts.enabled, rect: enabledRect }
+          : layouts.enabled,
+      available:
+        layouts.available && availableRect
+          ? { ...layouts.available, rect: availableRect }
+          : layouts.available,
+    } satisfies DragLayouts;
+  }, []);
 
   const handleDragPointerMove = useCallback(
     (event: PointerEvent) => {
@@ -110,9 +148,17 @@ export function useAvailableSetsDrag(
       event.preventDefault();
       event.stopPropagation();
 
-      const nextTargetColumn = getDropColumn(current.layouts, event.clientX);
+      const nextLayouts = updateDragLayoutRects(current.layouts);
+      const nextScrollTop = current.scrollContainer
+        ? current.scrollContainer.scrollTop
+        : 0;
+      const nextTargetColumn = getDropColumn(
+        nextLayouts,
+        event.clientX,
+        event.clientY,
+      );
       const nextTargetIndex = getProjectedIndex(
-        current.layouts[nextTargetColumn],
+        nextLayouts[nextTargetColumn],
         current,
         nextTargetColumn,
         event.clientY,
@@ -127,7 +173,8 @@ export function useAvailableSetsDrag(
           prev.currentClientX === event.clientX &&
           prev.currentClientY === event.clientY &&
           prev.targetColumn === nextTargetColumn &&
-          prev.targetIndex === nextTargetIndex
+          prev.targetIndex === nextTargetIndex &&
+          prev.currentScrollTop === nextScrollTop
         ) {
           return prev;
         }
@@ -136,13 +183,78 @@ export function useAvailableSetsDrag(
           ...prev,
           currentClientX: event.clientX,
           currentClientY: event.clientY,
+          currentScrollTop: nextScrollTop,
+          layouts: nextLayouts,
           targetColumn: nextTargetColumn,
           targetIndex: nextTargetIndex,
         };
       });
     },
-    [],
+    [updateDragLayoutRects],
   );
+
+  useEffect(() => {
+    if (!isDragging) {
+      return;
+    }
+
+    const tick = () => {
+      const current = dragStateRef.current;
+
+      if (!current || !current.scrollContainer) {
+        autoScrollFrameRef.current = window.requestAnimationFrame(tick);
+        return;
+      }
+
+      const scrollDelta = getAutoScrollDelta(
+        current.scrollContainer,
+        current.currentClientY,
+      );
+
+      if (scrollDelta !== 0) {
+        current.scrollContainer.scrollTop += scrollDelta;
+
+        const nextLayouts = updateDragLayoutRects(current.layouts);
+        const nextScrollTop = current.scrollContainer.scrollTop;
+        const nextTargetColumn = getDropColumn(
+          nextLayouts,
+          current.currentClientX,
+          current.currentClientY,
+        );
+        const nextTargetIndex = getProjectedIndex(
+          nextLayouts[nextTargetColumn],
+          current,
+          nextTargetColumn,
+          current.currentClientY,
+        );
+
+        setDragState((prev) => {
+          if (!prev) {
+            return prev;
+          }
+
+          return {
+            ...prev,
+            currentScrollTop: nextScrollTop,
+            layouts: nextLayouts,
+            targetColumn: nextTargetColumn,
+            targetIndex: nextTargetIndex,
+          };
+        });
+      }
+
+      autoScrollFrameRef.current = window.requestAnimationFrame(tick);
+    };
+
+    autoScrollFrameRef.current = window.requestAnimationFrame(tick);
+
+    return () => {
+      if (autoScrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(autoScrollFrameRef.current);
+        autoScrollFrameRef.current = null;
+      }
+    };
+  }, [isDragging, updateDragLayoutRects]);
 
   const finishDrag = useCallback(
     (event: PointerEvent) => {
@@ -182,9 +294,9 @@ export function useAvailableSetsDrag(
           if (current.targetColumn === "enabled") {
             return {
               ...cols,
-              enabled: moveItem(
+              enabled: moveItemToProjectedIndex(
                 cols.enabled,
-                cols.enabled.indexOf(current.setId),
+                current.setId,
                 current.targetIndex,
               ),
             };
@@ -204,7 +316,7 @@ export function useAvailableSetsDrag(
         if (current.targetColumn === "available") {
           return {
             ...cols,
-            available: reorderVisibleSubset(
+            available: reorderVisibleSubsetToProjectedIndex(
               cols.available,
               current.layouts.available?.order ?? [],
               current.setId,
@@ -223,7 +335,7 @@ export function useAvailableSetsDrag(
   );
 
   useGlobalPointerDrag({
-    active: Boolean(dragState),
+    active: isDragging,
     onPointerEnd: finishDrag,
     onPointerMove: handleDragPointerMove,
   });
@@ -234,6 +346,10 @@ export function useAvailableSetsDrag(
     const currentRects = new Map<TimelineSetId, DOMRect>();
 
     for (const setId of visibleIds) {
+      if (dragState?.setId === setId) {
+        continue;
+      }
+
       const element = itemRefs.current.get(setId);
 
       if (element) {
@@ -243,10 +359,13 @@ export function useAvailableSetsDrag(
 
     if (
       previousSignatureRef.current !== null &&
-      previousSignatureRef.current !== visibleSignature &&
-      !dragState
+      previousSignatureRef.current !== layoutSignature
     ) {
       for (const [setId, currentRect] of currentRects) {
+        if (dragState?.setId === setId) {
+          continue;
+        }
+
         const previousRect = previousRectsRef.current.get(setId);
         const element = itemRefs.current.get(setId);
 
@@ -272,12 +391,12 @@ export function useAvailableSetsDrag(
     }
 
     previousRectsRef.current = currentRects;
-    previousSignatureRef.current = visibleSignature;
+    previousSignatureRef.current = layoutSignature;
   }, [
     draftColumns.enabled,
     dragState,
+    layoutSignature,
     visibleAvailableSetIds,
-    visibleSignature,
   ]);
 
   const handlePointerDown = (
@@ -289,7 +408,10 @@ export function useAvailableSetsDrag(
       return;
     }
 
-    if ((event.target as HTMLElement).closest("button")) {
+    const target = event.target as HTMLElement;
+    const dragHandle = target.closest("[data-drag-handle]");
+
+    if (!dragHandle) {
       return;
     }
 
@@ -302,6 +424,7 @@ export function useAvailableSetsDrag(
       return;
     }
 
+    const scrollContainer = scrollContainerRef.current;
     const enabledLayout = measureColumnLayout("enabled", draftColumns.enabled);
     const availableLayout = measureColumnLayout(
       "available",
@@ -330,6 +453,7 @@ export function useAvailableSetsDrag(
     setDragState({
       pointerId: event.pointerId,
       captureElement: element,
+      scrollContainer,
       setId,
       sourceColumn,
       targetColumn: sourceColumn,
@@ -339,116 +463,20 @@ export function useAvailableSetsDrag(
       startClientY: event.clientY,
       currentClientX: event.clientX,
       currentClientY: event.clientY,
+      pointerOffsetX: event.clientX - itemRect.left,
       pointerOffsetY: event.clientY - itemRect.top,
+      draggedWidth: itemRect.width,
       draggedHeight: itemRect.height,
+      currentScrollTop: scrollContainer ? scrollContainer.scrollTop : 0,
       layouts: { enabled: enabledLayout, available: availableLayout },
     });
   };
-
-  // Compute live preview order for both columns while dragging.
-  const previewOrders = useMemo(() => {
-    if (!dragState) {
-      return {
-        enabled: draftColumns.enabled,
-        available: visibleAvailableSetIds,
-      } satisfies Record<ColumnId, readonly TimelineSetId[]>;
-    }
-
-    const nextEnabledOrder =
-      dragState.layouts.enabled?.order ?? draftColumns.enabled;
-    const nextAvailableOrder =
-      dragState.layouts.available?.order ?? visibleAvailableSetIds;
-
-    if (dragState.sourceColumn === dragState.targetColumn) {
-      const sourceOrder =
-        dragState.sourceColumn === "enabled"
-          ? nextEnabledOrder
-          : nextAvailableOrder;
-      const reordered = moveItem(
-        sourceOrder,
-        dragState.sourceIndex,
-        dragState.targetIndex,
-      );
-
-      return {
-        enabled:
-          dragState.sourceColumn === "enabled" ? reordered : nextEnabledOrder,
-        available:
-          dragState.sourceColumn === "available"
-            ? reordered
-            : nextAvailableOrder,
-      } satisfies Record<ColumnId, readonly TimelineSetId[]>;
-    }
-
-    return {
-      enabled:
-        dragState.sourceColumn === "enabled"
-          ? nextEnabledOrder.filter((id) => id !== dragState.setId)
-          : insertItem(
-              nextEnabledOrder,
-              dragState.targetIndex,
-              dragState.setId,
-            ),
-      available:
-        dragState.sourceColumn === "available"
-          ? nextAvailableOrder.filter((id) => id !== dragState.setId)
-          : insertItem(
-              nextAvailableOrder,
-              dragState.targetIndex,
-              dragState.setId,
-            ),
-    } satisfies Record<ColumnId, readonly TimelineSetId[]>;
-  }, [draftColumns.enabled, dragState, visibleAvailableSetIds]);
-
-  // Map each set to its projected top offset in the live preview.
-  const previewTopByColumn = useMemo(() => {
-    if (!dragState) {
-      return null;
-    }
-
-    const enabledLayout = dragState.layouts.enabled;
-    const availableLayout = dragState.layouts.available;
-    const enabledGap = enabledLayout ? estimateGap(enabledLayout) : 0;
-    const availableGap = availableLayout ? estimateGap(availableLayout) : 0;
-
-    // Inject the dragged item's measured height into the target column so it
-    // opens the correct slot even though it was never rendered there.
-    const extraForEnabled: ReadonlyMap<TimelineSetId, number> =
-      dragState.sourceColumn === "available"
-        ? new Map([[dragState.setId, dragState.draggedHeight]])
-        : new Map();
-
-    const extraForAvailable: ReadonlyMap<TimelineSetId, number> =
-      dragState.sourceColumn === "enabled"
-        ? new Map([[dragState.setId, dragState.draggedHeight]])
-        : new Map();
-
-    return {
-      enabled: enabledLayout
-        ? getPreviewTopBySetId(
-            previewOrders.enabled,
-            enabledLayout,
-            extraForEnabled,
-            enabledGap,
-          )
-        : null,
-      available: availableLayout
-        ? getPreviewTopBySetId(
-            previewOrders.available,
-            availableLayout,
-            extraForAvailable,
-            availableGap,
-          )
-        : null,
-    } satisfies Record<ColumnId, Map<TimelineSetId, number> | null>;
-  }, [dragState, previewOrders]);
 
   return {
     dragState,
     enabledColumnRef,
     availableColumnRef,
     itemRefs,
-    previewTopByColumn,
     handlePointerDown,
   };
 }

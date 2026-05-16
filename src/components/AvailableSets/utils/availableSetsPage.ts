@@ -80,6 +80,14 @@ export function removeItem<T>(items: readonly T[], item: T): T[] {
   return items.filter((candidate) => candidate !== item);
 }
 
+export function moveItemToProjectedIndex<T>(
+  items: readonly T[],
+  item: T,
+  targetIndex: number,
+): T[] {
+  return insertItem(removeItem(items, item), targetIndex, item);
+}
+
 export function createDraftColumns(
   orderedSetIds: readonly TimelineSetId[],
   enabledSetIds: ReadonlySet<TimelineSetId>,
@@ -88,50 +96,6 @@ export function createDraftColumns(
     enabled: orderedSetIds.filter((setId) => enabledSetIds.has(setId)),
     available: orderedSetIds.filter((setId) => !enabledSetIds.has(setId)),
   };
-}
-
-/**
- * Estimates the CSS grid gap from the space between the first two adjacent
- * items in the snapshot. Returns 0 when there are fewer than two items.
- */
-export function estimateGap(layout: ColumnLayoutSnapshot): number {
-  for (let i = 0; i + 1 < layout.order.length; i++) {
-    const aId = layout.order[i];
-    const bId = layout.order[i + 1];
-    const aTop = layout.tops.get(aId);
-    const aHeight = layout.heights.get(aId);
-    const bTop = layout.tops.get(bId);
-
-    if (aTop !== undefined && aHeight !== undefined && bTop !== undefined) {
-      return Math.max(0, bTop - aTop - aHeight);
-    }
-  }
-
-  return 0;
-}
-
-/**
- * Computes the preview top for each set in `order`.
- * `extraHeights` injects heights for items not yet measured in this column
- * (e.g. a cross-column dragged card). `gap` is the inter-item CSS gap.
- */
-export function getPreviewTopBySetId(
-  order: readonly TimelineSetId[],
-  layout: ColumnLayoutSnapshot,
-  extraHeights: ReadonlyMap<TimelineSetId, number> = new Map(),
-  gap = 0,
-): Map<TimelineSetId, number> {
-  const result = new Map<TimelineSetId, number>();
-  let nextTop = layout.baseTop;
-
-  for (const setId of order) {
-    result.set(setId, nextTop);
-    const height = layout.heights.get(setId) ?? extraHeights.get(setId) ?? 0;
-
-    nextTop += height + gap;
-  }
-
-  return result;
 }
 
 /**
@@ -151,6 +115,29 @@ export function reorderVisibleSubset(
   }
 
   const nextVisibleOrder = moveItem(visibleOrder, visibleIndex, targetIndex);
+  const visibleOrderSet = new Set(visibleOrder);
+  const queue = [...nextVisibleOrder];
+
+  return fullOrder.map((candidate) =>
+    visibleOrderSet.has(candidate) ? (queue.shift() ?? candidate) : candidate,
+  );
+}
+
+export function reorderVisibleSubsetToProjectedIndex(
+  fullOrder: readonly TimelineSetId[],
+  visibleOrder: readonly TimelineSetId[],
+  setId: TimelineSetId,
+  targetIndex: number,
+): TimelineSetId[] {
+  if (!visibleOrder.includes(setId)) {
+    return [...fullOrder];
+  }
+
+  const nextVisibleOrder = moveItemToProjectedIndex(
+    visibleOrder,
+    setId,
+    targetIndex,
+  );
   const visibleOrderSet = new Set(visibleOrder);
   const queue = [...nextVisibleOrder];
 
@@ -225,15 +212,30 @@ export function getProjectedIndex(
   return remainingIds.length;
 }
 
-/** Returns the column that best contains or is closest to `clientX`. */
-export function getDropColumn(layouts: DragLayouts, clientX: number): ColumnId {
+function getDistanceToRect(rect: DOMRect, clientX: number, clientY: number) {
+  const dx =
+    clientX < rect.left ? rect.left - clientX : Math.max(0, clientX - rect.right);
+  const dy =
+    clientY < rect.top ? rect.top - clientY : Math.max(0, clientY - rect.bottom);
+
+  return Math.hypot(dx, dy);
+}
+
+/** Returns the column that best contains or is closest to the pointer. */
+export function getDropColumn(
+  layouts: DragLayouts,
+  clientX: number,
+  clientY: number,
+): ColumnId {
   const enabledRect = layouts.enabled?.rect;
   const availableRect = layouts.available?.rect;
 
   if (
     enabledRect &&
     clientX >= enabledRect.left &&
-    clientX <= enabledRect.right
+    clientX <= enabledRect.right &&
+    clientY >= enabledRect.top &&
+    clientY <= enabledRect.bottom
   ) {
     return "enabled";
   }
@@ -241,7 +243,9 @@ export function getDropColumn(layouts: DragLayouts, clientX: number): ColumnId {
   if (
     availableRect &&
     clientX >= availableRect.left &&
-    clientX <= availableRect.right
+    clientX <= availableRect.right &&
+    clientY >= availableRect.top &&
+    clientY <= availableRect.bottom
   ) {
     return "available";
   }
@@ -249,11 +253,8 @@ export function getDropColumn(layouts: DragLayouts, clientX: number): ColumnId {
   if (!enabledRect) return "available";
   if (!availableRect) return "enabled";
 
-  const enabledCenter = enabledRect.left + enabledRect.width / 2;
-  const availableCenter = availableRect.left + availableRect.width / 2;
-
-  return Math.abs(clientX - enabledCenter) <=
-    Math.abs(clientX - availableCenter)
+  return getDistanceToRect(enabledRect, clientX, clientY) <=
+    getDistanceToRect(availableRect, clientX, clientY)
     ? "enabled"
     : "available";
 }

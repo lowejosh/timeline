@@ -13,7 +13,8 @@ export const EXPANDED_OVERLAY_BOTTOM_PADDING = 0;
 
 export const CALENDAR_DAY_STEP = 1 / 365.2425;
 
-export const BREADCRUMB_TOP = 14;
+export const PROJECT_LABEL_TOP = 10;
+export const BREADCRUMB_TOP = 26;
 export const BREADCRUMB_HEIGHT = 16;
 export const BREADCRUMB_TO_OVERLAY_GAP = 8;
 export const TIMELINE_BOTTOM_PADDING = 18;

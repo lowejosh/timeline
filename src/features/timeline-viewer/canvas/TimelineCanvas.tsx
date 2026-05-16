@@ -850,13 +850,29 @@ export function TimelineCanvas({
         const localX = event.clientX - rect.left;
         const localY = event.clientY - rect.top;
         const clickedRegion = resolveOverlayInteractionRegion(localX, localY);
-        const tappedTooltip =
+        const resolvedTouchTooltip =
           event.pointerType === "touch"
             ? resolveTooltipAtPoint(localX, localY, {
                 allowTouch: true,
                 hitSlopPx: TOUCH_TOOLTIP_HIT_SLOP_PX,
               })
             : null;
+        const childBandTouchTooltip =
+          event.pointerType === "touch" &&
+          clickedRegion?.role === "child" &&
+          clickedRegion.tooltip
+            ? ({
+                id: clickedRegion.id,
+                anchorX: Math.min(
+                  Math.max(localX, clickedRegion.left),
+                  clickedRegion.right,
+                ),
+                anchorY: clickedRegion.top,
+                placement: "above",
+                tooltip: clickedRegion.tooltip,
+              } satisfies HoveredTooltipState)
+            : null;
+        const tappedTooltip = resolvedTouchTooltip ?? childBandTouchTooltip;
 
         if (clickedRegion?.role === "parent") {
           isTouchTooltipPinnedRef.current = false;
@@ -865,6 +881,10 @@ export function TimelineCanvas({
               ? current.filter((id) => id !== clickedRegion.id)
               : [...current, clickedRegion.id],
           );
+        } else if (clickedRegion?.role === "child" && tappedTooltip) {
+          isTouchTooltipPinnedRef.current = true;
+          lastPointerRef.current = null;
+          commitHoveredTooltip(tappedTooltip);
         } else if (clickedRegion?.role === "child") {
           isTouchTooltipPinnedRef.current = false;
           setExpandedOverlayIds((current) => {
