@@ -31,6 +31,7 @@ export function TimelineView({ app, layout }: TimelineViewProps) {
               activeChain={app.chain}
               activeEra={app.activeEra}
               enabledGroupIds={app.renderEnabledGroupIds}
+              expandOverlayRequest={app.expandOverlayRequest}
               height={app.mainCanvasHeight}
               isAnimating={app.animated.isAnimating}
               isCosmicCalendarMode={app.isCosmicCalendarMode}

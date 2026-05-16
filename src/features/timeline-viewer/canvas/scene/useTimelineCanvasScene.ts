@@ -32,10 +32,7 @@ import {
   toApproximateTimelineYear,
   type TimelineViewport,
 } from "@/lib/core/viewport";
-import type {
-  TimelineMarker,
-  TimelineOverlayBand,
-} from "@/lib/catalog/eras";
+import type { TimelineMarker, TimelineOverlayBand } from "@/lib/catalog/eras";
 
 type UseTimelineCanvasSceneArgs = {
   enabledGroupIds: ReadonlySet<string>;
@@ -161,7 +158,10 @@ export function useTimelineCanvasScene({
       viewport,
       width,
       pad,
-    ).reduce((total, detail) => total + getExpandedOverlayPanelHeight(detail), 0);
+    ).reduce(
+      (total, detail) => total + getExpandedOverlayPanelHeight(detail),
+      0,
+    );
   }, [expandedOverlayIds, resolvedOverlayBands, viewport, width, pad]);
   const overlayInteractionLayout = useMemo(
     () =>

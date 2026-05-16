@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from "react";
 
 import type { RenderedTooltipState } from "@/lib/rendering/canvas/tooltip";
 import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
@@ -125,8 +131,7 @@ function useDelayedTooltipImage({
   src?: string;
   tooltipId: string;
 }) {
-  const [status, setStatus] =
-    useState<DelayedTooltipImageStatus>("idle");
+  const [status, setStatus] = useState<DelayedTooltipImageStatus>("idle");
 
   useEffect(() => {
     if (!src || !enabled) {
@@ -147,9 +152,7 @@ function useDelayedTooltipImage({
     setStatus("waiting");
 
     const timeout = window.setTimeout(() => {
-      setStatus((current) =>
-        current === "waiting" ? "loading" : current,
-      );
+      setStatus((current) => (current === "waiting" ? "loading" : current));
     }, TOOLTIP_IMAGE_DELAY_MS);
 
     return () => {
@@ -212,8 +215,14 @@ function getTooltipStyle({
     height - safeViewportInsets.bottom - anchorY - TOOLTIP_OFFSET;
   const preferBelow = displayedTooltip.placement === "below";
   // When height is known, use exact fit check; otherwise fall back to a heuristic
-  const fitsAbove = measuredHeight > 0 ? availableAbove >= measuredHeight : availableAbove >= 80;
-  const fitsBelow = measuredHeight > 0 ? availableBelow >= measuredHeight : availableBelow >= 80;
+  const fitsAbove =
+    measuredHeight > 0
+      ? availableAbove >= measuredHeight
+      : availableAbove >= 80;
+  const fitsBelow =
+    measuredHeight > 0
+      ? availableBelow >= measuredHeight
+      : availableBelow >= 80;
   const shouldPlaceBelow = (preferBelow && fitsBelow) || !fitsAbove;
 
   // Compute exact top so the tooltip never clips past a safe edge
@@ -275,16 +284,12 @@ export function TimelineTooltip({
     return () => ro.disconnect();
   }, []);
 
-  const {
-    markErrored,
-    markLoaded,
-    shouldRenderImage,
-    showSkeleton,
-  } = useDelayedTooltipImage({
-    enabled: renderedTooltip.phase === "present",
-    src: tooltipImage?.src,
-    tooltipId: renderedTooltip.tooltipState.id,
-  });
+  const { markErrored, markLoaded, shouldRenderImage, showSkeleton } =
+    useDelayedTooltipImage({
+      enabled: renderedTooltip.phase === "present",
+      src: tooltipImage?.src,
+      tooltipId: renderedTooltip.tooltipState.id,
+    });
 
   return (
     <div
@@ -297,7 +302,12 @@ export function TimelineTooltip({
           : "opacity-0 will-change-[transform,opacity]",
       )}
       data-phase={renderedTooltip.phase}
-      style={getTooltipStyle({ height, measuredHeight, renderedTooltip, width })}
+      style={getTooltipStyle({
+        height,
+        measuredHeight,
+        renderedTooltip,
+        width,
+      })}
     >
       <div className="flex items-start gap-2">
         <OverlayGroupIconSvg

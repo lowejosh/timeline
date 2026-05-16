@@ -25,6 +25,7 @@ export type TimelineCanvasProps = {
   parentEra: Era | null;
   isCosmicCalendarMode: boolean;
   isAnimating: boolean;
+  expandOverlayRequest?: { overlayId: string; seq: number } | null;
   onViewportChange: (
     updater: (current: TimelineViewport) => TimelineViewport,
   ) => void;

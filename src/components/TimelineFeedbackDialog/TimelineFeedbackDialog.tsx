@@ -90,39 +90,47 @@ export function TimelineFeedbackDialog({
         </header>
 
         <form className="px-4 py-4" onSubmit={handleSubmit}>
-            <label
-              className="mb-1.5 block text-[0.78rem] font-semibold text-foreground"
-              htmlFor="feedback-message"
+          <label
+            className="mb-1.5 block text-[0.78rem] font-semibold text-foreground"
+            htmlFor="feedback-message"
+          >
+            Message
+          </label>
+          <textarea
+            className="w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-[0.8rem] leading-snug text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
+            id="feedback-message"
+            onChange={(e) => setMessage(e.target.value)}
+            ref={textareaRef}
+            rows={4}
+            value={message}
+          />
+          {dialogState === "error" ? (
+            <p className="mt-1.5 text-[0.72rem] text-destructive">
+              Something went wrong. Try again or email{" "}
+              <a className="underline" href="mailto:jolojoloapps@gmail.com">
+                jolojoloapps@gmail.com
+              </a>{" "}
+              directly.
+            </p>
+          ) : null}
+          <div className="mt-3 flex justify-end">
+            <Button
+              disabled={
+                !message.trim() ||
+                dialogState === "submitting" ||
+                dialogState === "sent"
+              }
+              size="sm"
+              type="submit"
             >
-              Message
-            </label>
-            <textarea
-              className="w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-[0.8rem] leading-snug text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
-              id="feedback-message"
-              onChange={(e) => setMessage(e.target.value)}
-              ref={textareaRef}
-              rows={4}
-              value={message}
-            />
-            {dialogState === "error" ? (
-              <p className="mt-1.5 text-[0.72rem] text-destructive">
-                Something went wrong. Try again or email{" "}
-                <a className="underline" href="mailto:jolojoloapps@gmail.com">
-                  jolojoloapps@gmail.com
-                </a>{" "}
-                directly.
-              </p>
-            ) : null}
-            <div className="mt-3 flex justify-end">
-              <Button
-                disabled={!message.trim() || dialogState === "submitting" || dialogState === "sent"}
-                size="sm"
-                type="submit"
-              >
-                {dialogState === "submitting" ? "Sending…" : dialogState === "sent" ? "Sent" : "Send"}
-              </Button>
-            </div>
-          </form>
+              {dialogState === "submitting"
+                ? "Sending…"
+                : dialogState === "sent"
+                  ? "Sent"
+                  : "Send"}
+            </Button>
+          </div>
+        </form>
       </section>
     </div>
   );

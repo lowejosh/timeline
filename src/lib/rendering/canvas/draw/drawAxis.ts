@@ -82,7 +82,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
     context.fillStyle = labelColor;
     context.textAlign = "center";
     context.textBaseline = "top";
-    context.globalAlpha = 0.42;
+    context.globalAlpha = 0.7;
     context.fillText(projectLabel, sceneWidth / 2, PROJECT_LABEL_TOP);
 
     context.font = breadcrumbFont;

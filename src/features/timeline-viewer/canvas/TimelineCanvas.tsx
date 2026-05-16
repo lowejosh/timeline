@@ -103,6 +103,7 @@ export function TimelineCanvas({
   onNavigateUp,
   onRecordDragSample,
   onReleaseMomentum,
+  expandOverlayRequest,
 }: TimelineCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
@@ -584,6 +585,15 @@ export function TimelineCanvas({
     progressByIdRef: expandedOverlayProgressByIdRef,
     renderedIdsRef: renderedExpandedOverlayIdsRef,
   } = useExpandedOverlayAnimation(expandedOverlayIds, scheduleRedraw);
+
+  useEffect(() => {
+    if (!expandOverlayRequest) return;
+    setExpandedOverlayIds((current) =>
+      current.includes(expandOverlayRequest.overlayId)
+        ? current
+        : [...current, expandOverlayRequest.overlayId],
+    );
+  }, [expandOverlayRequest]);
 
   useEffect(() => {
     setExpandedOverlayIds((current) => {

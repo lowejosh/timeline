@@ -14,18 +14,22 @@ type UseTimelineKeyboardShortcutsOptions = {
   isSidebarOpen: boolean;
   onCloseHelp: () => void;
   onFullTimelineRange: () => void;
-  onHelpOpenChange: (updater: boolean | ((current: boolean) => boolean)) => void;
+  onHelpOpenChange: (
+    updater: boolean | ((current: boolean) => boolean),
+  ) => void;
   onHomeRange: () => void;
   onLayerShortcut: (normalizedKey: string) => boolean;
   onNavigationEnd: () => void;
   onNavigationFrame: (frame: KeyboardNavigationFrame) => void;
   onSearchToggle: () => void;
-  onSidebarOpenChange: (updater: boolean | ((current: boolean) => boolean)) => void;
+  onSidebarOpenChange: (
+    updater: boolean | ((current: boolean) => boolean),
+  ) => void;
 };
 
 const BASE_PAN_PIXELS_PER_SECOND = 760;
-const FAST_PAN_PIXELS_PER_SECOND = 2_000;
-const BASE_ZOOM_UNITS_PER_SECOND = 8.5;
+const FAST_PAN_PIXELS_PER_SECOND = 20_000;
+const BASE_ZOOM_UNITS_PER_SECOND = 2;
 const FAST_ZOOM_UNITS_PER_SECOND = 18;
 const MAX_FRAME_SECONDS = 0.05;
 const RESPONSE_SECONDS = 0.095;
@@ -50,7 +54,11 @@ function claimKeyboardEvent(event: KeyboardEvent) {
   event.stopPropagation();
 }
 
-function getPressedDirection(keys: ReadonlySet<string>, negative: string, positive: string) {
+function getPressedDirection(
+  keys: ReadonlySet<string>,
+  negative: string,
+  positive: string,
+) {
   return (keys.has(positive) ? 1 : 0) - (keys.has(negative) ? 1 : 0);
 }
 
@@ -214,11 +222,7 @@ export function useTimelineKeyboardShortcuts({
       previousFrameTimeRef.current = timestamp;
 
       const fast = keys.has("shift");
-      const panDirection = getPressedDirection(
-        keys,
-        "arrowright",
-        "arrowleft",
-      );
+      const panDirection = getPressedDirection(keys, "arrowright", "arrowleft");
       const zoomDirection =
         (keys.has("+") || keys.has("arrowup") ? 1 : 0) -
         (keys.has("-") || keys.has("arrowdown") ? 1 : 0);

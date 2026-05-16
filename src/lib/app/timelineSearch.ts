@@ -29,6 +29,9 @@ export type TimelineSearchItem = {
   maxZoom?: number;
   rangeLabel: string;
   searchText: string;
+  /** Raw overlay ID to add to expandedOverlayIds when this result is selected.
+   * Set on parent overlays (their own ID) and child overlays (their parent's ID). */
+  expandableAsOverlayId?: string;
 };
 
 export type TimelineSearchResult = TimelineSearchItem & {
@@ -115,6 +118,7 @@ function createMarkerSearchItem(marker: TimelineMarker): TimelineSearchItem {
 
 function createOverlaySearchItem(
   overlay: TimelineOverlayBand,
+  parentId?: string,
 ): TimelineSearchItem {
   const setId = overlay.setId ?? getSetIdForGroup(overlay.groupId);
   const groupLabel = getGroupLabel(overlay.groupId);
@@ -133,6 +137,8 @@ function createOverlaySearchItem(
     minZoom: overlay.minZoom,
     maxZoom: overlay.maxZoom,
     rangeLabel: formatSearchRange(overlay.startYear, overlay.endYear),
+    expandableAsOverlayId:
+      parentId ?? (overlay.children?.length ? overlay.id : undefined),
   };
 
   return {
@@ -144,12 +150,13 @@ function createOverlaySearchItem(
 function appendOverlaySearchItems(
   items: TimelineSearchItem[],
   overlays: readonly TimelineOverlayBand[],
+  parentId?: string,
 ) {
   for (const overlay of overlays) {
-    items.push(createOverlaySearchItem(overlay));
+    items.push(createOverlaySearchItem(overlay, parentId));
 
     if (overlay.children?.length) {
-      appendOverlaySearchItems(items, overlay.children);
+      appendOverlaySearchItems(items, overlay.children, overlay.id);
     }
   }
 }
@@ -181,7 +188,10 @@ function scoreSearchItem(item: TimelineSearchItem, tokens: readonly string[]) {
       score += 16;
     }
 
-    if (item.groupLabel && normalizeSearchText(item.groupLabel).includes(token)) {
+    if (
+      item.groupLabel &&
+      normalizeSearchText(item.groupLabel).includes(token)
+    ) {
       score += 8;
     }
 

@@ -123,10 +123,7 @@ function getSearchMarkerFocusSpan(year: number) {
   }
 
   if (yearsFromPresent >= 100_000) {
-    return Math.max(
-      10_000,
-      yearsFromPresent * SEARCH_DEEP_TIME_CONTEXT_FACTOR,
-    );
+    return Math.max(10_000, yearsFromPresent * SEARCH_DEEP_TIME_CONTEXT_FACTOR);
   }
 
   if (yearsFromPresent >= 10_000) {
@@ -256,6 +253,11 @@ export function useTimelineAppState() {
   const [isCosmicCalendarMode, setIsCosmicCalendarMode] = useState(false);
   const [overlayVisibilityTransitionSeed, setOverlayVisibilityTransitionSeed] =
     useState(0);
+  const [expandOverlayRequest, setExpandOverlayRequest] = useState<{
+    overlayId: string;
+    seq: number;
+  } | null>(null);
+  const expandOverlaySeqRef = useRef(0);
   const defaultEnabledGroupIds = useMemo(
     () => getDefaultEnabledTimelineGroupIds(),
     [],
@@ -457,19 +459,10 @@ export function useTimelineAppState() {
     }
 
     return visibleSetSpanPriorities;
-  }, [
-    animated.viewport,
-    canvasPad,
-    innerWidth,
-    viewportWidth,
-    visibleSetIds,
-  ]);
+  }, [animated.viewport, canvasPad, innerWidth, viewportWidth, visibleSetIds]);
 
   const hasHigherPrioritySetSpanVisible = useCallback(
-    (
-      ownerSetId: TimelineSetId | null | undefined,
-      ownerPriority?: number,
-    ) => {
+    (ownerSetId: TimelineSetId | null | undefined, ownerPriority?: number) => {
       if (!ownerSetId) {
         return false;
       }
@@ -840,10 +833,7 @@ export function useTimelineAppState() {
 
           childRange = childRange
             ? {
-                startYear: Math.min(
-                  childRange.startYear,
-                  groupRange.startYear,
-                ),
+                startYear: Math.min(childRange.startYear, groupRange.startYear),
                 endYear: Math.max(childRange.endYear, groupRange.endYear),
               }
             : groupRange;
@@ -1102,6 +1092,14 @@ export function useTimelineAppState() {
       setOverlayVisibilityTransitionSeed((current) => current + 1);
       setActiveEraId(prioritizedRootEra.id);
 
+      if (result.expandableAsOverlayId) {
+        expandOverlaySeqRef.current += 1;
+        setExpandOverlayRequest({
+          overlayId: result.expandableAsOverlayId,
+          seq: expandOverlaySeqRef.current,
+        });
+      }
+
       animated.animateToViewport(
         getSearchResultViewport(
           result,
@@ -1278,6 +1276,7 @@ export function useTimelineAppState() {
 
     // view
     activeView,
+    expandOverlayRequest,
 
     // handlers
     handleZoom,

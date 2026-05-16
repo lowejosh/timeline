@@ -85,8 +85,8 @@ export function TimelineSettings({
         </div>
 
         <p className="mt-3 border-t border-border/60 pt-2.5 text-[0.66rem] leading-snug text-muted-foreground/70">
-          This is just a personal project, not a comprehensive view of history.
-          Fact-checked as best I could, but errors may exist.{" "}
+          This is just a personal project of mine, I am definitely not a
+          historian and this is not a comprehensive view of history.{" "}
           <button
             className="cursor-pointer underline underline-offset-2 transition-opacity hover:opacity-80"
             onClick={() => {
