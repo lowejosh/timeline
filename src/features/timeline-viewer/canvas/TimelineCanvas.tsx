@@ -190,6 +190,7 @@ export function TimelineCanvas({
   const {
     adjustOverlayScrollOffset,
     axisTickTargets,
+    expandedOverlayExtraHeight,
     overlayInteractionLayout,
     overlayLaneCount,
     overlayScrollOffset,
@@ -574,6 +575,7 @@ export function TimelineCanvas({
     overlayScrollOffset,
     reserveAxisDateRow,
     overviewReservedHeight,
+    expandedOverlayExtraHeight,
     overlayVisibilityTransitionKey,
     scheduleRedraw,
   );

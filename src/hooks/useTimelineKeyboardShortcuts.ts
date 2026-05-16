@@ -22,6 +22,7 @@ type UseTimelineKeyboardShortcutsOptions = {
   onNavigationEnd: () => void;
   onNavigationFrame: (frame: KeyboardNavigationFrame) => void;
   onSearchToggle: () => void;
+  onSettingsOpenChange: (updater: boolean | ((current: boolean) => boolean)) => void;
   onSidebarOpenChange: (
     updater: boolean | ((current: boolean) => boolean),
   ) => void;
@@ -122,6 +123,7 @@ export function useTimelineKeyboardShortcuts({
   onNavigationEnd,
   onNavigationFrame,
   onSearchToggle,
+  onSettingsOpenChange,
   onSidebarOpenChange,
 }: UseTimelineKeyboardShortcutsOptions) {
   const latestRef = useRef<UseTimelineKeyboardShortcutsOptions>({
@@ -136,6 +138,7 @@ export function useTimelineKeyboardShortcuts({
     onNavigationEnd,
     onNavigationFrame,
     onSearchToggle,
+    onSettingsOpenChange,
     onSidebarOpenChange,
   });
   const pressedKeysRef = useRef(new Set<string>());
@@ -159,6 +162,7 @@ export function useTimelineKeyboardShortcuts({
       onNavigationEnd,
       onNavigationFrame,
       onSearchToggle,
+      onSettingsOpenChange,
       onSidebarOpenChange,
     };
   }, [
@@ -173,6 +177,7 @@ export function useTimelineKeyboardShortcuts({
     onNavigationEnd,
     onNavigationFrame,
     onSearchToggle,
+    onSettingsOpenChange,
     onSidebarOpenChange,
   ]);
 
@@ -323,6 +328,12 @@ export function useTimelineKeyboardShortcuts({
       if (primaryModified && normalizedKey === "/") {
         claimKeyboardEvent(event);
         latest.onHelpOpenChange((current) => !current);
+        return;
+      }
+
+      if (primaryModified && normalizedKey === ",") {
+        claimKeyboardEvent(event);
+        latest.onSettingsOpenChange((current) => !current);
         return;
       }
 

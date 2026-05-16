@@ -60,6 +60,15 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(162, 130, 92)",
     priority: 75,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage(
+        "Map of the Levantine sites with El Khiam points.jpg",
+      ),
+      alt: "Map of Levantine sites with El Khiam points",
+      width: 2061,
+      height: 1652,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["khiamianCultureWikipedia"],
   },
   {
@@ -75,6 +84,15 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(149, 123, 96)",
     priority: 75,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage(
+        "Main Upper Mesopotamian Pre-Pottery Neolithic centers.jpg",
+      ),
+      alt: "Map of main Upper Mesopotamian Pre-Pottery Neolithic centers",
+      width: 989,
+      height: 658,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["mureybetWikipedia"],
   },
   {
@@ -90,6 +108,13 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(145, 117, 91)",
     priority: 75,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Cayönü - Grillplangebäude.jpg"),
+      alt: "Grill-plan building remains at Cayonu",
+      width: 2592,
+      height: 1944,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["cayonuWikipedia"],
   },
   {
@@ -105,6 +130,15 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(143, 116, 94)",
     priority: 75,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage(
+        "Urfa museum Nevalı Çori Temple - Neolithic age 4843.jpg",
+      ),
+      alt: "Reconstructed Neolithic temple from Nevali Cori at Urfa Museum",
+      width: 8256,
+      height: 5504,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["nevaliCoriWikipedia"],
   },
   {
@@ -120,6 +154,13 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(150, 128, 99)",
     priority: 74,
     subGroup: "south-asia",
+    image: {
+      src: commonsTooltipImage("Mehrgarh Site.jpg"),
+      alt: "Archaeological site of Mehrgarh in Balochistan",
+      width: 7360,
+      height: 4912,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaMehrgarh"],
   },
   {
@@ -159,6 +200,13 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(140, 120, 90)",
     priority: 74,
     subGroup: "east-asia",
+    image: {
+      src: commonsTooltipImage("Jiahu Bone Flute.jpg"),
+      alt: "Bone flute excavated from the Jiahu site",
+      width: 3968,
+      height: 2976,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["metJiahu"],
   },
   {
@@ -174,6 +222,13 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(139, 114, 92)",
     priority: 74,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Halafpottery.jpg"),
+      alt: "Painted pottery from the Halaf culture",
+      width: 629,
+      height: 571,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["halafCultureWikipedia"],
   },
   {
@@ -189,6 +244,13 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(136, 118, 90)",
     priority: 75,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Samarra bowl.jpg"),
+      alt: "Painted Samarra culture bowl from the Vorderasiatisches Museum",
+      width: 800,
+      height: 812,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["samarraCultureWikipedia"],
   },
   {
@@ -204,6 +266,13 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(134, 126, 98)",
     priority: 75,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Pottery from the Ubaid period.jpg"),
+      alt: "Pottery vessels from the Ubaid period",
+      width: 2820,
+      height: 2141,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["ubaidPeriodWikipedia"],
   },
 ];

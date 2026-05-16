@@ -99,6 +99,7 @@ export function TimelineKeyboardHelp({
 
   const navigationRows: ShortcutHelpRow[] = [
     { label: "Show Keyboard Shortcuts", keys: [modifierLabel, "/"] },
+    { label: "Show Settings", keys: [modifierLabel, ","] },
     { label: "Toggle Layers", keys: ["L"] },
     { label: "Search", keys: [modifierLabel, "K"] },
     { label: "Zoom In", keys: ["+", "↑"] },

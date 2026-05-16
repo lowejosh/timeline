@@ -7,7 +7,10 @@ type AvailableSetsHeaderProps = {
   titleId: string;
 };
 
-export function AvailableSetsHeader({ onApply, titleId }: AvailableSetsHeaderProps) {
+export function AvailableSetsHeader({
+  onApply,
+  titleId,
+}: AvailableSetsHeaderProps) {
   return (
     <div className="flex items-center gap-3 max-sm:flex-wrap max-sm:items-start">
       <Button
@@ -43,7 +46,7 @@ export function AvailableSetsHeader({ onApply, titleId }: AvailableSetsHeaderPro
         variant="subtle"
       >
         <Plus className="size-3.5" />
-        <span>Create</span>
+        <span>Create (Coming soon)</span>
       </Button>
     </div>
   );

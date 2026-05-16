@@ -79,6 +79,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   {
     id: "paleolithic",
     name: "Paleolithic",
+    alternateName: "Old Stone Age",
     startYear: yearsAgo(300_000),
     endYear: bce(20_000),
     color: HUMAN_HISTORY_COLORS.paleolithic,
@@ -99,6 +100,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   {
     id: "epipaleolithic",
     name: "Epipaleolithic",
+    alternateName: "Middle Stone Age",
     startYear: bce(20_000),
     endYear: bce(10_000),
     color: HUMAN_HISTORY_COLORS.epipaleolithic,
@@ -120,6 +122,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   {
     id: "neolithic",
     name: "Neolithic",
+    alternateName: "New Stone Age",
     startYear: bce(10_000),
     endYear: bce(4_500),
     color: HUMAN_HISTORY_COLORS.neolithic,
@@ -201,6 +204,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
   {
     id: "chalcolithic",
     name: "Chalcolithic",
+    alternateName: "Copper Age",
     startYear: bce(4_500),
     endYear: bce(3_300),
     color: HUMAN_HISTORY_COLORS.chalcolithic,

@@ -263,6 +263,7 @@ export function useTimelineCanvasScene({
   return {
     adjustOverlayScrollOffset,
     axisTickTargets,
+    expandedOverlayExtraHeight,
     overlayInteractionLayout,
     overlayLaneCount,
     overlayScrollOffset,

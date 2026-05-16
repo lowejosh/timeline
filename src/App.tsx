@@ -33,6 +33,7 @@ function App() {
   const { activeView, isSidebarOpen, setIsSidebarOpen } = app;
   const [isKeyboardHelpOpen, setIsKeyboardHelpOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const layout = getTimelineAppLayoutState({
     height: app.stageSize.height,
     isOverviewVisible: app.isOverviewVisible,
@@ -101,6 +102,7 @@ function App() {
     onNavigationEnd: app.handleKeyboardNavigationEnd,
     onNavigationFrame: app.handleKeyboardNavigationFrame,
     onSearchToggle: toggleSearch,
+    onSettingsOpenChange: setIsSettingsOpen,
     onSidebarOpenChange: setIsSidebarOpen,
   });
 
@@ -159,6 +161,8 @@ function App() {
             <TimelineSettings
               className="order-3"
               isCosmicCalendarMode={app.isCosmicCalendarMode}
+              isOpen={isSettingsOpen}
+              onOpenChange={setIsSettingsOpen}
               onToggleCosmicCalendarMode={() => {
                 app.setIsCosmicCalendarMode((current) => !current);
               }}

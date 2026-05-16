@@ -16,15 +16,21 @@ const APP_VERSION = "v0.2.1";
 type TimelineSettingsProps = {
   className?: string;
   isCosmicCalendarMode: boolean;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
   onToggleCosmicCalendarMode: () => void;
 };
 
 export function TimelineSettings({
   className,
   isCosmicCalendarMode,
+  isOpen: isOpenProp,
+  onOpenChange: onOpenChangeProp,
   onToggleCosmicCalendarMode,
 }: TimelineSettingsProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenLocal, setIsOpenLocal] = useState(false);
+  const isOpen = isOpenProp ?? isOpenLocal;
+  const setIsOpen = onOpenChangeProp ?? setIsOpenLocal;
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const titleId = useId();
   const cosmicCalendarLabelId = useId();

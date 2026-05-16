@@ -348,8 +348,8 @@ export function TimelineTooltip({
                 alt=""
                 aria-hidden="true"
                 className={cn(
-                  "absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-xl saturate-150 transition-opacity duration-200",
-                  showSkeleton ? "opacity-0" : "opacity-35",
+                  "absolute inset-0 h-full w-full scale-105 object-cover opacity-50 blur-md brightness-105 saturate-125 transition-opacity duration-200",
+                  showSkeleton ? "opacity-0" : "opacity-50",
                 )}
                 decoding="async"
                 draggable={false}

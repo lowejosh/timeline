@@ -33,7 +33,7 @@
   --animate-collapsible-up: collapsible-up 220ms cubic-bezier(0.22, 1, 0.36, 1);
   --animate-popover-in: popover-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
   --animate-popover-out: popover-out 140ms ease;
-  --animate-tooltip-skeleton: tooltip-skeleton 1.15s ease-in-out infinite;
+  --animate-tooltip-skeleton: tooltip-skeleton 1.35s linear infinite;
   --font-sans:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
@@ -314,29 +314,36 @@ select,
 }
 
 .timeline-tooltip-image-skeleton {
-  background:
-    linear-gradient(
-      100deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.32) 46%,
-      transparent 72%
-    ),
-    linear-gradient(
-      135deg,
-      rgba(77, 61, 47, 0.09),
-      rgba(77, 61, 47, 0.04)
-    );
-  background-size: 220% 100%, 100% 100%;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(77, 61, 47, 0.1),
+    rgba(77, 61, 47, 0.045)
+  );
+}
+
+.timeline-tooltip-image-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.3) 46%,
+    transparent 72%
+  );
+  transform: translateX(-100%);
   animation: var(--animate-tooltip-skeleton);
+  will-change: transform;
 }
 
 @keyframes tooltip-skeleton {
   from {
-    background-position: 140% 0, 0 0;
+    transform: translateX(-100%);
   }
 
   to {
-    background-position: -80% 0, 0 0;
+    transform: translateX(100%);
   }
 }
 

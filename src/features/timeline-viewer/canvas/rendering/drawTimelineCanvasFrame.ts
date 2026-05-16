@@ -230,6 +230,10 @@ export function drawTimelineCanvasFrame({
       };
     },
   );
+  const expandedOverlayLayoutExtraHeight = expandedOverlayExpansionStates.reduce(
+    (total, state) => total + state.fullHeight,
+    0,
+  );
   const perfEnabled = perfMode !== "off";
   const verbosePerfEnabled = perfMode === "verbose";
   const drawStart = perfEnabled ? performance.now() : 0;
@@ -281,6 +285,7 @@ export function drawTimelineCanvasFrame({
     {
       reserveAxisDateRow,
       overviewReservedHeight,
+      expandedExtraHeight: expandedOverlayLayoutExtraHeight,
     },
   );
   const overlayBottomY = getOverlayLaneY(layout, 0);
