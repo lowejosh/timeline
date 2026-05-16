@@ -1,5 +1,6 @@
 import type { TimelineMarker } from "@/lib/core/timelineTypes";
 import { yearsAgo } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 export const EARTH_MILESTONE_MARKERS: TimelineMarker[] = [
   {
@@ -12,6 +13,13 @@ export const EARTH_MILESTONE_MARKERS: TimelineMarker[] = [
       "Dust and rock clump together in the young solar system, building the planet Earth.",
     minZoom: 0,
     priority: 100,
+    image: {
+      src: commonsTooltipImage("Earth formation.jpg"),
+      alt: "Illustration of early Earth formation conditions",
+      width: 1920,
+      height: 1920,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["usgsAgeOfEarth"],
   },
   {
@@ -36,6 +44,15 @@ export const EARTH_MILESTONE_MARKERS: TimelineMarker[] = [
       "Jack Hills zircons preserve the oldest known material formed on Earth, hinting that crust had already solidified surprisingly early.",
     minZoom: 0,
     priority: 98,
+    image: {
+      src: commonsTooltipImage(
+        "Jack Hills detrital zircons BSE micrographs.jpg",
+      ),
+      alt: "Backscatter electron micrographs of Jack Hills detrital zircons",
+      width: 886,
+      height: 1129,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["uwMadisonCoolEarlyEarth", "amnhZirconsEarlyEarth"],
   },
   {
@@ -61,6 +78,13 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 0,
     priority: 95,
+    image: {
+      src: commonsTooltipImage("Stromatolites.jpg"),
+      alt: "Precambrian stromatolite fossil formed by microbial mats",
+      width: 550,
+      height: 371,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["berkeleyOriginOfLife"],
   },
   {
@@ -93,6 +117,15 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     year: yearsAgo(575_000_000),
     minZoom: 0,
     priority: 93,
+    image: {
+      src: commonsTooltipImage(
+        "Dickinsonia - Ediacaran Fossil from Flinders Range in South Australia.jpg",
+      ),
+      alt: "Dickinsonia Ediacaran fossil from the Flinders Ranges",
+      width: 4896,
+      height: 3672,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["museumsVictoria600MillionYears"],
   },
   {
@@ -105,6 +138,13 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       "Tiny early plants were among the first to colonise land, beginning the long transformation of bare continents into living landscapes.",
     minZoom: 0,
     priority: 92,
+    image: {
+      src: commonsTooltipImage("Cooksonia pertoni.png"),
+      alt: "Life reconstruction of the early land plant Cooksonia pertoni",
+      width: 900,
+      height: 900,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["nhmFirstLandPlants"],
   },
   {
@@ -132,6 +172,13 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       "Cooksonia appears among the oldest known vascular plants, marking an early step toward taller and more complex land floras.",
     minZoom: 0,
     priority: 89,
+    image: {
+      src: commonsTooltipImage("Cooksonia pertoni.png"),
+      alt: "Life reconstruction of the early vascular plant Cooksonia pertoni",
+      width: 900,
+      height: 900,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: [
       "nationalMuseumEarliestVascularPlants",
       "museumsVictoriaPalaeobotany",
@@ -169,6 +216,15 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     year: yearsAgo(370_000_000),
     minZoom: 0,
     priority: 92,
+    image: {
+      src: commonsTooltipImage(
+        "Tiktaalik restoration (side view) by ObsidianSoul 02 flipped.png",
+      ),
+      alt: "Life restoration of Tiktaalik roseae",
+      width: 2240,
+      height: 636,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["berkeleyTetrapodOrigin"],
   },
   {
@@ -189,6 +245,14 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     year: yearsAgo(315_000_000),
     minZoom: 0,
     priority: 88,
+    image: {
+      src: commonsTooltipImage("Meganeura monyi - MUSE.jpg"),
+      alt:
+        "Life-size reconstruction of the giant Carboniferous insect Meganeura monyi",
+      width: 1888,
+      height: 1172,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["britannicaCarboniferousPeriod"],
   },
   {
@@ -215,6 +279,13 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     year: yearsAgo(225_000_000),
     minZoom: 0,
     priority: 90,
+    image: {
+      src: commonsTooltipImage("Morganucodon watsoni life restoration.jpg"),
+      alt: "Life restoration of the early mammaliaform Morganucodon watsoni",
+      width: 928,
+      height: 410,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["ucmpMesozoicLife"],
   },
   {
@@ -241,6 +312,13 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 0,
     priority: 89,
+    image: {
+      src: commonsTooltipImage("Archaeopteryx fossil.jpg"),
+      alt: "Archaeopteryx lithographica fossil from the Solnhofen Limestone",
+      width: 2048,
+      height: 1365,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["berkeleyBirdOrigin"],
   },
   {
@@ -253,6 +331,13 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       "Fossils such as Archaefructus show flowering plants were already present by about 125 million years ago, with southern Australian flower-bearing forests appearing soon after.",
     minZoom: 0,
     priority: 90,
+    image: {
+      src: commonsTooltipImage("Archaefructus NGMC.jpg"),
+      alt: "Fossil specimen of the early flowering plant Archaefructus",
+      width: 2592,
+      height: 1321,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: [
       "australianMuseumCretaceous",
       "universityMelbourneFlowersReachedAustralia",
@@ -268,6 +353,13 @@ export const DEEP_TIME_LIFE_MARKERS: TimelineMarker[] = [
       "The Chicxulub impact triggered abrupt global collapse that wiped out about 75% of species, including all non-avian dinosaurs, while birds and mammals pulled through.",
     minZoom: 0,
     priority: 99,
+    image: {
+      src: commonsTooltipImage("Chicxulub Free-Air Gravity anomaly.png"),
+      alt: "Gravity anomaly map of the Chicxulub impact crater",
+      width: 834,
+      height: 620,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: [
       "smithsonianExtinctionOverTime",
       "icsChart2024",

@@ -1,5 +1,6 @@
 import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
 import { bce, yearsAgo } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
   {
@@ -15,6 +16,13 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(154, 120, 88)",
     priority: 76,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Ain Sakhri lovers figurine.jpg"),
+      alt: "Ain Sakhri lovers figurine from the Natufian culture",
+      width: 1840,
+      height: 2867,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["natufianCultureWikipedia", "metPrehistoricArt"],
   },
   {
@@ -30,6 +38,13 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(156, 122, 86)",
     priority: 76,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Gobekli Tepe 1.jpg"),
+      alt: "Stone enclosures and T-shaped pillars at Gobekli Tepe",
+      width: 4160,
+      height: 2340,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["unescoGobekliTepe"],
   },
   {
@@ -120,6 +135,15 @@ export const CULTURE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(147, 119, 93)",
     priority: 75,
     subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage(
+        "Çatalhöyük after the first excavations by James Mellaart and his team..jpg",
+      ),
+      alt: "Excavated Neolithic houses at Catalhoyuk",
+      width: 1799,
+      height: 1197,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["unescoCatalhoyuk"],
   },
   {

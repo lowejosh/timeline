@@ -85,6 +85,15 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Long era of mobile hunter-gatherers, stone tools, and the first known art.",
     scheme: "archaeological",
+    image: {
+      src: commonsTooltipImage(
+        "Palaeolithic acheulean handaxe (FindID 709909).jpg",
+      ),
+      alt: "Lower Paleolithic Acheulean flint handaxe",
+      width: 8588,
+      height: 4038,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["khanPaleolithicCulture", "smithsonianHumanOrigins"],
   },
   {
@@ -99,6 +108,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Warming-climate transition when some hunter-gatherer communities grew more settled and locally rooted.",
     scheme: "archaeological",
+    image: {
+      src: commonsTooltipImage("Ain Sakhri lovers figurine.jpg"),
+      alt: "Ain Sakhri lovers figurine from the Natufian culture",
+      width: 1840,
+      height: 2867,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["periodo"],
   },
   {
@@ -113,6 +129,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
     description:
       "Farming villages, domesticated plants and animals, and more permanent settlement reshape daily life.",
     scheme: "archaeological",
+    image: {
+      src: commonsTooltipImage("Gobekli Tepe 1.jpg"),
+      alt: "Stone enclosures and T-shaped pillars at Gobekli Tepe",
+      width: 4160,
+      height: 2340,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["periodo", "khanNeolithicRevolution"],
     children: [
       {
@@ -141,6 +164,13 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Larger farming communities with domesticated animals, plastered skulls, and expanding village architecture.",
         scheme: "archaeological",
+        image: {
+          src: commonsTooltipImage("Plastered skull from Jericho 12741-42.jpg"),
+          alt: "Plastered Neolithic skull from Jericho",
+          width: 1700,
+          height: 2000,
+          credit: "Wikimedia Commons",
+        },
         sourceIds: ["khanNeolithicRevolution"],
       },
       {
@@ -155,6 +185,15 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         description:
           "Established farming world of everyday pottery, food storage, and widening local exchange.",
         scheme: "archaeological",
+        image: {
+          src: commonsTooltipImage(
+            "Çatalhöyük after the first excavations by James Mellaart and his team..jpg",
+          ),
+          alt: "Excavated Neolithic houses at Catalhoyuk",
+          width: 1799,
+          height: 1197,
+          credit: "Wikimedia Commons",
+        },
         sourceIds: ["periodo"],
       },
     ],
@@ -186,10 +225,12 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
       "Cities, kingdoms, bronze metallurgy, and long-distance trade tie the ancient Near East into a shared world.",
     scheme: "archaeological",
     image: {
-      src: commonsTooltipImage("Mesopotamia location map.svg"),
-      alt: "Map locating the Bronze Age heartlands of Mesopotamia and the ancient Near East",
-      width: 1000,
-      height: 1200,
+      src: commonsTooltipImage(
+        "14 century BC Eastern Mediterranean and the Middle East.png",
+      ),
+      alt: "Map of the Eastern Mediterranean and Middle East in the 14th century BCE",
+      width: 1041,
+      height: 578,
       credit: "Wikimedia Commons",
     },
     sourceIds: ["britannicaBronzeAge", "britannicaMiddleEast"],

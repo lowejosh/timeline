@@ -1,5 +1,6 @@
 import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
 import { yearsAgo } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
   {
@@ -13,6 +14,13 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(82, 136, 138)",
     minZoom: 0,
     priority: 86,
+    image: {
+      src: commonsTooltipImage("TTT Cambrian (2).png"),
+      alt: "Artist's rendition of diverse life in a Cambrian sea",
+      width: 1458,
+      height: 1024,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["berkeleyCambrianExplosion"],
   },
   {
@@ -72,6 +80,15 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(79, 124, 156)",
     minZoom: 0,
     priority: 87,
+    image: {
+      src: commonsTooltipImage(
+        "Diorama of a Devonian seafloor 5 (45573090092).jpg",
+      ),
+      alt: "Diorama of diverse Devonian seafloor life",
+      width: 3008,
+      height: 1900,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["gutenbergHistoricalGeologyMiller1922"],
   },
   {
@@ -177,6 +194,15 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
         color: "rgb(105, 136, 86)",
         minZoom: 0,
         priority: 90,
+        image: {
+          src: commonsTooltipImage(
+            "Dakotaraptor, Edmontosaurus, Pachycephalosaurus and Tyrannosaurus.jpg",
+          ),
+          alt: "Restoration of several Hell Creek Formation dinosaurs",
+          width: 2728,
+          height: 1901,
+          credit: "Wikimedia Commons",
+        },
         sourceIds: [
           "ucmpMesozoicLife",
           "smithsonianExtinctionOverTime",
@@ -201,6 +227,13 @@ export const DEEP_TIME_LIFE_OVERLAYS: TimelineOverlayBand[] = [
       hideAtOrBelowYears: 10_500_000,
       onlyWhenAnyGroupVisible: ["human-evolution"],
       onlyWhenHigherPrioritySetSpanVisible: true,
+    },
+    image: {
+      src: commonsTooltipImage("Cenozoic.jpg"),
+      alt: "Cenozoic mammals and landscapes illustration",
+      width: 762,
+      height: 551,
+      credit: "Wikimedia Commons",
     },
     sourceIds: ["gutenbergHistoricalGeologyMiller1922"],
   },

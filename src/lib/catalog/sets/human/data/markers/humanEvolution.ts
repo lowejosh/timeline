@@ -1,5 +1,6 @@
 import type { TimelineMarker } from "@/lib/core/timelineTypes";
 import { yearsAgo } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
   {
@@ -13,6 +14,15 @@ export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
     priority: 92,
     description:
       "Some of the oldest candidate hominins already show anatomy linked to upright posture.",
+    image: {
+      src: commonsTooltipImage(
+        "Sahelenthropus tchadensis-MGL 95214-P4150633-white.jpg",
+      ),
+      alt: "Cast of the Toumai Sahelanthropus tchadensis skull",
+      width: 4000,
+      height: 4000,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianSahelanthropus", "smithsonianHumanEvolutionIntro"],
   },
   {
@@ -39,6 +49,13 @@ export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
     priority: 89,
     description:
       "Cut-marked bones and the oldest stone tools cluster around the rise of early Homo.",
+    image: {
+      src: commonsTooltipImage("Bokol Dora Stone Tool (cropped).jpg"),
+      alt: "Early Oldowan stone tool from Bokol Dora",
+      width: 723,
+      height: 867,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoHabilis"],
   },
   {
@@ -52,6 +69,15 @@ export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
     priority: 88,
     description:
       "Early Homo enters the record with larger brains, altered faces, and a more flexible ecological niche.",
+    image: {
+      src: commonsTooltipImage(
+        "Homo habilis - forensic facial reconstruction.png",
+      ),
+      alt: "Forensic facial reconstruction of Homo habilis",
+      width: 1920,
+      height: 1920,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoHabilis"],
   },
   {
@@ -65,6 +91,13 @@ export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
     priority: 87,
     description:
       "The first major dispersal carries early humans out of Africa and into Asia.",
+    image: {
+      src: commonsTooltipImage("Putative migration waves out of Africa.png"),
+      alt: "Map of putative early human migration waves out of Africa",
+      width: 1210,
+      height: 1002,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHumanEvolutionIntro", "smithsonianHomoErectus"],
   },
   {
@@ -78,6 +111,15 @@ export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
     priority: 86,
     description:
       "Large cutting tools mark the first major leap in stone-tool design.",
+    image: {
+      src: commonsTooltipImage(
+        "Palaeolithic acheulean handaxe (FindID 709909).jpg",
+      ),
+      alt: "Lower Paleolithic Acheulean flint handaxe",
+      width: 8588,
+      height: 4038,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoErectus"],
   },
   {
@@ -117,6 +159,13 @@ export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
     priority: 82,
     description:
       "A tiny island-dwelling human lineage lingers surprisingly late in Southeast Asia.",
+    image: {
+      src: commonsTooltipImage("Homo floresiensis v 2-0.jpg"),
+      alt: "Forensic facial reconstruction of Homo floresiensis",
+      width: 2500,
+      height: 2500,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoFloresiensis"],
   },
   {
@@ -130,6 +179,15 @@ export const HUMAN_EVOLUTION_MARKERS: TimelineMarker[] = [
     priority: 81,
     description:
       "The last surviving Neanderthal populations vanish, leaving Homo sapiens alone.",
+    image: {
+      src: commonsTooltipImage(
+        "Reconstruction of Neanderthal at the SUMPHG.jpg",
+      ),
+      alt: "Reconstruction of a Neanderthal",
+      width: 1920,
+      height: 2560,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoNeanderthalensis"],
   },
 ];

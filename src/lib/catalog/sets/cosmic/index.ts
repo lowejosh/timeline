@@ -2,6 +2,7 @@ import {
   normalizeTimelineSetDocument,
   type TimelineRawSetDocument,
 } from "@/lib/catalog/setSchema";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 const COSMIC_SET_DOCUMENT = {
   version: 1,
@@ -112,6 +113,13 @@ const COSMIC_SET_DOCUMENT = {
         },
         color: "rgba(0, 0, 0, 0)",
         scheme: "cosmic",
+        image: {
+          src: commonsTooltipImage("CMB Timeline No Labels or WMAP.jpg"),
+          alt: "Graphical representation of the universe's expansion history",
+          width: 3200,
+          height: 1800,
+          credit: "Wikimedia Commons",
+        },
         children: [
           {
             id: "planck-epoch",
@@ -417,6 +425,13 @@ const COSMIC_SET_DOCUMENT = {
             description:
               "As electrons settle into the first neutral atoms, the cosmic fog clears. By around 380,000 years after the Big Bang, the universe becomes transparent and the oldest light we observe today as the cosmic microwave background can travel freely.",
             scheme: "cosmic",
+            image: {
+              src: commonsTooltipImage("WMAP 2012.png"),
+              alt: "Nine-year WMAP map of cosmic microwave background temperature fluctuations",
+              width: 4096,
+              height: 2048,
+              credit: "Wikimedia Commons",
+            },
             sourceIds: ["nasaUniverseOverview", "nasaLambdaCosmology"],
           },
           {
@@ -461,6 +476,13 @@ const COSMIC_SET_DOCUMENT = {
             description:
               "The first stars and young galaxies ignite, flooding space with ultraviolet light that reionizes cosmic gas.",
             scheme: "cosmic",
+            image: {
+              src: commonsTooltipImage("NASA-WMAP-first-stars.jpg"),
+              alt: "Artist's concept of the first stars in the universe turning on",
+              width: 5333,
+              height: 3000,
+              credit: "Wikimedia Commons",
+            },
             sourceIds: ["nasaUniverseOverview", "nasaLambdaCosmology"],
           },
           {
@@ -483,6 +505,13 @@ const COSMIC_SET_DOCUMENT = {
             description:
               "Galaxies keep growing into groups, clusters, and the large-scale cosmic web.",
             scheme: "cosmic",
+            image: {
+              src: commonsTooltipImage("Webb's First Deep Field.jpg"),
+              alt: "Webb's First Deep Field showing thousands of distant galaxies",
+              width: 4537,
+              height: 4630,
+              credit: "Wikimedia Commons",
+            },
             sourceIds: ["nasaUniverseOverview"],
           },
           {
@@ -528,6 +557,13 @@ const COSMIC_SET_DOCUMENT = {
         "About 380,000 years after the Big Bang, the first atoms formed and the cosmic fog cleared, releasing the oldest light we can still observe today.",
       minZoom: 0,
       priority: 92,
+      image: {
+        src: commonsTooltipImage("WMAP 2012.png"),
+        alt: "Nine-year WMAP map of cosmic microwave background temperature fluctuations",
+        width: 4096,
+        height: 2048,
+        credit: "Wikimedia Commons",
+      },
       sourceIds: ["nasaUniverseOverview", "nasaLambdaCosmology"],
     },
     {
@@ -546,6 +582,13 @@ const COSMIC_SET_DOCUMENT = {
         "The first stars ended the fully dark universe, flooding space with new light and helping seed the earliest galaxies.",
       minZoom: 0,
       priority: 91,
+      image: {
+        src: commonsTooltipImage("NASA-WMAP-first-stars.jpg"),
+        alt: "Artist's concept of the first stars in the universe turning on",
+        width: 5333,
+        height: 3000,
+        credit: "Wikimedia Commons",
+      },
       sourceIds: ["nasaUniverseOverview", "nasaLambdaCosmology"],
     },
     {
@@ -564,6 +607,13 @@ const COSMIC_SET_DOCUMENT = {
         "By roughly 1 billion years after the Big Bang, starlight and young galaxies had reionized nearly all intergalactic gas, leaving the universe broadly transparent to light again.",
       minZoom: 0,
       priority: 90,
+      image: {
+        src: commonsTooltipImage("First stars.jpg"),
+        alt: "Spitzer infrared image analyzed for possible glow from the first stars",
+        width: 1152,
+        height: 1024,
+        credit: "Wikimedia Commons",
+      },
       sourceIds: ["nasaUniverseOverview", "nasaLambdaCosmology"],
     },
     {
@@ -582,6 +632,15 @@ const COSMIC_SET_DOCUMENT = {
         "Milky Way-like galaxies hit a stellar baby boom, forming stars far faster than our galaxy does today.",
       minZoom: 0,
       priority: 89,
+      image: {
+        src: commonsTooltipImage(
+          "Hubble Ultra Deep Field 2014 (27993302656).jpg",
+        ),
+        alt: "Hubble Ultra Deep Field 2014, a deep view of galaxies across cosmic time",
+        width: 2300,
+        height: 2100,
+        credit: "Wikimedia Commons",
+      },
       sourceIds: ["nasaMilkyWayGrowth", "nasaSunLateToMilkyWayParty"],
     },
     {
@@ -600,6 +659,13 @@ const COSMIC_SET_DOCUMENT = {
         "By this stage, Milky Way-like galaxies have grown larger and show a clear spiral form with older stars concentrated toward the center.",
       minZoom: 0,
       priority: 88,
+      image: {
+        src: commonsTooltipImage("NGC 4414 (NASA-med).jpg"),
+        alt: "Hubble image of the spiral galaxy NGC 4414",
+        width: 1730,
+        height: 1428,
+        credit: "Wikimedia Commons",
+      },
       sourceIds: ["nasaMilkyWayGrowth", "nasaGalaxyBasics"],
     },
     {
@@ -618,6 +684,13 @@ const COSMIC_SET_DOCUMENT = {
         "A collapsing cloud of gas and dust forms the Sun, a spinning solar nebula, and the raw material of the planets.",
       minZoom: 0,
       priority: 90,
+      image: {
+        src: commonsTooltipImage("HL Tau protoplanetary disk.jpg"),
+        alt: "ALMA image of the protoplanetary disk around HL Tauri",
+        width: 1800,
+        height: 1800,
+        credit: "Wikimedia Commons",
+      },
       sourceIds: ["nasaSolarSystemFacts"],
     },
   ],

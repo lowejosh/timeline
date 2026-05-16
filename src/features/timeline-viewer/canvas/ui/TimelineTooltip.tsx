@@ -301,9 +301,27 @@ export function TimelineTooltip({
             ) : null}
             {shouldRenderImage ? (
               <img
+                alt=""
+                aria-hidden="true"
+                className={cn(
+                  "absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-xl saturate-150 transition-opacity duration-200",
+                  showSkeleton ? "opacity-0" : "opacity-35",
+                )}
+                decoding="async"
+                draggable={false}
+                fetchPriority="low"
+                height={tooltipImage.height}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                src={tooltipImage.src}
+                width={tooltipImage.width}
+              />
+            ) : null}
+            {shouldRenderImage ? (
+              <img
                 alt={tooltipImage.alt}
                 className={cn(
-                  "h-full w-full object-cover transition-opacity duration-200",
+                  "relative z-[1] h-full w-full object-contain transition-opacity duration-200",
                   showSkeleton ? "opacity-0" : "opacity-100",
                 )}
                 decoding="async"

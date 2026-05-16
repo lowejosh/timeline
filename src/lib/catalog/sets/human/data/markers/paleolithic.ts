@@ -1,5 +1,6 @@
 import type { TimelineMarker } from "@/lib/core/timelineTypes";
 import { yearsAgo } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
   {
@@ -22,6 +23,13 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 17,
     priority: 75,
+    image: {
+      src: commonsTooltipImage("Blombo.jpg"),
+      alt: "Engraved ochre stone from Blombos Cave",
+      width: 331,
+      height: 388,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["metPrehistoricArt"],
   },
   {
@@ -33,6 +41,13 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 77,
+    image: {
+      src: commonsTooltipImage("Lions group Chauvet Cave.jpg"),
+      alt: "Group of painted lions from Chauvet Cave",
+      width: 1366,
+      height: 768,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["unescoChauvet", "metChauvet"],
   },
   {
@@ -44,6 +59,13 @@ export const PALEOLITHIC_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 18,
     priority: 74,
+    image: {
+      src: commonsTooltipImage("Venus of Dolni Vestonice 2014-09-30.jpg"),
+      alt: "Venus of Dolni Vestonice ceramic figurine",
+      width: 4000,
+      height: 2667,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["khanPaleolithicCulture"],
   },
 ];

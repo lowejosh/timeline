@@ -212,6 +212,13 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     approximate: true,
     minZoom: 19,
     priority: 67,
+    image: {
+      src: commonsTooltipImage("Plastered skull from Jericho 12741-42.jpg"),
+      alt: "Plastered Neolithic skull from Jericho",
+      width: 1700,
+      height: 2000,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["khanNeolithicRevolution"],
   },
   {

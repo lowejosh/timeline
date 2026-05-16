@@ -1,6 +1,7 @@
 import { TIMELINE_MAX_YEAR } from "@/lib/core/timelineYears";
 import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
 import { bce, yearsAgo } from "@/lib/core/timelineDateBuilders";
+import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 const CURRENT_YEAR = TIMELINE_MAX_YEAR;
 const HUMAN_EVOLUTION_MIN_ZOOM = 8;
@@ -20,6 +21,15 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(140, 113, 92)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 95,
+    image: {
+      src: commonsTooltipImage(
+        "Sahelenthropus tchadensis-MGL 95214-P4150633-white.jpg",
+      ),
+      alt: "Cast of the Toumai Sahelanthropus tchadensis skull",
+      width: 4000,
+      height: 4000,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianSahelanthropus", "smithsonianHumanFamilyTree"],
   },
   {
@@ -100,6 +110,13 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(186, 145, 105)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 90,
+    image: {
+      src: commonsTooltipImage("Australopithecus afarensis.png"),
+      alt: "Forensic facial reconstruction of Australopithecus afarensis",
+      width: 557,
+      height: 495,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianAustralopithecusAfarensis"],
   },
   {
@@ -132,6 +149,13 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(179, 128, 90)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 88,
+    image: {
+      src: commonsTooltipImage("Mrs Ples Face.jpg"),
+      alt: "Mrs Ples skull of Australopithecus africanus",
+      width: 1828,
+      height: 1659,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianAustralopithecusAfricanus"],
   },
   {
@@ -180,6 +204,15 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(159, 117, 88)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 85,
+    image: {
+      src: commonsTooltipImage(
+        "Homo habilis - forensic facial reconstruction.png",
+      ),
+      alt: "Forensic facial reconstruction of Homo habilis",
+      width: 1920,
+      height: 1920,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoHabilis"],
   },
   {
@@ -244,6 +277,15 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(166, 107, 83)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 81,
+    image: {
+      src: commonsTooltipImage(
+        "Homo erectus reconstruction, Natural History Museum, London.jpg",
+      ),
+      alt: "Homo erectus reconstruction at the Natural History Museum, London",
+      width: 4896,
+      height: 3264,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoErectus"],
   },
   {
@@ -276,6 +318,15 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(141, 116, 100)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 79,
+    image: {
+      src: commonsTooltipImage(
+        "Homo heidelbergensis - forensic facial reconstruction-crop.png",
+      ),
+      alt: "Forensic facial reconstruction of Homo heidelbergensis",
+      width: 207,
+      height: 238,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoHeidelbergensis"],
   },
   {
@@ -292,6 +343,15 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(129, 107, 145)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 78,
+    image: {
+      src: commonsTooltipImage(
+        "Reconstruction of Neanderthal at the SUMPHG.jpg",
+      ),
+      alt: "Reconstruction of a Neanderthal",
+      width: 1920,
+      height: 2560,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoNeanderthalensis"],
   },
   {
@@ -308,6 +368,13 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(115, 125, 109)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 77,
+    image: {
+      src: commonsTooltipImage("Homo naledi facial reconstruction.jpg"),
+      alt: "Facial reconstruction of Homo naledi",
+      width: 2632,
+      height: 2632,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoNaledi"],
   },
   {
@@ -323,6 +390,15 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(98, 121, 86)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 76,
+    image: {
+      src: commonsTooltipImage(
+        "Homo sapiens sapiens (Fundort Jebel Irhoud Marokko).jpg",
+      ),
+      alt: "Life reconstruction of an early Homo sapiens from Jebel Irhoud",
+      width: 2456,
+      height: 3680,
+      credit: "Wikimedia Commons",
+    },
     autoToggleRule: {
       kind: "coverage-after-year",
       thresholdYear: bce(10_000),
@@ -345,6 +421,13 @@ export const HUMAN_EVOLUTION_OVERLAYS: TimelineOverlayBand[] = [
     color: "rgb(116, 122, 157)",
     minZoom: HUMAN_EVOLUTION_MIN_ZOOM,
     priority: 75,
+    image: {
+      src: commonsTooltipImage("Homo floresiensis v 2-0.jpg"),
+      alt: "Forensic facial reconstruction of Homo floresiensis",
+      width: 2500,
+      height: 2500,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["smithsonianHomoFloresiensis"],
   },
 ];
