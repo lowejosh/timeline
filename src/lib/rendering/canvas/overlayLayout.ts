@@ -108,6 +108,7 @@ export function getTimelineLayout(
   options?: {
     reserveAxisDateRow?: boolean;
     overviewReservedHeight?: number;
+    expandedExtraHeight?: number;
   },
 ): TimelineCanvasLayout {
   const reserveAxisDateRow = options?.reserveAxisDateRow ?? true;
@@ -116,10 +117,12 @@ export function getTimelineLayout(
     0,
   );
   const effectiveHeight = Math.max(height - overviewReservedHeight, 0);
+  const expandedExtraHeight = options?.expandedExtraHeight ?? 0;
   const overlayHeight =
     overlayLaneCount > 0
       ? overlayLaneCount * OVERLAY_LANE_HEIGHT +
-        Math.max(overlayLaneCount - 1, 0) * OVERLAY_LANE_GAP
+        Math.max(overlayLaneCount - 1, 0) * OVERLAY_LANE_GAP +
+        expandedExtraHeight
       : 0;
   const compactMarkerStack = effectiveHeight <= COMPACT_MARKER_STACK_MAX_HEIGHT;
   const roomyBottomPadding = Math.round(

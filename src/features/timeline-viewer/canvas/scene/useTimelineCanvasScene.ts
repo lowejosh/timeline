@@ -9,7 +9,11 @@ import {
 import { getVisibleTimelineMarkers } from "@/lib/rendering/queries/markers";
 import { resolveTimelineOverlayTracks } from "@/lib/rendering/overlayTracks";
 import { resolveAxisTickRenderStates } from "@/lib/rendering/axisTickStates";
-import { getTimelineLayout } from "@/lib/rendering/canvas/overlayLayout";
+import {
+  getExpandedOverlayPanelHeight,
+  getTimelineLayout,
+  resolveExpandedOverlayDetails,
+} from "@/lib/rendering/canvas/overlayLayout";
 import { AXIS_TICK_OVERSCAN_PX } from "@/lib/rendering/canvas/constants";
 import {
   EARLY_UNIVERSE_END_YEAR,
@@ -35,6 +39,7 @@ import type {
 
 type UseTimelineCanvasSceneArgs = {
   enabledGroupIds: ReadonlySet<string>;
+  expandedOverlayIds: readonly string[];
   height: number;
   markers: TimelineMarker[];
   onOverlayScroll: (eventName: string) => void;
@@ -48,6 +53,7 @@ type UseTimelineCanvasSceneArgs = {
 
 export function useTimelineCanvasScene({
   enabledGroupIds,
+  expandedOverlayIds,
   height,
   markers,
   onOverlayScroll,
@@ -147,13 +153,25 @@ export function useTimelineCanvasScene({
     [enabledGroupIds, overlayBands, pad, viewport, width],
   );
   const overlayLaneCount = resolvedOverlayBands[0]?.laneCount ?? 0;
+  const expandedOverlayExtraHeight = useMemo(() => {
+    if (expandedOverlayIds.length === 0) return 0;
+    return resolveExpandedOverlayDetails(
+      expandedOverlayIds,
+      resolvedOverlayBands,
+      viewport,
+      width,
+      pad,
+    ).reduce((total, detail) => total + getExpandedOverlayPanelHeight(detail), 0);
+  }, [expandedOverlayIds, resolvedOverlayBands, viewport, width, pad]);
   const overlayInteractionLayout = useMemo(
     () =>
       getTimelineLayout(height, overlayLaneCount, overlayScrollOffset, {
         reserveAxisDateRow,
         overviewReservedHeight,
+        expandedExtraHeight: expandedOverlayExtraHeight,
       }),
     [
+      expandedOverlayExtraHeight,
       height,
       overlayLaneCount,
       overlayScrollOffset,
@@ -167,8 +185,15 @@ export function useTimelineCanvasScene({
       getTimelineLayout(height, overlayLaneCount, requestedOffset, {
         reserveAxisDateRow,
         overviewReservedHeight,
+        expandedExtraHeight: expandedOverlayExtraHeight,
       }).overlayScrollOffset,
-    [height, overlayLaneCount, overviewReservedHeight, reserveAxisDateRow],
+    [
+      expandedOverlayExtraHeight,
+      height,
+      overlayLaneCount,
+      overviewReservedHeight,
+      reserveAxisDateRow,
+    ],
   );
 
   const adjustOverlayScrollOffset = useCallback(

@@ -61,10 +61,11 @@ export function PwaInstallPrompt() {
             className="m-0 font-display text-[1rem] font-semibold leading-tight text-foreground"
             id="pwa-install-title"
           >
-            Add Timeline to Home Screen
+            Add to Home Screen
           </h2>
           <p className="m-0 text-[0.78rem] font-medium leading-snug text-muted-foreground">
-            It opens cleaner as an app, without browser bars around the timeline.
+            Removes the annoying browser UI. Looks better (especially in
+            landscape).
           </p>
         </div>
       </div>

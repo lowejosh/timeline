@@ -197,6 +197,7 @@ export function TimelineCanvas({
     visibleMarkers,
   } = useTimelineCanvasScene({
     enabledGroupIds,
+    expandedOverlayIds,
     height,
     markers,
     onOverlayScroll: recordVerboseInteractionEvent,
