@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type RefObject } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 
 import type { RenderedTooltipState } from "@/lib/rendering/canvas/tooltip";
 import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
@@ -179,10 +179,12 @@ function useDelayedTooltipImage({
 
 function getTooltipStyle({
   height,
+  measuredHeight,
   renderedTooltip,
   width,
 }: {
   height: number;
+  measuredHeight: number;
   renderedTooltip: RenderedTooltipState;
   width: number;
 }): CSSProperties {
@@ -204,14 +206,32 @@ function getTooltipStyle({
       : displayedTooltip.anchorX > centeredMaxX
         ? "right"
         : "center";
-  const shouldPlaceBelow =
-    displayedTooltip.anchorY < safeViewportInsets.top + 96 ||
-    (displayedTooltip.placement === "below" &&
-      displayedTooltip.anchorY <= height - safeViewportInsets.bottom - 120);
+  const anchorY = displayedTooltip.anchorY;
+  const availableAbove = anchorY - safeViewportInsets.top - TOOLTIP_OFFSET;
+  const availableBelow =
+    height - safeViewportInsets.bottom - anchorY - TOOLTIP_OFFSET;
+  const preferBelow = displayedTooltip.placement === "below";
+  // When height is known, use exact fit check; otherwise fall back to a heuristic
+  const fitsAbove = measuredHeight > 0 ? availableAbove >= measuredHeight : availableAbove >= 80;
+  const fitsBelow = measuredHeight > 0 ? availableBelow >= measuredHeight : availableBelow >= 80;
+  const shouldPlaceBelow = (preferBelow && fitsBelow) || !fitsAbove;
+
+  // Compute exact top so the tooltip never clips past a safe edge
+  let tooltipTop: number;
+  if (shouldPlaceBelow) {
+    tooltipTop = anchorY + TOOLTIP_OFFSET;
+    if (measuredHeight > 0) {
+      tooltipTop = Math.min(
+        tooltipTop,
+        height - safeViewportInsets.bottom - measuredHeight,
+      );
+    }
+  } else {
+    tooltipTop = anchorY - TOOLTIP_OFFSET - measuredHeight;
+    tooltipTop = Math.max(tooltipTop, safeViewportInsets.top);
+  }
+
   const translateX = horizontalPlacement === "center" ? "-50%" : "0%";
-  const translateY = shouldPlaceBelow
-    ? `${TOOLTIP_OFFSET}px`
-    : `calc(-100% - ${TOOLTIP_OFFSET}px)`;
   const motionOffset = shouldPlaceBelow ? "-4px" : "4px";
   const isTransitioning = renderedTooltip.phase !== "present";
 
@@ -224,15 +244,12 @@ function getTooltipStyle({
               ? displayedTooltip.anchorX
               : safeViewportInsets.left + tooltipHorizontalPadding,
         }),
-    top: Math.min(
-      Math.max(displayedTooltip.anchorY, safeViewportInsets.top + 6),
-      height - safeViewportInsets.bottom - 6,
-    ),
+    top: tooltipTop,
     width: `${tooltipWidth}px`,
     maxWidth: `${tooltipWidth}px`,
     transform: isTransitioning
-      ? `translate(${translateX}, calc(${translateY} + ${motionOffset})) scale(0.965)`
-      : `translate(${translateX}, ${translateY}) scale(1)`,
+      ? `translate(${translateX}, ${motionOffset}) scale(0.965)`
+      : `translate(${translateX}, 0px) scale(1)`,
     transformOrigin: shouldPlaceBelow ? "top center" : "bottom center",
   };
 }
@@ -245,6 +262,19 @@ export function TimelineTooltip({
 }: TimelineTooltipProps) {
   const tooltip = renderedTooltip.tooltipState.tooltip;
   const tooltipImage = tooltip.image;
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [measuredHeight, setMeasuredHeight] = useState(0);
+
+  useEffect(() => {
+    const el = tooltipRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      setMeasuredHeight(el.offsetHeight);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const {
     markErrored,
     markLoaded,
@@ -258,6 +288,7 @@ export function TimelineTooltip({
 
   return (
     <div
+      ref={tooltipRef}
       className={cn(
         "absolute z-[2] rounded-lg border border-border bg-glass p-3 text-foreground shadow-glass backdrop-blur-md transition-[opacity,transform] duration-200 ease-out",
         "pointer-events-none",
@@ -266,7 +297,7 @@ export function TimelineTooltip({
           : "opacity-0 will-change-[transform,opacity]",
       )}
       data-phase={renderedTooltip.phase}
-      style={getTooltipStyle({ height, renderedTooltip, width })}
+      style={getTooltipStyle({ height, measuredHeight, renderedTooltip, width })}
     >
       <div className="flex items-start gap-2">
         <OverlayGroupIconSvg
@@ -292,7 +323,10 @@ export function TimelineTooltip({
       ) : null}
       {tooltipImage ? (
         <figure className="mt-2">
-          <div className="relative aspect-video overflow-hidden rounded-md border border-border/60 bg-surface/45">
+          <div
+            className="relative overflow-hidden rounded-md border border-border/60 bg-surface/45"
+            style={{ height: "clamp(72px, 35svh, 157px)" }}
+          >
             {showSkeleton ? (
               <div
                 aria-hidden="true"

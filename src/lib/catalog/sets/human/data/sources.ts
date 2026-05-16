@@ -1598,8 +1598,7 @@ export const HUMAN_SOURCES = {
     shortTitle: "WHE: Phoenicia",
     title: "Phoenicia",
     organization: "World History Encyclopedia",
-    citation:
-      'Mark, Joshua J. "Phoenicia." World History Encyclopedia.',
+    citation: 'Mark, Joshua J. "Phoenicia." World History Encyclopedia.',
     url: "https://www.worldhistory.org/phoenicia/",
   },
   worldHistoryPtolemaicDynasty: {
