@@ -61,6 +61,7 @@ const CONTEXT_BAND_LABEL_SHOW_EXIT_SLACK = -2;
 const CONTEXT_BAND_LABEL_FULL_ENTER_SLACK = 10;
 const CONTEXT_BAND_LABEL_FULL_EXIT_SLACK = 2;
 const CONTEXT_BAND_LABEL_SWAP_POINT = 0.48;
+const MIN_VISIBLE_BAND_WIDTH_PX = 0;
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));
@@ -490,7 +491,7 @@ export function resolveContextBandRenderState({
 
   const pixelRatio = Math.max(devicePixelRatio, 1);
   const pixelStep = 1 / pixelRatio;
-  const effectiveMinVisibleWidth = minVisibleWidth ?? pixelStep * 0.5;
+  const effectiveMinVisibleWidth = minVisibleWidth ?? MIN_VISIBLE_BAND_WIDTH_PX;
   const effectiveMinRenderWidth = minRenderWidth ?? pixelStep;
 
   const clippedLeft = Math.max(x0, minX);

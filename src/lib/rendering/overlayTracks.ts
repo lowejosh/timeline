@@ -26,7 +26,7 @@ export type ResolvedTimelineOverlayBand = {
   isHairline: boolean;
 };
 
-const OVERLAY_MIN_VISIBLE_WIDTH_DEVICE_PX = 0.5;
+const OVERLAY_MIN_VISIBLE_WIDTH_PX = 0;
 const ALL_GROUPS_CACHE_KEY = "__all__";
 
 type CachedLaneAssignment = {
@@ -88,7 +88,7 @@ function resolveOverlayRenderGeometry(
 ) {
   const visibleWidth = Math.max(clippedX1 - clippedX0, 0);
   const pixelRatio = Math.max(devicePixelRatio, 1);
-  const minVisibleWidth = OVERLAY_MIN_VISIBLE_WIDTH_DEVICE_PX / pixelRatio;
+  const minVisibleWidth = OVERLAY_MIN_VISIBLE_WIDTH_PX;
   const minRenderWidth = 1 / pixelRatio;
 
   if (visibleWidth < minVisibleWidth) {
@@ -152,8 +152,8 @@ export function resolveTimelineOverlayTracks(
       continue;
     }
 
-    // minZoom is intentionally NOT checked here: bands only disappear when they
-    // are genuinely sub-pixel on screen (handled by resolveOverlayRenderGeometry).
+    // minZoom is intentionally NOT checked here: sub-pixel bands stay as
+    // one-device-pixel hairlines with opacity matched to their actual width.
 
     const x0 = pad + worldToScreen(band.startYear, viewport, innerWidth);
     const x1 = pad + worldToScreen(band.endYear, viewport, innerWidth);

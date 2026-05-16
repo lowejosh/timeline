@@ -75,10 +75,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
       .map((era) => era.name)
       .join(" • ");
     const trailText = trailLabel ? ` • ${trailLabel}` : "";
-    const breadcrumbFont =
-      breadcrumbChain.length > 1
-        ? `600 14px ${fontSans}`
-        : `500 13px ${fontSans}`;
+    const breadcrumbFont = `500 12px ${fontSans}`;
 
     context.save();
     context.font = `600 9px ${fontSans}`;
