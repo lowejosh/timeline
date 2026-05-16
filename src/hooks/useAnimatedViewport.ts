@@ -191,6 +191,27 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
     [startRaf, viewport.scaleMode, width],
   );
 
+  const animateToViewport = useCallback(
+    (target: TimelineViewport) => {
+      const normalizedTarget = normalizeViewport(target, Math.max(width, 1));
+
+      setIsAnimating(true);
+      setViewport((current) => {
+        animationRef.current = {
+          centerYear: normalizedTarget.centerYear,
+          zoom: normalizedTarget.zoom,
+          scaleMode: normalizedTarget.scaleMode,
+          startTime: performance.now(),
+          duration: ANIMATION_DURATION,
+          from: { ...current },
+        };
+        startRaf();
+        return current;
+      });
+    },
+    [startRaf, width],
+  );
+
   const animateZoom = useCallback(
     (zoomDelta: number, anchorX: number) => {
       cancelTransientMotion();
@@ -252,6 +273,7 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
     updateViewport,
     updateViewportDirect,
     animateToRange,
+    animateToViewport,
     animateZoom,
     recordDragSample,
     releaseMomentum,

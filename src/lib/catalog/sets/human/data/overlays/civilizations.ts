@@ -86,6 +86,50 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     sourceIds: ["metUrZiggurat", "metIsinLarsaOldBabylonian"],
   },
   {
+    id: "isin-larsa-period",
+    label: "Isin-Larsa period",
+    shortLabel: "Isin-Larsa",
+    description:
+      "Fragmented era following Ur III's collapse, when rival city-states, chiefly Isin and Larsa, competed for supremacy over southern Mesopotamia before Hammurabi's Babylon absorbed them.",
+    startYear: bce(2_004),
+    endYear: bce(1_763),
+    regionalScopeLabel: "Southern Mesopotamia",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(176, 138, 96)",
+    subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Mésopotamie_Isin-Larsa.svg"),
+      alt: "Map of the Isin-Larsa period city-states in southern Mesopotamia",
+      width: 404,
+      height: 595,
+      credit: "Wikimedia Commons",
+    },
+    sourceIds: ["metIsinLarsaOldBabylonian"],
+  },
+  {
+    id: "old-assyrian-period",
+    label: "Old Assyrian period",
+    shortLabel: "Old Assyria",
+    description:
+      "Assyrian city-state centered on Ashur that built extensive trading colonies reaching into Anatolia, running merchant caravans to Karum Kanesh while the great polities of the south rose and fell around it.",
+    startYear: bce(2_025),
+    endYear: bce(1_365),
+    regionalScopeLabel: "Northern Mesopotamia",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(162, 138, 160)",
+    subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Ancient_Near_East_2000BC.svg"),
+      alt: "Map of the ancient Near East c. 2000 BCE, showing Assyria and surrounding states",
+      width: 800,
+      height: 575,
+      credit: "Wikimedia Commons",
+    },
+    sourceIds: ["oldAssyrianEmpireWikipedia"],
+  },
+  {
     id: "old-babylonian-empire",
     label: "Old Babylonian period",
     shortLabel: "Old Babylonian",
@@ -507,6 +551,53 @@ const EGYPT_SUB_BANDS: TimelineOverlayBand[] = [
   },
 ];
 
+const CANAAN_PHOENICIA_SUB_BANDS: TimelineOverlayBand[] = [
+  {
+    id: "bronze-age-canaan",
+    label: "Bronze Age Canaan",
+    shortLabel: "Canaan",
+    description:
+      "Network of Canaanite city-states along the Levantine coast and interior, trading with Egypt, Mesopotamia, and the Aegean from major centers including Ugarit, Byblos, and Hazor.",
+    startYear: bce(3_000),
+    endYear: bce(1_200),
+    regionalScopeLabel: "Levant",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(165, 98, 118)",
+    subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Canaanite_City_States_In_The_Bronze_Age.svg"),
+      alt: "Map of Canaanite city-states in the Bronze Age",
+      width: 269,
+      height: 600,
+      credit: "Wikimedia Commons",
+    },
+    sourceIds: ["britannicaCanaan"],
+  },
+  {
+    id: "phoenicia",
+    label: "Phoenicia",
+    shortLabel: "Phoenicia",
+    description:
+      "Canaanite coastal cities, chiefly Tyre, Sidon, and Byblos, who gave the ancient world its alphabet, planted colonies from Cyprus to Spain, and traded cedar and Tyrian purple across the Mediterranean.",
+    startYear: bce(1_200),
+    endYear: bce(332),
+    regionalScopeLabel: "Levant",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(140, 85, 142)",
+    subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Phoenicia map-en.svg"),
+      alt: "Map of Phoenicia and its major cities along the Levantine coast",
+      width: 610,
+      height: 405,
+      credit: "Wikimedia Commons",
+    },
+    sourceIds: ["worldHistoryPhoenicia"],
+  },
+];
+
 export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
   {
     id: "mesopotamia",
@@ -670,6 +761,23 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
       credit: "Wikimedia Commons",
     },
     sourceIds: ["unescoMycenaeTiryns"],
+  },
+  {
+    id: "canaan-phoenicia",
+    label: "Canaan and Phoenicia",
+    shortLabel: "Canaan / Phoenicia",
+    description:
+      "Levantine coastal civilization whose Bronze Age city-states gave way to the Phoenician maritime world, source of the alphabet and one of antiquity's great seafaring cultures.",
+    startYear: bce(3_000),
+    endYear: bce(332),
+    regionalScopeLabel: "Levant",
+    approximateStart: true,
+    color: "rgb(148, 92, 130)",
+    minZoom: 0,
+    priority: 91,
+    subGroup: "near-east",
+    children: CANAAN_PHOENICIA_SUB_BANDS,
+    sourceIds: ["britannicaCanaan", "worldHistoryPhoenicia"],
   },
   {
     id: "olmec-civilization",

@@ -251,7 +251,7 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     regionalScopeLabel: "Eastern Mediterranean",
     approximate: true,
     minZoom: 18,
-    priority: 78,
+    priority: 92,
     sourceIds: ["britannicaBronzeAge", "britannicaAncientGreece"],
   },
   {

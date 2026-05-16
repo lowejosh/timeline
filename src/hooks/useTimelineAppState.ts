@@ -67,7 +67,9 @@ import {
 import {
   getVisibleRange,
   getHomeViewport,
+  getViewportForRange,
   HOME_RANGE,
+  normalizeViewport,
   panByPixels,
   TIMELINE_MAX_YEAR,
   TIMELINE_MIN_YEAR,
@@ -91,6 +93,121 @@ type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
 
 const HUMAN_EVOLUTION_GROUP_ID =
   TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
+const SEARCH_MARKER_VISIBILITY_ZOOM_OFFSET = 4;
+const SEARCH_MAX_FOCUS_ZOOM = 30;
+const SEARCH_POINT_MIN_FOCUS_SPAN_YEARS = 120;
+const SEARCH_DEEP_TIME_CONTEXT_FACTOR = 0.04;
+
+function getSearchMarkerFocusSpan(year: number) {
+  const yearsFromPresent = Math.abs(TIMELINE_MAX_YEAR - year);
+
+  if (yearsFromPresent >= 1_000_000_000) {
+    return Math.max(
+      100_000_000,
+      yearsFromPresent * SEARCH_DEEP_TIME_CONTEXT_FACTOR,
+    );
+  }
+
+  if (yearsFromPresent >= 100_000_000) {
+    return Math.max(
+      10_000_000,
+      yearsFromPresent * SEARCH_DEEP_TIME_CONTEXT_FACTOR,
+    );
+  }
+
+  if (yearsFromPresent >= 1_000_000) {
+    return Math.max(
+      100_000,
+      yearsFromPresent * SEARCH_DEEP_TIME_CONTEXT_FACTOR,
+    );
+  }
+
+  if (yearsFromPresent >= 100_000) {
+    return Math.max(
+      10_000,
+      yearsFromPresent * SEARCH_DEEP_TIME_CONTEXT_FACTOR,
+    );
+  }
+
+  if (yearsFromPresent >= 10_000) {
+    return Math.max(1_000, yearsFromPresent * 0.08);
+  }
+
+  if (yearsFromPresent >= 500) {
+    return 250;
+  }
+
+  return SEARCH_POINT_MIN_FOCUS_SPAN_YEARS;
+}
+
+function getSearchResultFocusRange(result: TimelineSearchResult) {
+  if (Math.abs(result.startYear - result.endYear) >= 1e-9) {
+    return {
+      startYear: result.startYear,
+      endYear: result.endYear,
+    };
+  }
+
+  const markerFocusSpan = getSearchMarkerFocusSpan(result.startYear);
+
+  return {
+    startYear: result.startYear - markerFocusSpan / 2,
+    endYear: result.endYear + markerFocusSpan / 2,
+  };
+}
+
+function getSearchResultViewport(
+  result: TimelineSearchResult,
+  current: TimelineViewport,
+  width: number,
+) {
+  const focusRange = getSearchResultFocusRange(result);
+  const fitViewport = getViewportForRange(
+    focusRange.startYear,
+    focusRange.endYear,
+    width,
+    undefined,
+    current.scaleMode,
+  );
+  const visibilityZoom = result.minZoom ?? 0;
+  const maxFocusZoom = Math.min(
+    SEARCH_MAX_FOCUS_ZOOM,
+    result.maxZoom ?? Infinity,
+  );
+  let targetZoom: number;
+
+  if (result.kind === "marker") {
+    const requiredZoom = Math.min(
+      maxFocusZoom,
+      visibilityZoom + SEARCH_MARKER_VISIBILITY_ZOOM_OFFSET,
+    );
+    const desiredZoom = Math.max(
+      requiredZoom,
+      Math.min(fitViewport.zoom, maxFocusZoom),
+    );
+
+    targetZoom = desiredZoom;
+  } else if (current.zoom > fitViewport.zoom) {
+    targetZoom = fitViewport.zoom;
+  } else {
+    const requiredZoom = Math.min(maxFocusZoom, visibilityZoom);
+    const desiredZoom = Math.max(
+      requiredZoom,
+      Math.min(fitViewport.zoom, maxFocusZoom),
+    );
+
+    targetZoom = desiredZoom;
+  }
+
+  return normalizeViewport(
+    {
+      centerYear: fitViewport.centerYear,
+      zoom: targetZoom,
+      scaleMode: current.scaleMode,
+    },
+    width,
+  );
+}
 
 function getDefaultGroupIdsForSet(setId: TimelineSetId): string[] {
   const set = TIMELINE_SETS_BY_ID[setId];
@@ -985,16 +1102,13 @@ export function useTimelineAppState() {
       setOverlayVisibilityTransitionSeed((current) => current + 1);
       setActiveEraId(prioritizedRootEra.id);
 
-      if (Math.abs(result.startYear - result.endYear) < 1e-9) {
-        const markerFocusSpan = Math.max(10, Math.abs(result.startYear) * 2e-6);
-
-        animated.animateToRange(
-          result.startYear - markerFocusSpan / 2,
-          result.endYear + markerFocusSpan / 2,
-        );
-      } else {
-        animated.animateToRange(result.startYear, result.endYear);
-      }
+      animated.animateToViewport(
+        getSearchResultViewport(
+          result,
+          animated.viewport,
+          viewportWidthRef.current,
+        ),
+      );
 
       scheduleAutoTransitionCheck();
     },

@@ -986,6 +986,14 @@ export const HUMAN_SOURCES = {
       'Wikipedia contributors, "Nebra sky disc." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Nebra_sky_disc",
   },
+  oldAssyrianEmpireWikipedia: {
+    shortTitle: "Wikipedia: Old Assyrian Empire",
+    title: "Old Assyrian Empire",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Old Assyrian Empire." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Old_Assyrian_Empire",
+  },
   oldKingdomEgyptWikipedia: {
     shortTitle: "Wikipedia: Old Kingdom of Egypt",
     title: "Old Kingdom of Egypt",
@@ -1563,6 +1571,13 @@ export const HUMAN_SOURCES = {
       'Mark, Joshua J. "New Kingdom of Egypt." World History Encyclopedia.',
     url: "https://www.worldhistory.org/New_Kingdom_of_Egypt/",
   },
+  britannicaCanaan: {
+    shortTitle: "Britannica: Canaan",
+    title: "Canaan",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Canaan."',
+    url: "https://www.britannica.com/place/Canaan-historical-region-Middle-East",
+  },
   worldHistoryGreatPyramidGiza: {
     shortTitle: "WHE: Great Pyramid",
     title: "Great Pyramid of Giza",
@@ -1578,6 +1593,14 @@ export const HUMAN_SOURCES = {
     citation:
       'Mark, Joshua J. "Neo-Assyrian Empire." World History Encyclopedia.',
     url: "https://www.worldhistory.org/Neo-Assyrian_Empire/",
+  },
+  worldHistoryPhoenicia: {
+    shortTitle: "WHE: Phoenicia",
+    title: "Phoenicia",
+    organization: "World History Encyclopedia",
+    citation:
+      'Mark, Joshua J. "Phoenicia." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/phoenicia/",
   },
   worldHistoryPtolemaicDynasty: {
     shortTitle: "WHE: Ptolemaic Dynasty",

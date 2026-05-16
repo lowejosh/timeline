@@ -25,6 +25,8 @@ export type TimelineSearchItem = {
   setLabel?: string;
   startYear: number;
   endYear: number;
+  minZoom?: number;
+  maxZoom?: number;
   rangeLabel: string;
   searchText: string;
 };
@@ -100,6 +102,8 @@ function createMarkerSearchItem(marker: TimelineMarker): TimelineSearchItem {
     setLabel,
     startYear: marker.year,
     endYear: marker.year,
+    minZoom: marker.minZoom,
+    maxZoom: marker.maxZoom,
     rangeLabel: marker.dateLabel ?? formatSearchRange(marker.year, marker.year),
   };
 
@@ -126,6 +130,8 @@ function createOverlaySearchItem(
     setLabel,
     startYear: overlay.startYear,
     endYear: overlay.endYear,
+    minZoom: overlay.minZoom,
+    maxZoom: overlay.maxZoom,
     rangeLabel: formatSearchRange(overlay.startYear, overlay.endYear),
   };
 
@@ -222,4 +228,3 @@ export function searchTimelineIndex(
     )
     .slice(0, limit);
 }
-
