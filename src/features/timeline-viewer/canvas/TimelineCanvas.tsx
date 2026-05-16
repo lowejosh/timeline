@@ -1101,6 +1101,10 @@ export function TimelineCanvas({
     if (!isMapPreviewEnabled || width <= 0) return null;
     return mapPreviewOverrideX ?? width / 2;
   }, [isMapPreviewEnabled, mapPreviewOverrideX, width]);
+  const mapPreviewLineBottom = Math.max(
+    height - overlayInteractionLayout.axisY,
+    0,
+  );
 
   return (
     <div
@@ -1166,7 +1170,7 @@ export function TimelineCanvas({
           style={{
             left: mapPreviewDashedLineX - 6,
             width: 13,
-            bottom: overviewReservedHeight,
+            bottom: mapPreviewLineBottom,
           }}
           onPointerDown={(event) => {
             event.preventDefault();
@@ -1215,7 +1219,7 @@ export function TimelineCanvas({
         <div
           aria-hidden="true"
           className="pointer-events-none absolute top-16 z-[1]"
-          style={{ left: mapPreviewGuide.x, bottom: overviewReservedHeight }}
+          style={{ left: mapPreviewGuide.x, bottom: mapPreviewLineBottom }}
         >
           <div className="absolute inset-y-0 left-0 border-l border-muted-foreground/45" />
           {mapPreviewGuide.label ? (
