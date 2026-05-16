@@ -16,16 +16,20 @@ const APP_VERSION = "v0.2.1";
 type TimelineSettingsProps = {
   className?: string;
   isCosmicCalendarMode: boolean;
+  isMapPreviewEnabled: boolean;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onToggleMapPreview: () => void;
   onToggleCosmicCalendarMode: () => void;
 };
 
 export function TimelineSettings({
   className,
   isCosmicCalendarMode,
+  isMapPreviewEnabled,
   isOpen: isOpenProp,
   onOpenChange: onOpenChangeProp,
+  onToggleMapPreview,
   onToggleCosmicCalendarMode,
 }: TimelineSettingsProps) {
   const [isOpenLocal, setIsOpenLocal] = useState(false);
@@ -35,6 +39,8 @@ export function TimelineSettings({
   const titleId = useId();
   const cosmicCalendarLabelId = useId();
   const cosmicCalendarDescriptionId = useId();
+  const mapPreviewLabelId = useId();
+  const mapPreviewDescriptionId = useId();
 
   return (
     <Popover onOpenChange={setIsOpen} open={isOpen}>
@@ -87,6 +93,29 @@ export function TimelineSettings({
             aria-labelledby={cosmicCalendarLabelId}
             checked={isCosmicCalendarMode}
             onClick={onToggleCosmicCalendarMode}
+          />
+        </div>
+
+        <div className="flex items-center justify-between gap-3 py-1">
+          <div className="flex flex-col gap-1 font-sans text-[0.78rem] leading-snug text-foreground">
+            <span id={mapPreviewLabelId} className="flex items-center gap-1.5">
+              Historical maps
+              <span className="rounded px-1 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wide bg-muted text-muted-foreground leading-none">
+                Experimental
+              </span>
+            </span>
+            <span
+              className="font-sans text-[0.68rem] leading-snug text-muted-foreground"
+              id={mapPreviewDescriptionId}
+            >
+              Show a movable map for historical borders and continental drift.
+            </span>
+          </div>
+          <Switch
+            aria-describedby={mapPreviewDescriptionId}
+            aria-labelledby={mapPreviewLabelId}
+            checked={isMapPreviewEnabled}
+            onClick={onToggleMapPreview}
           />
         </div>
 

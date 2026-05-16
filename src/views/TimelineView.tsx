@@ -35,11 +35,13 @@ export function TimelineView({ app, layout }: TimelineViewProps) {
               height={app.mainCanvasHeight}
               isAnimating={app.animated.isAnimating}
               isCosmicCalendarMode={app.isCosmicCalendarMode}
+              isMapPreviewEnabled={app.isMapPreviewEnabled}
               markers={app.setFilteredMarkers}
               onAnimateToRange={app.animated.animateToRange}
               onAnimateZoom={app.handleZoom}
               onContinuousViewportChange={app.handleContinuousViewportChange}
               onDrillIntoEra={app.handleDrillIntoEra}
+              onMapPreviewClose={() => app.setIsMapPreviewEnabled(false)}
               onNavigateUp={app.handleNavigateUp}
               onRecordDragSample={app.animated.recordDragSample}
               onReleaseMomentum={app.animated.releaseMomentum}

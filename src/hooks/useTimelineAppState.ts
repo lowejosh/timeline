@@ -19,6 +19,7 @@ import {
   readStoredEnabledGroupIds,
   readStoredExpandedSetIds,
   readStoredGroupToggleMode,
+  readStoredMapPreviewEnabled,
   readStoredSidebarOpen,
   readStoredTimelineSetOrder,
   readStoredVisibleSetIds,
@@ -26,6 +27,7 @@ import {
   writeStoredEnabledGroupIds,
   writeStoredExpandedSetIds,
   writeStoredGroupToggleMode,
+  writeStoredMapPreviewEnabled,
   writeStoredSidebarOpen,
   writeStoredTimelineSetOrder,
   writeStoredVisibleSetIds,
@@ -251,6 +253,9 @@ export function useTimelineAppState() {
     shouldStartWithSidebarOpen(),
   );
   const [isCosmicCalendarMode, setIsCosmicCalendarMode] = useState(false);
+  const [isMapPreviewEnabled, setIsMapPreviewEnabled] = useState(() =>
+    readStoredMapPreviewEnabled(),
+  );
   const [overlayVisibilityTransitionSeed, setOverlayVisibilityTransitionSeed] =
     useState(0);
   const [expandOverlayRequest, setExpandOverlayRequest] = useState<{
@@ -276,6 +281,9 @@ export function useTimelineAppState() {
   useEffect(() => {
     writeStoredVisibleSetIds(visibleSetIds);
   }, [visibleSetIds]);
+  useEffect(() => {
+    writeStoredMapPreviewEnabled(isMapPreviewEnabled);
+  }, [isMapPreviewEnabled]);
   const [orderedSetIds, setOrderedSetIds] = useState<TimelineSetId[]>(() =>
     readStoredTimelineSetOrder(),
   );
@@ -1266,6 +1274,8 @@ export function useTimelineAppState() {
     setIsSidebarOpen,
     isCosmicCalendarMode,
     setIsCosmicCalendarMode,
+    isMapPreviewEnabled,
+    setIsMapPreviewEnabled,
     sidebarTree,
     expandedSetIds,
     layerShortcuts,

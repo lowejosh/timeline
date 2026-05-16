@@ -25,6 +25,7 @@ const SET_ORDER_SCOPE = "timeline-sets:order";
 const GROUP_ENABLED_SCOPE = "timeline-groups:enabled";
 const GROUP_AUTO_TOGGLE_SCOPE = "timeline-groups:auto-toggle";
 const SIDEBAR_OPEN_UI_KEY = "sidebarOpen";
+const MAP_PREVIEW_ENABLED_UI_KEY = "mapPreviewEnabled";
 
 const LEGACY_STORAGE_KEYS = {
   enabledGroups: "timeline:enabled-group-ids:v1",
@@ -337,6 +338,23 @@ export function writeStoredSidebarOpen(value: boolean) {
   state.ui = {
     ...(state.ui ?? {}),
     [SIDEBAR_OPEN_UI_KEY]: value,
+  };
+
+  writeLayerStorageState(state);
+}
+
+export function readStoredMapPreviewEnabled(): boolean {
+  const value = readLayerStorageState().ui?.[MAP_PREVIEW_ENABLED_UI_KEY];
+
+  return typeof value === "boolean" ? value : false;
+}
+
+export function writeStoredMapPreviewEnabled(value: boolean) {
+  const state = readLayerStorageState();
+
+  state.ui = {
+    ...(state.ui ?? {}),
+    [MAP_PREVIEW_ENABLED_UI_KEY]: value,
   };
 
   writeLayerStorageState(state);

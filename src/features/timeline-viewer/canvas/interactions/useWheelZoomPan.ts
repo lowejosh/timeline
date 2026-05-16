@@ -68,6 +68,13 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
+function isInsideMapPreview(event: WheelEvent) {
+  return (
+    event.target instanceof Element &&
+    event.target.closest("[data-map-preview='true']") !== null
+  );
+}
+
 export function useWheelZoomPan({
   surfaceRef,
   pad,
@@ -364,6 +371,10 @@ export function useWheelZoomPan({
     }
 
     const handleNativeWheel = (event: globalThis.WheelEvent) => {
+      if (isInsideMapPreview(event)) {
+        return;
+      }
+
       handleWheel(event, surface);
     };
 

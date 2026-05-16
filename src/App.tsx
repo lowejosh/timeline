@@ -161,8 +161,12 @@ function App() {
             <TimelineSettings
               className="order-3"
               isCosmicCalendarMode={app.isCosmicCalendarMode}
+              isMapPreviewEnabled={app.isMapPreviewEnabled}
               isOpen={isSettingsOpen}
               onOpenChange={setIsSettingsOpen}
+              onToggleMapPreview={() => {
+                app.setIsMapPreviewEnabled((current) => !current);
+              }}
               onToggleCosmicCalendarMode={() => {
                 app.setIsCosmicCalendarMode((current) => !current);
               }}

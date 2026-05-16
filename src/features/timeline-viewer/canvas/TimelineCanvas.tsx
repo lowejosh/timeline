@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type PointerEvent,
@@ -20,10 +21,16 @@ import { useCanvasBackingStore } from "./platform/useCanvasBackingStore";
 import { useViewportInteractionState } from "./interactions/useViewportInteractionState";
 import { useEdgeRailInteraction } from "./interactions/useEdgeRailInteraction";
 import { TimelineTooltip } from "./ui/TimelineTooltip";
+import { HistoricalMapOverlay } from "@/features/map-preview/HistoricalMapOverlay";
+import {
+  getMapSliceLabelForPreviewYear,
+  getMapSliceYearForPreviewYear,
+} from "@/features/map-preview/mapSliceData";
 import { useWheelZoomPan } from "./interactions/useWheelZoomPan";
 import { useTouchGestures } from "./interactions/useTouchGestures";
 import { EdgeZoomZones } from "./ui/EdgeZoomZones";
 import { drawTimelineCanvasFrame } from "./rendering/drawTimelineCanvasFrame";
+import { publishMapPreviewYear } from "@/lib/maps/mapPreviewStore";
 import type {
   HoverRegion,
   OverlayInteractionRegion,
@@ -47,6 +54,7 @@ import {
 import {
   screenToWorld,
   panByPixels,
+  worldToScreen,
   zoomAtPosition,
 } from "@/lib/core/viewport";
 import {
@@ -92,6 +100,7 @@ export function TimelineCanvas({
   overlayVisibilityTransitionKey,
   parentEra,
   isCosmicCalendarMode,
+  isMapPreviewEnabled,
   isAnimating,
   onViewportChange,
   onContinuousViewportChange,
@@ -100,6 +109,7 @@ export function TimelineCanvas({
   onAnimateZoom,
   onAnimateToRange,
   onDrillIntoEra,
+  onMapPreviewClose,
   onNavigateUp,
   onRecordDragSample,
   onReleaseMomentum,
@@ -123,6 +133,7 @@ export function TimelineCanvas({
   const drawFrameRef = useRef(0);
   const interactiveChildErasRef = useRef<Era[]>([]);
   const dragStateRef = useRef<DragState | null>(null);
+  const mapLineDragRef = useRef<{ pointerId: number } | null>(null);
   const dualEdgeTouchZoomRef = useRef<DualEdgeTouchZoomState | null>(null);
   const pinchZoomRef = useRef<PinchZoomState | null>(null);
   const hoverRegionsRef = useRef<HoverRegion[]>([]);
@@ -155,6 +166,7 @@ export function TimelineCanvas({
   const [renderedTooltip, setRenderedTooltip] =
     useState<RenderedTooltipState | null>(null);
   const [expandedOverlayIds, setExpandedOverlayIds] = useState<string[]>([]);
+  const [mapPreviewOverrideX, setMapPreviewOverrideX] = useState<number | null>(null);
   const viewportRef = useRef(viewport);
   const reserveAxisDateRowRef = useRef(true);
   useEffect(() => {
@@ -176,6 +188,8 @@ export function TimelineCanvas({
       if (tooltipEnterFrameRef.current) {
         cancelAnimationFrame(tooltipEnterFrameRef.current);
       }
+
+      publishMapPreviewYear(null);
     };
   }, []);
   const recordVerboseInteractionEvent = useCallback((eventName: string) => {
@@ -510,6 +524,24 @@ export function TimelineCanvas({
   function resolveHoveredTooltip(x: number, y: number, pointerType: string) {
     return resolveTooltipAtPoint(x, y, { pointerType });
   }
+  const publishCurrentMapPreviewYear = useCallback(
+    () => {
+      if (!isMapPreviewEnabled) {
+        publishMapPreviewYear(null);
+        return;
+      }
+
+      const innerW = Math.max(width - pad * 2, 1);
+      const nextYear =
+        mapPreviewOverrideX !== null
+          ? screenToWorld(mapPreviewOverrideX - pad, viewport, innerW)
+          : viewport.centerYear;
+      const shouldShowMap = nextYear >= -400_000_000 && nextYear <= 2_100;
+
+      publishMapPreviewYear(shouldShowMap ? nextYear : null);
+    },
+    [isMapPreviewEnabled, mapPreviewOverrideX, pad, viewport, width],
+  );
   function resolveOverlayInteractionRegion(x: number, y: number) {
     const rolePriority = {
       child: 0,
@@ -759,6 +791,10 @@ export function TimelineCanvas({
     viewportRef,
     width,
   });
+
+  useEffect(() => {
+    publishCurrentMapPreviewYear();
+  }, [publishCurrentMapPreviewYear]);
 
   const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     event.preventDefault();
@@ -1034,6 +1070,39 @@ export function TimelineCanvas({
     }
   };
 
+  const mapPreviewGuide = useMemo(() => {
+    if (!isMapPreviewEnabled || width <= 0) {
+      return null;
+    }
+
+    const innerW = Math.max(width - pad * 2, 1);
+    const baseYear =
+      mapPreviewOverrideX !== null
+        ? screenToWorld(mapPreviewOverrideX - pad, viewport, innerW)
+        : viewport.centerYear;
+    const sliceYear = getMapSliceYearForPreviewYear(baseYear);
+
+    if (sliceYear === null) {
+      return null;
+    }
+
+    const x = pad + worldToScreen(sliceYear, viewport, innerW);
+
+    if (x < 0 || x > width) {
+      return null;
+    }
+
+    return {
+      label: getMapSliceLabelForPreviewYear(baseYear),
+      x,
+    };
+  }, [isMapPreviewEnabled, mapPreviewOverrideX, pad, viewport, width]);
+
+  const mapPreviewDashedLineX = useMemo(() => {
+    if (!isMapPreviewEnabled || width <= 0) return null;
+    return mapPreviewOverrideX ?? width / 2;
+  }, [isMapPreviewEnabled, mapPreviewOverrideX, width]);
+
   return (
     <div
       className="relative w-full h-full"
@@ -1091,6 +1160,68 @@ export function TimelineCanvas({
         ref={canvasRef}
         tabIndex={0}
       />
+      {mapPreviewDashedLineX !== null ? (
+        <div
+          aria-hidden="true"
+          className="absolute top-16 z-[2] touch-none cursor-ew-resize"
+          style={{ left: mapPreviewDashedLineX - 6, width: 13, bottom: overviewReservedHeight }}
+          onPointerDown={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.setPointerCapture(event.pointerId);
+            mapLineDragRef.current = { pointerId: event.pointerId };
+          }}
+          onPointerMove={(event) => {
+            if (mapLineDragRef.current?.pointerId !== event.pointerId) return;
+            event.preventDefault();
+            event.stopPropagation();
+            const rect = shellRef.current?.getBoundingClientRect();
+            if (!rect) return;
+            const screenX = Math.max(0, Math.min(width, event.clientX - rect.left));
+            setMapPreviewOverrideX(screenX);
+            const innerW = Math.max(width - pad * 2, 1);
+            const year = screenToWorld(screenX - pad, viewportRef.current, innerW);
+            publishMapPreviewYear(year);
+          }}
+          onPointerUp={(event) => {
+            event.stopPropagation();
+            if (mapLineDragRef.current?.pointerId === event.pointerId) {
+              mapLineDragRef.current = null;
+            }
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+              event.currentTarget.releasePointerCapture(event.pointerId);
+            }
+          }}
+          onPointerCancel={(event) => {
+            if (mapLineDragRef.current?.pointerId === event.pointerId) {
+              mapLineDragRef.current = null;
+            }
+          }}
+        >
+          <div className="pointer-events-none absolute inset-y-0 left-[6px] border-l border-dashed border-primary/55" />
+        </div>
+      ) : null}
+      {mapPreviewGuide ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-16 z-[1]"
+          style={{ left: mapPreviewGuide.x, bottom: overviewReservedHeight }}
+        >
+          <div className="absolute inset-y-0 left-0 border-l border-muted-foreground/45" />
+          {mapPreviewGuide.label ? (
+            <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[0.56rem] font-medium uppercase tracking-[0.1em] text-muted-foreground/70">
+              {mapPreviewGuide.label}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      {isMapPreviewEnabled ? (
+        <HistoricalMapOverlay
+          onClose={onMapPreviewClose}
+          stageHeight={height}
+          stageWidth={width}
+        />
+      ) : null}
       <EdgeZoomZones
         draggingSide={draggingEdgeZoomSide}
         glow={edgeZoomGlow}

@@ -24,6 +24,7 @@ export type TimelineCanvasProps = {
   overlayVisibilityTransitionKey: string;
   parentEra: Era | null;
   isCosmicCalendarMode: boolean;
+  isMapPreviewEnabled: boolean;
   isAnimating: boolean;
   expandOverlayRequest?: { overlayId: string; seq: number } | null;
   onViewportChange: (
@@ -37,6 +38,7 @@ export type TimelineCanvasProps = {
   onAnimateZoom: (zoomDelta: number, anchorX: number) => void;
   onAnimateToRange: (startYear: number, endYear: number) => void;
   onDrillIntoEra: (era: Era) => void;
+  onMapPreviewClose: () => void;
   onNavigateUp: () => void;
   onRecordDragSample: (dx: number) => void;
   onReleaseMomentum: () => void;
