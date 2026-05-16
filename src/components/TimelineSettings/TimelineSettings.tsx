@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 import { Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { TimelineFeedbackDialog } from "@/components/TimelineFeedbackDialog/TimelineFeedbackDialog";
 import {
   Popover,
   PopoverContent,
@@ -10,7 +11,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-const APP_VERSION = "v0.1.7";
+const APP_VERSION = "v0.2.1";
 
 type TimelineSettingsProps = {
   className?: string;
@@ -24,6 +25,7 @@ export function TimelineSettings({
   onToggleCosmicCalendarMode,
 }: TimelineSettingsProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const titleId = useId();
   const cosmicCalendarLabelId = useId();
   const cosmicCalendarDescriptionId = useId();
@@ -82,10 +84,30 @@ export function TimelineSettings({
           />
         </div>
 
-        <div className="mt-3 border-t border-border/60 pt-2 text-right font-mono text-[0.62rem] font-semibold leading-none text-muted-foreground/70">
+        <p className="mt-3 border-t border-border/60 pt-2.5 text-[0.66rem] leading-snug text-muted-foreground/70">
+          This is just a personal project, not a comprehensive view of history.
+          Fact-checked as best I could, but errors may exist.{" "}
+          <button
+            className="cursor-pointer underline underline-offset-2 transition-opacity hover:opacity-80"
+            onClick={() => {
+              setIsOpen(false);
+              setIsFeedbackOpen(true);
+            }}
+            type="button"
+          >
+            Let me know
+          </button>{" "}
+          if you spot a mistake or have a suggestion.
+        </p>
+
+        <div className="mt-2 text-right font-mono text-[0.62rem] font-semibold leading-none text-muted-foreground/70">
           {APP_VERSION}
         </div>
       </PopoverContent>
+      <TimelineFeedbackDialog
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+      />
     </Popover>
   );
 }
