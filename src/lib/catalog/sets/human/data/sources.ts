@@ -169,6 +169,13 @@ export const HUMAN_SOURCES = {
       'Encyclopaedia Britannica, "Anatolia: The Hittite empire, c. 1650–1180 BCE."',
     url: "https://www.britannica.com/place/Anatolia/The-Hittite-empire-c-1650-1180-bce",
   },
+  britannicaMitanni: {
+    shortTitle: "Britannica: Mitanni",
+    title: "Mitanni",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Mitanni."',
+    url: "https://www.britannica.com/place/Mitanni",
+  },
   britannicaIndusCivilization: {
     shortTitle: "Britannica: Indus civilization",
     title: "Indus civilization",
@@ -603,6 +610,14 @@ export const HUMAN_SOURCES = {
     citation:
       'Wikipedia contributors, "History of the Maya civilization." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/History_of_the_Maya_civilization",
+  },
+  historyOfElamWikipedia: {
+    shortTitle: "Wikipedia: Elam",
+    title: "Elam",
+    organization: "Wikimedia Foundation",
+    citation:
+      'Wikipedia contributors, "Elam." In Wikipedia, The Free Encyclopedia.',
+    url: "https://en.wikipedia.org/wiki/Elam",
   },
   historyOttomanEmpire: {
     shortTitle: "History: Ottoman Empire",

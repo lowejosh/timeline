@@ -11,7 +11,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-const APP_VERSION = "v0.2.1";
+const APP_VERSION = "v0.3.0";
 
 type TimelineSettingsProps = {
   className?: string;
@@ -121,7 +121,7 @@ export function TimelineSettings({
 
         <p className="mt-3 border-t border-border/60 pt-2.5 text-[0.66rem] leading-snug text-muted-foreground/70">
           This is just a personal project of mine, I am definitely not a
-          historian and this is not a comprehensive view of history.{" "}
+          historian.{" "}
           <button
             className="cursor-pointer underline underline-offset-2 transition-opacity hover:opacity-80"
             onClick={() => {

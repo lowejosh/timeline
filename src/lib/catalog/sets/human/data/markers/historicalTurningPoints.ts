@@ -56,14 +56,6 @@ const HIGGS_BOSON_ANNOUNCED_AT = createExactCalendarTimestamp({
   precision: "day",
 });
 
-const CHATGPT_INTRODUCED_AT = createExactCalendarTimestamp({
-  era: "ce",
-  year: 2022,
-  month: 11,
-  day: 30,
-  precision: "day",
-});
-
 const WORLD_WIDE_WEB_OPENED_AT = createExactCalendarTimestamp({
   era: "ce",
   year: 1993,
@@ -1014,17 +1006,18 @@ export const HISTORICAL_TURNING_POINT_MARKERS: TimelineMarker[] = [
     priority: 84,
     sourceIds: ["whoCovid19Pandemic"],
   },
-  {
-    id: "chatgpt-introduced",
-    label: "ChatGPT introduced",
-    shortLabel: "ChatGPT",
-    description:
-      "OpenAI released ChatGPT as a public research preview, helping push generative AI into everyday use.",
-    year: getTimelineYearFromExactTimestamp(CHATGPT_INTRODUCED_AT),
-    exactTime: CHATGPT_INTRODUCED_AT,
-    dateLabel: "Nov 30, 2022",
-    minZoom: 20,
-    priority: 82,
-    sourceIds: ["openAiIntroducingChatGpt"],
-  },
 ];
+
+// {
+//   id: "chatgpt-introduced",
+//   label: "ChatGPT introduced",
+//   shortLabel: "ChatGPT",
+//   description:
+//     "OpenAI released ChatGPT as a public research preview, helping push generative AI into everyday use.",
+//   year: getTimelineYearFromExactTimestamp(CHATGPT_INTRODUCED_AT),
+//   exactTime: CHATGPT_INTRODUCED_AT,
+//   dateLabel: "Nov 30, 2022",
+//   minZoom: 20,
+//   priority: 82,
+//   sourceIds: ["openAiIntroducingChatGpt"],
+// },

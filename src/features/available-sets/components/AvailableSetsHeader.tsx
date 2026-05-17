@@ -46,7 +46,7 @@ export function AvailableSetsHeader({
         variant="subtle"
       >
         <Plus className="size-3.5" />
-        <span>Create (Coming soon)</span>
+        <span>Create (Coming soon.. probably)</span>
       </Button>
     </div>
   );

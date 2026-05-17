@@ -674,6 +674,30 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     sourceIds: ["britannicaAncientEgypt"],
   },
   {
+    id: "elam",
+    label: "Elam",
+    shortLabel: "Elam",
+    description:
+      "Ancient civilization centered in the far west and southwest of modern-day Iran, with major centers including Susa and Anshan.",
+    startYear: bce(2_700),
+    endYear: bce(539),
+    regionalScopeLabel: "Southwestern Iran",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(142, 106, 132)",
+    minZoom: 0,
+    priority: 89,
+    subGroup: "iranian-world",
+    image: {
+      src: commonsTooltipImage("Elam Map-en.svg"),
+      alt: "Map of Elam in southwestern Iran",
+      width: 555,
+      height: 480,
+      credit: "Wikimedia Commons",
+    },
+    sourceIds: ["historyOfElamWikipedia"],
+  },
+  {
     id: "kingdom-of-kush",
     label: "Kingdom of Kush",
     shortLabel: "Kush",
@@ -688,6 +712,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 89,
     subGroup: "nile-valley",
+    image: {
+      src: commonsTooltipImage("Kush 5th be.png"),
+      alt: "Map of the Kingdom of Kush in the 5th century BCE",
+      width: 800,
+      height: 734,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["kingdomOfKushWikipedia"],
   },
   {
@@ -713,6 +744,30 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
       credit: "Wikimedia Commons",
     },
     sourceIds: ["britannicaHittiteEmpire"],
+  },
+  {
+    id: "mitanni",
+    label: "Mitanni",
+    shortLabel: "Mitanni",
+    description:
+      "Late Bronze Age empire centred in northern Mesopotamia, with its heartland in the Khabur River basin and influence stretching toward the Mediterranean.",
+    startYear: bce(1_500),
+    endYear: bce(1_360),
+    regionalScopeLabel: "Northern Mesopotamia and northern Syria",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(121, 114, 162)",
+    minZoom: 0,
+    priority: 88,
+    subGroup: "near-east",
+    image: {
+      src: commonsTooltipImage("Carte du Mitanni-en.svg"),
+      alt: "Map of Mitanni in northern Mesopotamia and northern Syria",
+      width: 490,
+      height: 357,
+      credit: "Wikimedia Commons",
+    },
+    sourceIds: ["britannicaMitanni"],
   },
   {
     id: "minoan-civilization",
@@ -995,6 +1050,13 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 77,
     subGroup: "east-africa",
+    image: {
+      src: commonsTooltipImage("Kingdom of Aksum Map.png"),
+      alt: "Map of the Kingdom of Aksum in the Horn of Africa and South Arabia",
+      width: 2000,
+      height: 1800,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["kingdomOfAksumWikipedia"],
   },
 ];
@@ -1207,7 +1269,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     description:
       "Dynasty that grew from an Anatolian frontier state into an empire spanning the Balkans, the eastern Mediterranean, and the Middle East.",
     startYear: ce(1299),
-    endYear: ce(1800),
+    endYear: ce(1922),
     regionalScopeLabel: "Eastern Mediterranean and Balkans",
     color: "rgb(111, 137, 92)",
     minZoom: POST_CLASSICAL_MIN_ZOOM,
@@ -1235,6 +1297,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 71,
     subGroup: "mesoamerica",
+    image: {
+      src: commonsTooltipImage("Aztec Empire under Montezuma II.png"),
+      alt: "Map of the Aztec Empire under Montezuma II",
+      width: 20000,
+      height: 13333,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyAztecs"],
   },
   {
@@ -1251,6 +1320,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 72,
     subGroup: "west-africa",
+    image: {
+      src: commonsTooltipImage("SONGHAI empire map.PNG"),
+      alt: "Map of the Songhai Empire in West Africa",
+      width: 1580,
+      height: 988,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["songhaiEmpireWikipedia"],
   },
   {
@@ -1266,6 +1342,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 70,
     subGroup: "andes",
+    image: {
+      src: commonsTooltipImage("Inca road system map-en.svg"),
+      alt: "Map of the Inca realm and its road system across the Andes",
+      width: 1188,
+      height: 1833,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["historyInca"],
   },
   {
@@ -1281,6 +1364,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 72,
     subGroup: "iranian-world",
+    image: {
+      src: commonsTooltipImage("Map of the Safavid Empire, circa 1630.png"),
+      alt: "Map of the Safavid Empire around 1630",
+      width: 3196,
+      height: 1840,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["safavidIranWikipedia"],
   },
   {
@@ -1296,6 +1386,13 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 72,
     subGroup: "south-asia",
+    image: {
+      src: commonsTooltipImage("Map of the Mughal Empire circa 1600.png"),
+      alt: "Map of the Mughal Empire around 1600",
+      width: 3196,
+      height: 1840,
+      credit: "Wikimedia Commons",
+    },
     sourceIds: ["mughalEmpireWikipedia"],
   },
 ];
