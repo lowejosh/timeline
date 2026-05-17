@@ -16,7 +16,7 @@ import {
   MAX_POINTS_PER_RING,
   MAX_RENDERED_SLICE_CACHE_SIZE,
 } from "./MapPreview.const";
-import { waitForMapIdle } from "./utils/MapPreview.utils";
+import { waitForMapIdle } from "./MapPreview.utils";
 import type {
   GeoJsonGeometry,
   GeoJsonPolygon,

@@ -19,7 +19,14 @@ import {
   MAP_WINDOW_MIN_HEIGHT,
 } from "./MapPreview.const";
 import { MapPreviewCanvas } from "./components/MapPreviewCanvas";
-import { clamp } from "./utils/MapPreview.utils";
+import {
+  clamp,
+  getDefaultMapWindowBounds,
+  normalizeMapWindowBounds,
+  readStoredMapWindowBounds,
+  resizeMapWindowBounds,
+  writeStoredMapWindowBounds,
+} from "./MapPreview.utils";
 import {
   getLoadingLabel,
   getMapSlice,
@@ -29,13 +36,6 @@ import {
   getSourceUrl,
   loadMapSlice,
 } from "./MapPreview.data";
-import {
-  getDefaultMapWindowBounds,
-  normalizeMapWindowBounds,
-  readStoredMapWindowBounds,
-  resizeMapWindowBounds,
-  writeStoredMapWindowBounds,
-} from "./utils/MapPreview.bounds";
 import type {
   HoveredMapFeature,
   MapWindowDragState,

@@ -1,7 +1,7 @@
 import {
   ensureWorldLandLoaded,
   getWorldLandPath2D,
-} from "../utils/MapPreview.worldLand";
+} from "../MapPreview.utils";
 import {
   memo,
   useCallback,
@@ -18,7 +18,7 @@ import {
   MAP_MIN_ZOOM,
   MAP_WIDTH,
 } from "../MapPreview.const";
-import { clamp, scheduleMapIdleTask } from "../utils/MapPreview.utils";
+import { clamp, scheduleMapIdleTask } from "../MapPreview.utils";
 import type {
   HoveredMapFeature,
   MapViewport,
