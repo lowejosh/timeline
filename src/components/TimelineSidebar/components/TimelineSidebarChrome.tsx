@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import * as rx from "./TimelineSidebarChrome.selectors";
 
 import { useTimelineSidebarEscape } from "../hooks/useTimelineSidebarEscape";
 import { Button } from "@/components/ui/button";
@@ -10,47 +10,29 @@ import { TimelineSidebar } from "../TimelineSidebar";
 import { cn } from "@/lib/utils";
 
 type TimelineSidebarChromeProps = {
-  activeView: "timeline" | "available-sets";
-  expandedSetIds: ReadonlySet<TimelineSetId>;
-  isOpen: boolean;
   layerShortcuts: readonly TimelineLayerShortcutTarget[];
   mode: "drawer" | "popup";
-  onOpenSetManager: () => void;
-  onReorderSets: (nextSetIds: TimelineSetId[]) => void;
-  onToggleEntry: (groupIds: string[], nextEnabled: boolean) => void;
   onToggleSet: (setId: TimelineSetId, nextEnabled: boolean) => void;
-  onToggleSetExpanded: (
-    setId: TimelineSetId,
-    nextExpanded: boolean,
-  ) => void;
-  setIsOpen: (updater: boolean | ((current: boolean) => boolean)) => void;
   showShortcuts?: boolean;
   sets: TimelineSidebarSetState[];
 };
 
 export function TimelineSidebarChrome({
-  activeView,
-  expandedSetIds,
-  isOpen,
   layerShortcuts,
   mode,
-  onOpenSetManager,
-  onReorderSets,
-  onToggleEntry,
   onToggleSet,
-  onToggleSetExpanded,
-  setIsOpen,
   showShortcuts = true,
   sets,
 }: TimelineSidebarChromeProps) {
-  const closeSidebar = useCallback(() => {
-    setIsOpen(false);
-  }, [setIsOpen]);
+  const activeView = rx.useSidebarActiveView();
+  const expandedSetIds = rx.useExpandedSetIds();
+  const isOpen = rx.useIsSidebarOpen();
+  const actions = rx.useSidebarChromeActions();
 
   useTimelineSidebarEscape({
     activeView,
     isOpen,
-    onClose: closeSidebar,
+    onClose: actions.closeSidebar,
   });
 
   return (
@@ -69,7 +51,7 @@ export function TimelineSidebarChrome({
         )}
         data-open={isOpen ? "true" : "false"}
         onClick={() => {
-          setIsOpen((current) => !current);
+          actions.setIsSidebarOpen((current) => !current);
         }}
         size="pill"
         type="button"
@@ -103,7 +85,7 @@ export function TimelineSidebarChrome({
           activeView === "available-sets" && "pointer-events-none opacity-0",
         )}
         data-open={isOpen ? "true" : "false"}
-        onClick={closeSidebar}
+        onClick={actions.closeSidebar}
         tabIndex={isOpen ? 0 : -1}
         type="button"
       />
@@ -132,11 +114,11 @@ export function TimelineSidebarChrome({
           expandedSetIds={expandedSetIds}
           layerShortcuts={layerShortcuts}
           mode={mode}
-          onOpenSetManager={onOpenSetManager}
-          onReorderSets={onReorderSets}
-          onToggleEntry={onToggleEntry}
+          onOpenSetManager={actions.openSetManager}
+          onReorderSets={actions.reorderSets}
+          onToggleEntry={actions.toggleEntry}
           onToggleSet={onToggleSet}
-          onToggleSetExpanded={onToggleSetExpanded}
+          onToggleSetExpanded={actions.toggleSetExpanded}
           showShortcuts={showShortcuts}
           sets={sets}
         />

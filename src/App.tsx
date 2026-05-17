@@ -1,12 +1,6 @@
-import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { lazy, Suspense, useEffect, useMemo } from "react";
 
+import * as rx from "./App.selectors";
 import { useStandaloneViewportHeight } from "./hooks/useStandaloneViewportHeight";
 import { useTimelineKeyboardShortcuts } from "./hooks/useTimelineKeyboardShortcuts";
 import { getTimelineAppLayoutState } from "./lib/app/layout";
@@ -30,10 +24,15 @@ const AvailableSetsView = lazy(() =>
 
 function App() {
   const app = useTimelineAppState();
-  const { activeView, isSidebarOpen, setIsSidebarOpen } = app;
-  const [isKeyboardHelpOpen, setIsKeyboardHelpOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const activeView = rx.useActiveView();
+  const isSidebarOpen = rx.useIsSidebarOpen();
+  const isKeyboardHelpOpen = rx.useIsKeyboardHelpOpen();
+  const isSearchOpen = rx.useIsSearchOpen();
+  const isSettingsOpen = rx.useIsSettingsOpen();
+  const isCosmicCalendarMode = rx.useIsCosmicCalendarMode();
+  const isMapPreviewEnabled = rx.useIsMapPreviewEnabled();
+  const searchScope = rx.useTimelineSearchScope();
+  const actions = rx.useAppActions();
   const layout = getTimelineAppLayoutState({
     height: app.stageSize.height,
     isOverviewVisible: app.isOverviewVisible,
@@ -46,31 +45,6 @@ function App() {
     () => getPrimaryShortcutModifierLabel(),
     [],
   );
-  const closeKeyboardHelp = useCallback(() => {
-    setIsKeyboardHelpOpen(false);
-  }, []);
-  const toggleKeyboardHelp = useCallback(() => {
-    setIsKeyboardHelpOpen((current) => {
-      const nextOpen = !current;
-
-      if (nextOpen) {
-        setIsSearchOpen(false);
-      }
-
-      return nextOpen;
-    });
-  }, []);
-  const toggleSearch = useCallback(() => {
-    setIsSearchOpen((current) => {
-      const nextOpen = !current;
-
-      if (nextOpen) {
-        setIsKeyboardHelpOpen(false);
-      }
-
-      return nextOpen;
-    });
-  }, []);
 
   useStandaloneViewportHeight();
 
@@ -79,31 +53,31 @@ function App() {
       return;
     }
 
-    setIsKeyboardHelpOpen(false);
-  }, [shortcutUiEnabled]);
+    actions.setIsKeyboardHelpOpen(false);
+  }, [actions, shortcutUiEnabled]);
 
   useEffect(() => {
     if (activeView === "timeline") {
       return;
     }
 
-    setIsSearchOpen(false);
-  }, [activeView]);
+    actions.setIsSearchOpen(false);
+  }, [actions, activeView]);
 
   useTimelineKeyboardShortcuts({
     enabled: shortcutUiEnabled,
     isHelpOpen: isKeyboardHelpOpen,
     isSidebarOpen,
-    onCloseHelp: closeKeyboardHelp,
+    onCloseHelp: actions.closeKeyboardHelp,
     onFullTimelineRange: app.handleFullTimelineRange,
-    onHelpOpenChange: setIsKeyboardHelpOpen,
+    onHelpOpenChange: actions.setIsKeyboardHelpOpen,
     onHomeRange: app.handleHomeRange,
     onLayerShortcut: app.handleLayerShortcut,
     onNavigationEnd: app.handleKeyboardNavigationEnd,
     onNavigationFrame: app.handleKeyboardNavigationFrame,
-    onSearchToggle: toggleSearch,
-    onSettingsOpenChange: setIsSettingsOpen,
-    onSidebarOpenChange: setIsSidebarOpen,
+    onSearchToggle: actions.toggleSearch,
+    onSettingsOpenChange: actions.setIsSettingsOpen,
+    onSidebarOpenChange: actions.setIsSidebarOpen,
   });
 
   return (
@@ -122,19 +96,19 @@ function App() {
                   className="order-1"
                   isOpen={isKeyboardHelpOpen}
                   modifierLabel={shortcutModifierLabel}
-                  onClick={toggleKeyboardHelp}
+                  onClick={actions.toggleKeyboardHelp}
                 />
                 <TimelineSearch
                   className="order-2"
-                  enabledGroupIds={app.searchEnabledGroupIds}
-                  enabledSetIds={app.visibleSetIds}
+                  enabledGroupIds={searchScope.enabledGroupIds}
+                  enabledSetIds={searchScope.enabledSetIds}
                   isOpen={isSearchOpen}
                   modifierLabel={shortcutModifierLabel}
                   onOpenChange={(nextOpen) => {
                     if (nextOpen) {
-                      setIsKeyboardHelpOpen(false);
+                      actions.setIsKeyboardHelpOpen(false);
                     }
-                    setIsSearchOpen(nextOpen);
+                    actions.setIsSearchOpen(nextOpen);
                   }}
                   onSelectResult={app.handleSearchResultSelect}
                 />
@@ -143,15 +117,15 @@ function App() {
             {!shortcutUiEnabled ? (
               <TimelineSearch
                 className="order-2"
-                enabledGroupIds={app.searchEnabledGroupIds}
-                enabledSetIds={app.visibleSetIds}
+                enabledGroupIds={searchScope.enabledGroupIds}
+                enabledSetIds={searchScope.enabledSetIds}
                 isOpen={isSearchOpen}
                 modifierLabel={shortcutModifierLabel}
                 onOpenChange={(nextOpen) => {
                   if (nextOpen) {
-                    setIsKeyboardHelpOpen(false);
+                    actions.setIsKeyboardHelpOpen(false);
                   }
-                  setIsSearchOpen(nextOpen);
+                  actions.setIsSearchOpen(nextOpen);
                 }}
                 onSelectResult={app.handleSearchResultSelect}
                 showShortcutHint={false}
@@ -160,32 +134,24 @@ function App() {
             ) : null}
             <TimelineSettings
               className="order-3"
-              isCosmicCalendarMode={app.isCosmicCalendarMode}
-              isMapPreviewEnabled={app.isMapPreviewEnabled}
+              isCosmicCalendarMode={isCosmicCalendarMode}
+              isMapPreviewEnabled={isMapPreviewEnabled}
               isOpen={isSettingsOpen}
-              onOpenChange={setIsSettingsOpen}
+              onOpenChange={actions.setIsSettingsOpen}
               onToggleMapPreview={() => {
-                app.setIsMapPreviewEnabled((current) => !current);
+                actions.setIsMapPreviewEnabled((current) => !current);
               }}
               onToggleCosmicCalendarMode={() => {
-                app.setIsCosmicCalendarMode((current) => !current);
+                actions.setIsCosmicCalendarMode((current) => !current);
               }}
             />
           </div>
         </>
       ) : null}
       <TimelineSidebarChrome
-        activeView={activeView}
-        expandedSetIds={app.expandedSetIds}
-        isOpen={isSidebarOpen}
         layerShortcuts={app.layerShortcuts}
         mode={layout.shouldUseMobileDrawer ? "drawer" : "popup"}
-        onOpenSetManager={app.handleOpenSetManager}
-        onReorderSets={app.handleReorderSets}
-        onToggleEntry={app.handleToggleEntry}
         onToggleSet={app.handleToggleSet}
-        onToggleSetExpanded={app.handleToggleSetExpanded}
-        setIsOpen={setIsSidebarOpen}
         showShortcuts={shortcutUiEnabled}
         sets={app.sidebarTree}
       />
@@ -196,7 +162,7 @@ function App() {
         <div className="app-view-stack relative w-full h-full overflow-hidden">
           <TimelineView app={app} layout={layout} />
           <Suspense fallback={null}>
-            <AvailableSetsView app={app} />
+            <AvailableSetsView />
           </Suspense>
         </div>
       </section>
@@ -204,7 +170,7 @@ function App() {
         isOpen={isKeyboardHelpOpen && shortcutUiEnabled}
         layerShortcuts={app.layerShortcuts}
         modifierLabel={shortcutModifierLabel}
-        onClose={closeKeyboardHelp}
+        onClose={actions.closeKeyboardHelp}
       />
       <PwaInstallPrompt />
     </main>

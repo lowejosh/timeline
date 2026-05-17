@@ -184,16 +184,6 @@ function getUniqueFeatureDetailValues(...values: Array<string | undefined>) {
     .filter((value, index, array) => array.indexOf(value) === index);
 }
 
-function getPrecisionPercentage(feature: MapGeoJsonFeature) {
-  const precision = Number(feature.properties?.BORDERPRECISION ?? 2);
-
-  if (!Number.isFinite(precision)) {
-    return null;
-  }
-
-  return Math.round((Math.min(Math.max(precision, 1), 3) / 3) * 100);
-}
-
 function detailsForFeature(feature: MapGeoJsonFeature) {
   const name = feature.properties?.NAME?.trim();
   const details = getUniqueFeatureDetailValues(

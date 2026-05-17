@@ -1,22 +1,21 @@
-import type { useTimelineAppState } from "@/hooks/useTimelineAppState";
-
+import * as rx from "./AvailableSetsView.selectors";
 import { AvailableSetsPage } from "@/components/AvailableSets";
 import { TIMELINE_SETS } from "@/lib/catalog/timelineSets";
 import { THEME } from "@/lib/ui/theme";
 import { cn } from "@/lib/utils";
 
-type TimelineAppState = ReturnType<typeof useTimelineAppState>;
+export function AvailableSetsView() {
+  const activeView = rx.useActiveView();
+  const enabledSetIds = rx.useEnabledSetIds();
+  const orderedSetIds = rx.useOrderedSetIds();
+  const visibleSetIds = rx.useVisibleSetIds();
+  const actions = rx.useAvailableSetsActions();
 
-type AvailableSetsViewProps = {
-  app: TimelineAppState;
-};
-
-export function AvailableSetsView({ app }: AvailableSetsViewProps) {
   return (
     <div
       className={cn(
         "absolute inset-0 h-full w-full overflow-hidden backdrop-blur-2xl transition-[transform,opacity] duration-300 ease-out will-change-[transform,opacity]",
-        app.activeView === "available-sets"
+        activeView === "available-sets"
           ? "pointer-events-auto translate-x-0 opacity-100"
           : "pointer-events-none translate-x-full opacity-0",
       )}
@@ -26,13 +25,13 @@ export function AvailableSetsView({ app }: AvailableSetsViewProps) {
     >
       <AvailableSetsPage
         allSets={TIMELINE_SETS}
-        enabledSetIds={app.enabledSetIds}
-        isActive={app.activeView === "available-sets"}
-        onApply={app.handleApplySets}
-        onClose={app.handleCloseSetManager}
-        onToggleVisible={app.handleToggleSet}
-        orderedSetIds={app.orderedSetIds}
-        visibleSetIds={app.visibleSetIds}
+        enabledSetIds={enabledSetIds}
+        isActive={activeView === "available-sets"}
+        onApply={actions.applySets}
+        onClose={actions.closeSetManager}
+        onToggleVisible={actions.toggleVisibleSet}
+        orderedSetIds={orderedSetIds}
+        visibleSetIds={visibleSetIds}
       />
     </div>
   );

@@ -1,6 +1,7 @@
 import type { getTimelineAppLayoutState } from "@/lib/app/layout";
 import type { useTimelineAppState } from "@/hooks/useTimelineAppState";
 
+import * as rx from "./TimelineView.selectors";
 import { TimelineOverviewRulerStack } from "@/components/TimelineOverviewRuler/TimelineOverviewRulerStack";
 import { TIMELINE_APP_LAYOUT } from "@/lib/app/layout";
 import { TimelineCanvas } from "@/features/timeline-viewer/canvas";
@@ -15,11 +16,17 @@ type TimelineViewProps = {
 };
 
 export function TimelineView({ app, layout }: TimelineViewProps) {
+  const activeView = rx.useActiveView();
+  const expandOverlayRequest = rx.useExpandOverlayRequest();
+  const isCosmicCalendarMode = rx.useIsCosmicCalendarMode();
+  const isMapPreviewEnabled = rx.useIsMapPreviewEnabled();
+  const actions = rx.useTimelineViewActions();
+
   return (
     <div
       className={cn(
         "absolute inset-0 h-full w-full transition-[transform,opacity] duration-300 ease-out",
-        app.activeView === "available-sets"
+        activeView === "available-sets"
           ? "pointer-events-none -translate-x-[6%] opacity-0 will-change-[transform,opacity]"
           : "translate-x-0 opacity-100",
       )}
@@ -31,17 +38,17 @@ export function TimelineView({ app, layout }: TimelineViewProps) {
               activeChain={app.chain}
               activeEra={app.activeEra}
               enabledGroupIds={app.renderEnabledGroupIds}
-              expandOverlayRequest={app.expandOverlayRequest}
+              expandOverlayRequest={expandOverlayRequest}
               height={app.mainCanvasHeight}
               isAnimating={app.animated.isAnimating}
-              isCosmicCalendarMode={app.isCosmicCalendarMode}
-              isMapPreviewEnabled={app.isMapPreviewEnabled}
+              isCosmicCalendarMode={isCosmicCalendarMode}
+              isMapPreviewEnabled={isMapPreviewEnabled}
               markers={app.setFilteredMarkers}
               onAnimateToRange={app.animated.animateToRange}
               onAnimateZoom={app.handleZoom}
               onContinuousViewportChange={app.handleContinuousViewportChange}
               onDrillIntoEra={app.handleDrillIntoEra}
-              onMapPreviewClose={() => app.setIsMapPreviewEnabled(false)}
+              onMapPreviewClose={actions.closeMapPreview}
               onNavigateUp={app.handleNavigateUp}
               onRecordDragSample={app.animated.recordDragSample}
               onReleaseMomentum={app.animated.releaseMomentum}

@@ -1,37 +1,17 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { useAnimatedViewport } from "./useAnimatedViewport";
 import { getTimelineCanvasPad } from "../lib/rendering/layout/padding";
 import { useElementSize } from "./useElementSize";
 import { resolveTimelineSidebarTree } from "../lib/app/sidebarModel";
 import { getAutoHiddenOverlayIds } from "../lib/rendering/overlayRedundancy";
 import {
   MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER,
-  shouldUseMobileTimelineDrawer,
 } from "../lib/app/layout";
 import {
   filterHiddenOverlayBands,
   getVisibleTimelineOverlayGroupIdsWithViewportEdges,
   getVisibleTimelineGroupIds,
 } from "../lib/app/timelineVisibility";
-import {
-  readStoredEnabledSetIds,
-  readStoredEnabledGroupIds,
-  readStoredExpandedSetIds,
-  readStoredGroupToggleMode,
-  readStoredMapPreviewEnabled,
-  readStoredSidebarOpen,
-  readStoredTimelineSetOrder,
-  readStoredVisibleSetIds,
-  writeStoredEnabledSetIds,
-  writeStoredEnabledGroupIds,
-  writeStoredExpandedSetIds,
-  writeStoredGroupToggleMode,
-  writeStoredMapPreviewEnabled,
-  writeStoredSidebarOpen,
-  writeStoredTimelineSetOrder,
-  writeStoredVisibleSetIds,
-} from "../lib/app/timelineSetStorage";
 import {
   ROOT_ERA,
   TIMELINE_DISPLAY,
@@ -46,7 +26,6 @@ import {
   type TimelineSetId,
 } from "@/lib/catalog/eras";
 import {
-  TIMELINE_DECORATION_CATEGORY_IDS,
   TIMELINE_DECORATION_GROUPS,
   getDefaultEnabledTimelineGroupIds,
 } from "../lib/catalog/decorations";
@@ -57,9 +36,7 @@ import {
   filterMarkersBySets,
   filterOverlaysBySets,
   getSetIdForEraFamily,
-  normalizeTimelineSetOrder,
   TIMELINE_SET_ID_BY_GROUP_ID,
-  TIMELINE_SETS_BY_ID,
   TIMELINE_SET_SPAN_PRIORITY_BY_ID,
 } from "../lib/catalog/timelineSets";
 import {
@@ -68,7 +45,6 @@ import {
 } from "../lib/catalog/layerAutoToggle";
 import {
   getVisibleRange,
-  getHomeViewport,
   getViewportForRange,
   HOME_RANGE,
   normalizeViewport,
@@ -90,11 +66,14 @@ import {
   type TimelineYearRange,
 } from "@/lib/catalog/timelineSetMetrics";
 import type { TimelineSearchResult } from "@/lib/app/timelineSearch";
+import {
+  HUMAN_EVOLUTION_GROUP_ID,
+  useTimelineLayerStore,
+} from "@/stores/timelineLayerStore";
+import { useTimelineNavigationStore } from "@/stores/timelineNavigationStore";
+import { useTimelineUiStore } from "@/stores/timelineUiStore";
+import { useTimelineViewportStore } from "@/stores/timelineViewportStore";
 
-type LayerAutoToggleMode = "auto" | "manual-on" | "manual-off";
-
-const HUMAN_EVOLUTION_GROUP_ID =
-  TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
 const SEARCH_MARKER_VISIBILITY_ZOOM_OFFSET = 4;
 const SEARCH_MAX_FOCUS_ZOOM = 30;
 const SEARCH_POINT_MIN_FOCUS_SPAN_YEARS = 120;
@@ -208,97 +187,113 @@ function getSearchResultViewport(
   );
 }
 
-function getDefaultGroupIdsForSet(setId: TimelineSetId): string[] {
-  const set = TIMELINE_SETS_BY_ID[setId];
-
-  if (!set) {
-    return [];
-  }
-
-  return set.groups
-    .filter((group) => group.defaultEnabled !== false)
-    .map((group) => group.id);
-}
-
-function shouldStartWithSidebarOpen() {
-  const stored = readStoredSidebarOpen();
-
-  if (stored !== null) {
-    return stored;
-  }
-
-  if (typeof window === "undefined") {
-    return true;
-  }
-
-  return !shouldUseMobileTimelineDrawer(window.innerWidth, window.innerHeight);
-}
-
 export function useTimelineAppState() {
   const [stageRef, stageSize] = useElementSize<HTMLDivElement>();
   const [timelineRef, timelineSize] = useElementSize<HTMLDivElement>();
   const innerWidth = Math.max(stageSize.width, 1);
   const canvasPad = getTimelineCanvasPad(stageSize.width, stageSize.height);
   const viewportWidth = Math.max(innerWidth - canvasPad * 2, 1);
-  const animated = useAnimatedViewport(
-    getHomeViewport(Math.max(1440 - canvasPad * 2, 1)),
-    viewportWidth,
+  const viewport = useTimelineViewportStore((state) => state.viewport);
+  const isAnimating = useTimelineViewportStore((state) => state.isAnimating);
+  const setViewportWidth = useTimelineViewportStore(
+    (state) => state.setViewportWidth,
   );
-
-  const [activeView, setActiveView] = useState<"timeline" | "available-sets">(
-    "timeline",
+  const cancelTransientMotion = useTimelineViewportStore(
+    (state) => state.cancelTransientMotion,
   );
-  const [activeEraId, setActiveEraId] = useState(ROOT_ERA.id);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(() =>
-    shouldStartWithSidebarOpen(),
+  const updateViewport = useTimelineViewportStore(
+    (state) => state.updateViewport,
   );
-  const [isCosmicCalendarMode, setIsCosmicCalendarMode] = useState(false);
-  const [isMapPreviewEnabled, setIsMapPreviewEnabled] = useState(() =>
-    readStoredMapPreviewEnabled(),
+  const updateViewportDirect = useTimelineViewportStore(
+    (state) => state.updateViewportDirect,
   );
-  const [overlayVisibilityTransitionSeed, setOverlayVisibilityTransitionSeed] =
-    useState(0);
-  const [expandOverlayRequest, setExpandOverlayRequest] = useState<{
-    overlayId: string;
-    seq: number;
-  } | null>(null);
-  const expandOverlaySeqRef = useRef(0);
+  const animateToRange = useTimelineViewportStore(
+    (state) => state.animateToRange,
+  );
+  const animateToViewport = useTimelineViewportStore(
+    (state) => state.animateToViewport,
+  );
+  const animateZoom = useTimelineViewportStore((state) => state.animateZoom);
+  const recordDragSample = useTimelineViewportStore(
+    (state) => state.recordDragSample,
+  );
+  const releaseMomentum = useTimelineViewportStore(
+    (state) => state.releaseMomentum,
+  );
+  const animated = useMemo(
+    () => ({
+      viewport,
+      isAnimating,
+      cancelTransientMotion,
+      updateViewport,
+      updateViewportDirect,
+      animateToRange,
+      animateToViewport,
+      animateZoom,
+      recordDragSample,
+      releaseMomentum,
+    }),
+    [
+      animateToRange,
+      animateToViewport,
+      animateZoom,
+      cancelTransientMotion,
+      isAnimating,
+      recordDragSample,
+      releaseMomentum,
+      updateViewport,
+      updateViewportDirect,
+      viewport,
+    ],
+  );
+  const activeEraId = useTimelineNavigationStore((state) => state.activeEraId);
+  const setActiveEraId = useTimelineNavigationStore(
+    (state) => state.setActiveEraId,
+  );
+  const requestExpandOverlay = useTimelineNavigationStore(
+    (state) => state.requestExpandOverlay,
+  );
+  const resolveInitialSidebarVisibility = useTimelineUiStore(
+    (state) => state.resolveInitialSidebarVisibility,
+  );
+  const manualEnabledGroupIds = useTimelineLayerStore(
+    (state) => state.manualEnabledGroupIds,
+  );
+  const enabledSetIds = useTimelineLayerStore((state) => state.enabledSetIds);
+  const visibleSetIds = useTimelineLayerStore((state) => state.visibleSetIds);
+  const orderedSetIds = useTimelineLayerStore((state) => state.orderedSetIds);
+  const humanEvolutionToggleMode = useTimelineLayerStore(
+    (state) => state.humanEvolutionToggleMode,
+  );
+  const autoSuppressedGroupIds = useTimelineLayerStore(
+    (state) => state.autoSuppressedGroupIds,
+  );
+  const overlayVisibilityTransitionSeed = useTimelineLayerStore(
+    (state) => state.overlayVisibilityTransitionSeed,
+  );
+  const ensureGroupsEnabled = useTimelineLayerStore(
+    (state) => state.ensureGroupsEnabled,
+  );
+  const ensureSetVisible = useTimelineLayerStore(
+    (state) => state.ensureSetVisible,
+  );
+  const setAutoSuppressedGroupIds = useTimelineLayerStore(
+    (state) => state.setAutoSuppressedGroupIds,
+  );
+  const toggleSetExpanded = useTimelineLayerStore(
+    (state) => state.toggleSetExpanded,
+  );
+  const toggleSetVisible = useTimelineLayerStore(
+    (state) => state.toggleSetVisible,
+  );
+  const triggerOverlayVisibilityTransition = useTimelineLayerStore(
+    (state) => state.triggerOverlayVisibilityTransition,
+  );
   const defaultEnabledGroupIds = useMemo(
     () => getDefaultEnabledTimelineGroupIds(),
     [],
   );
-  const [manualEnabledGroupIds, setManualEnabledGroupIds] = useState<
-    Set<string>
-  >(() => readStoredEnabledGroupIds());
-  const [enabledSetIds, setEnabledSetIds] = useState<Set<TimelineSetId>>(() =>
-    readStoredEnabledSetIds(),
-  );
-  // Separate from enabledSetIds (library membership): which collected sets are
-  // currently rendering on the timeline. Toggled from the sidebar.
-  const [visibleSetIds, setVisibleSetIds] = useState<Set<TimelineSetId>>(() =>
-    readStoredVisibleSetIds(),
-  );
-  useEffect(() => {
-    writeStoredVisibleSetIds(visibleSetIds);
-  }, [visibleSetIds]);
-  useEffect(() => {
-    writeStoredMapPreviewEnabled(isMapPreviewEnabled);
-  }, [isMapPreviewEnabled]);
-  const [orderedSetIds, setOrderedSetIds] = useState<TimelineSetId[]>(() =>
-    readStoredTimelineSetOrder(),
-  );
-  const [expandedSetIds, setExpandedSetIds] = useState<Set<TimelineSetId>>(() =>
-    readStoredExpandedSetIds(),
-  );
-  const [humanEvolutionToggleMode, setHumanEvolutionToggleMode] =
-    useState<LayerAutoToggleMode>(() =>
-      readStoredGroupToggleMode(HUMAN_EVOLUTION_GROUP_ID),
-    );
-  const [autoSuppressedGroupIds, setAutoSuppressedGroupIds] = useState<
-    Set<string>
-  >(() => new Set());
   const autoTransitionFrameRef = useRef(0);
-  const hasResolvedInitialSidebarVisibilityRef = useRef(false);
 
   const autoToggleRulesByGroupId = useMemo(
     () =>
@@ -319,68 +314,16 @@ export function useTimelineAppState() {
   });
 
   useEffect(() => {
-    if (
-      hasResolvedInitialSidebarVisibilityRef.current ||
-      stageSize.width <= 0 ||
-      stageSize.height <= 0
-    ) {
-      return;
-    }
-
-    hasResolvedInitialSidebarVisibilityRef.current = true;
-
-    if (readStoredSidebarOpen() === null) {
-      setIsSidebarOpen(
-        !shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height),
-      );
-    }
-  }, [stageSize.height, stageSize.width]);
+    setViewportWidth(viewportWidth);
+  }, [setViewportWidth, viewportWidth]);
 
   useEffect(() => {
-    writeStoredSidebarOpen(isSidebarOpen);
-  }, [isSidebarOpen]);
-
-  useEffect(() => {
-    writeStoredTimelineSetOrder(orderedSetIds);
-  }, [orderedSetIds]);
-
-  useEffect(() => {
-    writeStoredEnabledSetIds(enabledSetIds);
-  }, [enabledSetIds]);
-
-  useEffect(() => {
-    writeStoredEnabledGroupIds(manualEnabledGroupIds);
-  }, [manualEnabledGroupIds]);
-
-  useEffect(() => {
-    if (
-      !enabledSetIds.has("computing") ||
-      manualEnabledGroupIds.has("computer-models")
-    ) {
-      return;
-    }
-
-    setManualEnabledGroupIds((current) => {
-      if (current.has("computer-models")) {
-        return current;
-      }
-
-      const next = new Set(current);
-      next.add("computer-models");
-      return next;
-    });
-  }, [enabledSetIds, manualEnabledGroupIds]);
-
-  useEffect(() => {
-    writeStoredGroupToggleMode(
-      HUMAN_EVOLUTION_GROUP_ID,
-      humanEvolutionToggleMode,
-    );
-  }, [humanEvolutionToggleMode]);
-
-  useEffect(() => {
-    writeStoredExpandedSetIds(expandedSetIds);
-  }, [expandedSetIds]);
+    resolveInitialSidebarVisibility(stageSize.width, stageSize.height);
+  }, [
+    resolveInitialSidebarVisibility,
+    stageSize.height,
+    stageSize.width,
+  ]);
 
   const baseEnabledGroupIds = useMemo(() => {
     const next = new Set(manualEnabledGroupIds);
@@ -592,6 +535,7 @@ export function useTimelineAppState() {
     baseEnabledGroupIds,
     canvasPad,
     hasHigherPrioritySetSpanVisible,
+    setAutoSuppressedGroupIds,
     visibleSetIds,
     innerWidth,
   ]);
@@ -677,43 +621,35 @@ export function useTimelineAppState() {
         : (activeEra.children ?? []);
 
   const checkAutoTransition = useCallback(() => {
-    setActiveEraId((currentId: string) => {
-      const era =
-        findEraById(prioritizedRootEra, currentId) ?? prioritizedRootEra;
-      const navigableAncestor = getNavigableAncestor(
-        prioritizedRootEra,
-        currentId,
-      );
+    const currentId = useTimelineNavigationStore.getState().activeEraId;
+    const era = findEraById(prioritizedRootEra, currentId) ?? prioritizedRootEra;
+    const navigableAncestor = getNavigableAncestor(
+      prioritizedRootEra,
+      currentId,
+    );
 
-      if (
-        currentId === prioritizedRootEra.id ||
-        isEraFamilyRoot(era) ||
-        !navigableAncestor
-      ) {
-        return currentId;
-      }
+    if (
+      currentId === prioritizedRootEra.id ||
+      isEraFamilyRoot(era) ||
+      !navigableAncestor
+    ) {
+      return;
+    }
 
-      const eraPixelWidth = Math.abs(
+    const eraPixelWidth = Math.abs(
+      worldToScreen(era.endYear, viewportRef.current, viewportWidthRef.current) -
         worldToScreen(
-          era.endYear,
+          era.startYear,
           viewportRef.current,
           viewportWidthRef.current,
-        ) -
-          worldToScreen(
-            era.startYear,
-            viewportRef.current,
-            viewportWidthRef.current,
-          ),
-      );
-      const fillRatio = eraPixelWidth / viewportWidthRef.current;
+        ),
+    );
+    const fillRatio = eraPixelWidth / viewportWidthRef.current;
 
-      if (fillRatio < 0.45) {
-        return navigableAncestor.id;
-      }
-
-      return currentId;
-    });
-  }, [prioritizedRootEra]);
+    if (fillRatio < 0.45) {
+      setActiveEraId(navigableAncestor.id);
+    }
+  }, [prioritizedRootEra, setActiveEraId]);
 
   const scheduleAutoTransitionCheck = useCallback(() => {
     if (autoTransitionFrameRef.current) {
@@ -770,7 +706,7 @@ export function useTimelineAppState() {
       setActiveEraId(era.id);
       animated.animateToRange(era.startYear, era.endYear, -0.1);
     },
-    [animated],
+    [animated, setActiveEraId],
   );
 
   const handleNavigateUp = useCallback(() => {
@@ -783,7 +719,7 @@ export function useTimelineAppState() {
       setActiveEraId(prioritizedRootEra.id);
       animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1], 0);
     }
-  }, [activeEraId, animated, prioritizedRootEra]);
+  }, [activeEraId, animated, prioritizedRootEra, setActiveEraId]);
 
   const sidebarTree = useMemo(
     () =>
@@ -856,30 +792,6 @@ export function useTimelineAppState() {
     return ranges;
   }, [sidebarTree]);
 
-  const handleToggleEntry = useCallback(
-    (groupIds: string[], nextEnabled: boolean) => {
-      if (groupIds.includes(HUMAN_EVOLUTION_GROUP_ID)) {
-        setHumanEvolutionToggleMode(nextEnabled ? "manual-on" : "manual-off");
-      }
-      setOverlayVisibilityTransitionSeed((current) => current + 1);
-
-      setManualEnabledGroupIds((current) => {
-        const next = new Set(current);
-
-        for (const groupId of groupIds) {
-          if (nextEnabled) {
-            next.add(groupId);
-          } else {
-            next.delete(groupId);
-          }
-        }
-
-        return next;
-      });
-    },
-    [],
-  );
-
   const handleToggleSet = useCallback(
     (setId: TimelineSetId, nextEnabled: boolean) => {
       if (!nextEnabled) {
@@ -894,51 +806,38 @@ export function useTimelineAppState() {
         }
       }
 
-      setVisibleSetIds((current) => {
-        const next = new Set(current);
-
-        if (nextEnabled) {
-          next.add(setId);
-        } else {
-          next.delete(setId);
-        }
-
-        return next;
-      });
-
-      setOverlayVisibilityTransitionSeed((current) => current + 1);
+      toggleSetVisible(setId, nextEnabled);
     },
-    [activeEraId, animated, prioritizedRootEra],
-  );
-
-  const handleToggleSetExpanded = useCallback(
-    (setId: TimelineSetId, nextExpanded: boolean) => {
-      setExpandedSetIds((current) => {
-        const next = new Set(current);
-
-        if (nextExpanded) {
-          next.add(setId);
-        } else {
-          next.delete(setId);
-        }
-
-        return next;
-      });
-    },
-    [],
+    [
+      activeEraId,
+      animated,
+      prioritizedRootEra,
+      setActiveEraId,
+      toggleSetVisible,
+    ],
   );
 
   const handleHomeRange = useCallback(() => {
     setActiveEraId(prioritizedRootEra.id);
     animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1], 0);
     scheduleAutoTransitionCheck();
-  }, [animated, prioritizedRootEra.id, scheduleAutoTransitionCheck]);
+  }, [
+    animated,
+    prioritizedRootEra.id,
+    scheduleAutoTransitionCheck,
+    setActiveEraId,
+  ]);
 
   const handleFullTimelineRange = useCallback(() => {
     setActiveEraId(prioritizedRootEra.id);
     animated.animateToRange(TIMELINE_MIN_YEAR, TIMELINE_MAX_YEAR, 0);
     scheduleAutoTransitionCheck();
-  }, [animated, prioritizedRootEra.id, scheduleAutoTransitionCheck]);
+  }, [
+    animated,
+    prioritizedRootEra.id,
+    scheduleAutoTransitionCheck,
+    setActiveEraId,
+  ]);
 
   const handleKeyboardNavigationFrame = useCallback(
     ({
@@ -989,66 +888,15 @@ export function useTimelineAppState() {
       const range = layerRangeByShortcutId.get(shortcut.id);
 
       if (shortcut.kind === "set") {
-        setExpandedSetIds((current) => {
-          if (current.has(shortcut.setId)) {
-            return current;
-          }
-
-          const next = new Set(current);
-          next.add(shortcut.setId);
-          return next;
-        });
-
-        setVisibleSetIds((current) => {
-          if (current.has(shortcut.setId)) {
-            return current;
-          }
-
-          const next = new Set(current);
-          next.add(shortcut.setId);
-          return next;
-        });
+        toggleSetExpanded(shortcut.setId, true);
+        ensureSetVisible(shortcut.setId);
       } else {
-        setExpandedSetIds((current) => {
-          if (current.has(shortcut.parentSetId)) {
-            return current;
-          }
-
-          const next = new Set(current);
-          next.add(shortcut.parentSetId);
-          return next;
-        });
-
-        setVisibleSetIds((current) => {
-          if (current.has(shortcut.parentSetId)) {
-            return current;
-          }
-
-          const next = new Set(current);
-          next.add(shortcut.parentSetId);
-          return next;
-        });
-
-        if (shortcut.groupIds.includes(HUMAN_EVOLUTION_GROUP_ID)) {
-          setHumanEvolutionToggleMode("manual-on");
-        }
-
-        setManualEnabledGroupIds((current) => {
-          let changed = false;
-          const next = new Set(current);
-
-          for (const groupId of shortcut.groupIds) {
-            if (!next.has(groupId)) {
-              next.add(groupId);
-              changed = true;
-            }
-          }
-
-          return changed ? next : current;
-        });
+        toggleSetExpanded(shortcut.parentSetId, true);
+        ensureSetVisible(shortcut.parentSetId);
+        ensureGroupsEnabled(shortcut.groupIds);
       }
 
-      setOverlayVisibilityTransitionSeed((current) => current + 1);
+      triggerOverlayVisibilityTransition();
       setActiveEraId(prioritizedRootEra.id);
 
       if (range) {
@@ -1060,52 +908,33 @@ export function useTimelineAppState() {
     },
     [
       animated,
+      ensureGroupsEnabled,
+      ensureSetVisible,
       layerRangeByShortcutId,
       layerShortcuts,
       prioritizedRootEra.id,
       scheduleAutoTransitionCheck,
+      setActiveEraId,
+      toggleSetExpanded,
+      triggerOverlayVisibilityTransition,
     ],
   );
 
   const handleSearchResultSelect = useCallback(
     (result: TimelineSearchResult) => {
       if (result.setId) {
-        setVisibleSetIds((current) => {
-          if (current.has(result.setId!)) {
-            return current;
-          }
-
-          const next = new Set(current);
-          next.add(result.setId!);
-          return next;
-        });
+        ensureSetVisible(result.setId);
       }
 
       if (result.groupId) {
-        if (result.groupId === HUMAN_EVOLUTION_GROUP_ID) {
-          setHumanEvolutionToggleMode("manual-on");
-        }
-
-        setManualEnabledGroupIds((current) => {
-          if (current.has(result.groupId!)) {
-            return current;
-          }
-
-          const next = new Set(current);
-          next.add(result.groupId!);
-          return next;
-        });
+        ensureGroupsEnabled([result.groupId]);
       }
 
-      setOverlayVisibilityTransitionSeed((current) => current + 1);
+      triggerOverlayVisibilityTransition();
       setActiveEraId(prioritizedRootEra.id);
 
       if (result.expandableAsOverlayId) {
-        expandOverlaySeqRef.current += 1;
-        setExpandOverlayRequest({
-          overlayId: result.expandableAsOverlayId,
-          seq: expandOverlaySeqRef.current,
-        });
+        requestExpandOverlay(result.expandableAsOverlayId);
       }
 
       animated.animateToViewport(
@@ -1118,123 +947,17 @@ export function useTimelineAppState() {
 
       scheduleAutoTransitionCheck();
     },
-    [animated, prioritizedRootEra.id, scheduleAutoTransitionCheck],
-  );
-
-  const handleOpenSetManager = useCallback(() => {
-    setIsSidebarOpen(false);
-    setActiveView("available-sets");
-  }, []);
-
-  const handleCloseSetManager = useCallback(() => {
-    setActiveView("timeline");
-    setIsSidebarOpen(
-      !shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height),
-    );
-  }, [stageSize.height, stageSize.width]);
-
-  const handleApplySets = useCallback(
-    (
-      nextEnabledSetIds: Set<TimelineSetId>,
-      nextOrderedSetIds: TimelineSetId[],
-    ) => {
-      // Mirror the safety logic from handleToggleSet: if the active era belongs
-      // to a set that is being disabled, navigate back to the root.
-      const activeFamilyId = getEraFamilyId(prioritizedRootEra, activeEraId);
-      const activeSetId = activeFamilyId
-        ? getSetIdForEraFamily(activeFamilyId)
-        : null;
-      const normalizedNextOrder = normalizeTimelineSetOrder(nextOrderedSetIds);
-
-      if (activeSetId && !nextEnabledSetIds.has(activeSetId)) {
-        setActiveEraId(ROOT_ERA.id);
-        animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1], 0);
-      }
-
-      // Sync visibleSetIds: remove sets removed from library, add newly
-      // added sets as visible by default. Keep existing visibility choices.
-      const prevEnabledSetIds = enabledSetIds;
-      setVisibleSetIds((currentVisible) => {
-        const next = new Set(currentVisible);
-        for (const id of next) {
-          if (!nextEnabledSetIds.has(id)) next.delete(id);
-        }
-        for (const id of nextEnabledSetIds) {
-          if (!prevEnabledSetIds.has(id)) next.add(id);
-        }
-        return next;
-      });
-
-      const addedSetIds = Array.from(nextEnabledSetIds).filter(
-        (setId) => !enabledSetIds.has(setId),
-      );
-
-      if (addedSetIds.length > 0) {
-        setManualEnabledGroupIds((current) => {
-          const next = new Set(current);
-          let changed = false;
-
-          for (const setId of addedSetIds) {
-            for (const groupId of getDefaultGroupIdsForSet(setId)) {
-              if (!next.has(groupId)) {
-                next.add(groupId);
-                changed = true;
-              }
-            }
-          }
-
-          return changed ? next : current;
-        });
-      }
-
-      setEnabledSetIds(new Set(nextEnabledSetIds));
-      setOrderedSetIds((current) => {
-        const normalizedCurrent = normalizeTimelineSetOrder(current);
-
-        if (
-          normalizedCurrent.length === normalizedNextOrder.length &&
-          normalizedCurrent.every(
-            (setId, index) => setId === normalizedNextOrder[index],
-          )
-        ) {
-          return current;
-        }
-
-        return normalizedNextOrder;
-      });
-      setOverlayVisibilityTransitionSeed((current) => current + 1);
-      setActiveView("timeline");
-      setIsSidebarOpen(
-        !shouldUseMobileTimelineDrawer(stageSize.width, stageSize.height),
-      );
-    },
     [
-      activeEraId,
       animated,
-      enabledSetIds,
-      prioritizedRootEra,
-      stageSize.height,
-      stageSize.width,
+      ensureGroupsEnabled,
+      ensureSetVisible,
+      prioritizedRootEra.id,
+      requestExpandOverlay,
+      scheduleAutoTransitionCheck,
+      setActiveEraId,
+      triggerOverlayVisibilityTransition,
     ],
   );
-
-  const handleReorderSets = useCallback((nextOrder: TimelineSetId[]) => {
-    setOrderedSetIds((current) => {
-      const normalizedCurrent = normalizeTimelineSetOrder(current);
-      const normalizedNext = normalizeTimelineSetOrder(nextOrder);
-
-      if (
-        normalizedCurrent.length === normalizedNext.length &&
-        normalizedCurrent.every(
-          (setId, index) => setId === normalizedNext[index],
-        )
-      ) {
-        return current;
-      }
-
-      return normalizedNext;
-    });
-  }, []);
 
   const isOverviewVisible =
     stageSize.height >= MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER;
@@ -1269,24 +992,8 @@ export function useTimelineAppState() {
     renderEnabledGroupIds,
     overlayVisibilityTransitionKey,
 
-    // sidebar
-    isSidebarOpen,
-    setIsSidebarOpen,
-    isCosmicCalendarMode,
-    setIsCosmicCalendarMode,
-    isMapPreviewEnabled,
-    setIsMapPreviewEnabled,
     sidebarTree,
-    expandedSetIds,
     layerShortcuts,
-    enabledSetIds,
-    visibleSetIds,
-    orderedSetIds,
-    searchEnabledGroupIds: baseEnabledGroupIds,
-
-    // view
-    activeView,
-    expandOverlayRequest,
 
     // handlers
     handleZoom,
@@ -1296,18 +1003,12 @@ export function useTimelineAppState() {
     handleViewportGestureEnd,
     handleDrillIntoEra,
     handleNavigateUp,
-    handleToggleEntry,
     handleToggleSet,
-    handleToggleSetExpanded,
     handleHomeRange,
     handleFullTimelineRange,
     handleKeyboardNavigationFrame,
     handleKeyboardNavigationEnd,
     handleLayerShortcut,
     handleSearchResultSelect,
-    handleReorderSets,
-    handleOpenSetManager,
-    handleCloseSetManager,
-    handleApplySets,
   };
 }
