@@ -73,6 +73,9 @@ function App() {
     onHelpOpenChange: actions.setIsKeyboardHelpOpen,
     onHomeRange: app.handleHomeRange,
     onLayerShortcut: app.handleLayerShortcut,
+    onMapPreviewToggle: () => {
+      actions.setIsMapPreviewEnabled((current) => !current);
+    },
     onNavigationEnd: app.handleKeyboardNavigationEnd,
     onNavigationFrame: app.handleKeyboardNavigationFrame,
     onSearchToggle: actions.toggleSearch,
@@ -135,12 +138,8 @@ function App() {
             <TimelineSettings
               className="order-3"
               isCosmicCalendarMode={isCosmicCalendarMode}
-              isMapPreviewEnabled={isMapPreviewEnabled}
               isOpen={isSettingsOpen}
               onOpenChange={actions.setIsSettingsOpen}
-              onToggleMapPreview={() => {
-                actions.setIsMapPreviewEnabled((current) => !current);
-              }}
               onToggleCosmicCalendarMode={() => {
                 actions.setIsCosmicCalendarMode((current) => !current);
               }}
@@ -149,8 +148,12 @@ function App() {
         </>
       ) : null}
       <TimelineSidebarChrome
+        isMapPreviewEnabled={isMapPreviewEnabled}
         layerShortcuts={app.layerShortcuts}
         mode={layout.shouldUseMobileDrawer ? "drawer" : "popup"}
+        onToggleMapPreview={() => {
+          actions.setIsMapPreviewEnabled((current) => !current);
+        }}
         onToggleSet={app.handleToggleSet}
         showShortcuts={shortcutUiEnabled}
         sets={app.sidebarTree}

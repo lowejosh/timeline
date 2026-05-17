@@ -19,6 +19,7 @@ type UseTimelineKeyboardShortcutsOptions = {
   ) => void;
   onHomeRange: () => void;
   onLayerShortcut: (normalizedKey: string) => boolean;
+  onMapPreviewToggle: () => void;
   onNavigationEnd: () => void;
   onNavigationFrame: (frame: KeyboardNavigationFrame) => void;
   onSearchToggle: () => void;
@@ -120,6 +121,7 @@ export function useTimelineKeyboardShortcuts({
   onHelpOpenChange,
   onHomeRange,
   onLayerShortcut,
+  onMapPreviewToggle,
   onNavigationEnd,
   onNavigationFrame,
   onSearchToggle,
@@ -135,6 +137,7 @@ export function useTimelineKeyboardShortcuts({
     onHelpOpenChange,
     onHomeRange,
     onLayerShortcut,
+    onMapPreviewToggle,
     onNavigationEnd,
     onNavigationFrame,
     onSearchToggle,
@@ -159,6 +162,7 @@ export function useTimelineKeyboardShortcuts({
       onHelpOpenChange,
       onHomeRange,
       onLayerShortcut,
+      onMapPreviewToggle,
       onNavigationEnd,
       onNavigationFrame,
       onSearchToggle,
@@ -174,6 +178,7 @@ export function useTimelineKeyboardShortcuts({
     onHelpOpenChange,
     onHomeRange,
     onLayerShortcut,
+    onMapPreviewToggle,
     onNavigationEnd,
     onNavigationFrame,
     onSearchToggle,
@@ -363,6 +368,12 @@ export function useTimelineKeyboardShortcuts({
       if (normalizedKey === "l") {
         claimKeyboardEvent(event);
         latest.onSidebarOpenChange((current) => !current);
+        return;
+      }
+
+      if (normalizedKey === "m") {
+        claimKeyboardEvent(event);
+        latest.onMapPreviewToggle();
         return;
       }
 

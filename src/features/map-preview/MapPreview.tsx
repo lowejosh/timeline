@@ -269,16 +269,21 @@ export const MapPreview = memo(function MapPreview({
       }}
     >
       <div
-        className="absolute inset-x-0 top-0 z-[2] flex h-[38px] cursor-move select-none items-center gap-2 border-b border-border/55 bg-background/70 px-3 text-card-foreground"
+        className="absolute inset-x-0 top-0 z-[2] flex h-[45px] cursor-move select-none items-center gap-2 border-b border-border/55 bg-background/70 px-3 text-card-foreground"
         onPointerCancel={endWindowDrag}
         onPointerDown={(event) => beginWindowDrag(event, "move")}
         onPointerMove={updateWindowDrag}
         onPointerUp={endWindowDrag}
       >
         <div className="flex min-w-0 flex-1 flex-col leading-none">
-          <span className="truncate text-[0.66rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-            Map Preview
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="truncate text-[0.66rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              Map Preview
+            </span>
+            <span className="shrink-0 rounded px-1 py-0.5 text-[0.55rem] font-semibold uppercase tracking-wide bg-muted/80 text-muted-foreground/70 leading-none">
+              Experimental
+            </span>
+          </div>
           <span className="mt-1 flex min-w-0 items-baseline gap-2">
             <span className="shrink-0 text-[0.7rem] font-semibold text-foreground">
               {focusYearLabel}

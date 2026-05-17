@@ -101,6 +101,7 @@ export function TimelineKeyboardHelp({
     { label: "Show Keyboard Shortcuts", keys: [modifierLabel, "/"] },
     { label: "Show Settings", keys: [modifierLabel, ","] },
     { label: "Toggle Layers", keys: ["L"] },
+    { label: "Toggle Map", keys: ["M"] },
     { label: "Search", keys: [modifierLabel, "K"] },
     { label: "Zoom In", keys: ["+", "↑"] },
     { label: "Zoom Out", keys: ["-", "↓"] },

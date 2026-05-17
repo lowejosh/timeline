@@ -8,18 +8,23 @@ import type { TimelineLayerShortcutTarget } from "@/lib/app/timelineKeyboard";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import { TimelineSidebar } from "../TimelineSidebar";
 import { cn } from "@/lib/utils";
+import { Map } from "lucide-react";
 
 type TimelineSidebarChromeProps = {
+  isMapPreviewEnabled: boolean;
   layerShortcuts: readonly TimelineLayerShortcutTarget[];
   mode: "drawer" | "popup";
+  onToggleMapPreview: () => void;
   onToggleSet: (setId: TimelineSetId, nextEnabled: boolean) => void;
   showShortcuts?: boolean;
   sets: TimelineSidebarSetState[];
 };
 
 export function TimelineSidebarChrome({
+  isMapPreviewEnabled,
   layerShortcuts,
   mode,
+  onToggleMapPreview,
   onToggleSet,
   showShortcuts = true,
   sets,
@@ -37,42 +42,74 @@ export function TimelineSidebarChrome({
 
   return (
     <>
-      <Button
-        aria-controls="timeline-layers-panel"
-        aria-expanded={isOpen}
-        aria-label={isOpen ? "Hide layers controls" : "Show layers controls"}
+      <div
         className={cn(
-          "absolute left-[var(--app-chrome-left)] top-[var(--app-chrome-top)] z-[4] h-auto rounded-full px-3 py-2 text-xs",
-          "transition-[background-color,border-color,box-shadow,opacity,transform] duration-200",
+          "absolute left-[var(--app-chrome-left)] top-[var(--app-chrome-top)] z-[4] flex items-center gap-2",
+          "transition-[opacity,transform] duration-200",
           activeView === "available-sets" && "pointer-events-none opacity-0",
           mode === "drawer" &&
             isOpen &&
             "pointer-events-none -translate-y-1 scale-[0.98] opacity-0",
         )}
-        data-open={isOpen ? "true" : "false"}
-        onClick={() => {
-          actions.setIsSidebarOpen((current) => !current);
-        }}
-        size="pill"
-        type="button"
-        variant="glass"
       >
-        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden className="size-4 shrink-0">
-          <rect x="2" y="3.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', transform: isOpen ? 'translateY(4px) rotate(45deg)' : 'none', transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
-          <rect x="2" y="7.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', opacity: isOpen ? 0 : 1, transform: isOpen ? 'scaleX(0)' : 'none', transition: 'opacity 160ms ease, transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
-          <rect x="2" y="11.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', transform: isOpen ? 'translateY(-4px) rotate(-45deg)' : 'none', transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
-        </svg>
-        <span>Layers</span>
-        {showShortcuts ? (
-          <ShortcutKey
-            aria-hidden="true"
-            className="border-border/70 bg-surface/70 text-muted-foreground"
-            size="sm"
-          >
-            L
-          </ShortcutKey>
-        ) : null}
-      </Button>
+        <Button
+          aria-controls="timeline-layers-panel"
+          aria-expanded={isOpen}
+          aria-label={isOpen ? "Hide layers controls" : "Show layers controls"}
+          className="h-auto rounded-full px-3 py-2 text-xs"
+          data-open={isOpen ? "true" : "false"}
+          onClick={() => {
+            actions.setIsSidebarOpen((current) => !current);
+          }}
+          size="pill"
+          type="button"
+          variant="glass"
+        >
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden className="size-4 shrink-0">
+            <rect x="2" y="3.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', transform: isOpen ? 'translateY(4px) rotate(45deg)' : 'none', transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
+            <rect x="2" y="7.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', opacity: isOpen ? 0 : 1, transform: isOpen ? 'scaleX(0)' : 'none', transition: 'opacity 160ms ease, transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
+            <rect x="2" y="11.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', transform: isOpen ? 'translateY(-4px) rotate(-45deg)' : 'none', transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
+          </svg>
+          <span>Layers</span>
+          {showShortcuts ? (
+            <ShortcutKey
+              aria-hidden="true"
+              className="border-border/70 bg-surface/70 text-muted-foreground"
+              size="sm"
+            >
+              L
+            </ShortcutKey>
+          ) : null}
+        </Button>
+        <Button
+          aria-label={isMapPreviewEnabled ? "Hide map preview" : "Show map preview"}
+          aria-pressed={isMapPreviewEnabled}
+          className={cn(
+            "h-auto rounded-full px-3 py-2 text-xs",
+            isMapPreviewEnabled &&
+              "border-foreground/80 bg-foreground text-background hover:bg-foreground/90 hover:border-foreground",
+          )}
+          onClick={onToggleMapPreview}
+          size="pill"
+          type="button"
+          variant="glass"
+        >
+          <Map className="size-4 shrink-0" />
+          {showShortcuts ? (
+            <ShortcutKey
+              aria-hidden="true"
+              className={cn(
+                isMapPreviewEnabled
+                  ? "border-background/30 bg-background/20 text-background/70"
+                  : "border-border/70 bg-surface/70 text-muted-foreground",
+              )}
+              size="sm"
+            >
+              M
+            </ShortcutKey>
+          ) : null}
+        </Button>
+      </div>
       <button
         aria-label="Close layers controls"
         className={cn(
