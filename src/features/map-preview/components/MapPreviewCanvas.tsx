@@ -66,16 +66,35 @@ function clampMapViewport(viewport: MapViewport) {
   };
 }
 
+function hashLabel(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+function shadeForSubject(rgb: string, label: string): string {
+  const match = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/.exec(rgb);
+  if (!match) return rgb;
+  const [r, g, b] = [Number(match[1]), Number(match[2]), Number(match[3])];
+  const hash = hashLabel(label);
+  const clamp = (n: number) => Math.max(0, Math.min(255, n));
+  return `rgb(${clamp(r + (hash % 41) - 20)}, ${clamp(g + ((hash >> 7) % 41) - 20)}, ${clamp(b + ((hash >> 14) % 41) - 20)})`;
+}
+
 export const MapPreviewCanvas = memo(function MapPreviewCanvas({
   height,
   hoveredFeatureLabel,
   onHoverFeature,
+  overlayColorMap,
   slice,
   width,
 }: {
   height: number;
   hoveredFeatureLabel: string | null;
   onHoverFeature: (feature: HoveredMapFeature | null) => void;
+  overlayColorMap?: ReadonlyMap<string, string>;
   slice: RenderedMapSlice | null;
   width: number;
 }) {
@@ -103,6 +122,7 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
   const latestDrawStateRef = useRef({
     height,
     hoveredFeatureLabel,
+    overlayColorMap,
     slice,
     width,
   });
@@ -110,6 +130,7 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
   latestDrawStateRef.current = {
     height,
     hoveredFeatureLabel,
+    overlayColorMap,
     slice,
     width,
   };
@@ -124,6 +145,7 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
     const {
       height: currentHeight,
       hoveredFeatureLabel: currentHoveredFeatureLabel,
+      overlayColorMap: currentOverlayColorMap,
       slice: currentSlice,
       width: currentWidth,
     } = latestDrawStateRef.current;
@@ -198,8 +220,15 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
         const isHovered =
           feature.hoverable && currentHoveredFeatureLabel === feature.label;
 
+        const directMatch = currentOverlayColorMap?.get(feature.label.toLowerCase());
+        const subjectoMatch =
+          feature.subjecto && !directMatch
+            ? currentOverlayColorMap?.get(feature.subjecto.toLowerCase())
+            : undefined;
+        const overrideColor =
+          directMatch ?? (subjectoMatch ? shadeForSubject(subjectoMatch, feature.label) : undefined);
         context.save();
-        context.fillStyle = feature.color;
+        context.fillStyle = overrideColor ?? feature.color;
         context.globalAlpha = feature.opacity;
         context.fill(path, "evenodd");
         context.restore();
@@ -257,7 +286,7 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
 
   useEffect(() => {
     scheduleDrawMap(true);
-  }, [height, hoveredFeatureLabel, scheduleDrawMap, slice, width]);
+  }, [height, hoveredFeatureLabel, overlayColorMap, scheduleDrawMap, slice, width]);
 
   useEffect(() => {
     ensureWorldLandLoaded(() => scheduleDrawMap(true));

@@ -228,6 +228,13 @@ export function TimelineCanvas({
     width,
   });
   reserveAxisDateRowRef.current = reserveAxisDateRow;
+  const overlayColorMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const { band } of resolvedOverlayBands) {
+      if (band.color) map.set(band.label.toLowerCase(), band.color);
+    }
+    return map;
+  }, [resolvedOverlayBands]);
   const commitHoveredTooltip = useCallback(
     (nextTooltip: HoveredTooltipState | null) => {
       const currentTooltip = hoveredTooltipRef.current;
@@ -1233,6 +1240,7 @@ export function TimelineCanvas({
       {isMapPreviewEnabled ? (
         <MapPreview
           onClose={onMapPreviewClose}
+          overlayColorMap={overlayColorMap}
           stageHeight={height}
           stageWidth={width}
         />

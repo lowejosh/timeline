@@ -45,12 +45,14 @@ import type {
 
 type MapPreviewProps = {
   onClose: () => void;
+  overlayColorMap?: ReadonlyMap<string, string>;
   stageHeight: number;
   stageWidth: number;
 };
 
 export const MapPreview = memo(function MapPreview({
   onClose,
+  overlayColorMap,
   stageHeight,
   stageWidth,
 }: MapPreviewProps) {
@@ -310,6 +312,7 @@ export const MapPreview = memo(function MapPreview({
           height={canvasHeight}
           hoveredFeatureLabel={hoveredFeature?.label ?? null}
           onHoverFeature={setHoveredFeature}
+          overlayColorMap={overlayColorMap}
           slice={renderedSlice}
           width={windowBounds.width}
         />

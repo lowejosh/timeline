@@ -284,6 +284,10 @@ function createRenderedFeatures(data: MapGeoJson, kind: MapSlice["kind"]) {
         label: labelForFeature(feature, "Historical region"),
         opacity: 1,
         strokeOpacity: precisionStrokeOpacity(feature),
+        subjecto:
+          feature.properties?.SUBJECTO?.trim() ||
+          feature.properties?.PARTOF?.trim() ||
+          undefined,
       };
     })
     .filter((feature): feature is RenderedMapFeature => feature !== null);

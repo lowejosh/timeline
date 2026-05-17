@@ -45,6 +45,7 @@ export type RenderedMapFeature = {
   label: string;
   opacity: number;
   strokeOpacity: number;
+  subjecto?: string;
 };
 
 export type HoveredMapFeature = {
