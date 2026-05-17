@@ -5,9 +5,9 @@ import {
   MAP_WINDOW_MIN_HEIGHT,
   MAP_WINDOW_MIN_WIDTH,
   MAP_WINDOW_STORAGE_KEY,
-} from "./constants";
-import type { MapWindowBounds, ResizeHandle } from "./types";
-import { clamp } from "./mapPreviewUtils";
+} from "../MapPreview.const";
+import type { MapWindowBounds, ResizeHandle } from "../MapPreview.types";
+import { clamp } from "./MapPreview.utils";
 
 export function getDefaultMapWindowBounds(stageWidth: number): MapWindowBounds {
   const width = Math.min(

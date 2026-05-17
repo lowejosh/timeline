@@ -20,15 +20,16 @@ import { useAxisTickAnimation } from "./animation/useAxisTickAnimation";
 import { useCanvasBackingStore } from "./platform/useCanvasBackingStore";
 import { useViewportInteractionState } from "./interactions/useViewportInteractionState";
 import { useEdgeRailInteraction } from "./interactions/useEdgeRailInteraction";
-import { TimelineTooltip } from "./ui/TimelineTooltip";
-import { HistoricalMapOverlay } from "@/features/map-preview/HistoricalMapOverlay";
+import { TimelineTooltip } from "./components/TimelineTooltip";
+import { MapPreview } from "@/features/map-preview/MapPreview";
 import {
+  getMapSlice,
   getMapSliceLabelForPreviewYear,
   getMapSliceYearForPreviewYear,
-} from "@/features/map-preview/mapSliceData";
+} from "@/features/map-preview/MapPreview.data";
 import { useWheelZoomPan } from "./interactions/useWheelZoomPan";
 import { useTouchGestures } from "./interactions/useTouchGestures";
-import { EdgeZoomZones } from "./ui/EdgeZoomZones";
+import { EdgeZoomZones } from "./components/EdgeZoomZones";
 import { drawTimelineCanvasFrame } from "./rendering/drawTimelineCanvasFrame";
 import { publishMapPreviewYear } from "@/lib/maps/mapPreviewStore";
 import type {
@@ -537,7 +538,7 @@ export function TimelineCanvas({
       mapPreviewOverrideX !== null
         ? screenToWorld(mapPreviewOverrideX - pad, viewport, innerW)
         : viewport.centerYear;
-    const shouldShowMap = nextYear >= -400_000_000 && nextYear <= 2_100;
+    const shouldShowMap = getMapSlice(nextYear) !== null;
 
     publishMapPreviewYear(shouldShowMap ? nextYear : null);
   }, [isMapPreviewEnabled, mapPreviewOverrideX, pad, viewport, width]);
@@ -1223,14 +1224,14 @@ export function TimelineCanvas({
         >
           <div className="absolute inset-y-0 left-0 border-l border-muted-foreground/45" />
           {mapPreviewGuide.label ? (
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[0.56rem] font-medium uppercase tracking-[0.1em] text-muted-foreground/70">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[0.56rem] font-medium uppercase tracking-[0.1em] text-muted-foreground/70">
               {mapPreviewGuide.label}
             </div>
           ) : null}
         </div>
       ) : null}
       {isMapPreviewEnabled ? (
-        <HistoricalMapOverlay
+        <MapPreview
           onClose={onMapPreviewClose}
           stageHeight={height}
           stageWidth={width}

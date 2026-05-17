@@ -17,9 +17,9 @@ import {
 import {
   MAP_WINDOW_HEADER_HEIGHT,
   MAP_WINDOW_MIN_HEIGHT,
-} from "./constants";
-import { MapPreviewCanvas } from "./MapPreviewCanvas";
-import { clamp } from "./mapPreviewUtils";
+} from "./MapPreview.const";
+import { MapPreviewCanvas } from "./components/MapPreviewCanvas";
+import { clamp } from "./utils/MapPreview.utils";
 import {
   getLoadingLabel,
   getMapSlice,
@@ -28,40 +28,41 @@ import {
   getSourceLabel,
   getSourceUrl,
   loadMapSlice,
-} from "./mapSliceData";
+} from "./MapPreview.data";
 import {
   getDefaultMapWindowBounds,
   normalizeMapWindowBounds,
   readStoredMapWindowBounds,
   resizeMapWindowBounds,
   writeStoredMapWindowBounds,
-} from "./mapWindowBounds";
+} from "./utils/MapPreview.bounds";
 import type {
   HoveredMapFeature,
   MapWindowDragState,
   RenderedMapSlice,
   ResizeHandle,
-} from "./types";
+} from "./MapPreview.types";
 
-type HistoricalMapOverlayProps = {
+type MapPreviewProps = {
   onClose: () => void;
   stageHeight: number;
   stageWidth: number;
 };
 
-export const HistoricalMapOverlay = memo(function HistoricalMapOverlay({
+export const MapPreview = memo(function MapPreview({
   onClose,
   stageHeight,
   stageWidth,
-}: HistoricalMapOverlayProps) {
+}: MapPreviewProps) {
   const year = useSyncExternalStore(
     subscribeMapPreviewYear,
     getMapPreviewYearSnapshot,
     getMapPreviewYearSnapshot,
   );
   const mapSlice = useMemo(() => getMapSlice(year), [year]);
-  const [renderedSlice, setRenderedSlice] =
-    useState<RenderedMapSlice | null>(null);
+  const [renderedSlice, setRenderedSlice] = useState<RenderedMapSlice | null>(
+    null,
+  );
   const [failedFilename, setFailedFilename] = useState<string | null>(null);
   const [hoveredFeature, setHoveredFeature] =
     useState<HoveredMapFeature | null>(null);
@@ -245,7 +246,7 @@ export const HistoricalMapOverlay = memo(function HistoricalMapOverlay({
 
   return (
     <aside
-      aria-label="Historical map preview"
+      aria-label="Map preview"
       className="pointer-events-auto absolute z-[3] overflow-hidden rounded-md border border-border/55 bg-background/10 text-card-foreground shadow-[0_8px_22px_rgba(15,23,42,0.12)] [contain:layout_paint_style]"
       data-map-preview="true"
       onPointerDown={(event) => event.stopPropagation()}
@@ -309,22 +310,26 @@ export const HistoricalMapOverlay = memo(function HistoricalMapOverlay({
 
       {hoveredFeature ? (
         <div
-          className="pointer-events-none absolute z-[4] max-w-[14rem] rounded-md border border-border bg-popover px-2.5 py-2 text-popover-foreground shadow-lg"
+          className="pointer-events-none absolute z-[4] max-w-[15rem] rounded-md border border-border bg-popover px-2.5 py-2 text-popover-foreground shadow-lg"
           style={{
             left: clamp(hoveredFeature.x + 12, 8, windowBounds.width - 232),
             top: clamp(
               hoveredFeature.y + MAP_WINDOW_HEADER_HEIGHT + 12,
               MAP_WINDOW_HEADER_HEIGHT + 8,
-              windowBounds.height - 78,
+              windowBounds.height - 108,
             ),
           }}
         >
           <div className="truncate text-[0.74rem] font-semibold leading-tight">
             {hoveredFeature.label}
           </div>
-          {hoveredFeature.detail ? (
-            <div className="mt-1 line-clamp-2 text-[0.66rem] leading-snug text-muted-foreground">
-              {hoveredFeature.detail}
+          {hoveredFeature.details.length > 0 ? (
+            <div className="mt-1.5 space-y-0.5 text-[0.64rem] leading-snug text-muted-foreground">
+              {hoveredFeature.details.map((detail) => (
+                <div className="truncate" key={detail}>
+                  {detail}
+                </div>
+              ))}
             </div>
           ) : null}
         </div>
@@ -370,9 +375,7 @@ export const HistoricalMapOverlay = memo(function HistoricalMapOverlay({
           className={`absolute z-[3] touch-none ${resizeHandle.className}`}
           key={resizeHandle.handle}
           onPointerCancel={endWindowDrag}
-          onPointerDown={(event) =>
-            beginWindowDrag(event, resizeHandle.handle)
-          }
+          onPointerDown={(event) => beginWindowDrag(event, resizeHandle.handle)}
           onPointerMove={updateWindowDrag}
           onPointerUp={endWindowDrag}
           role="separator"

@@ -22,10 +22,12 @@ export type MapGeoJsonFeature = {
   type: "Feature";
   geometry: GeoJsonGeometry | null;
   properties?: {
+    ABBREVN?: string;
     BORDERPRECISION?: number | string;
     NAME?: string;
     PARTOF?: string;
     SUBJECTO?: string;
+    wikipedia?: string;
   };
 };
 
@@ -37,7 +39,8 @@ export type MapGeoJson = {
 export type RenderedMapFeature = {
   color: string;
   d: string;
-  detail: string;
+  details: string[];
+  hoverable: boolean;
   id: string;
   label: string;
   opacity: number;
@@ -45,7 +48,7 @@ export type RenderedMapFeature = {
 };
 
 export type HoveredMapFeature = {
-  detail: string;
+  details: string[];
   label: string;
   x: number;
   y: number;

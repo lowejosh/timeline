@@ -1,4 +1,7 @@
-import { ensureWorldLandLoaded, getWorldLandPath2D } from "./worldLandLoader";
+import {
+  ensureWorldLandLoaded,
+  getWorldLandPath2D,
+} from "../utils/MapPreview.worldLand";
 import {
   memo,
   useCallback,
@@ -14,9 +17,15 @@ import {
   MAP_MAX_ZOOM,
   MAP_MIN_ZOOM,
   MAP_WIDTH,
-} from "./constants";
-import { clamp, scheduleMapIdleTask } from "./mapPreviewUtils";
-import type { HoveredMapFeature, MapViewport, RenderedMapSlice } from "./types";
+} from "../MapPreview.const";
+import { clamp, scheduleMapIdleTask } from "../utils/MapPreview.utils";
+import type {
+  HoveredMapFeature,
+  MapViewport,
+  RenderedMapSlice,
+} from "../MapPreview.types";
+
+const HOVER_SETTLE_MS = 70;
 
 function clampMapViewport(viewport: MapViewport) {
   const zoom = clamp(viewport.zoom, MAP_MIN_ZOOM, MAP_MAX_ZOOM);
@@ -45,6 +54,8 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const drawFrameRef = useRef(0);
+  const hoverSettleTimeoutRef = useRef<number | null>(null);
+  const pendingHoverFeatureRef = useRef<HoveredMapFeature | null>(null);
   const idleCancelRef = useRef<(() => void) | null>(null);
   const panStateRef = useRef<{
     offsetX: number;
@@ -160,20 +171,27 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       }
 
       for (const { feature, path } of cachedPaths.paths) {
-        const isHovered = currentHoveredFeatureLabel === feature.label;
+        const isHovered =
+          feature.hoverable && currentHoveredFeatureLabel === feature.label;
 
         context.save();
         context.fillStyle = feature.color;
-        context.globalAlpha = 1;
+        context.globalAlpha = feature.opacity;
         context.fill(path, "evenodd");
         context.restore();
 
+        if (isHovered) {
+          context.save();
+          context.fillStyle = "rgba(255, 255, 255, 0.28)";
+          context.globalCompositeOperation = "source-atop";
+          context.fill(path, "evenodd");
+          context.restore();
+        }
+
         context.save();
-        context.strokeStyle = isHovered
-          ? "rgba(248, 250, 252, 0.86)"
-          : "rgba(15, 23, 42, 0.42)";
-        context.globalAlpha = isHovered ? 0.92 : 0.38;
-        context.lineWidth = isHovered ? 0.6 : 0.34;
+        context.strokeStyle = "rgba(15, 23, 42, 0.38)";
+        context.globalAlpha = feature.strokeOpacity;
+        context.lineWidth = 0.32;
         context.stroke(path);
         context.restore();
       }
@@ -231,6 +249,10 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       if (drawFrameRef.current) {
         window.cancelAnimationFrame(drawFrameRef.current);
       }
+
+      if (hoverSettleTimeoutRef.current !== null) {
+        window.clearTimeout(hoverSettleTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -257,6 +279,47 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       y,
     };
   };
+  const commitHoverFeature = (feature: HoveredMapFeature | null) => {
+    latestDrawStateRef.current = {
+      ...latestDrawStateRef.current,
+      hoveredFeatureLabel: feature?.label ?? null,
+    };
+    onHoverFeature(feature);
+    scheduleDrawMap();
+  };
+  const clearPendingHoverFeature = () => {
+    pendingHoverFeatureRef.current = null;
+
+    if (hoverSettleTimeoutRef.current !== null) {
+      window.clearTimeout(hoverSettleTimeoutRef.current);
+      hoverSettleTimeoutRef.current = null;
+    }
+  };
+  const scheduleHoverFeature = (feature: HoveredMapFeature | null) => {
+    if (!feature) {
+      clearPendingHoverFeature();
+      commitHoverFeature(null);
+      return;
+    }
+
+    if (latestDrawStateRef.current.hoveredFeatureLabel === feature.label) {
+      clearPendingHoverFeature();
+      commitHoverFeature(feature);
+      return;
+    }
+
+    pendingHoverFeatureRef.current = feature;
+
+    if (hoverSettleTimeoutRef.current !== null) {
+      return;
+    }
+
+    hoverSettleTimeoutRef.current = window.setTimeout(() => {
+      hoverSettleTimeoutRef.current = null;
+      commitHoverFeature(pendingHoverFeatureRef.current);
+      pendingHoverFeatureRef.current = null;
+    }, HOVER_SETTLE_MS);
+  };
   const updateHoverFeature = (event: PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
@@ -264,16 +327,16 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
     const cachedPaths = pathCacheRef.current;
 
     if (!context || !mapPoint || !cachedPaths) {
-      latestDrawStateRef.current = {
-        ...latestDrawStateRef.current,
-        hoveredFeatureLabel: null,
-      };
-      onHoverFeature(null);
+      scheduleHoverFeature(null);
       return;
     }
 
     for (let index = cachedPaths.paths.length - 1; index >= 0; index -= 1) {
       const { feature, path } = cachedPaths.paths[index];
+
+      if (!feature.hoverable) {
+        continue;
+      }
 
       context.save();
       context.setTransform(1, 0, 0, 1, 0, 0);
@@ -286,12 +349,8 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       context.restore();
 
       if (isHit) {
-        latestDrawStateRef.current = {
-          ...latestDrawStateRef.current,
-          hoveredFeatureLabel: feature.label,
-        };
-        onHoverFeature({
-          detail: feature.detail,
+        scheduleHoverFeature({
+          details: feature.details,
           label: feature.label,
           x: mapPoint.canvasX,
           y: mapPoint.canvasY,
@@ -300,11 +359,7 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       }
     }
 
-    latestDrawStateRef.current = {
-      ...latestDrawStateRef.current,
-      hoveredFeatureLabel: null,
-    };
-    onHoverFeature(null);
+    scheduleHoverFeature(null);
   };
   const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     event.preventDefault();
@@ -387,12 +442,7 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       onPointerCancel={handlePointerEnd}
       onPointerDown={handlePointerDown}
       onPointerLeave={() => {
-        latestDrawStateRef.current = {
-          ...latestDrawStateRef.current,
-          hoveredFeatureLabel: null,
-        };
-        scheduleDrawMap();
-        onHoverFeature(null);
+        scheduleHoverFeature(null);
       }}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}

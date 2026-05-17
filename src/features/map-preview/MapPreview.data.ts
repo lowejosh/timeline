@@ -15,8 +15,8 @@ import {
   MAP_WIDTH,
   MAX_POINTS_PER_RING,
   MAX_RENDERED_SLICE_CACHE_SIZE,
-} from "./constants";
-import { waitForMapIdle } from "./mapPreviewUtils";
+} from "./MapPreview.const";
+import { waitForMapIdle } from "./utils/MapPreview.utils";
 import type {
   GeoJsonGeometry,
   GeoJsonPolygon,
@@ -26,7 +26,7 @@ import type {
   MapSlice,
   RenderedMapFeature,
   RenderedMapSlice,
-} from "./types";
+} from "./MapPreview.types";
 
 const historicalStartYear = HISTORICAL_BASEMAP_SLICES[0]?.year ?? -123_000;
 const mapSliceRegistry = new Map<string, MapSlice>();
@@ -170,41 +170,51 @@ function colorForFeature(feature: MapGeoJsonFeature) {
     "historical-region";
   const hue = hashString(key) % 360;
 
-  return `hsl(${hue} 72% 54%)`;
+  return `hsl(${hue} 48% 62%)`;
 }
 
 function labelForFeature(feature: MapGeoJsonFeature, fallback: string) {
   return feature.properties?.NAME?.trim() || fallback;
 }
 
-function detailForFeature(feature: MapGeoJsonFeature) {
-  const name = feature.properties?.NAME?.trim();
-  return [
-    feature.properties?.SUBJECTO?.trim(),
-    feature.properties?.PARTOF?.trim(),
-  ]
-    .filter((v, i, arr) => Boolean(v) && v !== name && arr.indexOf(v) === i)
-    .join(" · ");
+function getUniqueFeatureDetailValues(...values: Array<string | undefined>) {
+  return values
+    .map((value) => value?.trim())
+    .filter((value): value is string => Boolean(value))
+    .filter((value, index, array) => array.indexOf(value) === index);
 }
 
-function precisionOpacity(feature: MapGeoJsonFeature) {
+function getPrecisionPercentage(feature: MapGeoJsonFeature) {
   const precision = Number(feature.properties?.BORDERPRECISION ?? 2);
 
-  if (precision <= 1) {
-    return 0.28;
+  if (!Number.isFinite(precision)) {
+    return null;
   }
 
-  if (precision >= 3) {
-    return 0.5;
-  }
+  return Math.round((Math.min(Math.max(precision, 1), 3) / 3) * 100);
+}
 
-  return 0.4;
+function detailsForFeature(feature: MapGeoJsonFeature) {
+  const name = feature.properties?.NAME?.trim();
+  const details = getUniqueFeatureDetailValues(
+    feature.properties?.SUBJECTO?.trim(),
+    feature.properties?.PARTOF?.trim(),
+  )
+    .filter((value) => value !== name)
+    .map((value) => {
+      if (value === feature.properties?.SUBJECTO?.trim()) {
+        return `Subject: ${value}`;
+      }
+
+      return `Part of: ${value}`;
+    });
+  return details;
 }
 
 function precisionStrokeOpacity(feature: MapGeoJsonFeature) {
   const precision = Number(feature.properties?.BORDERPRECISION ?? 2);
 
-  return precision <= 1 ? 0.12 : 0.28;
+  return precision <= 1 ? 0.08 : 0.16;
 }
 
 function projectPosition(position: GeoJsonPosition) {
@@ -266,10 +276,11 @@ function createRenderedFeatures(data: MapGeoJson, kind: MapSlice["kind"]) {
           id: `gplates-coastline-${index}`,
           d,
           color: "hsl(154 67% 50%)",
-          detail: "GPlates reconstructed coastline",
+          details: [],
+          hoverable: false,
           label: "Reconstructed coastline",
-          opacity: 0.3,
-          strokeOpacity: 0.42,
+          opacity: 0.64,
+          strokeOpacity: 0.28,
         };
       }
 
@@ -277,9 +288,10 @@ function createRenderedFeatures(data: MapGeoJson, kind: MapSlice["kind"]) {
         id: `${feature.properties?.NAME ?? "feature"}-${index}`,
         d,
         color: colorForFeature(feature),
-        detail: detailForFeature(feature),
+        details: detailsForFeature(feature),
+        hoverable: true,
         label: labelForFeature(feature, "Historical region"),
-        opacity: precisionOpacity(feature),
+        opacity: 1,
         strokeOpacity: precisionStrokeOpacity(feature),
       };
     })

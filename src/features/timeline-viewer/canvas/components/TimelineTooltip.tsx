@@ -295,7 +295,7 @@ export function TimelineTooltip({
     <div
       ref={tooltipRef}
       className={cn(
-        "absolute z-[2] rounded-lg border border-border bg-glass p-3 text-foreground shadow-glass backdrop-blur-md transition-[opacity,transform] duration-200 ease-out",
+        "absolute z-[5] rounded-lg border border-border bg-glass p-3 text-foreground shadow-glass backdrop-blur-md transition-[opacity,transform] duration-200 ease-out",
         "pointer-events-none",
         renderedTooltip.phase === "present"
           ? "opacity-100"
