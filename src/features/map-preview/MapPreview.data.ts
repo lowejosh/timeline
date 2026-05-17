@@ -193,7 +193,7 @@ function detailsForFeature(feature: MapGeoJsonFeature) {
     .filter((value) => value !== name)
     .map((value) => {
       if (value === feature.properties?.SUBJECTO?.trim()) {
-        return `Subject: ${value}`;
+        return `Subject of ${value}`;
       }
 
       return `Part of: ${value}`;

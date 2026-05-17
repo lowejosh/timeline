@@ -117,7 +117,7 @@ export function TimelineKeyboardHelp({
     <div
       aria-label="Keyboard shortcuts"
       aria-modal="true"
-      className="absolute inset-0 z-[60] flex animate-[shortcut-overlay-in_180ms_ease-out] items-start justify-center bg-[rgba(44,31,20,0.16)] px-3 pt-[calc(env(safe-area-inset-top,0px)+4.5rem)] backdrop-blur-sm"
+      className="absolute inset-0 z-[60] flex animate-[shortcut-overlay-in_180ms_ease-out] items-start justify-center bg-overlay-scrim px-3 pt-[calc(env(safe-area-inset-top,0px)+4.5rem)] backdrop-blur-sm"
       role="dialog"
     >
       <button

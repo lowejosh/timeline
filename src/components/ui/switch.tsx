@@ -27,7 +27,7 @@ export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
       <span
         aria-hidden="true"
         className={cn(
-          "absolute left-1 top-1/2 size-3 -translate-y-1/2 rounded-full bg-white shadow-sm transition-transform duration-200 ease-out",
+          "absolute left-1 top-1/2 size-3 -translate-y-1/2 rounded-full bg-background shadow-sm transition-transform duration-200 ease-out",
           checked && "translate-x-[0.86rem]",
         )}
       />

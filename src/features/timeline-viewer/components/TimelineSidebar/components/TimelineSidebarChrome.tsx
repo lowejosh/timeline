@@ -56,7 +56,11 @@ export function TimelineSidebarChrome({
           aria-controls="timeline-layers-panel"
           aria-expanded={isOpen}
           aria-label={isOpen ? "Hide layers controls" : "Show layers controls"}
-          className="h-auto rounded-full px-3 py-2 text-xs"
+          className={cn(
+            "h-auto rounded-full px-3 py-2 text-xs",
+            isOpen &&
+              "bg-glass-selected border-border",
+          )}
           data-open={isOpen ? "true" : "false"}
           onClick={() => {
             actions.setIsSidebarOpen((current) => !current);
@@ -87,7 +91,7 @@ export function TimelineSidebarChrome({
           className={cn(
             "h-auto rounded-full px-3 py-2 text-xs",
             isMapPreviewEnabled &&
-              "border-foreground/80 bg-foreground text-background hover:bg-foreground/90 hover:border-foreground",
+              "bg-glass-selected border-border",
           )}
           onClick={onToggleMapPreview}
           size="pill"
@@ -98,11 +102,7 @@ export function TimelineSidebarChrome({
           {showShortcuts ? (
             <ShortcutKey
               aria-hidden="true"
-              className={cn(
-                isMapPreviewEnabled
-                  ? "border-background/30 bg-background/20 text-background/70"
-                  : "border-border/70 bg-surface/70 text-muted-foreground",
-              )}
+              className="border-border/70 bg-surface/70 text-muted-foreground"
               size="sm"
             >
               M
@@ -117,7 +117,7 @@ export function TimelineSidebarChrome({
           mode === "drawer" && "z-[6] block",
           mode !== "drawer" && "z-[2]",
           isOpen
-            ? "pointer-events-auto bg-[rgba(44,31,20,0.16)] opacity-100 backdrop-blur-md"
+            ? "pointer-events-auto bg-overlay-scrim opacity-100 backdrop-blur-md"
             : "pointer-events-none opacity-0",
           activeView === "available-sets" && "pointer-events-none opacity-0",
         )}

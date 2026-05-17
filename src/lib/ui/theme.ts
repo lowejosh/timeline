@@ -43,6 +43,14 @@ export const THEME = {
     /** Accent background chip */
     accentChip: "rgba(124, 92, 59, 0.12)",
 
+    /** Primary brand color — brown ink at high opacity (buttons, active states) */
+    primary: "rgba(77, 61, 47, 0.86)",
+    /** Primary foreground — near-opaque paper surface (text on primary, popover bg) */
+    primaryForeground: "rgba(251, 247, 239, 0.97)",
+
+    /** Modal / drawer backdrop scrim */
+    overlayScrim: "rgba(44, 31, 20, 0.16)",
+
     /**
      * Brown ink base: rgba(77, 61, 47, α).
      * Used for borders, dividers, and muted text.
@@ -103,8 +111,10 @@ export const THEME = {
       base: "rgba(251, 247, 239, 0.5)",
       /** Hover state */
       hover: "rgba(255, 251, 244, 0.62)",
-      /** Active / open state */
+      /** Active / open state (Radix-driven popovers) */
       active: "rgba(255, 251, 244, 0.58)",
+      /** Selected / toggled-on state (persistent, non-Radix toggles) */
+      selected: "rgba(215, 208, 196, 0.92)",
       /** Elevated panel gradient start (sidebar, settings panel) */
       panelFrom: "rgba(251, 247, 239, 0.56)",
       /** Elevated panel gradient end */

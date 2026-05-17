@@ -7,7 +7,8 @@ import {
   useSyncExternalStore,
   type PointerEvent,
 } from "react";
-import { X } from "lucide-react";
+import { Contrast, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import { formatTimelineYear } from "@/lib/rendering/bands";
 import {
@@ -56,6 +57,7 @@ export const MapPreview = memo(function MapPreview({
   stageHeight,
   stageWidth,
 }: MapPreviewProps) {
+  const [isOpaqueBg, setIsOpaqueBg] = useState(false);
   const year = useSyncExternalStore(
     subscribeMapPreviewYear,
     getMapPreviewYearSnapshot,
@@ -249,7 +251,10 @@ export const MapPreview = memo(function MapPreview({
   return (
     <aside
       aria-label="Map preview"
-      className="pointer-events-auto absolute z-[3] overflow-hidden rounded-md border border-border/55 bg-background/10 text-card-foreground shadow-[0_8px_22px_rgba(15,23,42,0.12)] [contain:layout_paint_style]"
+      className={cn(
+        "pointer-events-auto absolute z-[3] overflow-hidden rounded-md border border-border/55 text-card-foreground shadow-[0_8px_22px_rgba(15,23,42,0.12)] [contain:layout_paint_style] transition-[background-color] duration-200",
+        isOpaqueBg ? "bg-background/95 backdrop-blur-md" : "bg-background/10",
+      )}
       data-map-preview="true"
       onPointerDown={(event) => event.stopPropagation()}
       onPointerMove={(event) => event.stopPropagation()}
@@ -295,6 +300,24 @@ export const MapPreview = memo(function MapPreview({
             ) : null}
           </span>
         </div>
+        <button
+          aria-label={isOpaqueBg ? "Use transparent background" : "Use solid background"}
+          aria-pressed={isOpaqueBg}
+          className={cn(
+            "grid size-7 shrink-0 cursor-pointer place-items-center rounded-md transition-colors",
+            isOpaqueBg
+              ? "border border-primary/45 bg-primary/15 text-foreground hover:bg-primary/20"
+              : "text-muted-foreground hover:bg-accent/70 hover:text-foreground",
+          )}
+          onClick={(event) => {
+            event.stopPropagation();
+            setIsOpaqueBg((v) => !v);
+          }}
+          onPointerDown={(event) => event.stopPropagation()}
+          type="button"
+        >
+          <Contrast className="size-3.5" />
+        </button>
         <button
           aria-label="Close map preview"
           className="ml-2 grid size-7 shrink-0 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground"

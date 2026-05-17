@@ -23,6 +23,8 @@
   --color-glass: var(--glass);
   --color-glass-hover: var(--glass-hover);
   --color-glass-active: var(--glass-active);
+  --color-glass-selected: var(--glass-selected);
+  --color-overlay-scrim: var(--overlay-scrim);
   --color-warning: var(--warning);
   --shadow-glass: 0 8px 18px rgba(44, 31, 20, 0.08);
   --shadow-glass-hover: 0 10px 22px rgba(44, 31, 20, 0.1);
@@ -94,6 +96,8 @@
   --glass-base: rgba(251, 247, 239, 0.5);
   --glass-hover: rgba(255, 251, 244, 0.62);
   --glass-active: rgba(255, 251, 244, 0.58);
+  --glass-selected: rgba(215, 208, 196, 0.92);
+  --overlay-scrim: rgba(44, 31, 20, 0.16);
   --brown-8: rgba(77, 61, 47, 0.08);
   --brown-10: rgba(77, 61, 47, 0.1);
   --brown-12: rgba(77, 61, 47, 0.12);

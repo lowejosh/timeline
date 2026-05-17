@@ -47,7 +47,9 @@ export function TimelineSettings({
         <PopoverTrigger asChild>
           <Button
             aria-label={isOpen ? "Hide settings" : "Show settings"}
-            className="group rounded-full"
+            className={cn(
+              "group rounded-full data-[state=open]:bg-glass-selected data-[state=open]:border-border",
+            )}
             size="icon"
             type="button"
             variant="glass"
