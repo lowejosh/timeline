@@ -252,6 +252,13 @@ export const MapPreview = memo(function MapPreview({
       onPointerDown={(event) => event.stopPropagation()}
       onPointerMove={(event) => event.stopPropagation()}
       onPointerUp={(event) => event.stopPropagation()}
+      onTouchCancel={(event) => event.stopPropagation()}
+      onTouchEnd={(event) => event.stopPropagation()}
+      onTouchMove={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+      onTouchStart={(event) => event.stopPropagation()}
       style={{
         height: windowBounds.height,
         left: windowBounds.left,

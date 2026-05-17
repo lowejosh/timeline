@@ -208,6 +208,7 @@ function detailsForFeature(feature: MapGeoJsonFeature) {
 
       return `Part of: ${value}`;
     });
+
   return details;
 }
 

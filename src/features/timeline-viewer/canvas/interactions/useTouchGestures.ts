@@ -84,6 +84,15 @@ export function useTouchGestures({
       y: touch.clientY - rect.top,
     });
 
+    const isMapPreviewGesture = (event: TouchEvent) =>
+      event
+        .composedPath()
+        .some(
+          (target) =>
+            target instanceof HTMLElement &&
+            target.dataset.mapPreview === "true",
+        );
+
     const stopActiveCanvasDrag = () => {
       const dragState = dragStateRef.current;
 
@@ -173,6 +182,10 @@ export function useTouchGestures({
     };
 
     const handleTouchStart = (event: TouchEvent) => {
+      if (isMapPreviewGesture(event)) {
+        return;
+      }
+
       const rect = surface.getBoundingClientRect();
 
       if (tryStartDualEdgeTouchZoom(event.touches, rect)) {
@@ -204,6 +217,10 @@ export function useTouchGestures({
     };
 
     const handleTouchMove = (event: TouchEvent) => {
+      if (isMapPreviewGesture(event)) {
+        return;
+      }
+
       const rect = surface.getBoundingClientRect();
       const dualEdgeTouchZoom = dualEdgeTouchZoomRef.current;
 
@@ -284,6 +301,10 @@ export function useTouchGestures({
     };
 
     const handleTouchEnd = (event: TouchEvent) => {
+      if (isMapPreviewGesture(event)) {
+        return;
+      }
+
       const dualEdgeTouchZoom = dualEdgeTouchZoomRef.current;
 
       if (dualEdgeTouchZoom) {
@@ -306,7 +327,11 @@ export function useTouchGestures({
       }
     };
 
-    const handleTouchCancel = () => {
+    const handleTouchCancel = (event: TouchEvent) => {
+      if (isMapPreviewGesture(event)) {
+        return;
+      }
+
       stopPinchZoom();
       stopDualEdgeTouchZoom();
     };

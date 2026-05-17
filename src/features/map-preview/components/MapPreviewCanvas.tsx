@@ -26,6 +26,33 @@ import type {
 } from "../MapPreview.types";
 
 const HOVER_SETTLE_MS = 70;
+const TAP_SLOP_PX = 8;
+
+type ActiveMapPointer = {
+  clientX: number;
+  clientY: number;
+  pointerType: string;
+  startClientX: number;
+  startClientY: number;
+};
+
+type MapGestureState =
+  | {
+      mode: "pan";
+      pointerId: number;
+      startClientX: number;
+      startClientY: number;
+      startViewport: MapViewport;
+    }
+  | {
+      firstPointerId: number;
+      mode: "pinch";
+      secondPointerId: number;
+      startDistance: number;
+      startMidpointX: number;
+      startMidpointY: number;
+      startViewport: MapViewport;
+    };
 
 function clampMapViewport(viewport: MapViewport) {
   const zoom = clamp(viewport.zoom, MAP_MIN_ZOOM, MAP_MAX_ZOOM);
@@ -56,14 +83,11 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
   const drawFrameRef = useRef(0);
   const hoverSettleTimeoutRef = useRef<number | null>(null);
   const pendingHoverFeatureRef = useRef<HoveredMapFeature | null>(null);
+  const touchTooltipPinnedRef = useRef(false);
+  const lastTouchInteractionAtRef = useRef(0);
   const idleCancelRef = useRef<(() => void) | null>(null);
-  const panStateRef = useRef<{
-    offsetX: number;
-    offsetY: number;
-    pointerId: number;
-    startX: number;
-    startY: number;
-  } | null>(null);
+  const activePointersRef = useRef(new Map<number, ActiveMapPointer>());
+  const gestureStateRef = useRef<MapGestureState | null>(null);
   const pathCacheRef = useRef<{
     paths: Array<{
       feature: RenderedMapSlice["features"][number];
@@ -279,6 +303,91 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       y,
     };
   };
+  const getMapPointForClientPoint = (clientX: number, clientY: number) => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) {
+      return null;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = width / MAP_WIDTH;
+    const scaleY = height / MAP_HEIGHT;
+
+    return {
+      x: (clientX - rect.left) / scaleX,
+      y: (clientY - rect.top) / scaleY,
+    };
+  };
+  const getTwoTouchPointers = () => {
+    const touchPointers = [...activePointersRef.current.entries()].filter(
+      ([, pointer]) => pointer.pointerType === "touch",
+    );
+
+    if (touchPointers.length < 2) {
+      return null;
+    }
+
+    return [touchPointers[0], touchPointers[1]] as const;
+  };
+  const getPointerDistance = (
+    firstPointer: ActiveMapPointer,
+    secondPointer: ActiveMapPointer,
+  ) =>
+    Math.hypot(
+      secondPointer.clientX - firstPointer.clientX,
+      secondPointer.clientY - firstPointer.clientY,
+    );
+  const getPointerMidpoint = (
+    firstPointer: ActiveMapPointer,
+    secondPointer: ActiveMapPointer,
+  ) => ({
+    clientX: (firstPointer.clientX + secondPointer.clientX) / 2,
+    clientY: (firstPointer.clientY + secondPointer.clientY) / 2,
+  });
+  const beginPinchGesture = () => {
+    const touchPointers = getTwoTouchPointers();
+
+    if (!touchPointers) {
+      return false;
+    }
+
+    const [[firstPointerId, firstPointer], [secondPointerId, secondPointer]] =
+      touchPointers;
+    const midpoint = getPointerMidpoint(firstPointer, secondPointer);
+    const mapMidpoint = getMapPointForClientPoint(
+      midpoint.clientX,
+      midpoint.clientY,
+    );
+
+    if (!mapMidpoint) {
+      return false;
+    }
+
+    gestureStateRef.current = {
+      firstPointerId,
+      mode: "pinch",
+      secondPointerId,
+      startDistance: Math.max(1, getPointerDistance(firstPointer, secondPointer)),
+      startMidpointX: mapMidpoint.x,
+      startMidpointY: mapMidpoint.y,
+      startViewport: viewportRef.current,
+    };
+    scheduleHoverFeature(null);
+    return true;
+  };
+  const beginPanGesture = (
+    pointerId: number,
+    pointer: ActiveMapPointer,
+  ) => {
+    gestureStateRef.current = {
+      mode: "pan",
+      pointerId,
+      startClientX: pointer.clientX,
+      startClientY: pointer.clientY,
+      startViewport: viewportRef.current,
+    };
+  };
   const commitHoverFeature = (feature: HoveredMapFeature | null) => {
     latestDrawStateRef.current = {
       ...latestDrawStateRef.current,
@@ -286,6 +395,16 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
     };
     onHoverFeature(feature);
     scheduleDrawMap();
+  };
+  const clearHoverFeature = () => {
+    touchTooltipPinnedRef.current = false;
+    clearPendingHoverFeature();
+    commitHoverFeature(null);
+  };
+  const pinTouchHoverFeature = (feature: HoveredMapFeature | null) => {
+    touchTooltipPinnedRef.current = Boolean(feature);
+    clearPendingHoverFeature();
+    commitHoverFeature(feature);
   };
   const clearPendingHoverFeature = () => {
     pendingHoverFeatureRef.current = null;
@@ -297,10 +416,11 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
   };
   const scheduleHoverFeature = (feature: HoveredMapFeature | null) => {
     if (!feature) {
-      clearPendingHoverFeature();
-      commitHoverFeature(null);
+      clearHoverFeature();
       return;
     }
+
+    touchTooltipPinnedRef.current = false;
 
     if (latestDrawStateRef.current.hoveredFeatureLabel === feature.label) {
       clearPendingHoverFeature();
@@ -361,47 +481,245 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
 
     scheduleHoverFeature(null);
   };
+  const updateTapFeature = (
+    clientX: number,
+    clientY: number,
+    options: { immediate?: boolean } = {},
+  ) => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    const rawMapPoint = getMapPointForClientPoint(clientX, clientY);
+    const cachedPaths = pathCacheRef.current;
+
+    if (!context || !rawMapPoint || !cachedPaths) {
+      if (options.immediate) {
+        pinTouchHoverFeature(null);
+      } else {
+        scheduleHoverFeature(null);
+      }
+      return;
+    }
+
+    const viewport = viewportRef.current;
+    const mapPoint = {
+      canvasX: rawMapPoint.x * (width / MAP_WIDTH),
+      canvasY: rawMapPoint.y * (height / MAP_HEIGHT),
+      x: (rawMapPoint.x - viewport.offsetX) / viewport.zoom,
+      y: (rawMapPoint.y - viewport.offsetY) / viewport.zoom,
+    };
+
+    for (let index = cachedPaths.paths.length - 1; index >= 0; index -= 1) {
+      const { feature, path } = cachedPaths.paths[index];
+
+      if (!feature.hoverable) {
+        continue;
+      }
+
+      context.save();
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      const isHit = context.isPointInPath(
+        path,
+        mapPoint.x,
+        mapPoint.y,
+        "evenodd",
+      );
+      context.restore();
+
+      if (isHit) {
+        const hoverFeature = {
+          details: feature.details,
+          label: feature.label,
+          x: mapPoint.canvasX,
+          y: mapPoint.canvasY,
+        };
+
+        if (options.immediate) {
+          pinTouchHoverFeature(hoverFeature);
+          return;
+        }
+
+        scheduleHoverFeature(hoverFeature);
+        return;
+      }
+    }
+
+    if (options.immediate) {
+      pinTouchHoverFeature(null);
+      return;
+    }
+
+    scheduleHoverFeature(null);
+  };
   const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
-    const viewport = viewportRef.current;
-    panStateRef.current = {
-      offsetX: viewport.offsetX,
-      offsetY: viewport.offsetY,
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
+    const pointer = {
+      clientX: event.clientX,
+      clientY: event.clientY,
+      pointerType: event.pointerType,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
     };
+
+    activePointersRef.current.set(event.pointerId, pointer);
+
+    if (event.pointerType === "touch") {
+      lastTouchInteractionAtRef.current = Date.now();
+
+      if (beginPinchGesture()) {
+        return;
+      }
+
+      beginPanGesture(event.pointerId, pointer);
+      return;
+    }
+
+    beginPanGesture(event.pointerId, pointer);
   };
   const handlePointerMove = (event: PointerEvent<HTMLCanvasElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    const panState = panStateRef.current;
+    const currentPointer = activePointersRef.current.get(event.pointerId);
 
-    if (panState?.pointerId === event.pointerId) {
+    if (currentPointer) {
+      activePointersRef.current.set(event.pointerId, {
+        clientX: event.clientX,
+        clientY: event.clientY,
+        pointerType: currentPointer.pointerType,
+        startClientX: currentPointer.startClientX,
+        startClientY: currentPointer.startClientY,
+      });
+    }
+
+    const gestureState = gestureStateRef.current;
+
+    if (gestureState?.mode === "pinch") {
+      const firstPointer = activePointersRef.current.get(
+        gestureState.firstPointerId,
+      );
+      const secondPointer = activePointersRef.current.get(
+        gestureState.secondPointerId,
+      );
+
+      if (!firstPointer || !secondPointer) {
+        return;
+      }
+
+      const midpoint = getPointerMidpoint(firstPointer, secondPointer);
+      const mapMidpoint = getMapPointForClientPoint(
+        midpoint.clientX,
+        midpoint.clientY,
+      );
+
+      if (!mapMidpoint) {
+        return;
+      }
+
+      const nextZoom = clamp(
+        gestureState.startViewport.zoom *
+          (getPointerDistance(firstPointer, secondPointer) /
+            gestureState.startDistance),
+        MAP_MIN_ZOOM,
+        MAP_MAX_ZOOM,
+      );
+      const worldX =
+        (gestureState.startMidpointX - gestureState.startViewport.offsetX) /
+        gestureState.startViewport.zoom;
+      const worldY =
+        (gestureState.startMidpointY - gestureState.startViewport.offsetY) /
+        gestureState.startViewport.zoom;
+
+      viewportRef.current = clampMapViewport({
+        offsetX: mapMidpoint.x - worldX * nextZoom,
+        offsetY: mapMidpoint.y - worldY * nextZoom,
+        zoom: nextZoom,
+      });
+      scheduleHoverFeature(null);
+      scheduleDrawMap();
+      return;
+    }
+
+    if (gestureState?.mode === "pan" && gestureState.pointerId === event.pointerId) {
       const scaleX = width / MAP_WIDTH;
       const scaleY = height / MAP_HEIGHT;
 
       viewportRef.current = clampMapViewport({
         ...viewportRef.current,
-        offsetX: panState.offsetX + (event.clientX - panState.startX) / scaleX,
-        offsetY: panState.offsetY + (event.clientY - panState.startY) / scaleY,
+        offsetX:
+          gestureState.startViewport.offsetX +
+          (event.clientX - gestureState.startClientX) / scaleX,
+        offsetY:
+          gestureState.startViewport.offsetY +
+          (event.clientY - gestureState.startClientY) / scaleY,
       });
+      if (currentPointer?.pointerType === "touch") {
+        if (
+          Math.hypot(
+            event.clientX - currentPointer.startClientX,
+            event.clientY - currentPointer.startClientY,
+          ) > TAP_SLOP_PX
+        ) {
+          clearHoverFeature();
+        }
+      }
       scheduleDrawMap();
       return;
     }
 
-    updateHoverFeature(event);
+    if (event.pointerType !== "touch") {
+      updateHoverFeature(event);
+    }
     scheduleDrawMap();
   };
   const handlePointerEnd = (event: PointerEvent<HTMLCanvasElement>) => {
-    if (panStateRef.current?.pointerId === event.pointerId) {
-      panStateRef.current = null;
-    }
+    const endedPointer = activePointersRef.current.get(event.pointerId);
+
+    activePointersRef.current.delete(event.pointerId);
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    if (endedPointer?.pointerType === "touch") {
+      lastTouchInteractionAtRef.current = Date.now();
+      const wasTap =
+        gestureStateRef.current?.mode === "pan" &&
+        gestureStateRef.current.pointerId === event.pointerId &&
+        activePointersRef.current.size === 0 &&
+        Math.hypot(
+          event.clientX - endedPointer.startClientX,
+          event.clientY - endedPointer.startClientY,
+        ) <= TAP_SLOP_PX;
+
+      if (wasTap) {
+        gestureStateRef.current = null;
+        updateTapFeature(event.clientX, event.clientY, { immediate: true });
+        return;
+      }
+
+      if (beginPinchGesture()) {
+        return;
+      }
+
+      const nextPointer = [...activePointersRef.current.entries()].find(
+        ([, pointer]) => pointer.pointerType === "touch",
+      );
+
+      if (nextPointer) {
+        beginPanGesture(nextPointer[0], nextPointer[1]);
+      } else {
+        gestureStateRef.current = null;
+      }
+
+      return;
+    }
+
+    if (
+      gestureStateRef.current?.mode === "pan" &&
+      gestureStateRef.current.pointerId === event.pointerId
+    ) {
+      gestureStateRef.current = null;
     }
   };
   const handleWheel = (event: WheelEvent<HTMLCanvasElement>) => {
@@ -436,13 +754,19 @@ export const MapPreviewCanvas = memo(function MapPreviewCanvas({
       className="h-full w-full cursor-grab touch-none active:cursor-grabbing"
       height={Math.round(height)}
       onDoubleClick={() => {
+        if (Date.now() - lastTouchInteractionAtRef.current < 700) {
+          return;
+        }
+
         viewportRef.current = { offsetX: 0, offsetY: 0, zoom: 1 };
         scheduleDrawMap();
       }}
       onPointerCancel={handlePointerEnd}
       onPointerDown={handlePointerDown}
       onPointerLeave={() => {
-        scheduleHoverFeature(null);
+        if (!touchTooltipPinnedRef.current) {
+          scheduleHoverFeature(null);
+        }
       }}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
