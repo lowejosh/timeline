@@ -1,12 +1,12 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/input";
+import { Select, type SelectOption } from "@/components/ui/select";
 import type {
   TimelineRawElapsedTimestamp,
   TimelineRawExactTimestamp,
   TimelineRawTimelinePoint,
 } from "@/lib/catalog/setSchema";
-import { cn } from "@/lib/utils";
 
 type TimeMode = "ce" | "bce" | "years-ago" | "after-big-bang";
 
@@ -24,6 +24,7 @@ type TimePointFieldProps = {
   }) => void;
 };
 
+const EXACT_PRECISION = "minute";
 const PRECISIONS = ["year", "month", "day", "hour", "minute"] as const;
 const MODE_LABELS = {
   ce: "CE",
@@ -31,9 +32,10 @@ const MODE_LABELS = {
   "years-ago": "Years ago",
   "after-big-bang": "After Big Bang",
 } satisfies Record<TimeMode, string>;
-
-const selectClassName =
-  "h-9 rounded-md border border-border bg-background/70 px-2 text-sm text-foreground transition-[border-color,box-shadow] focus:outline-none focus:ring-1 focus:ring-ring";
+const MODE_OPTIONS = Object.entries(MODE_LABELS).map(([value, label]) => ({
+  label,
+  value: value as TimeMode,
+})) satisfies SelectOption<TimeMode>[];
 
 type TimePointState = {
   day: number;
@@ -45,17 +47,6 @@ type TimePointState = {
   precision: (typeof PRECISIONS)[number];
   value: number;
 };
-
-function getPrecisionRank(precision: TimePointState["precision"]) {
-  return PRECISIONS.indexOf(precision);
-}
-
-function hasPrecision(
-  precision: TimePointState["precision"],
-  minimum: TimePointState["precision"],
-) {
-  return getPrecisionRank(precision) >= getPrecisionRank(minimum);
-}
 
 function toNumber(value: unknown, fallback: number) {
   const parsed = Number(value);
@@ -157,24 +148,22 @@ function buildExactTimestamp(state: TimePointState): TimelineRawExactTimestamp {
       kind: "calendar",
       era: state.mode,
       year: Math.max(1, Math.trunc(state.value)),
-      precision: state.precision,
-      month: hasPrecision(state.precision, "month") ? state.month : undefined,
-      day: hasPrecision(state.precision, "day") ? state.day : undefined,
-      hour: hasPrecision(state.precision, "hour") ? state.hour : undefined,
-      minute: hasPrecision(state.precision, "minute") ? state.minute : undefined,
+      precision: EXACT_PRECISION,
+      month: state.month,
+      day: state.day,
+      hour: state.hour,
+      minute: state.minute,
     };
   }
 
   return {
     kind: "elapsed",
     reference: state.mode === "after-big-bang" ? "after-big-bang" : "ago",
-    precision: state.precision,
+    precision: EXACT_PRECISION,
     years: String(Math.max(0, Math.trunc(state.value))),
-    days: hasPrecision(state.precision, "day") ? String(state.day) : undefined,
-    hours: hasPrecision(state.precision, "hour") ? String(state.hour) : undefined,
-    minutes: hasPrecision(state.precision, "minute")
-      ? String(state.minute)
-      : undefined,
+    days: String(state.day),
+    hours: String(state.hour),
+    minutes: String(state.minute),
   } satisfies TimelineRawElapsedTimestamp;
 }
 
@@ -209,6 +198,40 @@ function buildPoint(state: TimePointState): {
   };
 }
 
+type ExactNumberFieldProps = {
+  id: string;
+  label: string;
+  max?: number;
+  min?: number;
+  value: number;
+  onChange: (value: number) => void;
+};
+
+function ExactNumberField({
+  id,
+  label,
+  max,
+  min = 0,
+  onChange,
+  value,
+}: ExactNumberFieldProps) {
+  return (
+    <label className="grid gap-1.5" htmlFor={id}>
+      <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+        {label}
+      </span>
+      <NumberInput
+        className="h-9 rounded-md bg-background/70"
+        id={id}
+        max={max}
+        min={min}
+        onValueChange={onChange}
+        value={value}
+      />
+    </label>
+  );
+}
+
 export function TimePointField({
   approximate = false,
   exactTime,
@@ -228,38 +251,48 @@ export function TimePointField({
   };
 
   return (
-    <Field htmlFor={`${id}-value`} label={label} required={required}>
-      <div className="grid gap-2 rounded-md border border-border/70 bg-surface/25 p-3">
+    <Field
+      className="h-full grid-rows-[auto_minmax(0,1fr)]"
+      htmlFor={`${id}-value`}
+      label={label}
+      required={required}
+    >
+      <div className="grid h-full content-start gap-3 rounded-md border border-border/70 bg-surface/25 p-3">
         <div className="grid grid-cols-[minmax(0,1fr)_9rem] gap-2 max-sm:grid-cols-1">
-          <Input
-            className="h-9 rounded-md bg-background/70"
-            id={`${id}-value`}
-            min={state.mode === "bce" ? 1 : 0}
-            onChange={(event) =>
-              commit({
-                ...state,
-                value: toNumber(event.target.value, state.value),
-              })
-            }
-            type="number"
-            value={state.value}
-          />
-          <select
-            className={selectClassName}
-            onChange={(event) =>
-              commit({
-                ...state,
-                mode: event.target.value as TimeMode,
-              })
-            }
-            value={state.mode}
-          >
-            {Object.entries(MODE_LABELS).map(([mode, modeLabel]) => (
-              <option key={mode} value={mode}>
-                {modeLabel}
-              </option>
-            ))}
-          </select>
+          <label className="grid gap-1.5" htmlFor={`${id}-value`}>
+            <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              {state.mode === "years-ago" || state.mode === "after-big-bang"
+                ? "Years"
+                : "Year"}
+            </span>
+            <NumberInput
+              className="h-9 rounded-md bg-background/70"
+              id={`${id}-value`}
+              min={state.mode === "bce" ? 1 : 0}
+              onValueChange={(nextValue) =>
+                commit({
+                  ...state,
+                  value: nextValue,
+                })
+              }
+              value={state.value}
+            />
+          </label>
+          <div className="grid gap-1.5">
+            <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              Scale
+            </span>
+            <Select
+              onValueChange={(mode) =>
+                commit({
+                  ...state,
+                  mode,
+                })
+              }
+              options={MODE_OPTIONS}
+              value={state.mode}
+            />
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-[0.76rem] font-semibold text-muted-foreground">
@@ -277,6 +310,7 @@ export function TimePointField({
                 commit({
                   ...state,
                   exact: event.target.checked,
+                  precision: EXACT_PRECISION,
                 })
               }
             />
@@ -285,92 +319,39 @@ export function TimePointField({
         </div>
 
         {state.exact ? (
-          <div
-            className={cn(
-              "grid gap-2 border-t border-border/60 pt-2",
-              state.mode === "ce" || state.mode === "bce"
-                ? "grid-cols-4 max-sm:grid-cols-2"
-                : "grid-cols-3 max-sm:grid-cols-2",
-            )}
-          >
-            <select
-              className={selectClassName}
-              onChange={(event) =>
-                commit({
-                  ...state,
-                  precision: event.target.value as TimePointState["precision"],
-                })
-              }
-              value={state.precision}
-            >
-              {PRECISIONS.map((precision) => (
-                <option key={precision} value={precision}>
-                  {precision}
-                </option>
-              ))}
-            </select>
-
-            {(state.mode === "ce" || state.mode === "bce") &&
-            hasPrecision(state.precision, "month") ? (
-              <Input
-                className="h-9 rounded-md bg-background/70"
+          <div className="grid grid-cols-4 gap-2 border-t border-border/60 pt-3 max-sm:grid-cols-2">
+            {state.mode === "ce" || state.mode === "bce" ? (
+              <ExactNumberField
+                id={`${id}-month`}
+                label="Month"
                 max={12}
                 min={1}
-                onChange={(event) =>
-                  commit({
-                    ...state,
-                    month: toNumber(event.target.value, state.month),
-                  })
-                }
-                type="number"
+                onChange={(month) => commit({ ...state, month })}
                 value={state.month}
               />
             ) : null}
-            {hasPrecision(state.precision, "day") ? (
-              <Input
-                className="h-9 rounded-md bg-background/70"
-                max={state.mode === "ce" || state.mode === "bce" ? 31 : undefined}
-                min={0}
-                onChange={(event) =>
-                  commit({
-                    ...state,
-                    day: toNumber(event.target.value, state.day),
-                  })
-                }
-                type="number"
-                value={state.day}
-              />
-            ) : null}
-            {hasPrecision(state.precision, "hour") ? (
-              <Input
-                className="h-9 rounded-md bg-background/70"
-                max={23}
-                min={0}
-                onChange={(event) =>
-                  commit({
-                    ...state,
-                    hour: toNumber(event.target.value, state.hour),
-                  })
-                }
-                type="number"
-                value={state.hour}
-              />
-            ) : null}
-            {hasPrecision(state.precision, "minute") ? (
-              <Input
-                className="h-9 rounded-md bg-background/70"
-                max={59}
-                min={0}
-                onChange={(event) =>
-                  commit({
-                    ...state,
-                    minute: toNumber(event.target.value, state.minute),
-                  })
-                }
-                type="number"
-                value={state.minute}
-              />
-            ) : null}
+            <ExactNumberField
+              id={`${id}-day`}
+              label={state.mode === "ce" || state.mode === "bce" ? "Day" : "Days"}
+              max={state.mode === "ce" || state.mode === "bce" ? 31 : undefined}
+              min={state.mode === "ce" || state.mode === "bce" ? 1 : 0}
+              onChange={(day) => commit({ ...state, day })}
+              value={state.day}
+            />
+            <ExactNumberField
+              id={`${id}-hour`}
+              label="Hour"
+              max={23}
+              onChange={(hour) => commit({ ...state, hour })}
+              value={state.hour}
+            />
+            <ExactNumberField
+              id={`${id}-minute`}
+              label="Minute"
+              max={59}
+              onChange={(minute) => commit({ ...state, minute })}
+              value={state.minute}
+            />
           </div>
         ) : null}
       </div>

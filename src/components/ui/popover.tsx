@@ -28,7 +28,7 @@ function PopoverContent({
       <PopoverPrimitive.Content
         align={align}
         className={cn(
-          "z-50 rounded-lg border border-border bg-card p-3 text-card-foreground shadow-panel backdrop-blur-md outline-none",
+          "z-50 rounded-lg border border-border bg-card p-3 text-primary shadow-panel backdrop-blur-md outline-none",
           "data-[state=closed]:animate-popover-out data-[state=open]:animate-popover-in",
           className,
         )}

@@ -49,7 +49,7 @@ export function AvailableSetsColumn({
       aria-live="polite"
       className={cn(
         "grid min-h-36 list-none place-items-center rounded-lg border border-dashed border-border/80 bg-surface/25 px-4 py-5 text-center text-sm leading-snug text-muted-foreground transition-[background-color,border-color,color] duration-150",
-        isDropTarget && "border-primary/40 bg-surface/60 text-foreground",
+        isDropTarget && "border-primary/40 bg-surface/60 text-primary",
       )}
       key="empty-drop-zone"
       style={
@@ -112,7 +112,7 @@ export function AvailableSetsColumn({
       >
         <div>
           <h2
-            className="m-0 font-display text-sm font-semibold leading-tight text-foreground"
+            className="m-0 font-display text-sm font-semibold leading-tight text-primary"
             id={titleId}
           >
             {title}

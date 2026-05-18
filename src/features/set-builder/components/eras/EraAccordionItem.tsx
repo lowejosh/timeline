@@ -2,7 +2,6 @@ import { ChevronDown, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ColorPicker } from "@/components/ui/color-picker";
 import {
   Collapsible,
@@ -12,6 +11,7 @@ import {
 import { Field } from "@/components/ui/field";
 import { Input, Textarea } from "@/components/ui/input";
 import type {
+  TimelineRawTimelinePoint,
   TimelineRawEraNode,
   TimelineRawSetDocument,
 } from "@/lib/catalog/setSchema";
@@ -29,6 +29,30 @@ type EraAccordionItemProps = {
   onEraChange: (eraId: string, era: TimelineRawEraNode) => void;
 };
 
+function formatTimelinePoint(point: TimelineRawTimelinePoint) {
+  if (typeof point === "number") {
+    if (point < 1) {
+      return `${Math.round(1 - point).toLocaleString()} BCE`;
+    }
+
+    return `${Math.round(point).toLocaleString()} CE`;
+  }
+
+  if (point.kind === "relative") {
+    return `${Number(point.value).toLocaleString()} ${
+      point.reference === "after-big-bang" ? "after Big Bang" : "years ago"
+    }`;
+  }
+
+  if (point.kind === "calendar") {
+    return `${point.year.toLocaleString()} ${point.era.toUpperCase()}`;
+  }
+
+  return `${Number(point.years ?? 0).toLocaleString()} ${
+    point.reference === "after-big-bang" ? "after Big Bang" : "years ago"
+  }`;
+}
+
 export function EraAccordionItem({
   depth,
   document,
@@ -40,6 +64,9 @@ export function EraAccordionItem({
 }: EraAccordionItemProps) {
   const [isOpen, setIsOpen] = useState(true);
   const childEras = era.children ?? [];
+  const rangeLabel = `${formatTimelinePoint(era.startYear)} - ${formatTimelinePoint(
+    era.endYear,
+  )}`;
 
   return (
     <div
@@ -54,7 +81,7 @@ export function EraAccordionItem({
             <CollapsibleTrigger asChild>
               <button
                 aria-label={isOpen ? "Collapse era" : "Expand era"}
-                className="grid size-8 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-surface/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="grid size-8 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-surface/70 hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 type="button"
               >
                 <ChevronDown
@@ -66,8 +93,11 @@ export function EraAccordionItem({
               </button>
             </CollapsibleTrigger>
             <div className="min-w-0 flex-1">
-              <p className="m-0 truncate text-sm font-semibold text-foreground">
-                {era.name || "Untitled era"}
+              <p className="m-0 flex min-w-0 items-baseline gap-2 text-sm font-semibold text-primary">
+                <span className="truncate">{era.name || "Untitled era"}</span>
+                <span className="shrink-0 text-[0.72rem] font-semibold text-muted-foreground">
+                  {rangeLabel}
+                </span>
               </p>
               {era.regionalScopeLabel ? (
                 <p className="m-0 truncate text-[0.72rem] text-muted-foreground">
@@ -102,7 +132,10 @@ export function EraAccordionItem({
               </Field>
 
               <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-                <Field htmlFor={`${era.id}-alternate-name`} label="Alternate name">
+                <Field
+                  htmlFor={`${era.id}-alternate-name`}
+                  label="Alternate name"
+                >
                   <Input
                     className="h-10 rounded-md bg-background/70"
                     id={`${era.id}-alternate-name`}
@@ -115,11 +148,7 @@ export function EraAccordionItem({
                     value={era.alternateName ?? ""}
                   />
                 </Field>
-                <Field
-                  description="Stored as regionalScopeLabel for now."
-                  htmlFor={`${era.id}-subtitle`}
-                  label="Subtitle"
-                >
+                <Field htmlFor={`${era.id}-subtitle`} label="Subtitle">
                   <Input
                     className="h-10 rounded-md bg-background/70"
                     id={`${era.id}-subtitle`}
@@ -135,39 +164,43 @@ export function EraAccordionItem({
                 </Field>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-                <TimePointField
-                  approximate={era.approximateStart}
-                  exactTime={era.exactStartTime}
-                  id={`${era.id}-start`}
-                  label="Start"
-                  onChange={(next) =>
-                    onEraChange(era.id, {
-                      ...era,
-                      approximateStart: next.approximate,
-                      exactStartTime: next.exactTime,
-                      startYear: next.value,
-                    })
-                  }
-                  required
-                  value={era.startYear}
-                />
-                <TimePointField
-                  approximate={era.approximateEnd}
-                  exactTime={era.exactEndTime}
-                  id={`${era.id}-end`}
-                  label="End"
-                  onChange={(next) =>
-                    onEraChange(era.id, {
-                      ...era,
-                      approximateEnd: next.approximate,
-                      exactEndTime: next.exactTime,
-                      endYear: next.value,
-                    })
-                  }
-                  required
-                  value={era.endYear}
-                />
+              <div className="flex items-stretch gap-4 max-sm:flex-col">
+                <div className="flex min-w-0 flex-1">
+                  <TimePointField
+                    approximate={era.approximateStart}
+                    exactTime={era.exactStartTime}
+                    id={`${era.id}-start`}
+                    label="Start"
+                    onChange={(next) =>
+                      onEraChange(era.id, {
+                        ...era,
+                        approximateStart: next.approximate,
+                        exactStartTime: next.exactTime,
+                        startYear: next.value,
+                      })
+                    }
+                    required
+                    value={era.startYear}
+                  />
+                </div>
+                <div className="flex min-w-0 flex-1">
+                  <TimePointField
+                    approximate={era.approximateEnd}
+                    exactTime={era.exactEndTime}
+                    id={`${era.id}-end`}
+                    label="End"
+                    onChange={(next) =>
+                      onEraChange(era.id, {
+                        ...era,
+                        approximateEnd: next.approximate,
+                        exactEndTime: next.exactTime,
+                        endYear: next.value,
+                      })
+                    }
+                    required
+                    value={era.endYear}
+                  />
+                </div>
               </div>
 
               <Field htmlFor={`${era.id}-color`} label="Color">
@@ -204,27 +237,24 @@ export function EraAccordionItem({
                 onEraChange={(nextEra) => onEraChange(era.id, nextEra)}
               />
 
-              <label className="inline-flex w-fit items-center gap-2 text-[0.76rem] font-semibold text-muted-foreground">
-                <Checkbox
-                  checked={Boolean(era.isFamilyRoot)}
-                  onChange={(event) =>
-                    onEraChange(era.id, {
-                      ...era,
-                      isFamilyRoot: event.target.checked || undefined,
-                    })
-                  }
-                />
-                Treat as family root
-              </label>
-
-              <button
-                className="inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md border border-transparent px-0 py-1 text-[0.76rem] font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                onClick={() => onAddChild(era.id)}
-                type="button"
-              >
-                <Plus className="size-3.5" />
-                Add sub-era
-              </button>
+              <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-4">
+                <button
+                  className="inline-flex h-8 w-fit cursor-pointer items-center gap-1.5 rounded-md border border-transparent px-0 text-[0.76rem] font-semibold text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  onClick={() => onAddChild(era.id)}
+                  type="button"
+                >
+                  <Plus className="size-3.5" />
+                  Add sub-era
+                </button>
+                <Button
+                  onClick={() => setIsOpen(false)}
+                  size="pill"
+                  type="button"
+                  variant="subtle"
+                >
+                  Done
+                </Button>
+              </div>
             </div>
           </CollapsibleContent>
         </div>

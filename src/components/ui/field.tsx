@@ -22,7 +22,7 @@ export function Field({
   return (
     <div className={cn("grid gap-2", className)}>
       <label
-        className="text-[0.76rem] font-semibold text-foreground"
+        className="text-[0.76rem] font-semibold text-primary"
         htmlFor={htmlFor}
       >
         {label}

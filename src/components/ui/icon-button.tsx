@@ -26,7 +26,7 @@ export function IconButton({
       aria-pressed={selected}
       className={cn(
         "rounded-full text-muted-foreground",
-        selected && "border-border bg-glass-selected text-foreground",
+        selected && "border-border bg-glass-selected text-primary",
         className,
       )}
       data-selected={selected ? "true" : "false"}

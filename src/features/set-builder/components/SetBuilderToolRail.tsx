@@ -49,12 +49,12 @@ function SetBuilderToolButton({
         aria-label={label}
         aria-pressed={selected}
         className={cn(
-          "group relative flex h-16 w-full cursor-pointer items-center justify-center overflow-hidden border-0 border-b border-border/60 bg-transparent p-0 text-muted-foreground transition-[background-color,color] duration-200 ease-out hover:bg-surface/45 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
+          "group relative flex h-16 w-full cursor-pointer items-center justify-center overflow-hidden border-0 border-b border-border/60 bg-transparent p-0 text-muted-foreground transition-[background-color,color] duration-200 ease-out hover:bg-surface/45 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
           "before:absolute before:inset-y-1.5 before:left-0 before:w-1 before:-translate-x-full before:rounded-r-full before:bg-primary before:opacity-0 before:transition-[opacity,transform,height,inset] before:duration-250 before:ease-out hover:before:translate-x-0 hover:before:opacity-60",
           exiting &&
             "bg-surface/20 before:translate-x-0 before:opacity-0",
           selected &&
-            "bg-surface/70 text-foreground hover:bg-surface/75 before:inset-y-0 before:translate-x-0 before:opacity-100",
+            "bg-surface/70 text-primary hover:bg-surface/75 before:inset-y-0 before:translate-x-0 before:opacity-100",
         )}
         data-selected={selected ? "true" : "false"}
         onClick={onClick}

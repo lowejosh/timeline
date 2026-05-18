@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-[background-color,border-color,color,box-shadow,opacity] duration-150 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-[background-color,border-color,color,box-shadow,opacity] duration-150 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-current",
   {
     defaultVariants: {
       size: "default",
@@ -22,13 +22,13 @@ const buttonVariants = cva(
         default:
           "border border-primary bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
         ghost:
-          "border border-transparent bg-transparent text-foreground hover:bg-accent/60",
+          "border border-transparent bg-transparent text-primary hover:bg-accent/60",
         glass:
-          "border border-border/80 bg-glass text-foreground shadow-glass backdrop-blur-md hover:border-border hover:bg-glass-hover hover:shadow-glass-hover data-[state=open]:bg-glass-active",
+          "border border-border/80 bg-glass text-primary shadow-glass backdrop-blur-md hover:border-border hover:bg-glass-hover hover:shadow-glass-hover data-[state=open]:bg-glass-active",
         outline:
-          "border border-border bg-surface/50 text-foreground hover:bg-glass-hover",
+          "border border-border bg-surface/50 text-primary hover:bg-glass-hover",
         subtle:
-          "border border-border/70 bg-surface/40 text-muted-foreground hover:bg-surface hover:text-foreground",
+          "border border-border/70 bg-surface/40 text-muted-foreground hover:bg-surface hover:text-primary",
       },
     },
   },

@@ -14,7 +14,7 @@ export function ShortcutKey({
   return (
     <kbd
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded border border-border bg-surface/80 font-mono font-semibold leading-none text-foreground shadow-[inset_0_-1px_0_rgba(77,61,47,0.1)]",
+        "inline-flex shrink-0 items-center justify-center rounded border border-border bg-surface/80 font-mono font-semibold leading-none text-primary shadow-[inset_0_-1px_0_rgba(77,61,47,0.1)]",
         size === "sm"
           ? "h-5 min-w-5 px-1.5 text-[0.62rem]"
           : "min-h-6 min-w-6 px-1.5 text-[0.68rem]",
@@ -44,4 +44,3 @@ export function ShortcutChord({
     </span>
   );
 }
-

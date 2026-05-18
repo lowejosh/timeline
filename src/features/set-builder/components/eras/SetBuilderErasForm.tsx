@@ -51,15 +51,6 @@ export function SetBuilderErasForm({
   return (
     <div className="h-full overflow-y-auto p-6">
       <div className="grid w-full gap-4">
-        <button
-          className="inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md border border-transparent px-0 py-1 text-[0.8rem] font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          onClick={() => addEra()}
-          type="button"
-        >
-          <Plus className="size-3.5" />
-          Add era
-        </button>
-
         {eras.length > 0 ? (
           <div className="grid gap-3">
             {eras.map((era) => (
@@ -82,6 +73,15 @@ export function SetBuilderErasForm({
             </p>
           </div>
         )}
+
+        <button
+          className="inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md border border-transparent px-0 py-1 text-[0.8rem] font-semibold text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          onClick={() => addEra()}
+          type="button"
+        >
+          <Plus className="size-3.5" />
+          Add era
+        </button>
       </div>
     </div>
   );

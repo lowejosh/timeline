@@ -6,7 +6,7 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLElement>)
   return (
     <section
       className={cn(
-        "rounded-lg border border-border bg-card text-card-foreground shadow-panel",
+        "rounded-lg border border-border bg-card text-primary shadow-panel",
         className,
       )}
       {...props}

@@ -9,12 +9,14 @@ type ColorPickerProps = {
 };
 
 const DEFAULT_SWATCHES = [
-  "#4f8a8b",
-  "#8b6f47",
-  "#8a4f6f",
-  "#627d4d",
-  "#7c6fb0",
-  "#b66a50",
+  "rgb(64, 167, 226)",
+  "rgb(232, 134, 69)",
+  "rgb(88, 217, 69)",
+  "rgb(191, 82, 224)",
+  "rgb(229, 208, 67)",
+  "rgb(63, 213, 188)",
+  "rgb(227, 84, 93)",
+  "rgb(81, 114, 225)",
 ] as const;
 
 export function ColorPicker({
@@ -44,9 +46,11 @@ export function ColorPicker({
         {swatches.map((swatch) => (
           <button
             aria-label={`Use ${swatch}`}
-            aria-pressed={value.toLocaleLowerCase() === swatch.toLocaleLowerCase()}
+            aria-pressed={
+              value.toLocaleLowerCase() === swatch.toLocaleLowerCase()
+            }
             className={cn(
-              "size-7 cursor-pointer rounded-full border border-border shadow-inner transition-[box-shadow,transform,border-color] hover:scale-105 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+              "size-8 cursor-pointer rounded-full border border-border shadow-inner transition-[box-shadow,transform,border-color] hover:scale-105 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
               value.toLocaleLowerCase() === swatch.toLocaleLowerCase() &&
                 "border-foreground shadow-[0_0_0_2px_var(--color-background),0_0_0_4px_var(--color-primary)]",
             )}

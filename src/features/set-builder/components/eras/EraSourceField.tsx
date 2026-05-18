@@ -112,7 +112,7 @@ export function EraSourceField({
 
   return (
     <div className="grid gap-2">
-      <span className="text-[0.76rem] font-semibold text-foreground">
+      <span className="text-[0.76rem] font-semibold text-primary">
         Sources
       </span>
 
@@ -129,7 +129,7 @@ export function EraSourceField({
                 {source?.shortTitle ?? sourceId}
                 <button
                   aria-label={`Remove ${source?.shortTitle ?? sourceId}`}
-                  className="grid size-4 cursor-pointer place-items-center rounded-full transition-colors hover:bg-background/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="grid size-4 cursor-pointer place-items-center rounded-full transition-colors hover:bg-background/80 hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   onClick={() => removeSource(sourceId)}
                   type="button"
                 >
@@ -144,7 +144,7 @@ export function EraSourceField({
       <Collapsible onOpenChange={setIsAdding} open={isAdding}>
         <CollapsibleTrigger asChild>
           <button
-            className="inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md border border-transparent px-0 py-1 text-[0.76rem] font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md border border-transparent px-0 py-1 text-[0.76rem] font-semibold text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             type="button"
           >
             <Plus className="size-3.5" />

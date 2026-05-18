@@ -115,7 +115,7 @@ export function AvailableSetCard({
       </Button>
 
       <div className="grid min-w-0 flex-1 gap-1">
-        <span className="font-display text-sm font-semibold leading-tight text-foreground">
+        <span className="font-display text-sm font-semibold leading-tight text-primary">
           {set.metadata.label}
         </span>
         {timeRange ? (
@@ -216,7 +216,7 @@ export function AvailableSetCard({
           aria-label={isEnabled ? `Remove ${set.metadata.label}` : `Add ${set.metadata.label}`}
           className={cn(
             "rounded-full text-muted-foreground",
-            !isEnabled && "text-foreground/70",
+            !isEnabled && "text-primary/70",
           )}
           data-variant={isEnabled ? "remove" : "add"}
           onClick={() => {

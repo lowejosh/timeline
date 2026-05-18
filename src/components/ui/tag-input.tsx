@@ -114,7 +114,7 @@ export function TagInput({
           {tag}
           <button
             aria-label={`Remove ${tag}`}
-            className="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground transition-colors hover:bg-background/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="grid size-4 cursor-pointer place-items-center rounded-full text-muted-foreground transition-colors hover:bg-background/80 hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             onClick={() => removeTag(tag)}
             type="button"
           >
@@ -124,7 +124,7 @@ export function TagInput({
       ))}
       <input
         autoComplete="off"
-        className="min-w-24 flex-1 border-0 bg-transparent px-1 py-1 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+        className="min-w-24 flex-1 border-0 bg-transparent px-1 py-1 text-sm text-primary placeholder:text-muted-foreground/60 focus:outline-none"
         id={id}
         onBlur={() => commitTags()}
         onChange={(event) => setInputValue(event.target.value)}

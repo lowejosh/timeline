@@ -135,6 +135,10 @@
   outline: none;
 }
 
+:where(svg.lucide) {
+  stroke: currentColor;
+}
+
 .peer:focus-visible ~ .peer-focus-ring {
   box-shadow:
     0 0 0 1px var(--focus-ring),
@@ -184,6 +188,17 @@ select,
   user-select: text;
   -webkit-user-select: text;
   -webkit-touch-callout: default;
+}
+
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
 }
 
 ::selection {

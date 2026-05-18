@@ -46,7 +46,7 @@ export function SetBuilderFormPanel({
           <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Editing tool
           </span>
-          <p className="m-0 text-lg font-semibold text-foreground">
+          <p className="m-0 text-lg font-semibold text-primary">
             {SET_BUILDER_TOOL_LABELS[selectedTool]} selected
           </p>
         </div>
@@ -54,7 +54,7 @@ export function SetBuilderFormPanel({
     );
 
   return (
-    <section className="flex h-full min-h-[28rem] flex-col overflow-hidden">
+    <section className="flex h-full min-h-0 flex-col overflow-hidden">
       <div className="min-h-0 flex-1 overflow-hidden">{content}</div>
       {nextTool ? (
         <footer className="flex shrink-0 justify-end border-t border-border/70 px-6 py-4">
