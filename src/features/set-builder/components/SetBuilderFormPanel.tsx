@@ -7,6 +7,7 @@ import {
   SET_BUILDER_TOOL_SEQUENCE,
   type SetBuilderTool,
 } from "../SetBuilder.types";
+import { SetBuilderErasForm } from "./eras/SetBuilderErasForm";
 import { SetBuilderMetadataForm } from "./SetBuilderMetadataForm";
 
 type SetBuilderFormPanelProps = {
@@ -32,6 +33,11 @@ export function SetBuilderFormPanel({
       <SetBuilderMetadataForm
         document={document}
         lockSetId={isEditing}
+        onDocumentChange={onDocumentChange}
+      />
+    ) : selectedTool === "eras" ? (
+      <SetBuilderErasForm
+        document={document}
         onDocumentChange={onDocumentChange}
       />
     ) : (

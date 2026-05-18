@@ -32,14 +32,14 @@ export function PageShell({
   titleId,
 }: PageShellProps) {
   return (
-    <div
-      className="flex h-full w-full items-start justify-start overflow-hidden p-[calc(env(safe-area-inset-top,0px)+1.2rem)_calc(env(safe-area-inset-right,0px)+1.4rem)_calc(env(safe-area-inset-bottom,0px)+1.2rem)_calc(env(safe-area-inset-left,0px)+1.4rem)] text-foreground overscroll-contain max-sm:p-[calc(env(safe-area-inset-top,0px)+0.7rem)_calc(env(safe-area-inset-right,0px)+0.7rem)_calc(env(safe-area-inset-bottom,0px)+0.7rem)_calc(env(safe-area-inset-left,0px)+0.7rem)]"
-    >
+    <div className="flex h-full w-full items-start justify-start overflow-hidden p-[calc(env(safe-area-inset-top,0px)+1.2rem)_calc(env(safe-area-inset-right,0px)+1.4rem)_calc(env(safe-area-inset-bottom,0px)+1.2rem)_calc(env(safe-area-inset-left,0px)+1.4rem)] text-foreground overscroll-contain max-sm:p-[calc(env(safe-area-inset-top,0px)+0.7rem)_calc(env(safe-area-inset-right,0px)+0.7rem)_calc(env(safe-area-inset-bottom,0px)+0.7rem)_calc(env(safe-area-inset-left,0px)+0.7rem)]">
       <section
         aria-labelledby={titleId}
         className={cn(
           "mx-auto grid h-full max-h-full w-[min(92rem,100%)] overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-panel",
-          footer ? "grid-rows-[auto_minmax(0,1fr)_auto]" : "grid-rows-[auto_minmax(0,1fr)]",
+          footer
+            ? "grid-rows-[auto_minmax(0,1fr)_auto]"
+            : "grid-rows-[auto_minmax(0,1fr)]",
           className,
         )}
       >
@@ -50,7 +50,7 @@ export function PageShell({
             onClick={onBack}
             size="icon"
             type="button"
-            variant="glass"
+            variant="ghost"
           >
             <ChevronLeft className="size-4" />
           </Button>
