@@ -10,17 +10,16 @@ import {
 import { Field } from "@/components/ui/field";
 import { Input, Textarea } from "@/components/ui/input";
 import { slugifyTimelineSetId } from "@/lib/catalog/setDocumentValidation";
-import type {
-  TimelineRawEraNode,
-  TimelineRawSetDocument,
-} from "@/lib/catalog/setSchema";
-import { updateEraNodeInDocument } from "../../utils/eraTree";
+import type { TimelineRawSetDocument } from "@/lib/catalog/setSchema";
 
-type EraSourceFieldProps = {
+type SourceAttachmentFieldProps = {
   document: TimelineRawSetDocument;
-  era: TimelineRawEraNode;
-  onDocumentChange: (document: TimelineRawSetDocument) => void;
-  onEraChange: (era: TimelineRawEraNode) => void;
+  ownerId: string;
+  sourceIds: readonly string[];
+  onChange: (next: {
+    document: TimelineRawSetDocument;
+    sourceIds: string[];
+  }) => void;
 };
 
 type SourceDraft = {
@@ -53,15 +52,14 @@ function createUniqueSourceId(
   return candidate;
 }
 
-export function EraSourceField({
+export function SourceAttachmentField({
   document,
-  era,
-  onDocumentChange,
-  onEraChange,
-}: EraSourceFieldProps) {
+  onChange,
+  ownerId,
+  sourceIds,
+}: SourceAttachmentFieldProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [draft, setDraft] = useState<SourceDraft>(EMPTY_SOURCE_DRAFT);
-  const sourceIds = era.sourceIds ?? [];
 
   const updateDraft = (key: keyof SourceDraft, value: string) => {
     setDraft((current) => ({
@@ -71,8 +69,8 @@ export function EraSourceField({
   };
 
   const removeSource = (sourceId: string) => {
-    onEraChange({
-      ...era,
+    onChange({
+      document,
       sourceIds: sourceIds.filter((id) => id !== sourceId),
     });
   };
@@ -85,8 +83,7 @@ export function EraSourceField({
     }
 
     const sourceId = createUniqueSourceId(document, title);
-
-    const documentWithSource = {
+    const nextDocument = {
       ...document,
       sources: {
         ...document.sources,
@@ -100,12 +97,10 @@ export function EraSourceField({
       },
     };
 
-    onDocumentChange(
-      updateEraNodeInDocument(documentWithSource, era.id, () => ({
-        ...era,
-        sourceIds: [...sourceIds, sourceId],
-      })),
-    );
+    onChange({
+      document: nextDocument,
+      sourceIds: [...sourceIds, sourceId],
+    });
     setDraft(EMPTY_SOURCE_DRAFT);
     setIsAdding(false);
   };
@@ -153,39 +148,36 @@ export function EraSourceField({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="mt-2 grid gap-3 rounded-md border border-border/70 bg-surface/25 p-3">
-            <Field htmlFor={`${era.id}-source-title`} label="Title" required>
+            <Field htmlFor={`${ownerId}-source-title`} label="Title" required>
               <Input
                 className="h-9 rounded-md bg-background/70"
-                id={`${era.id}-source-title`}
+                id={`${ownerId}-source-title`}
                 onChange={(event) => updateDraft("title", event.target.value)}
                 value={draft.title}
               />
             </Field>
-            <Field
-              htmlFor={`${era.id}-source-organization`}
-              label="Organization"
-            >
+            <Field htmlFor={`${ownerId}-source-organization`} label="Organization">
               <Input
                 className="h-9 rounded-md bg-background/70"
-                id={`${era.id}-source-organization`}
+                id={`${ownerId}-source-organization`}
                 onChange={(event) =>
                   updateDraft("organization", event.target.value)
                 }
                 value={draft.organization}
               />
             </Field>
-            <Field htmlFor={`${era.id}-source-url`} label="URL">
+            <Field htmlFor={`${ownerId}-source-url`} label="URL">
               <Input
                 className="h-9 rounded-md bg-background/70"
-                id={`${era.id}-source-url`}
+                id={`${ownerId}-source-url`}
                 onChange={(event) => updateDraft("url", event.target.value)}
                 value={draft.url}
               />
             </Field>
-            <Field htmlFor={`${era.id}-source-citation`} label="Citation">
+            <Field htmlFor={`${ownerId}-source-citation`} label="Citation">
               <Textarea
                 className="min-h-20 bg-background/70"
-                id={`${era.id}-source-citation`}
+                id={`${ownerId}-source-citation`}
                 onChange={(event) =>
                   updateDraft("citation", event.target.value)
                 }

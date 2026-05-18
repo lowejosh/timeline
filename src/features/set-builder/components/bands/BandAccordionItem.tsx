@@ -11,39 +11,39 @@ import {
 import { Field } from "@/components/ui/field";
 import { Input, Textarea } from "@/components/ui/input";
 import type {
-  TimelineRawEraNode,
+  TimelineRawOverlay,
   TimelineRawSetDocument,
 } from "@/lib/catalog/setSchema";
 import { cn } from "@/lib/utils";
+import { updateBandInDocument } from "../../utils/bandTree";
 import { formatTimelinePoint } from "../../utils/formatTimelinePoint";
-import { updateEraNodeInDocument } from "../../utils/eraTree";
 import { ImageAttachmentField } from "../fields/ImageAttachmentField";
 import { SourceAttachmentField } from "../fields/SourceAttachmentField";
 import { TimePointField } from "../fields/TimePointField";
 
-type EraAccordionItemProps = {
+type BandAccordionItemProps = {
+  band: TimelineRawOverlay;
   depth: number;
   document: TimelineRawSetDocument;
-  era: TimelineRawEraNode;
   onAddChild: (parentId: string) => void;
-  onDelete: (eraId: string) => void;
+  onBandChange: (bandId: string, band: TimelineRawOverlay) => void;
+  onDelete: (bandId: string) => void;
   onDocumentChange: (document: TimelineRawSetDocument) => void;
-  onEraChange: (eraId: string, era: TimelineRawEraNode) => void;
 };
 
-export function EraAccordionItem({
+export function BandAccordionItem({
+  band,
   depth,
   document,
-  era,
   onAddChild,
+  onBandChange,
   onDelete,
   onDocumentChange,
-  onEraChange,
-}: EraAccordionItemProps) {
+}: BandAccordionItemProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const childEras = era.children ?? [];
-  const rangeLabel = `${formatTimelinePoint(era.startYear)} - ${formatTimelinePoint(
-    era.endYear,
+  const childBands = band.children ?? [];
+  const rangeLabel = `${formatTimelinePoint(band.startYear)} - ${formatTimelinePoint(
+    band.endYear,
   )}`;
 
   return (
@@ -58,7 +58,7 @@ export function EraAccordionItem({
           <div className="flex min-h-12 items-center gap-2 border-b border-border/60 bg-surface/35 px-3">
             <CollapsibleTrigger asChild>
               <button
-                aria-label={isOpen ? "Collapse era" : "Expand era"}
+                aria-label={isOpen ? "Collapse band" : "Expand band"}
                 className="grid size-8 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:bg-surface/70 hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 type="button"
               >
@@ -72,19 +72,19 @@ export function EraAccordionItem({
             </CollapsibleTrigger>
             <div className="min-w-0 flex-1">
               <p className="m-0 flex min-w-0 items-baseline gap-2 text-sm font-semibold text-primary">
-                <span className="truncate">{era.name || "Untitled era"}</span>
+                <span className="truncate">{band.label || "Untitled band"}</span>
                 <span className="shrink-0 text-[0.72rem] font-semibold text-muted-foreground">
                   {rangeLabel}
                 </span>
               </p>
-              {era.regionalScopeLabel ? (
+              {band.regionalScopeLabel ? (
                 <p className="m-0 truncate text-[0.72rem] text-muted-foreground">
-                  {era.regionalScopeLabel}
+                  {band.regionalScopeLabel}
                 </p>
               ) : null}
             </div>
             <Button
-              onClick={() => onDelete(era.id)}
+              onClick={() => onDelete(band.id)}
               size="icon"
               type="button"
               variant="ghost"
@@ -95,116 +95,98 @@ export function EraAccordionItem({
 
           <CollapsibleContent>
             <div className="grid gap-5 p-4">
-              <Field htmlFor={`${era.id}-name`} label="Name" required>
+              <Field htmlFor={`${band.id}-label`} label="Label" required>
                 <Input
                   className="h-10 rounded-md bg-background/70"
-                  id={`${era.id}-name`}
+                  id={`${band.id}-label`}
                   onChange={(event) =>
-                    onEraChange(era.id, {
-                      ...era,
-                      name: event.target.value,
+                    onBandChange(band.id, {
+                      ...band,
+                      label: event.target.value,
                     })
                   }
-                  value={era.name}
+                  value={band.label}
                 />
               </Field>
 
-              <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-                <Field
-                  htmlFor={`${era.id}-alternate-name`}
-                  label="Alternate name"
-                >
-                  <Input
-                    className="h-10 rounded-md bg-background/70"
-                    id={`${era.id}-alternate-name`}
-                    onChange={(event) =>
-                      onEraChange(era.id, {
-                        ...era,
-                        alternateName: event.target.value || undefined,
-                      })
-                    }
-                    value={era.alternateName ?? ""}
-                  />
-                </Field>
-                <Field htmlFor={`${era.id}-subtitle`} label="Subtitle">
-                  <Input
-                    className="h-10 rounded-md bg-background/70"
-                    id={`${era.id}-subtitle`}
-                    onChange={(event) =>
-                      onEraChange(era.id, {
-                        ...era,
-                        regionalScopeLabel: event.target.value || undefined,
-                      })
-                    }
-                    placeholder="Example: Eastern Mediterranean"
-                    value={era.regionalScopeLabel ?? ""}
-                  />
-                </Field>
-              </div>
+              <Field htmlFor={`${band.id}-subtitle`} label="Subtitle">
+                <Input
+                  className="h-10 rounded-md bg-background/70"
+                  id={`${band.id}-subtitle`}
+                  onChange={(event) =>
+                    onBandChange(band.id, {
+                      ...band,
+                      regionalScopeLabel: event.target.value || undefined,
+                    })
+                  }
+                  placeholder="Example: Eastern Mediterranean"
+                  value={band.regionalScopeLabel ?? ""}
+                />
+              </Field>
 
               <div className="flex items-stretch gap-4 max-sm:flex-col">
                 <div className="flex min-w-0 flex-1">
                   <TimePointField
-                    approximate={era.approximateStart}
-                    exactTime={era.exactStartTime}
-                    id={`${era.id}-start`}
+                    approximate={band.approximateStart}
+                    exactTime={band.exactStartTime}
+                    id={`${band.id}-start`}
                     label="Start"
                     onChange={(next) =>
-                      onEraChange(era.id, {
-                        ...era,
+                      onBandChange(band.id, {
+                        ...band,
                         approximateStart: next.approximate,
                         exactStartTime: next.exactTime,
                         startYear: next.value,
                       })
                     }
                     required
-                    value={era.startYear}
+                    value={band.startYear}
                   />
                 </div>
                 <div className="flex min-w-0 flex-1">
                   <TimePointField
-                    approximate={era.approximateEnd}
-                    exactTime={era.exactEndTime}
-                    id={`${era.id}-end`}
+                    approximate={band.approximateEnd}
+                    exactTime={band.exactEndTime}
+                    id={`${band.id}-end`}
                     label="End"
                     onChange={(next) =>
-                      onEraChange(era.id, {
-                        ...era,
+                      onBandChange(band.id, {
+                        ...band,
                         approximateEnd: next.approximate,
                         exactEndTime: next.exactTime,
                         endYear: next.value,
                       })
                     }
                     required
-                    value={era.endYear}
+                    value={band.endYear}
                   />
                 </div>
               </div>
 
-              <Field htmlFor={`${era.id}-color`} label="Color">
+              <Field htmlFor={`${band.id}-color`} label="Color" required>
                 <ColorPicker
-                  id={`${era.id}-color`}
+                  id={`${band.id}-color`}
                   onChange={(color) =>
-                    onEraChange(era.id, {
-                      ...era,
+                    onBandChange(band.id, {
+                      ...band,
                       color,
                     })
                   }
-                  value={era.color ?? "#4f8a8b"}
+                  value={band.color}
                 />
               </Field>
 
-              <Field htmlFor={`${era.id}-description`} label="Description">
+              <Field htmlFor={`${band.id}-description`} label="Description">
                 <Textarea
                   className="bg-background/70"
-                  id={`${era.id}-description`}
+                  id={`${band.id}-description`}
                   onChange={(event) =>
-                    onEraChange(era.id, {
-                      ...era,
+                    onBandChange(band.id, {
+                      ...band,
                       description: event.target.value,
                     })
                   }
-                  value={era.description ?? ""}
+                  value={band.description ?? ""}
                 />
               </Field>
 
@@ -212,22 +194,22 @@ export function EraAccordionItem({
                 document={document}
                 onChange={({ document: nextDocument, sourceIds }) => {
                   onDocumentChange(
-                    updateEraNodeInDocument(nextDocument, era.id, () => ({
-                      ...era,
+                    updateBandInDocument(nextDocument, band.id, () => ({
+                      ...band,
                       sourceIds,
                     })),
                   );
                 }}
-                ownerId={era.id}
-                sourceIds={era.sourceIds ?? []}
+                ownerId={band.id}
+                sourceIds={band.sourceIds ?? []}
               />
 
               <ImageAttachmentField
-                id={era.id}
-                image={era.image}
+                id={band.id}
+                image={band.image}
                 onImageChange={(image) =>
-                  onEraChange(era.id, {
-                    ...era,
+                  onBandChange(band.id, {
+                    ...band,
                     image,
                   })
                 }
@@ -236,11 +218,11 @@ export function EraAccordionItem({
               <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-4">
                 <button
                   className="inline-flex h-8 w-fit cursor-pointer items-center gap-1.5 rounded-md border border-transparent px-0 text-[0.76rem] font-semibold text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  onClick={() => onAddChild(era.id)}
+                  onClick={() => onAddChild(band.id)}
                   type="button"
                 >
                   <Plus className="size-3.5" />
-                  Add sub-era
+                  Add sub-band
                 </button>
                 <Button
                   onClick={() => setIsOpen(false)}
@@ -256,18 +238,18 @@ export function EraAccordionItem({
         </div>
       </Collapsible>
 
-      {childEras.length > 0 ? (
+      {childBands.length > 0 ? (
         <div className="grid gap-3">
-          {childEras.map((child) => (
-            <EraAccordionItem
+          {childBands.map((child) => (
+            <BandAccordionItem
+              band={child}
               depth={depth + 1}
               document={document}
-              era={child}
               key={child.id}
               onAddChild={onAddChild}
+              onBandChange={onBandChange}
               onDelete={onDelete}
               onDocumentChange={onDocumentChange}
-              onEraChange={onEraChange}
             />
           ))}
         </div>

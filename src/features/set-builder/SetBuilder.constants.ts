@@ -1,0 +1,1 @@
+export const DEFAULT_MARKER_COLOR = "#473727";

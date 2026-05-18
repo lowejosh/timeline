@@ -7,7 +7,9 @@ import {
   SET_BUILDER_TOOL_SEQUENCE,
   type SetBuilderTool,
 } from "../SetBuilder.types";
+import { SetBuilderBandsForm } from "./bands/SetBuilderBandsForm";
 import { SetBuilderErasForm } from "./eras/SetBuilderErasForm";
+import { SetBuilderMarkersForm } from "./markers/SetBuilderMarkersForm";
 import { SetBuilderMetadataForm } from "./SetBuilderMetadataForm";
 
 type SetBuilderFormPanelProps = {
@@ -37,6 +39,16 @@ export function SetBuilderFormPanel({
       />
     ) : selectedTool === "eras" ? (
       <SetBuilderErasForm
+        document={document}
+        onDocumentChange={onDocumentChange}
+      />
+    ) : selectedTool === "markers" ? (
+      <SetBuilderMarkersForm
+        document={document}
+        onDocumentChange={onDocumentChange}
+      />
+    ) : selectedTool === "bands" ? (
+      <SetBuilderBandsForm
         document={document}
         onDocumentChange={onDocumentChange}
       />
