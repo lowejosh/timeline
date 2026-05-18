@@ -33,8 +33,7 @@ export function PageShell({
 }: PageShellProps) {
   return (
     <div
-      className="flex h-full w-full items-start justify-start overflow-auto p-[calc(env(safe-area-inset-top,0px)+1.2rem)_calc(env(safe-area-inset-right,0px)+1.4rem)_calc(env(safe-area-inset-bottom,0px)+1.2rem)_calc(env(safe-area-inset-left,0px)+1.4rem)] text-foreground overscroll-contain max-sm:p-[calc(env(safe-area-inset-top,0px)+0.7rem)_calc(env(safe-area-inset-right,0px)+0.7rem)_calc(env(safe-area-inset-bottom,0px)+0.7rem)_calc(env(safe-area-inset-left,0px)+0.7rem)]"
-      ref={scrollRef}
+      className="flex h-full w-full items-start justify-start overflow-hidden p-[calc(env(safe-area-inset-top,0px)+1.2rem)_calc(env(safe-area-inset-right,0px)+1.4rem)_calc(env(safe-area-inset-bottom,0px)+1.2rem)_calc(env(safe-area-inset-left,0px)+1.4rem)] text-foreground overscroll-contain max-sm:p-[calc(env(safe-area-inset-top,0px)+0.7rem)_calc(env(safe-area-inset-right,0px)+0.7rem)_calc(env(safe-area-inset-bottom,0px)+0.7rem)_calc(env(safe-area-inset-left,0px)+0.7rem)]"
     >
       <section
         aria-labelledby={titleId}
@@ -76,13 +75,14 @@ export function PageShell({
         </header>
         <div
           className={cn(
-            "grid min-h-0 gap-4 overflow-auto p-4 max-sm:p-3",
+            "grid h-full min-h-0 gap-4 overflow-auto p-4 max-sm:p-3",
             sidebar
               ? "grid-cols-[minmax(0,1fr)_22rem] max-lg:grid-cols-1"
               : "grid-cols-1",
           )}
+          ref={scrollRef}
         >
-          {children ? <main className="min-w-0">{children}</main> : null}
+          {children ? <main className="h-full min-w-0">{children}</main> : null}
           {sidebar ? <aside className="min-w-0">{sidebar}</aside> : null}
         </div>
         {footer ? (

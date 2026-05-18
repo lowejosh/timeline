@@ -7,6 +7,8 @@ import { createEmptyTimelineSetDocument } from "@/lib/catalog/setDocumentValidat
 import type { TimelineRawSetDocument } from "@/lib/catalog/setSchema";
 import { useCustomSetCatalogStore } from "@/stores/customSetCatalog.store";
 import { useTimelineNavigationStore } from "@/stores/timelineNavigation.store";
+import type { SetBuilderTool } from "./SetBuilder.types";
+import { SetBuilderWorkspace } from "./components/SetBuilderWorkspace";
 
 function cloneDocument(document: TimelineRawSetDocument): TimelineRawSetDocument {
   return JSON.parse(JSON.stringify(document)) as TimelineRawSetDocument;
@@ -41,6 +43,8 @@ export function SetBuilderPage() {
   const [document, setDocument] = useState<TimelineRawSetDocument>(() =>
     cloneDocument(sourceDocument),
   );
+  const [selectedTool, setSelectedTool] =
+    useState<SetBuilderTool>("metadata");
   const isEditing = editingSetId !== null;
   const canDelete = isEditing && documents.some(
     (candidate) => candidate.metadata.id === editingSetId,
@@ -97,6 +101,14 @@ export function SetBuilderPage() {
       onBack={handleBack}
       title={isEditing ? "Edit custom set" : "Create custom set"}
       titleId={titleId}
-    />
+    >
+      <SetBuilderWorkspace
+        document={document}
+        isEditing={isEditing}
+        onDocumentChange={setDocument}
+        onSelectTool={setSelectedTool}
+        selectedTool={selectedTool}
+      />
+    </PageShell>
   );
 }
