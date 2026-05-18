@@ -1,10 +1,10 @@
 import { getVisibleRange, type TimelineViewport } from "../core/viewport";
 import { isTimelineDecorationVisibleAtZoom } from "../rendering/queries/visibility";
+import { getDefaultTimelineSetOrder, normalizeTimelineSetOrder } from "../catalog/timelineSets";
 import {
-  TIMELINE_SETS,
-  getDefaultTimelineSetOrder,
-  normalizeTimelineSetOrder,
-} from "../catalog/timelineSets";
+  STATIC_TIMELINE_CATALOG,
+  type TimelineCatalogSnapshot,
+} from "../catalog/timelineCatalog";
 import type {
   TimelineDecorationContentType,
   TimelineDisplayConfig,
@@ -61,7 +61,8 @@ export function resolveTimelineSidebarTree(
   visibleSetIds: ReadonlySet<TimelineSetId>,
   enabledGroupIds: ReadonlySet<string>,
   suppressedGroupIds: ReadonlySet<string> = new Set(),
-  setOrder: readonly TimelineSetId[] = getDefaultTimelineSetOrder(),
+  setOrder?: readonly TimelineSetId[],
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
 ): TimelineSidebarSetState[] {
   if (width <= pad * 2) {
     return [];
@@ -105,10 +106,13 @@ export function resolveTimelineSidebarTree(
   }
 
   const orderIndexBySetId = new Map(
-    normalizeTimelineSetOrder(setOrder).map((setId, index) => [setId, index]),
+    normalizeTimelineSetOrder(
+      setOrder ?? getDefaultTimelineSetOrder(catalog),
+      catalog,
+    ).map((setId, index) => [setId, index]),
   );
 
-  return [...TIMELINE_SETS]
+  return [...catalog.sets]
     .filter((set) => collectionSetIds.has(set.metadata.id))
     .sort(
       (left, right) =>

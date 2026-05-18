@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useMemo } from "react";
 
-import {
-  TIMELINE_DECORATION_GROUPS,
-  getDefaultEnabledTimelineGroupIds,
-} from "@/lib/catalog/decorations";
-import { TIMELINE_DISPLAY, type TimelineSetId } from "@/lib/catalog/eras";
+import { getDefaultEnabledTimelineGroupIds } from "@/lib/catalog/decorations";
+import { type TimelineSetId } from "@/lib/catalog/eras";
 import {
   filterMarkersBySets,
   filterOverlaysBySets,
-  TIMELINE_SET_ID_BY_GROUP_ID,
-  TIMELINE_SET_SPAN_PRIORITY_BY_ID,
 } from "@/lib/catalog/timelineSets";
+import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import {
   isTimelineLayerAutoToggleEnabled,
   shouldAutoSuppressTimelineLayer,
@@ -26,6 +22,7 @@ import { HUMAN_EVOLUTION_GROUP_ID } from "@/stores/timelineLayer.store";
 export function useTimelineVisibilityState({
   autoSuppressedGroupIds,
   canvasPad,
+  catalog,
   humanEvolutionToggleMode,
   innerWidth,
   overlayVisibilityTransitionSeed,
@@ -37,6 +34,7 @@ export function useTimelineVisibilityState({
 }: {
   autoSuppressedGroupIds: ReadonlySet<string>;
   canvasPad: number;
+  catalog: TimelineCatalogSnapshot;
   humanEvolutionToggleMode: "auto" | "manual-on" | "manual-off";
   innerWidth: number;
   overlayVisibilityTransitionSeed: number;
@@ -47,19 +45,19 @@ export function useTimelineVisibilityState({
   manualEnabledGroupIds: ReadonlySet<string>;
 }) {
   const defaultEnabledGroupIds = useMemo(
-    () => getDefaultEnabledTimelineGroupIds(),
-    [],
+    () => getDefaultEnabledTimelineGroupIds(catalog),
+    [catalog],
   );
   const autoToggleRulesByGroupId = useMemo(
     () =>
       new Map(
-        TIMELINE_DECORATION_GROUPS.flatMap((group) =>
+        catalog.groups.flatMap((group) =>
           group.autoToggleRule
             ? [[group.id, group.autoToggleRule] as const]
             : [],
         ),
       ),
-    [],
+    [catalog],
   );
 
   const baseEnabledGroupIds = useMemo(() => {
@@ -79,12 +77,12 @@ export function useTimelineVisibilityState({
   }, [defaultEnabledGroupIds, humanEvolutionToggleMode, manualEnabledGroupIds]);
 
   const visibleSetMarkers = useMemo(
-    () => filterMarkersBySets(TIMELINE_DISPLAY.markers, visibleSetIds),
-    [visibleSetIds],
+    () => filterMarkersBySets(catalog.display.markers, visibleSetIds),
+    [catalog, visibleSetIds],
   );
   const visibleSetOverlays = useMemo(
-    () => filterOverlaysBySets(TIMELINE_DISPLAY.overlays, visibleSetIds),
-    [visibleSetIds],
+    () => filterOverlaysBySets(catalog.display.overlays, visibleSetIds),
+    [catalog, visibleSetIds],
   );
 
   const autoToggleVisibleGroupIds = useMemo(
@@ -133,7 +131,7 @@ export function useTimelineVisibilityState({
     const [visibleStart, visibleEnd] = getVisibleRange(viewport, viewportWidth);
     const visibleSetSpanPriorities = new Map<string, number>();
 
-    for (const [setId, span] of TIMELINE_SET_SPAN_PRIORITY_BY_ID) {
+    for (const [setId, span] of catalog.setSpanPriorityById) {
       if (
         visibleSetIds.has(setId) &&
         span.startYear <= visibleEnd &&
@@ -144,7 +142,7 @@ export function useTimelineVisibilityState({
     }
 
     return visibleSetSpanPriorities;
-  }, [canvasPad, innerWidth, viewport, viewportWidth, visibleSetIds]);
+  }, [canvasPad, catalog, innerWidth, viewport, viewportWidth, visibleSetIds]);
 
   const hasHigherPrioritySetSpanVisible = useCallback(
     (ownerSetId: TimelineSetId | null | undefined, ownerPriority?: number) => {
@@ -154,7 +152,7 @@ export function useTimelineVisibilityState({
 
       const comparisonPriority =
         ownerPriority ??
-        TIMELINE_SET_SPAN_PRIORITY_BY_ID.get(ownerSetId)?.priority;
+        catalog.setSpanPriorityById.get(ownerSetId)?.priority;
 
       if (comparisonPriority === undefined) {
         return false;
@@ -168,7 +166,7 @@ export function useTimelineVisibilityState({
 
       return false;
     },
-    [autoToggleVisibleSetSpanPriorities],
+    [autoToggleVisibleSetSpanPriorities, catalog],
   );
 
   const autoHiddenOverlayIds = useMemo(
@@ -229,7 +227,7 @@ export function useTimelineVisibilityState({
         groupId,
         autoToggleVisibleOverlayGroupIds,
         hasHigherPrioritySetSpanVisible(
-          TIMELINE_SET_ID_BY_GROUP_ID.get(groupId),
+          catalog.setIdByGroupId.get(groupId),
         ),
       );
       const nextSuppressed = isAutoToggleEnabled
@@ -267,6 +265,7 @@ export function useTimelineVisibilityState({
     autoToggleVisibleOverlayGroupIds,
     baseEnabledGroupIds,
     canvasPad,
+    catalog.setIdByGroupId,
     hasHigherPrioritySetSpanVisible,
     innerWidth,
     setAutoSuppressedGroupIds,

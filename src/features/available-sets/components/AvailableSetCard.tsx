@@ -4,9 +4,11 @@ import {
   AlertTriangle,
   Eye,
   EyeOff,
+  Pencil,
   GripVertical,
   Minus,
   Plus,
+  Trash2,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +22,7 @@ type AvailableSetCardProps = {
   columnId: ColumnId;
   dragState: DragState | null;
   itemRefs: MutableRefObject<Map<TimelineSetId, HTMLElement>>;
+  isCustom: boolean;
   obscuredCount: number;
   onDragHandlePointerDown: (
     event: PointerEvent<HTMLElement>,
@@ -33,6 +36,8 @@ type AvailableSetCardProps = {
   ) => void;
   onToggleDraft: (setId: TimelineSetId, nextEnabled: boolean) => void;
   onToggleVisible: (setId: TimelineSetId, nextVisible: boolean) => void;
+  onDeleteCustomSet: (setId: TimelineSetId) => void;
+  onEditCustomSet: (setId: TimelineSetId) => void;
   reorderHelpId: string;
   set: TimelineSetDefinition;
   timeRange: string | null;
@@ -43,11 +48,14 @@ export function AvailableSetCard({
   columnId,
   dragState,
   itemRefs,
+  isCustom,
   obscuredCount,
   onDragHandlePointerDown,
   onReorderKeyDown,
   onToggleDraft,
   onToggleVisible,
+  onDeleteCustomSet,
+  onEditCustomSet,
   reorderHelpId,
   set,
   timeRange,
@@ -149,45 +157,78 @@ export function AvailableSetCard({
         ) : null}
       </div>
 
-      {isEnabled ? (
+      <div className="flex shrink-0 items-center gap-1 self-center">
+        {isCustom ? (
+          <>
+            <Button
+              aria-label={`Edit ${set.metadata.label}`}
+              className="rounded-full text-muted-foreground"
+              onClick={(event) => {
+                event.stopPropagation();
+                onEditCustomSet(setId);
+              }}
+              size="icon"
+              type="button"
+              variant="glass"
+            >
+              <Pencil className="size-4" />
+            </Button>
+            <Button
+              aria-label={`Delete ${set.metadata.label}`}
+              className="rounded-full text-muted-foreground"
+              onClick={(event) => {
+                event.stopPropagation();
+                onDeleteCustomSet(setId);
+              }}
+              size="icon"
+              type="button"
+              variant="glass"
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </>
+        ) : null}
+
+        {isEnabled ? (
+          <Button
+            aria-label={
+              isVisible ? `Hide ${set.metadata.label}` : `Show ${set.metadata.label}`
+            }
+            aria-pressed={isVisible}
+            className={cn(
+              "rounded-full text-muted-foreground",
+              isVisible && "text-muted-foreground/90",
+            )}
+            data-visible={isVisible ? "true" : "false"}
+            onClick={(event) => {
+              event.stopPropagation();
+              onToggleVisible(setId, !isVisible);
+            }}
+            size="icon"
+            type="button"
+            variant="glass"
+          >
+            {isVisible ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+          </Button>
+        ) : null}
+
         <Button
-          aria-label={
-            isVisible ? `Hide ${set.metadata.label}` : `Show ${set.metadata.label}`
-          }
-          aria-pressed={isVisible}
+          aria-label={isEnabled ? `Remove ${set.metadata.label}` : `Add ${set.metadata.label}`}
           className={cn(
-            "self-center rounded-full text-muted-foreground",
-            isVisible && "text-muted-foreground/90",
+            "rounded-full text-muted-foreground",
+            !isEnabled && "text-foreground/70",
           )}
-          data-visible={isVisible ? "true" : "false"}
-          onClick={(event) => {
-            event.stopPropagation();
-            onToggleVisible(setId, !isVisible);
+          data-variant={isEnabled ? "remove" : "add"}
+          onClick={() => {
+            onToggleDraft(setId, !isEnabled);
           }}
           size="icon"
           type="button"
           variant="glass"
         >
-          {isVisible ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+          {isEnabled ? <Minus className="size-4" /> : <Plus className="size-4" />}
         </Button>
-      ) : null}
-
-      <Button
-        aria-label={isEnabled ? `Remove ${set.metadata.label}` : `Add ${set.metadata.label}`}
-        className={cn(
-          "self-center rounded-full text-muted-foreground",
-          !isEnabled && "text-foreground/70",
-        )}
-        data-variant={isEnabled ? "remove" : "add"}
-        onClick={() => {
-          onToggleDraft(setId, !isEnabled);
-        }}
-        size="icon"
-        type="button"
-        variant="glass"
-      >
-        {isEnabled ? <Minus className="size-4" /> : <Plus className="size-4" />}
-      </Button>
+      </div>
     </li>
   );
 

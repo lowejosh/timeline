@@ -1,18 +1,24 @@
 import type { TimelineSetDefinition } from "@/lib/catalog/setSchema";
+import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 
 export type ColumnId = "enabled" | "available";
 
 export type AvailableSetsPageProps = {
   allSets: readonly TimelineSetDefinition[];
+  catalog: TimelineCatalogSnapshot;
   enabledSetIds: ReadonlySet<TimelineSetId>;
   visibleSetIds: ReadonlySet<TimelineSetId>;
   orderedSetIds: readonly TimelineSetId[];
   isActive: boolean;
+  customSetIds: ReadonlySet<TimelineSetId>;
   onApply: (
     nextEnabledSetIds: Set<TimelineSetId>,
     nextOrderedSetIds: TimelineSetId[],
   ) => void;
+  onCreateSet: () => void;
+  onDeleteCustomSet: (setId: TimelineSetId) => void;
+  onEditCustomSet: (setId: TimelineSetId) => void;
   onToggleVisible: (setId: TimelineSetId, nextVisible: boolean) => void;
   onClose: () => void;
 };

@@ -6,12 +6,14 @@ import { ShortcutKey } from "@/components/ui/shortcut-key";
 import type { TimelineSidebarSetState } from "@/lib/app/sidebarModel";
 import type { TimelineLayerShortcutTarget } from "@/lib/app/timelineKeyboard";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
+import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import { TimelineSidebar } from "../TimelineSidebar";
 import { cn } from "@/lib/utils";
 import { Map } from "lucide-react";
 
 type TimelineSidebarChromeProps = {
   isMapPreviewEnabled: boolean;
+  catalog: TimelineCatalogSnapshot;
   layerShortcuts: readonly TimelineLayerShortcutTarget[];
   mode: "drawer" | "popup";
   onToggleMapPreview: () => void;
@@ -21,6 +23,7 @@ type TimelineSidebarChromeProps = {
 };
 
 export function TimelineSidebarChrome({
+  catalog,
   isMapPreviewEnabled,
   layerShortcuts,
   mode,
@@ -32,7 +35,7 @@ export function TimelineSidebarChrome({
   const activeView = rx.useSidebarActiveView();
   const expandedSetIds = rx.useExpandedSetIds();
   const isOpen = rx.useIsSidebarOpen();
-  const actions = rx.useSidebarChromeActions();
+  const actions = rx.useSidebarChromeActions(catalog);
 
   useTimelineSidebarEscape({
     activeView,
@@ -46,7 +49,7 @@ export function TimelineSidebarChrome({
         className={cn(
           "absolute left-[var(--app-chrome-left)] top-[var(--app-chrome-top)] z-[4] flex items-center gap-2",
           "transition-[opacity,transform] duration-200",
-          activeView === "available-sets" && "pointer-events-none opacity-0",
+          activeView !== "timeline" && "pointer-events-none opacity-0",
           mode === "drawer" &&
             isOpen &&
             "pointer-events-none -translate-y-1 scale-[0.98] opacity-0",
@@ -119,7 +122,7 @@ export function TimelineSidebarChrome({
           isOpen
             ? "pointer-events-auto bg-overlay-scrim opacity-100 backdrop-blur-md"
             : "pointer-events-none opacity-0",
-          activeView === "available-sets" && "pointer-events-none opacity-0",
+          activeView !== "timeline" && "pointer-events-none opacity-0",
         )}
         data-open={isOpen ? "true" : "false"}
         onClick={actions.closeSidebar}
@@ -134,7 +137,7 @@ export function TimelineSidebarChrome({
           isOpen
             ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
             : "pointer-events-none -translate-y-2 scale-[0.985] opacity-0",
-          activeView === "available-sets" && "pointer-events-none opacity-0",
+          activeView !== "timeline" && "pointer-events-none opacity-0",
           mode === "drawer"
             ? "bottom-0 left-0 top-0 h-full max-h-none w-[min(calc(var(--sidebar-width)+env(safe-area-inset-left,0px)),calc(100vw-18px))] origin-left"
             : "left-3 top-14 w-[min(var(--sidebar-width),calc(100vw-24px))] max-h-[min(calc(100%-68px),var(--sidebar-max-height))] max-sm:left-[10px] max-sm:top-[50px] max-sm:w-[min(var(--sidebar-width),calc(100vw-20px))] max-sm:max-h-[min(calc(100%-60px),var(--sidebar-max-height))]",

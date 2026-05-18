@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useMemo } from "react";
 import * as rx from "./App.selectors";
 import { useStandaloneViewportHeight } from "@/hooks/useStandaloneViewportHeight";
 import { useTimelineAppState } from "@/hooks/useTimelineAppState";
+import { useTimelineCatalog } from "@/hooks/useTimelineCatalog";
 import { useTimelineKeyboardShortcuts } from "@/hooks/useTimelineKeyboardShortcuts";
 import { getTimelineAppLayoutState } from "@/lib/app/layout";
 import {
@@ -22,8 +23,15 @@ const AvailableSetsView = lazy(() =>
   })),
 );
 
+const SetBuilderView = lazy(() =>
+  import("@/pages/SetBuilderView/SetBuilderView").then((module) => ({
+    default: module.SetBuilderView,
+  })),
+);
+
 function App() {
-  const app = useTimelineAppState();
+  const catalog = useTimelineCatalog();
+  const app = useTimelineAppState(catalog);
   const activeView = rx.useActiveView();
   const isSidebarOpen = rx.useIsSidebarOpen();
   const isKeyboardHelpOpen = rx.useIsKeyboardHelpOpen();
@@ -31,7 +39,7 @@ function App() {
   const isSettingsOpen = rx.useIsSettingsOpen();
   const isCosmicCalendarMode = rx.useIsCosmicCalendarMode();
   const isMapPreviewEnabled = rx.useIsMapPreviewEnabled();
-  const searchScope = rx.useTimelineSearchScope();
+  const searchScope = rx.useTimelineSearchScope(catalog);
   const actions = rx.useAppActions();
   const layout = getTimelineAppLayoutState({
     height: app.stageSize.height,
@@ -103,6 +111,7 @@ function App() {
                 />
                 <TimelineSearch
                   className="order-2"
+                  catalog={catalog}
                   enabledGroupIds={searchScope.enabledGroupIds}
                   enabledSetIds={searchScope.enabledSetIds}
                   isOpen={isSearchOpen}
@@ -120,6 +129,7 @@ function App() {
             {!shortcutUiEnabled ? (
               <TimelineSearch
                 className="order-2"
+                catalog={catalog}
                 enabledGroupIds={searchScope.enabledGroupIds}
                 enabledSetIds={searchScope.enabledSetIds}
                 isOpen={isSearchOpen}
@@ -155,6 +165,7 @@ function App() {
           actions.setIsMapPreviewEnabled((current) => !current);
         }}
         onToggleSet={app.handleToggleSet}
+        catalog={catalog}
         showShortcuts={shortcutUiEnabled}
         sets={app.sidebarTree}
       />
@@ -166,6 +177,7 @@ function App() {
           <TimelineView app={app} layout={layout} />
           <Suspense fallback={null}>
             <AvailableSetsView />
+            <SetBuilderView />
           </Suspense>
         </div>
       </section>

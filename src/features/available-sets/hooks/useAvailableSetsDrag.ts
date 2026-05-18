@@ -164,31 +164,28 @@ export function useAvailableSetsDrag(
         event.clientY,
       );
 
-      setDragState((prev) => {
-        if (!prev || prev.pointerId !== event.pointerId) {
-          return prev;
-        }
+      if (
+        current.currentClientX === event.clientX &&
+        current.currentClientY === event.clientY &&
+        current.targetColumn === nextTargetColumn &&
+        current.targetIndex === nextTargetIndex &&
+        current.currentScrollTop === nextScrollTop
+      ) {
+        return;
+      }
 
-        if (
-          prev.currentClientX === event.clientX &&
-          prev.currentClientY === event.clientY &&
-          prev.targetColumn === nextTargetColumn &&
-          prev.targetIndex === nextTargetIndex &&
-          prev.currentScrollTop === nextScrollTop
-        ) {
-          return prev;
-        }
+      const next = {
+        ...current,
+        currentClientX: event.clientX,
+        currentClientY: event.clientY,
+        currentScrollTop: nextScrollTop,
+        layouts: nextLayouts,
+        targetColumn: nextTargetColumn,
+        targetIndex: nextTargetIndex,
+      };
 
-        return {
-          ...prev,
-          currentClientX: event.clientX,
-          currentClientY: event.clientY,
-          currentScrollTop: nextScrollTop,
-          layouts: nextLayouts,
-          targetColumn: nextTargetColumn,
-          targetIndex: nextTargetIndex,
-        };
-      });
+      dragStateRef.current = next;
+      setDragState(next);
     },
     [updateDragLayoutRects],
   );
@@ -228,19 +225,16 @@ export function useAvailableSetsDrag(
           current.currentClientY,
         );
 
-        setDragState((prev) => {
-          if (!prev) {
-            return prev;
-          }
+        const next = {
+          ...current,
+          currentScrollTop: nextScrollTop,
+          layouts: nextLayouts,
+          targetColumn: nextTargetColumn,
+          targetIndex: nextTargetIndex,
+        };
 
-          return {
-            ...prev,
-            currentScrollTop: nextScrollTop,
-            layouts: nextLayouts,
-            targetColumn: nextTargetColumn,
-            targetIndex: nextTargetIndex,
-          };
-        });
+        dragStateRef.current = next;
+        setDragState(next);
       }
 
       autoScrollFrameRef.current = window.requestAnimationFrame(tick);
@@ -268,6 +262,7 @@ export function useAvailableSetsDrag(
         current.captureElement.releasePointerCapture(current.pointerId);
       }
 
+      dragStateRef.current = null;
       setDragState(null);
 
       if (
@@ -450,7 +445,7 @@ export function useAvailableSetsDrag(
 
     element.setPointerCapture(event.pointerId);
 
-    setDragState({
+    const nextDragState = {
       pointerId: event.pointerId,
       captureElement: element,
       scrollContainer,
@@ -469,7 +464,10 @@ export function useAvailableSetsDrag(
       draggedHeight: itemRect.height,
       currentScrollTop: scrollContainer ? scrollContainer.scrollTop : 0,
       layouts: { enabled: enabledLayout, available: availableLayout },
-    });
+    } satisfies DragState;
+
+    dragStateRef.current = nextDragState;
+    setDragState(nextDragState);
   };
 
   return {

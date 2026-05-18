@@ -1,10 +1,13 @@
 import {
-  TIMELINE_SET_ID_BY_FAMILY_ID,
   TIMELINE_SET_ID_BY_GROUP_ID,
   TIMELINE_SET_SPAN_PRIORITY_BY_ID,
   TIMELINE_SETS,
   TIMELINE_SETS_BY_ID,
 } from "./timelineRegistry";
+import {
+  STATIC_TIMELINE_CATALOG,
+  type TimelineCatalogSnapshot,
+} from "./timelineCatalog";
 import type { TimelineSetDefinition } from "./setSchema";
 import type {
   Era,
@@ -23,24 +26,15 @@ type TimelinePriorityBearing = {
 
 export type TimelineSetAssignmentConfig = TimelineSetDefinition;
 
-function compareTimelineSetOrder(
-  left: TimelineSetDefinition,
-  right: TimelineSetDefinition,
-) {
-  return (
-    left.metadata.order - right.metadata.order ||
-    left.metadata.label.localeCompare(right.metadata.label)
-  );
-}
-
-export function getDefaultTimelineSetOrder(): TimelineSetId[] {
-  return [...TIMELINE_SETS]
-    .sort(compareTimelineSetOrder)
-    .map((set) => set.metadata.id);
+export function getDefaultTimelineSetOrder(
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
+): TimelineSetId[] {
+  return [...catalog.defaultSetOrder];
 }
 
 export function normalizeTimelineSetOrder(
   candidateOrder: readonly string[] | null | undefined,
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
 ): TimelineSetId[] {
   const normalized: TimelineSetId[] = [];
   const seen = new Set<TimelineSetId>();
@@ -48,7 +42,7 @@ export function normalizeTimelineSetOrder(
   for (const candidateId of candidateOrder ?? []) {
     const setId = candidateId as TimelineSetId;
 
-    if (seen.has(setId)) {
+    if (seen.has(setId) || !catalog.setsById[setId]) {
       continue;
     }
 
@@ -56,7 +50,7 @@ export function normalizeTimelineSetOrder(
     normalized.push(setId);
   }
 
-  for (const setId of getDefaultTimelineSetOrder()) {
+  for (const setId of getDefaultTimelineSetOrder(catalog)) {
     if (seen.has(setId)) {
       continue;
     }
@@ -67,8 +61,11 @@ export function normalizeTimelineSetOrder(
   return normalized;
 }
 
-function getTimelineSetPriorityBoosts(setOrder: readonly TimelineSetId[]) {
-  const normalizedOrder = normalizeTimelineSetOrder(setOrder);
+function getTimelineSetPriorityBoosts(
+  setOrder: readonly TimelineSetId[],
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
+) {
+  const normalizedOrder = normalizeTimelineSetOrder(setOrder, catalog);
   const boostBySetId = new Map<TimelineSetId, number>();
 
   normalizedOrder.forEach((setId, index) => {
@@ -88,8 +85,9 @@ export function getEffectiveTimelinePriority(item: TimelinePriorityBearing) {
 export function applyTimelineSetOrderToMarkers(
   markers: readonly TimelineMarker[],
   setOrder: readonly TimelineSetId[],
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
 ): TimelineMarker[] {
-  const boostBySetId = getTimelineSetPriorityBoosts(setOrder);
+  const boostBySetId = getTimelineSetPriorityBoosts(setOrder, catalog);
 
   return markers.map((marker) => {
     const setPriorityBoost = marker.setId
@@ -127,8 +125,9 @@ function applyTimelineSetOrderToOverlay(
 export function applyTimelineSetOrderToOverlays(
   overlays: readonly TimelineOverlayBand[],
   setOrder: readonly TimelineSetId[],
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
 ): TimelineOverlayBand[] {
-  const boostBySetId = getTimelineSetPriorityBoosts(setOrder);
+  const boostBySetId = getTimelineSetPriorityBoosts(setOrder, catalog);
 
   return overlays.map((overlay) =>
     applyTimelineSetOrderToOverlay(overlay, boostBySetId),
@@ -138,15 +137,16 @@ export function applyTimelineSetOrderToOverlays(
 function applyTimelineSetOrderToEra(
   era: Era,
   boostBySetId: ReadonlyMap<TimelineSetId, number>,
+  catalog: TimelineCatalogSnapshot,
 ): Era {
-  const setId = era.familyId ? getSetIdForEraFamily(era.familyId) : null;
+  const setId = era.familyId ? getSetIdForEraFamily(era.familyId, catalog) : null;
   const setPriorityBoost = setId ? boostBySetId.get(setId) : undefined;
 
   return {
     ...era,
     setPriorityBoost,
     children: era.children?.map((child) =>
-      applyTimelineSetOrderToEra(child, boostBySetId),
+      applyTimelineSetOrderToEra(child, boostBySetId, catalog),
     ),
   };
 }
@@ -154,19 +154,19 @@ function applyTimelineSetOrderToEra(
 export function applyTimelineSetOrderToEraTree(
   root: Era,
   setOrder: readonly TimelineSetId[],
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
 ): Era {
   return applyTimelineSetOrderToEra(
     root,
-    getTimelineSetPriorityBoosts(setOrder),
+    getTimelineSetPriorityBoosts(setOrder, catalog),
+    catalog,
   );
 }
 
-export function getDefaultEnabledTimelineSetIds(): Set<TimelineSetId> {
-  return new Set(
-    TIMELINE_SETS.filter((set) => set.metadata.defaultEnabled !== false).map(
-      (set) => set.metadata.id,
-    ),
-  );
+export function getDefaultEnabledTimelineSetIds(
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
+): Set<TimelineSetId> {
+  return new Set(catalog.defaultEnabledSetIds);
 }
 
 export function resolveDecorationSetId(
@@ -177,8 +177,9 @@ export function resolveDecorationSetId(
 
 export function getSetIdForEraFamily(
   familyId: EraFamilyId,
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
 ): TimelineSetId | null {
-  return TIMELINE_SET_ID_BY_FAMILY_ID.get(familyId) ?? null;
+  return catalog.setIdByFamilyId.get(familyId) ?? null;
 }
 
 export function isDecorationSetEnabled(

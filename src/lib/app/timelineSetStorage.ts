@@ -5,6 +5,10 @@ import {
   getDefaultTimelineSetOrder,
   normalizeTimelineSetOrder,
 } from "@/lib/catalog/timelineSets";
+import {
+  STATIC_TIMELINE_CATALOG,
+  type TimelineCatalogSnapshot,
+} from "@/lib/catalog/timelineCatalog";
 
 export type StoredLayerToggleMode = "auto" | "manual-on" | "manual-off";
 
@@ -228,33 +232,40 @@ function writeScopedIds(
   writeLayerStorageState(state);
 }
 
-export function readStoredTimelineSetOrder() {
+export function readStoredTimelineSetOrder(
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
+) {
   return normalizeTimelineSetOrder(
     readScopedIds(
       "orderedIdsByScope",
       SET_ORDER_SCOPE,
-      getDefaultTimelineSetOrder,
+      () => getDefaultTimelineSetOrder(catalog),
     ),
+    catalog,
   );
 }
 
-export function readStoredEnabledSetIds() {
+export function readStoredEnabledSetIds(
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
+) {
   return new Set(
     readScopedIds(
       "enabledIdsByScope",
       SET_COLLECTION_SCOPE,
-      () => Array.from(getDefaultEnabledTimelineSetIds()),
-    ),
+      () => Array.from(getDefaultEnabledTimelineSetIds(catalog)),
+    ).filter((setId) => Boolean(catalog.setsById[setId as TimelineSetId])),
   ) as Set<TimelineSetId>;
 }
 
-export function readStoredEnabledGroupIds() {
+export function readStoredEnabledGroupIds(
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
+) {
   return new Set(
     readScopedIds(
       "enabledIdsByScope",
       GROUP_ENABLED_SCOPE,
-      () => Array.from(getDefaultEnabledTimelineGroupIds()),
-    ),
+      () => Array.from(getDefaultEnabledTimelineGroupIds(catalog)),
+    ).filter((groupId) => Boolean(catalog.groupsById[groupId])),
   );
 }
 
@@ -275,13 +286,15 @@ export function readStoredExpandedSetIds() {
   ) as Set<TimelineSetId>;
 }
 
-export function readStoredVisibleSetIds() {
+export function readStoredVisibleSetIds(
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
+) {
   return new Set(
     readScopedIds(
       "enabledIdsByScope",
       SET_VISIBLE_SCOPE,
-      () => Array.from(readStoredEnabledSetIds()),
-    ),
+      () => Array.from(readStoredEnabledSetIds(catalog)),
+    ).filter((setId) => Boolean(catalog.setsById[setId as TimelineSetId])),
   ) as Set<TimelineSetId>;
 }
 
@@ -318,11 +331,14 @@ export function writeStoredVisibleSetIds(setIds: ReadonlySet<TimelineSetId>) {
   writeScopedIds("enabledIdsByScope", SET_VISIBLE_SCOPE, Array.from(setIds));
 }
 
-export function writeStoredTimelineSetOrder(setIds: readonly TimelineSetId[]) {
+export function writeStoredTimelineSetOrder(
+  setIds: readonly TimelineSetId[],
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
+) {
   writeScopedIds(
     "orderedIdsByScope",
     SET_ORDER_SCOPE,
-    normalizeTimelineSetOrder(setIds),
+    normalizeTimelineSetOrder(setIds, catalog),
   );
 }
 

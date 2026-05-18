@@ -1,6 +1,8 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Plus } from "lucide-react";
 
-import { Card } from "@/components/ui/card";
+import { PageShell } from "@/components/layout/PageShell";
+import { Button } from "@/components/ui/button";
 import type { TimelineSetDefinition } from "@/lib/catalog/setSchema";
 import {
   computeEraObscuredCounts,
@@ -12,7 +14,6 @@ import {
   AvailableSetsActions,
   AvailableSetsColumn,
   AvailableSetsFilters,
-  AvailableSetsHeader,
 } from "./components";
 import { useAvailableSetsDrag } from "./hooks/useAvailableSetsDrag";
 import { useAvailableSetsKeyboardReorder } from "./hooks/useAvailableSetsKeyboardReorder";
@@ -30,11 +31,16 @@ import {
 
 export function AvailableSetsPage({
   allSets,
+  catalog,
+  customSetIds,
   enabledSetIds,
   visibleSetIds,
   orderedSetIds,
   isActive,
   onApply,
+  onCreateSet,
+  onDeleteCustomSet,
+  onEditCustomSet,
   onToggleVisible,
   onClose,
 }: AvailableSetsPageProps) {
@@ -103,13 +109,13 @@ export function AvailableSetsPage({
   );
 
   const eraObscuredCounts = useMemo(
-    () => computeEraObscuredCounts(draftColumns.enabled),
-    [draftColumns.enabled],
+    () => computeEraObscuredCounts(draftColumns.enabled, catalog),
+    [catalog, draftColumns.enabled],
   );
 
   const setTimeRanges = useMemo(
-    () => computeSetTimeRanges(allSets.map((set) => set.metadata.id)),
-    [allSets],
+    () => computeSetTimeRanges(allSets.map((set) => set.metadata.id), catalog),
+    [allSets, catalog],
   );
 
   const ensureSetStartsVisible = (setId: TimelineSetId) => {
@@ -208,8 +214,11 @@ export function AvailableSetsPage({
         dragState={dragState}
         itemRefs={itemRefs}
         key={setId}
+        isCustom={customSetIds.has(setId)}
         obscuredCount={obscuredCount}
+        onDeleteCustomSet={onDeleteCustomSet}
         onDragHandlePointerDown={handlePointerDown}
+        onEditCustomSet={onEditCustomSet}
         onReorderKeyDown={handleReorderKeyDown}
         onToggleDraft={handleToggleDraft}
         onToggleVisible={onToggleVisible}
@@ -222,19 +231,27 @@ export function AvailableSetsPage({
   };
 
   return (
-    <div
-      className="flex h-full w-full items-start justify-start overflow-auto p-[calc(env(safe-area-inset-top,0px)+1.2rem)_calc(env(safe-area-inset-right,0px)+1.4rem)_calc(env(safe-area-inset-bottom,0px)+1.2rem)_calc(env(safe-area-inset-left,0px)+1.4rem)] text-foreground overscroll-contain max-sm:p-[calc(env(safe-area-inset-top,0px)+0.7rem)_calc(env(safe-area-inset-right,0px)+0.7rem)_calc(env(safe-area-inset-bottom,0px)+0.7rem)_calc(env(safe-area-inset-left,0px)+0.7rem)]"
-      ref={scrollContainerRef}
-    >
-      <Card
-        aria-labelledby={pageTitleId}
-        className="mx-auto grid w-[min(72rem,100%)] content-start gap-4 rounded-lg bg-card p-4 backdrop-blur-xl max-sm:w-full max-sm:gap-3 max-sm:p-3"
+    <div className="h-full w-full">
+      <PageShell
+        actions={
+          <Button onClick={onCreateSet} size="pill" type="button" variant="subtle">
+            <Plus className="size-3.5" />
+            Create set
+          </Button>
+        }
+        backLabel="Back to layers"
+        className="w-[min(92rem,100%)]"
+        description="Drag with the handle to add, remove, and order timeline layers."
+        footer={<AvailableSetsActions onApply={handleApply} onClose={onClose} />}
+        onBack={handleApply}
+        scrollRef={scrollContainerRef}
+        title="Available sets"
+        titleId={pageTitleId}
       >
         <p className="sr-only" id={reorderHelpId}>
           Use the arrow keys to reorder this set. Use left and right arrows to
           move it between selected and available.
         </p>
-        <AvailableSetsHeader onApply={handleApply} titleId={pageTitleId} />
 
         <div className="grid grid-cols-2 items-start gap-5 max-sm:grid-cols-1 max-sm:gap-3">
           <AvailableSetsColumn
@@ -273,9 +290,7 @@ export function AvailableSetsPage({
             />
           </AvailableSetsColumn>
         </div>
-
-        <AvailableSetsActions onApply={handleApply} onClose={onClose} />
-      </Card>
+      </PageShell>
     </div>
   );
 }

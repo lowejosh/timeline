@@ -12,9 +12,9 @@ import {
   getEraDisplayChain,
   getRootDisplayErasBySets,
   isEraFamilyRoot,
-  ROOT_ERA,
   type TimelineSetId,
 } from "@/lib/catalog/eras";
+import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import {
   computeGroupYearRanges,
   computeSetYearRanges,
@@ -33,6 +33,7 @@ export function useTimelineDisplayState({
   autoHiddenOverlayIds,
   baseEnabledGroupIds,
   canvasPad,
+  catalog,
   enabledSetIds,
   innerWidth,
   orderedSetIds,
@@ -45,6 +46,7 @@ export function useTimelineDisplayState({
   activeEraId: string;
   baseEnabledGroupIds: ReadonlySet<string>;
   canvasPad: number;
+  catalog: TimelineCatalogSnapshot;
   enabledSetIds: ReadonlySet<TimelineSetId>;
   innerWidth: number;
   orderedSetIds: readonly TimelineSetId[];
@@ -56,23 +58,23 @@ export function useTimelineDisplayState({
   visibleSetMarkers: ReturnType<typeof applyTimelineSetOrderToMarkers>;
 }) {
   const prioritizedRootEra = useMemo(
-    () => applyTimelineSetOrderToEraTree(ROOT_ERA, orderedSetIds),
-    [orderedSetIds],
+    () => applyTimelineSetOrderToEraTree(catalog.rootEra, orderedSetIds, catalog),
+    [catalog, orderedSetIds],
   );
 
   const rootDisplayEras = useMemo(
-    () => getRootDisplayErasBySets(prioritizedRootEra, visibleSetIds),
-    [prioritizedRootEra, visibleSetIds],
+    () => getRootDisplayErasBySets(prioritizedRootEra, visibleSetIds, catalog),
+    [catalog, prioritizedRootEra, visibleSetIds],
   );
 
   const setFilteredMarkers = useMemo(
-    () => applyTimelineSetOrderToMarkers(visibleSetMarkers, orderedSetIds),
-    [orderedSetIds, visibleSetMarkers],
+    () => applyTimelineSetOrderToMarkers(visibleSetMarkers, orderedSetIds, catalog),
+    [catalog, orderedSetIds, visibleSetMarkers],
   );
 
   const setFilteredOverlays = useMemo(
-    () => applyTimelineSetOrderToOverlays(visibleSetOverlays, orderedSetIds),
-    [orderedSetIds, visibleSetOverlays],
+    () => applyTimelineSetOrderToOverlays(visibleSetOverlays, orderedSetIds, catalog),
+    [catalog, orderedSetIds, visibleSetOverlays],
   );
 
   const visibleFilteredOverlays = useMemo(
@@ -122,6 +124,7 @@ export function useTimelineDisplayState({
         baseEnabledGroupIds,
         sidebarSuppressedGroupIds,
         orderedSetIds,
+        catalog,
       ),
     [
       baseEnabledGroupIds,
@@ -129,6 +132,7 @@ export function useTimelineDisplayState({
       enabledSetIds,
       innerWidth,
       orderedSetIds,
+      catalog,
       setFilteredDisplay,
       sidebarSuppressedGroupIds,
       viewport,
@@ -142,11 +146,14 @@ export function useTimelineDisplayState({
   );
 
   const layerRangeByShortcutId = useMemo(() => {
-    const setRanges = computeSetYearRanges(sidebarTree.map((set) => set.id));
+    const setRanges = computeSetYearRanges(
+      sidebarTree.map((set) => set.id),
+      catalog,
+    );
     const childGroupIds = sidebarTree.flatMap((set) =>
       set.children.flatMap((child) => child.groupIds),
     );
-    const groupRanges = computeGroupYearRanges(childGroupIds);
+    const groupRanges = computeGroupYearRanges(childGroupIds, catalog);
     const ranges = new Map<string, TimelineYearRange>();
 
     for (const [setId, range] of setRanges) {
@@ -179,7 +186,7 @@ export function useTimelineDisplayState({
     }
 
     return ranges;
-  }, [sidebarTree]);
+  }, [catalog, sidebarTree]);
 
   return {
     activeEra,

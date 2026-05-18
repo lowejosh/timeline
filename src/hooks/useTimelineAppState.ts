@@ -6,7 +6,6 @@ import {
   MIN_STAGE_HEIGHT_FOR_OVERVIEW_RULER,
 } from "@/lib/app/layout";
 import {
-  ROOT_ERA,
   findEraById,
   getEraFamilyId,
   getNavigableAncestor,
@@ -17,6 +16,7 @@ import {
 import {
   getSetIdForEraFamily,
 } from "@/lib/catalog/timelineSets";
+import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import {
   HOME_RANGE,
   panByPixels,
@@ -33,11 +33,12 @@ import {
 import { useTimelineNavigationStore } from "@/stores/timelineNavigation.store";
 import { useTimelineUiStore } from "@/stores/timelineUi.store";
 import { getSearchResultViewport } from "@/lib/app/timelineSearchFocus";
+import { setTimelineTooltipCatalog } from "@/lib/app/tooltipModel";
 import { useTimelineAnimatedViewport } from "@/hooks/useTimelineAnimatedViewport";
 import { useTimelineDisplayState } from "@/hooks/useTimelineDisplayState";
 import { useTimelineVisibilityState } from "@/hooks/useTimelineVisibilityState";
 
-export function useTimelineAppState() {
+export function useTimelineAppState(catalog: TimelineCatalogSnapshot) {
   const [stageRef, stageSize] = useElementSize<HTMLDivElement>();
   const [timelineRef, timelineSize] = useElementSize<HTMLDivElement>();
   const innerWidth = Math.max(stageSize.width, 1);
@@ -87,6 +88,7 @@ export function useTimelineAppState() {
   const triggerOverlayVisibilityTransition = useTimelineLayerStore(
     (state) => state.triggerOverlayVisibilityTransition,
   );
+  const syncWithCatalog = useTimelineLayerStore((state) => state.syncWithCatalog);
   const autoTransitionFrameRef = useRef(0);
   const viewportRef = useRef(animated.viewport);
   const viewportWidthRef = useRef(viewportWidth);
@@ -98,6 +100,11 @@ export function useTimelineAppState() {
   useEffect(() => {
     setViewportWidth(viewportWidth);
   }, [setViewportWidth, viewportWidth]);
+
+  useEffect(() => {
+    syncWithCatalog(catalog);
+    setTimelineTooltipCatalog(catalog);
+  }, [catalog, syncWithCatalog]);
 
   useEffect(() => {
     resolveInitialSidebarVisibility(stageSize.width, stageSize.height);
@@ -118,6 +125,7 @@ export function useTimelineAppState() {
   } = useTimelineVisibilityState({
     autoSuppressedGroupIds,
     canvasPad,
+    catalog,
     humanEvolutionToggleMode,
     innerWidth,
     manualEnabledGroupIds,
@@ -145,6 +153,7 @@ export function useTimelineAppState() {
     autoHiddenOverlayIds,
     baseEnabledGroupIds,
     canvasPad,
+    catalog,
     enabledSetIds,
     innerWidth,
     orderedSetIds,
@@ -261,11 +270,11 @@ export function useTimelineAppState() {
       if (!nextEnabled) {
         const activeFamilyId = getEraFamilyId(prioritizedRootEra, activeEraId);
         const activeSetId = activeFamilyId
-          ? getSetIdForEraFamily(activeFamilyId)
+          ? getSetIdForEraFamily(activeFamilyId, catalog)
           : null;
 
         if (activeSetId === setId) {
-          setActiveEraId(ROOT_ERA.id);
+          setActiveEraId(catalog.rootEra.id);
           animated.animateToRange(HOME_RANGE[0], HOME_RANGE[1], 0);
         }
       }
@@ -275,6 +284,7 @@ export function useTimelineAppState() {
     [
       activeEraId,
       animated,
+      catalog,
       prioritizedRootEra,
       setActiveEraId,
       toggleSetVisible,

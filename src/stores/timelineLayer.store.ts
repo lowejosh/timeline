@@ -5,6 +5,10 @@ import {
   normalizeTimelineSetOrder,
   TIMELINE_SETS_BY_ID,
 } from "@/lib/catalog/timelineSets";
+import {
+  STATIC_TIMELINE_CATALOG,
+  type TimelineCatalogSnapshot,
+} from "@/lib/catalog/timelineCatalog";
 import type { TimelineSetId } from "@/lib/catalog/eras";
 import {
   readStoredEnabledGroupIds,
@@ -28,6 +32,7 @@ export const HUMAN_EVOLUTION_GROUP_ID =
   TIMELINE_DECORATION_CATEGORY_IDS.humanEvolution;
 const COMPUTING_SET_ID = "computing" satisfies TimelineSetId;
 const COMPUTER_MODELS_GROUP_ID = "computer-models";
+let activeLayerCatalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG;
 
 type TimelineLayerState = {
   autoSuppressedGroupIds: Set<string>;
@@ -44,10 +49,14 @@ type TimelineLayerActions = {
   applySetLibrary: (
     nextEnabledSetIds: ReadonlySet<TimelineSetId>,
     nextOrderedSetIds: readonly TimelineSetId[],
+    catalog?: TimelineCatalogSnapshot,
   ) => void;
   ensureGroupsEnabled: (groupIds: readonly string[]) => void;
   ensureSetVisible: (setId: TimelineSetId) => void;
-  reorderSets: (nextSetIds: readonly TimelineSetId[]) => void;
+  reorderSets: (
+    nextSetIds: readonly TimelineSetId[],
+    catalog?: TimelineCatalogSnapshot,
+  ) => void;
   setAutoSuppressedGroupIds: (groupIds: ReadonlySet<string>) => void;
   setGroupToggleMode: (
     groupId: string,
@@ -57,12 +66,16 @@ type TimelineLayerActions = {
   toggleSetExpanded: (setId: TimelineSetId, nextExpanded: boolean) => void;
   toggleSetVisible: (setId: TimelineSetId, nextVisible: boolean) => void;
   triggerOverlayVisibilityTransition: () => void;
+  syncWithCatalog: (catalog: TimelineCatalogSnapshot) => void;
 };
 
 export type TimelineLayerStore = TimelineLayerState & TimelineLayerActions;
 
-function getDefaultGroupIdsForSet(setId: TimelineSetId): string[] {
-  const set = TIMELINE_SETS_BY_ID[setId];
+function getDefaultGroupIdsForSet(
+  setId: TimelineSetId,
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
+): string[] {
+  const set = catalog.setsById[setId] ?? TIMELINE_SETS_BY_ID[setId];
 
   if (!set) {
     return [];
@@ -114,11 +127,11 @@ function writeLayerState({
   | "manualEnabledGroupIds"
   | "orderedSetIds"
   | "visibleSetIds"
->) {
+>, catalog: TimelineCatalogSnapshot = activeLayerCatalog) {
   writeStoredEnabledSetIds(enabledSetIds);
   writeStoredExpandedSetIds(expandedSetIds);
   writeStoredEnabledGroupIds(manualEnabledGroupIds);
-  writeStoredTimelineSetOrder(orderedSetIds);
+  writeStoredTimelineSetOrder(orderedSetIds, catalog);
   writeStoredVisibleSetIds(visibleSetIds);
   writeStoredGroupToggleMode(HUMAN_EVOLUTION_GROUP_ID, humanEvolutionToggleMode);
 }
@@ -142,17 +155,21 @@ function createInitialLayerState(): TimelineLayerState {
     visibleSetIds: readStoredVisibleSetIds(),
   };
 
-  writeLayerState(initialState);
   return initialState;
 }
 
 export const useTimelineLayerStore = create<TimelineLayerStore>((set, get) => ({
   ...createInitialLayerState(),
 
-  applySetLibrary: (nextEnabledSetIds, nextOrderedSetIds) => {
+  applySetLibrary: (
+    nextEnabledSetIds,
+    nextOrderedSetIds,
+    catalog = activeLayerCatalog,
+  ) => {
+    activeLayerCatalog = catalog;
     const current = get();
     const enabledSetIds = new Set(nextEnabledSetIds);
-    const orderedSetIds = normalizeTimelineSetOrder(nextOrderedSetIds);
+    const orderedSetIds = normalizeTimelineSetOrder(nextOrderedSetIds, catalog);
     const visibleSetIds = new Set(current.visibleSetIds);
     const addedSetIds = Array.from(enabledSetIds).filter(
       (setId) => !current.enabledSetIds.has(setId),
@@ -173,7 +190,7 @@ export const useTimelineLayerStore = create<TimelineLayerStore>((set, get) => ({
 
     if (addedSetIds.length > 0) {
       for (const setId of addedSetIds) {
-        for (const groupId of getDefaultGroupIdsForSet(setId)) {
+        for (const groupId of getDefaultGroupIdsForSet(setId, catalog)) {
           manualEnabledGroupIds.add(groupId);
         }
       }
@@ -193,7 +210,7 @@ export const useTimelineLayerStore = create<TimelineLayerStore>((set, get) => ({
       visibleSetIds,
     };
 
-    writeLayerState(next);
+    writeLayerState(next, catalog);
     set({
       ...next,
       overlayVisibilityTransitionSeed:
@@ -257,16 +274,20 @@ export const useTimelineLayerStore = create<TimelineLayerStore>((set, get) => ({
     set({ visibleSetIds });
   },
 
-  reorderSets: (nextSetIds) => {
+  reorderSets: (nextSetIds, catalog = activeLayerCatalog) => {
+    activeLayerCatalog = catalog;
     const current = get();
-    const orderedSetIds = normalizeTimelineSetOrder(nextSetIds);
-    const normalizedCurrent = normalizeTimelineSetOrder(current.orderedSetIds);
+    const orderedSetIds = normalizeTimelineSetOrder(nextSetIds, catalog);
+    const normalizedCurrent = normalizeTimelineSetOrder(
+      current.orderedSetIds,
+      catalog,
+    );
 
     if (areSetArraysEqual(normalizedCurrent, orderedSetIds)) {
       return;
     }
 
-    writeStoredTimelineSetOrder(orderedSetIds);
+    writeStoredTimelineSetOrder(orderedSetIds, catalog);
     set({ orderedSetIds });
   },
 
@@ -370,5 +391,45 @@ export const useTimelineLayerStore = create<TimelineLayerStore>((set, get) => ({
     set((state) => ({
       overlayVisibilityTransitionSeed: state.overlayVisibilityTransitionSeed + 1,
     }));
+  },
+
+  syncWithCatalog: (catalog) => {
+    activeLayerCatalog = catalog;
+    const current = get();
+    const enabledSetIds = readStoredEnabledSetIds(catalog);
+    const orderedSetIds = readStoredTimelineSetOrder(catalog);
+    const visibleSetIds = new Set(
+      Array.from(readStoredVisibleSetIds(catalog)).filter((setId) =>
+        enabledSetIds.has(setId),
+      ),
+    );
+    const expandedSetIds = new Set(
+      Array.from(readStoredExpandedSetIds()).filter((setId) =>
+        Boolean(catalog.setsById[setId]),
+      ),
+    );
+    const manualEnabledGroupIds = new Set(
+      Array.from(readStoredEnabledGroupIds(catalog)).filter((groupId) =>
+        Boolean(catalog.groupsById[groupId]),
+      ),
+    );
+
+    writeLayerState({
+      enabledSetIds,
+      expandedSetIds,
+      humanEvolutionToggleMode: current.humanEvolutionToggleMode,
+      manualEnabledGroupIds,
+      orderedSetIds,
+      visibleSetIds,
+    }, catalog);
+    set({
+      enabledSetIds,
+      expandedSetIds,
+      manualEnabledGroupIds,
+      orderedSetIds,
+      visibleSetIds,
+      overlayVisibilityTransitionSeed:
+        current.overlayVisibilityTransitionSeed + 1,
+    });
   },
 }));

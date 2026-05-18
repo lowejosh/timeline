@@ -1,15 +1,26 @@
 import * as rx from "./AvailableSetsView.selectors";
+import { useMemo } from "react";
 import { AvailableSetsPage } from "@/features/available-sets";
-import { TIMELINE_SETS } from "@/lib/catalog/timelineSets";
+import { useTimelineCatalog } from "@/hooks/useTimelineCatalog";
+import { useCustomSetCatalogStore } from "@/stores/customSetCatalog.store";
 import { THEME } from "@/lib/ui/theme";
 import { cn } from "@/lib/utils";
 
 export function AvailableSetsView() {
+  const catalog = useTimelineCatalog();
+  const customSetDocuments = useCustomSetCatalogStore((state) => state.documents);
+  const customSetIds = useMemo(
+    () => new Set(customSetDocuments.map((document) => document.metadata.id)),
+    [customSetDocuments],
+  );
+  const deleteCustomSet = useCustomSetCatalogStore(
+    (state) => state.deleteCustomSet,
+  );
   const activeView = rx.useActiveView();
   const enabledSetIds = rx.useEnabledSetIds();
   const orderedSetIds = rx.useOrderedSetIds();
   const visibleSetIds = rx.useVisibleSetIds();
-  const actions = rx.useAvailableSetsActions();
+  const actions = rx.useAvailableSetsActions(catalog);
 
   return (
     <div
@@ -24,11 +35,16 @@ export function AvailableSetsView() {
       }}
     >
       <AvailableSetsPage
-        allSets={TIMELINE_SETS}
+        allSets={catalog.sets}
+        catalog={catalog}
+        customSetIds={customSetIds}
         enabledSetIds={enabledSetIds}
         isActive={activeView === "available-sets"}
         onApply={actions.applySets}
         onClose={actions.closeSetManager}
+        onCreateSet={actions.openCreateSet}
+        onDeleteCustomSet={deleteCustomSet}
+        onEditCustomSet={actions.openEditCustomSet}
         onToggleVisible={actions.toggleVisibleSet}
         orderedSetIds={orderedSetIds}
         visibleSetIds={visibleSetIds}

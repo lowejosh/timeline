@@ -17,11 +17,13 @@ import {
   searchTimelineIndex,
   type TimelineSearchResult,
 } from "@/lib/app/timelineSearch";
+import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import { cn } from "@/lib/utils";
 
 type TimelineSearchProps = {
   className?: string;
+  catalog: TimelineCatalogSnapshot;
   enabledGroupIds: ReadonlySet<string>;
   enabledSetIds: ReadonlySet<TimelineSetId>;
   isOpen: boolean;
@@ -54,6 +56,7 @@ function isSearchItemEnabled(
 
 export function TimelineSearch({
   className,
+  catalog,
   enabledGroupIds,
   enabledSetIds,
   isOpen,
@@ -69,7 +72,7 @@ export function TimelineSearch({
   const resultsId = useId();
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-  const searchIndex = useMemo(() => buildTimelineSearchIndex(), []);
+  const searchIndex = useMemo(() => buildTimelineSearchIndex(catalog), [catalog]);
   const enabledSearchIndex = useMemo(
     () =>
       searchIndex.filter((item) =>

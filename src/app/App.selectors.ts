@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { getDefaultEnabledTimelineGroupIds } from "@/lib/catalog/decorations";
+import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import {
   HUMAN_EVOLUTION_GROUP_ID,
   useTimelineLayerStore,
@@ -29,7 +30,7 @@ export const useIsCosmicCalendarMode = () =>
 export const useIsMapPreviewEnabled = () =>
   useTimelineUiStore((state) => state.isMapPreviewEnabled);
 
-export function useTimelineSearchScope() {
+export function useTimelineSearchScope(catalog: TimelineCatalogSnapshot) {
   const manualEnabledGroupIds = useTimelineLayerStore(
     (state) => state.manualEnabledGroupIds,
   );
@@ -38,8 +39,8 @@ export function useTimelineSearchScope() {
   );
   const visibleSetIds = useTimelineLayerStore((state) => state.visibleSetIds);
   const defaultEnabledGroupIds = useMemo(
-    () => getDefaultEnabledTimelineGroupIds(),
-    [],
+    () => getDefaultEnabledTimelineGroupIds(catalog),
+    [catalog],
   );
   const enabledGroupIds = useMemo(() => {
     const next = new Set(manualEnabledGroupIds);

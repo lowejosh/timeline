@@ -1,10 +1,7 @@
 import { useCallback, useMemo } from "react";
 
-import {
-  ROOT_ERA,
-  getEraFamilyId,
-  type TimelineSetId,
-} from "@/lib/catalog/eras";
+import { getEraFamilyId, type TimelineSetId } from "@/lib/catalog/eras";
+import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import { shouldUseMobileTimelineDrawer } from "@/lib/app/layout";
 import {
   applyTimelineSetOrderToEraTree,
@@ -39,13 +36,19 @@ function getCurrentStageSize() {
   };
 }
 
-export function useAvailableSetsActions() {
+export function useAvailableSetsActions(catalog: TimelineCatalogSnapshot) {
   const activeEraId = useTimelineNavigationStore((state) => state.activeEraId);
   const setActiveEraId = useTimelineNavigationStore(
     (state) => state.setActiveEraId,
   );
   const setActiveView = useTimelineNavigationStore(
     (state) => state.setActiveView,
+  );
+  const openCreateSetAction = useTimelineNavigationStore(
+    (state) => state.openCreateSet,
+  );
+  const openEditCustomSetAction = useTimelineNavigationStore(
+    (state) => state.openEditCustomSet,
   );
   const orderedSetIds = useTimelineLayerStore((state) => state.orderedSetIds);
   const applySetLibrary = useTimelineLayerStore(
@@ -61,18 +64,18 @@ export function useAvailableSetsActions() {
     (state) => state.animateToRange,
   );
   const prioritizedRootEra = useMemo(
-    () => applyTimelineSetOrderToEraTree(ROOT_ERA, orderedSetIds),
-    [orderedSetIds],
+    () => applyTimelineSetOrderToEraTree(catalog.rootEra, orderedSetIds, catalog),
+    [catalog, orderedSetIds],
   );
   const getActiveSetId = useCallback(() => {
     const activeFamilyId = getEraFamilyId(prioritizedRootEra, activeEraId);
 
-    return activeFamilyId ? getSetIdForEraFamily(activeFamilyId) : null;
-  }, [activeEraId, prioritizedRootEra]);
+    return activeFamilyId ? getSetIdForEraFamily(activeFamilyId, catalog) : null;
+  }, [activeEraId, catalog, prioritizedRootEra]);
   const resetActiveSet = useCallback(() => {
-    setActiveEraId(ROOT_ERA.id);
+    setActiveEraId(catalog.rootEra.id);
     animateToRange(HOME_RANGE[0], HOME_RANGE[1], 0);
-  }, [animateToRange, setActiveEraId]);
+  }, [animateToRange, catalog.rootEra.id, setActiveEraId]);
   const resetActiveSetIfRemoved = useCallback(
     (nextEnabledSetIds: ReadonlySet<TimelineSetId>) => {
       const activeSetId = getActiveSetId();
@@ -86,11 +89,11 @@ export function useAvailableSetsActions() {
   const resetActiveSetIfMatches = useCallback(
     (setId: TimelineSetId) => {
       if (getActiveSetId() === setId) {
-        setActiveEraId(ROOT_ERA.id);
+        setActiveEraId(catalog.rootEra.id);
         animateToRange(HOME_RANGE[0], HOME_RANGE[1], 0);
       }
     },
-    [animateToRange, getActiveSetId, setActiveEraId],
+    [animateToRange, catalog.rootEra.id, getActiveSetId, setActiveEraId],
   );
   const closeSetManager = useCallback(() => {
     const { width, height } = getCurrentStageSize();
@@ -98,6 +101,15 @@ export function useAvailableSetsActions() {
     setActiveView("timeline");
     setIsSidebarOpen(!shouldUseMobileTimelineDrawer(width, height));
   }, [setActiveView, setIsSidebarOpen]);
+  const openCreateSet = useCallback(() => {
+    openCreateSetAction();
+  }, [openCreateSetAction]);
+  const openEditCustomSet = useCallback(
+    (setId: TimelineSetId) => {
+      openEditCustomSetAction(setId);
+    },
+    [openEditCustomSetAction],
+  );
   const toggleVisibleSet = useCallback(
     (setId: TimelineSetId, nextVisible: boolean) => {
       if (!nextVisible) {
@@ -114,18 +126,26 @@ export function useAvailableSetsActions() {
       nextOrderedSetIds: TimelineSetId[],
     ) => {
       resetActiveSetIfRemoved(nextEnabledSetIds);
-      applySetLibrary(nextEnabledSetIds, nextOrderedSetIds);
+      applySetLibrary(nextEnabledSetIds, nextOrderedSetIds, catalog);
       closeSetManager();
     },
-    [applySetLibrary, closeSetManager, resetActiveSetIfRemoved],
+    [applySetLibrary, catalog, closeSetManager, resetActiveSetIfRemoved],
   );
 
   return useMemo(
     () => ({
       applySets,
       closeSetManager,
+      openCreateSet,
+      openEditCustomSet,
       toggleVisibleSet,
     }),
-    [applySets, closeSetManager, toggleVisibleSet],
+    [
+      applySets,
+      closeSetManager,
+      openCreateSet,
+      openEditCustomSet,
+      toggleVisibleSet,
+    ],
   );
 }

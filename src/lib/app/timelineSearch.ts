@@ -1,10 +1,7 @@
 import {
-  TIMELINE_DECORATION_GROUPS_BY_ID,
-  TIMELINE_MARKERS,
-  TIMELINE_OVERLAYS,
-  TIMELINE_SET_ID_BY_GROUP_ID,
-  TIMELINE_SETS_BY_ID,
-} from "@/lib/catalog/timelineRegistry";
+  STATIC_TIMELINE_CATALOG,
+  type TimelineCatalogSnapshot,
+} from "@/lib/catalog/timelineCatalog";
 import { formatTimelineYear } from "@/lib/rendering/bands";
 import type {
   TimelineMarker,
@@ -49,20 +46,26 @@ function normalizeSearchText(value: string) {
     .trim();
 }
 
-function getSetIdForGroup(groupId: string | null | undefined) {
+function getSetIdForGroup(
+  groupId: string | null | undefined,
+  catalog: TimelineCatalogSnapshot,
+) {
   if (!groupId) {
     return null;
   }
 
-  return TIMELINE_SET_ID_BY_GROUP_ID.get(groupId) ?? null;
+  return catalog.setIdByGroupId.get(groupId) ?? null;
 }
 
-function getSetLabel(setId: TimelineSetId | null) {
-  return setId ? TIMELINE_SETS_BY_ID[setId]?.metadata.label : undefined;
+function getSetLabel(setId: TimelineSetId | null, catalog: TimelineCatalogSnapshot) {
+  return setId ? catalog.setsById[setId]?.metadata.label : undefined;
 }
 
-function getGroupLabel(groupId: string | null | undefined) {
-  return groupId ? TIMELINE_DECORATION_GROUPS_BY_ID[groupId]?.label : undefined;
+function getGroupLabel(
+  groupId: string | null | undefined,
+  catalog: TimelineCatalogSnapshot,
+) {
+  return groupId ? catalog.groupsById[groupId]?.label : undefined;
 }
 
 function formatSearchRange(startYear: number, endYear: number) {
@@ -90,10 +93,13 @@ function createSearchText(item: Omit<TimelineSearchItem, "searchText">) {
   );
 }
 
-function createMarkerSearchItem(marker: TimelineMarker): TimelineSearchItem {
-  const setId = marker.setId ?? getSetIdForGroup(marker.groupId);
-  const groupLabel = getGroupLabel(marker.groupId);
-  const setLabel = getSetLabel(setId);
+function createMarkerSearchItem(
+  marker: TimelineMarker,
+  catalog: TimelineCatalogSnapshot,
+): TimelineSearchItem {
+  const setId = marker.setId ?? getSetIdForGroup(marker.groupId, catalog);
+  const groupLabel = getGroupLabel(marker.groupId, catalog);
+  const setLabel = getSetLabel(setId, catalog);
   const item = {
     id: `marker:${marker.id}`,
     kind: "marker" as const,
@@ -118,11 +124,12 @@ function createMarkerSearchItem(marker: TimelineMarker): TimelineSearchItem {
 
 function createOverlaySearchItem(
   overlay: TimelineOverlayBand,
+  catalog: TimelineCatalogSnapshot,
   parentId?: string,
 ): TimelineSearchItem {
-  const setId = overlay.setId ?? getSetIdForGroup(overlay.groupId);
-  const groupLabel = getGroupLabel(overlay.groupId);
-  const setLabel = getSetLabel(setId);
+  const setId = overlay.setId ?? getSetIdForGroup(overlay.groupId, catalog);
+  const groupLabel = getGroupLabel(overlay.groupId, catalog);
+  const setLabel = getSetLabel(setId, catalog);
   const item = {
     id: `band:${overlay.id}`,
     kind: "band" as const,
@@ -150,21 +157,26 @@ function createOverlaySearchItem(
 function appendOverlaySearchItems(
   items: TimelineSearchItem[],
   overlays: readonly TimelineOverlayBand[],
+  catalog: TimelineCatalogSnapshot,
   parentId?: string,
 ) {
   for (const overlay of overlays) {
-    items.push(createOverlaySearchItem(overlay, parentId));
+    items.push(createOverlaySearchItem(overlay, catalog, parentId));
 
     if (overlay.children?.length) {
-      appendOverlaySearchItems(items, overlay.children, overlay.id);
+      appendOverlaySearchItems(items, overlay.children, catalog, overlay.id);
     }
   }
 }
 
-export function buildTimelineSearchIndex(): TimelineSearchItem[] {
-  const items = TIMELINE_MARKERS.map(createMarkerSearchItem);
+export function buildTimelineSearchIndex(
+  catalog: TimelineCatalogSnapshot = STATIC_TIMELINE_CATALOG,
+): TimelineSearchItem[] {
+  const items = catalog.markers.map((marker) =>
+    createMarkerSearchItem(marker, catalog),
+  );
 
-  appendOverlaySearchItems(items, TIMELINE_OVERLAYS);
+  appendOverlaySearchItems(items, catalog.overlays, catalog);
 
   return items.sort(
     (left, right) =>

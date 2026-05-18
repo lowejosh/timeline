@@ -10,7 +10,7 @@ export function AvailableSetsActions({
   onClose,
 }: AvailableSetsActionsProps) {
   return (
-    <div className="flex justify-end gap-2 pt-1 max-sm:sticky max-sm:bottom-0 max-sm:z-10 max-sm:-mx-3 max-sm:-mb-3 max-sm:justify-stretch max-sm:border-t max-sm:border-border/70 max-sm:bg-card/95 max-sm:p-3 max-sm:backdrop-blur-xl">
+    <div className="flex justify-end gap-2 max-sm:justify-stretch">
       <Button
         className="max-sm:flex-1"
         onClick={onClose}

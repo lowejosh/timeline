@@ -8,6 +8,7 @@ import {
   formatTimelineExactTimestamp,
 } from "../core/exactTimestamp";
 import { TIMELINE_SOURCES_BY_ID } from "../catalog/timelineRegistry";
+import type { TimelineCatalogSnapshot } from "../catalog/timelineCatalog";
 import type {
   Era,
   TimelineTooltipImage,
@@ -36,6 +37,11 @@ export type TimelineTooltipContent = {
 };
 
 const EXPLICIT_RANGE_SEPARATORS = [" — ", " to "] as const;
+let activeSourcesById = TIMELINE_SOURCES_BY_ID;
+
+export function setTimelineTooltipCatalog(catalog: TimelineCatalogSnapshot) {
+  activeSourcesById = catalog.sourcesById;
+}
 
 function resolveTooltipSources(sourceIds?: readonly string[]) {
   const seen = new Set<string>();
@@ -45,12 +51,12 @@ function resolveTooltipSources(sourceIds?: readonly string[]) {
       return [];
     }
 
-    if (!(sourceId in TIMELINE_SOURCES_BY_ID)) {
+    if (!(sourceId in activeSourcesById)) {
       return [];
     }
 
     seen.add(sourceId);
-    const source = TIMELINE_SOURCES_BY_ID[sourceId];
+    const source = activeSourcesById[sourceId];
 
     return [
       {
