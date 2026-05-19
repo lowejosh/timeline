@@ -41,7 +41,11 @@ export function useSetBuilderPreviewModel(
       const endYear = spanPriority?.endYear ?? 2000;
 
       return {
-        eras: catalog.rootEra.children ?? [],
+        // Skip family roots with no children — they're empty containers and
+        // would render as a single colored block with nothing to drill into.
+        eras: (catalog.rootEra.children ?? []).filter(
+          (e) => (e.children?.length ?? 0) > 0,
+        ),
         markers: [...catalog.markers],
         overlayBands: [...catalog.overlays],
         range: [startYear, endYear],

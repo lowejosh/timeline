@@ -60,6 +60,36 @@ type SetLayoutSnapshot = {
   heights: Map<TimelineSetId, number>;
 };
 
+// Compute the layout snapshot that results after collapsing a set of items,
+// given the heights of their CollapsibleContent elements captured before
+// collapse.  Avoids any DOM remeasure (which would read mid-animation heights).
+function computeCollapsedLayout(
+  layout: SetLayoutSnapshot,
+  contentHeights: ReadonlyMap<TimelineSetId, number>,
+): SetLayoutSnapshot {
+  const newHeights = new Map(layout.heights);
+
+  for (const [setId, contentHeight] of contentHeights) {
+    const h = newHeights.get(setId) ?? 0;
+    newHeights.set(setId, Math.max(0, h - contentHeight));
+  }
+
+  const newTops = new Map<TimelineSetId, number>();
+  let top = layout.baseTop;
+
+  for (const setId of layout.order) {
+    newTops.set(setId, top);
+    top += newHeights.get(setId) ?? 0;
+  }
+
+  return {
+    order: layout.order,
+    baseTop: layout.baseTop,
+    tops: newTops,
+    heights: newHeights,
+  };
+}
+
 type DragState = {
   pointerId: number;
   captureElement: HTMLElement;
@@ -179,6 +209,11 @@ export function TimelineSidebar({
   const dragStateRef = useRef<DragState | null>(null);
   const dragMovedRef = useRef(false);
   const collapseOnDragRef = useRef<(() => void) | null>(null);
+  // Content heights of expanded sets captured at pointer-down so the
+  // collapsed layout can be computed virtually (no DOM remeasure after collapse).
+  const dragExpandedContentHeightsRef = useRef(
+    new Map<TimelineSetId, number>(),
+  );
   const measureSetLayoutRef = useRef<() => ReturnType<typeof measureSetLayout>>(
     null as never,
   );
@@ -286,33 +321,36 @@ export function TimelineSidebar({
         });
         collapseOnDragRef.current = null;
 
-        // Re-measure with collapsed DOM heights and update drag state.
-        const freshLayout = measureSetLayoutRef.current();
+        // Compute the collapsed layout from the pre-collapse snapshot and the
+        // content heights captured at pointer-down.  We intentionally avoid a
+        // DOM remeasure here because the CollapsibleContent CSS animation is
+        // still at its "from" keyframe (full height) right after flushSync.
+        const collapsedLayout = computeCollapsedLayout(
+          currentDragState.layout,
+          dragExpandedContentHeightsRef.current,
+        );
+        const freshIndex = collapsedLayout.order.indexOf(currentDragState.setId);
 
-        if (freshLayout) {
-          const freshIndex = freshLayout.order.indexOf(currentDragState.setId);
+        if (freshIndex >= 0) {
+          // Compensate startClientY for any layout shift of the dragged
+          // item so the visual position stays continuous.
+          const oldTop =
+            currentDragState.layout.tops.get(currentDragState.setId) ?? 0;
+          const newTop = collapsedLayout.tops.get(currentDragState.setId) ?? 0;
 
-          if (freshIndex >= 0) {
-            // Compensate startClientY for any layout shift of the dragged
-            // item so the visual position stays continuous.
-            const oldTop =
-              currentDragState.layout.tops.get(currentDragState.setId) ?? 0;
-            const newTop = freshLayout.tops.get(currentDragState.setId) ?? 0;
+          const updatedState = {
+            ...currentDragState,
+            startClientY: currentDragState.startClientY + (newTop - oldTop),
+            layout: collapsedLayout,
+            initialIndex: freshIndex,
+            projectedIndex: freshIndex,
+          };
 
-            const updatedState = {
-              ...currentDragState,
-              startClientY: currentDragState.startClientY + (newTop - oldTop),
-              layout: freshLayout,
-              initialIndex: freshIndex,
-              projectedIndex: freshIndex,
-            };
-
-            // Update the ref synchronously so the next pointermove event
-            // sees the fresh state before React re-renders.
-            dragStateRef.current = updatedState;
-            setDragState(updatedState);
-            return;
-          }
+          // Update the ref synchronously so the next pointermove event
+          // sees the fresh state before React re-renders.
+          dragStateRef.current = updatedState;
+          setDragState(updatedState);
+          return;
         }
       }
     }
@@ -474,6 +512,27 @@ export function TimelineSidebar({
             }
           }
         : null;
+
+    // Capture the heights of all CollapsibleContent elements for expanded sets
+    // so we can compute the post-collapse layout without a DOM remeasure.
+    const expandedContentHeights = new Map<TimelineSetId, number>();
+
+    for (const expandedId of expandedSetIds) {
+      const shell = setShellRefs.current.get(expandedId);
+
+      if (shell) {
+        const content = shell.querySelector('[data-slot="collapsible-content"]');
+
+        if (content instanceof HTMLElement) {
+          expandedContentHeights.set(
+            expandedId,
+            content.getBoundingClientRect().height,
+          );
+        }
+      }
+    }
+
+    dragExpandedContentHeightsRef.current = expandedContentHeights;
 
     try {
       event.currentTarget.setPointerCapture(event.pointerId);

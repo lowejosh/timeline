@@ -97,16 +97,23 @@ export function TimelineCanvasPreview({
   const [activeEraId, setActiveEraId] = useState<string | null>(null);
 
   // Synthetic home era that acts as the invisible parent of all era families.
+  // Falls back to initialRange when eras is empty to avoid Infinity spans.
   const homeEra = useMemo<Era>(
     () => ({
       id: PREVIEW_HOME_ERA_ID,
       name: "Overview",
-      startYear: eras.reduce((m, e) => Math.min(m, e.startYear), Infinity),
-      endYear: eras.reduce((m, e) => Math.max(m, e.endYear), -Infinity),
+      startYear:
+        eras.length > 0
+          ? eras.reduce((m, e) => Math.min(m, e.startYear), Infinity)
+          : initialRange[0],
+      endYear:
+        eras.length > 0
+          ? eras.reduce((m, e) => Math.max(m, e.endYear), -Infinity)
+          : initialRange[1],
       color: "rgba(0,0,0,0)",
       children: eras,
     }),
-    [eras],
+    [eras, initialRange],
   );
 
   // Resolve the active era from the current era tree.
