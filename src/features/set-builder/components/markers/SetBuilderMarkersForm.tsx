@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import { useState } from "react";
 
 import type {
   TimelineRawMarker,
@@ -21,10 +22,14 @@ export function SetBuilderMarkersForm({
   document,
   onDocumentChange,
 }: SetBuilderMarkersFormProps) {
+  const [openMarkerId, setOpenMarkerId] = useState<string | null>(null);
   const markers = document.markers;
 
   const addMarker = () => {
-    onDocumentChange(addMarkerToDocument(document, createMarker(document)));
+    const nextMarker = createMarker(document);
+
+    setOpenMarkerId(nextMarker.id);
+    onDocumentChange(addMarkerToDocument(document, nextMarker));
   };
 
   const updateMarker = (markerId: string, nextMarker: TimelineRawMarker) => {
@@ -45,6 +50,7 @@ export function SetBuilderMarkersForm({
             {markers.map((marker) => (
               <MarkerAccordionItem
                 document={document}
+                initiallyOpen={marker.id === openMarkerId}
                 key={marker.id}
                 marker={marker}
                 onDelete={deleteMarker}

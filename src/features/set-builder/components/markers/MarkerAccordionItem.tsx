@@ -24,6 +24,7 @@ import { TimePointField } from "../fields/TimePointField";
 
 type MarkerAccordionItemProps = {
   document: TimelineRawSetDocument;
+  initiallyOpen?: boolean;
   marker: TimelineRawMarker;
   onDelete: (markerId: string) => void;
   onDocumentChange: (document: TimelineRawSetDocument) => void;
@@ -32,12 +33,13 @@ type MarkerAccordionItemProps = {
 
 export function MarkerAccordionItem({
   document,
+  initiallyOpen = false,
   marker,
   onDelete,
   onDocumentChange,
   onMarkerChange,
 }: MarkerAccordionItemProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(initiallyOpen);
 
   return (
     <Collapsible onOpenChange={setIsOpen} open={isOpen}>

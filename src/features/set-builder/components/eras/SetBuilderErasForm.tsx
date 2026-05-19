@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import { useState } from "react";
 
 import type {
   TimelineRawEraNode,
@@ -21,6 +22,7 @@ export function SetBuilderErasForm({
   document,
   onDocumentChange,
 }: SetBuilderErasFormProps) {
+  const [openEraId, setOpenEraId] = useState<string | null>(null);
   const family = document.families[0];
   const root = family?.root;
   const eras = root?.children ?? [];
@@ -30,14 +32,10 @@ export function SetBuilderErasForm({
       return;
     }
 
-    onDocumentChange(
-      addEraChildToDocument(
-        document,
-        family.id,
-        parentId,
-        createEraNode(document),
-      ),
-    );
+    const nextEra = createEraNode(document);
+
+    setOpenEraId(nextEra.id);
+    onDocumentChange(addEraChildToDocument(document, family.id, parentId, nextEra));
   };
 
   const updateEra = (eraId: string, nextEra: TimelineRawEraNode) => {
@@ -58,6 +56,7 @@ export function SetBuilderErasForm({
                 depth={0}
                 document={document}
                 era={era}
+                initiallyOpen={era.id === openEraId}
                 key={era.id}
                 onAddChild={addEra}
                 onDelete={deleteEra}

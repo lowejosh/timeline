@@ -25,6 +25,7 @@ type BandAccordionItemProps = {
   band: TimelineRawOverlay;
   depth: number;
   document: TimelineRawSetDocument;
+  initiallyOpen?: boolean;
   onAddChild: (parentId: string) => void;
   onBandChange: (bandId: string, band: TimelineRawOverlay) => void;
   onDelete: (bandId: string) => void;
@@ -35,12 +36,13 @@ export function BandAccordionItem({
   band,
   depth,
   document,
+  initiallyOpen = false,
   onAddChild,
   onBandChange,
   onDelete,
   onDocumentChange,
 }: BandAccordionItemProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(initiallyOpen);
   const childBands = band.children ?? [];
   const rangeLabel = `${formatTimelinePoint(band.startYear)} - ${formatTimelinePoint(
     band.endYear,
@@ -245,6 +247,7 @@ export function BandAccordionItem({
               band={child}
               depth={depth + 1}
               document={document}
+              initiallyOpen={initiallyOpen}
               key={child.id}
               onAddChild={onAddChild}
               onBandChange={onBandChange}

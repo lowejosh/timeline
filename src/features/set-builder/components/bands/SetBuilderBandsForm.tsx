@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import { useState } from "react";
 
 import type {
   TimelineRawOverlay,
@@ -22,16 +23,21 @@ export function SetBuilderBandsForm({
   document,
   onDocumentChange,
 }: SetBuilderBandsFormProps) {
+  const [openBandId, setOpenBandId] = useState<string | null>(null);
   const bands = document.overlays;
 
   const addBand = () => {
-    onDocumentChange(addBandToDocument(document, createBand(document)));
+    const nextBand = createBand(document);
+
+    setOpenBandId(nextBand.id);
+    onDocumentChange(addBandToDocument(document, nextBand));
   };
 
   const addSubBand = (parentId: string) => {
-    onDocumentChange(
-      addBandChildToDocument(document, parentId, createBand(document)),
-    );
+    const nextBand = createBand(document);
+
+    setOpenBandId(nextBand.id);
+    onDocumentChange(addBandChildToDocument(document, parentId, nextBand));
   };
 
   const updateBand = (bandId: string, nextBand: TimelineRawOverlay) => {
@@ -52,6 +58,7 @@ export function SetBuilderBandsForm({
                 band={band}
                 depth={0}
                 document={document}
+                initiallyOpen={band.id === openBandId}
                 key={band.id}
                 onAddChild={addSubBand}
                 onBandChange={updateBand}

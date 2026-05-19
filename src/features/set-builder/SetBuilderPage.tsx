@@ -3,6 +3,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 
 import { PageShell } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { normalizeTimelineSetDocument } from "@/lib/catalog/setSchema";
 import { createEmptyTimelineSetDocument } from "@/lib/catalog/setDocumentValidation";
 import type { TimelineRawSetDocument } from "@/lib/catalog/setSchema";
@@ -15,9 +16,12 @@ import { useCustomSetCatalogStore } from "@/stores/customSetCatalog.store";
 import { useTimelineLayerStore } from "@/stores/timelineLayer.store";
 import { useAppRouteNavigation } from "@/app/routePaths";
 import type { SetBuilderTool } from "./SetBuilder.types";
+import { SetBuilderAiPromptButton } from "./components/SetBuilderAiPromptButton";
 import { SetBuilderWorkspace } from "./components/SetBuilderWorkspace";
 
-function cloneDocument(document: TimelineRawSetDocument): TimelineRawSetDocument {
+function cloneDocument(
+  document: TimelineRawSetDocument,
+): TimelineRawSetDocument {
   return JSON.parse(JSON.stringify(document)) as TimelineRawSetDocument;
 }
 
@@ -34,11 +38,17 @@ export function SetBuilderPage({ editingSetId }: SetBuilderPageProps) {
   const routeNavigation = useAppRouteNavigation();
   const documents = useCustomSetCatalogStore((state) => state.documents);
   const drafts = useCustomSetCatalogStore((state) => state.drafts);
-  const deleteCustomSet = useCustomSetCatalogStore((state) => state.deleteCustomSet);
+  const deleteCustomSet = useCustomSetCatalogStore(
+    (state) => state.deleteCustomSet,
+  );
   const deleteDraft = useCustomSetCatalogStore((state) => state.deleteDraft);
-  const publishDocument = useCustomSetCatalogStore((state) => state.publishDocument);
+  const publishDocument = useCustomSetCatalogStore(
+    (state) => state.publishDocument,
+  );
   const saveDraft = useCustomSetCatalogStore((state) => state.saveDraft);
-  const applySetLibrary = useTimelineLayerStore((state) => state.applySetLibrary);
+  const applySetLibrary = useTimelineLayerStore(
+    (state) => state.applySetLibrary,
+  );
   const enabledSetIds = useTimelineLayerStore((state) => state.enabledSetIds);
   const orderedSetIds = useTimelineLayerStore((state) => state.orderedSetIds);
   const sourceDocument = useMemo(() => {
@@ -57,12 +67,12 @@ export function SetBuilderPage({ editingSetId }: SetBuilderPageProps) {
     cloneDocument(sourceDocument),
   );
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [selectedTool, setSelectedTool] =
-    useState<SetBuilderTool>("metadata");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedTool, setSelectedTool] = useState<SetBuilderTool>("metadata");
   const isEditing = editingSetId !== null;
-  const canDelete = isEditing && documents.some(
-    (candidate) => candidate.metadata.id === editingSetId,
-  );
+  const canDelete =
+    isEditing &&
+    documents.some((candidate) => candidate.metadata.id === editingSetId);
 
   useEffect(() => {
     const next = cloneDocument(sourceDocument);
@@ -126,6 +136,7 @@ export function SetBuilderPage({ editingSetId }: SetBuilderPageProps) {
     }
 
     deleteCustomSet(editingSetId);
+    setIsDeleteDialogOpen(false);
     routeNavigation.openSets();
   };
 
@@ -139,15 +150,26 @@ export function SetBuilderPage({ editingSetId }: SetBuilderPageProps) {
             </span>
           ) : null}
           {canDelete ? (
-            <Button onClick={handleDelete} size="pill" type="button" variant="subtle">
+            <Button
+              onClick={() => setIsDeleteDialogOpen(true)}
+              size="pill"
+              type="button"
+              variant="subtle"
+            >
               <Trash2 className="size-3.5" />
               Delete
             </Button>
           ) : null}
-          <Button onClick={handleSave} size="pill" type="button" variant="subtle">
+          <Button
+            onClick={handleSave}
+            size="pill"
+            type="button"
+            variant="subtle"
+          >
             <Save className="size-3.5" />
             Save
           </Button>
+          <SetBuilderAiPromptButton document={document} />
         </>
       }
       backLabel="Back to available sets"
@@ -165,6 +187,14 @@ export function SetBuilderPage({ editingSetId }: SetBuilderPageProps) {
         onDocumentChange={setDocument}
         onSelectTool={setSelectedTool}
         selectedTool={selectedTool}
+      />
+      <ConfirmDialog
+        confirmLabel="Delete set"
+        description={`Delete "${document.metadata.label || "this custom set"}"? This removes the local custom set and its draft. This cannot be undone.`}
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete custom set"
       />
     </PageShell>
   );

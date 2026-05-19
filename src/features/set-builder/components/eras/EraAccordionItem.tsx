@@ -25,6 +25,7 @@ type EraAccordionItemProps = {
   depth: number;
   document: TimelineRawSetDocument;
   era: TimelineRawEraNode;
+  initiallyOpen?: boolean;
   onAddChild: (parentId: string) => void;
   onDelete: (eraId: string) => void;
   onDocumentChange: (document: TimelineRawSetDocument) => void;
@@ -35,12 +36,13 @@ export function EraAccordionItem({
   depth,
   document,
   era,
+  initiallyOpen = false,
   onAddChild,
   onDelete,
   onDocumentChange,
   onEraChange,
 }: EraAccordionItemProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(initiallyOpen);
   const childEras = era.children ?? [];
   const rangeLabel = `${formatTimelinePoint(era.startYear)} - ${formatTimelinePoint(
     era.endYear,
@@ -258,12 +260,13 @@ export function EraAccordionItem({
 
       {childEras.length > 0 ? (
         <div className="grid gap-3">
-          {childEras.map((child) => (
-            <EraAccordionItem
-              depth={depth + 1}
-              document={document}
-              era={child}
-              key={child.id}
+            {childEras.map((child) => (
+              <EraAccordionItem
+                depth={depth + 1}
+                document={document}
+                era={child}
+                initiallyOpen={initiallyOpen}
+                key={child.id}
               onAddChild={onAddChild}
               onDelete={onDelete}
               onDocumentChange={onDocumentChange}
