@@ -69,11 +69,10 @@ export function SetBuilderPreviewPane({
 
     return (
       <TimelineCanvasPreview
-        activeEra={model.rootEra}
+        eras={model.eras}
         initialRange={model.range}
         markers={model.markers}
         overlayBands={model.overlayBands}
-        siblingEras={model.eras}
       />
     );
   })();

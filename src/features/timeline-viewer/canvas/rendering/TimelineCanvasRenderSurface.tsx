@@ -31,6 +31,12 @@ type Props = {
    * system.
    */
   eraChildOpacityById?: ReadonlyMap<string, number>;
+  /** Overlay IDs that should show their disclosure indicator as expanded. */
+  expandedOverlayIds?: string[];
+  /** When provided, the draw populates this with clickable overlay regions. */
+  overlayInteractionRegionsRef?: MutableRefObject<OverlayInteractionRegion[]>;
+  /** When provided, populated with the era/marker/overlay hover regions after each draw. */
+  hoverRegionsRef?: MutableRefObject<HoverRegion[]>;
   commitHoveredTooltip?: (tooltip: HoveredTooltipState | null) => void;
   hoveredTooltipRef?: MutableRefObject<HoveredTooltipState | null>;
   lastPointer?: {
@@ -53,6 +59,9 @@ type Props = {
 export function TimelineCanvasRenderSurface({
   commitHoveredTooltip,
   eraChildOpacityById,
+  expandedOverlayIds,
+  overlayInteractionRegionsRef: externalOverlayInteractionRegionsRef,
+  hoverRegionsRef: externalHoverRegionsRef,
   hoveredTooltipRef: externalHoveredTooltipRef,
   lastPointer,
   pad,
@@ -84,11 +93,15 @@ export function TimelineCanvasRenderSurface({
   const axisTickAnimationRef = useRef<Map<string, AnimatedAxisTickState>>(new Map());
   const eraChildAnimationRef = useRef<Map<string, AnimatedEraChildState>>(new Map());
   const expandedOverlayProgressByIdRef = useRef<Map<string, number>>(new Map());
-  const hoverRegionsRef = useRef<HoverRegion[]>([]);
+  const internalHoverRegionsRef = useRef<HoverRegion[]>([]);
+  const hoverRegionsRef = externalHoverRegionsRef ?? internalHoverRegionsRef;
   const interactiveChildErasRef = useRef<Era[]>([]);
   const markerPriorityBoostRef = useRef<Map<string, MarkerPriorityBoostState>>(new Map());
   const overlayBandAnimationRef = useRef<Map<string, AnimatedOverlayBandState>>(new Map());
-  const overlayInteractionRegionsRef = useRef<OverlayInteractionRegion[]>([]);
+  const internalOverlayInteractionRegionsRef = useRef<OverlayInteractionRegion[]>([]);
+  const overlayInteractionRegionsRef =
+    externalOverlayInteractionRegionsRef ?? internalOverlayInteractionRegionsRef;
+  const expandedOverlayIdsRef = useRef(expandedOverlayIds ?? []);
   const preferredAxisLabelStepRef = useRef<number | undefined>(undefined);
   const primordialDetailStripAnimationRef = useRef<{
     opacity: number;
@@ -107,6 +120,27 @@ export function TimelineCanvasRenderSurface({
   // Stable draw function that reads all values from refs.
   const drawRef = useRef<() => void>(() => {});
   drawRef.current = () => {
+    // Sync marker priority boost from current hover state (1-frame lag is imperceptible).
+    const hoveredMarkerId =
+      hoveredTooltipRef.current?.tooltip.kind === "marker"
+        ? hoveredTooltipRef.current.id
+        : null;
+    const boostMap = markerPriorityBoostRef.current;
+    boostMap.clear();
+    if (hoveredMarkerId) {
+      boostMap.set(hoveredMarkerId, { current: 1, target: 1 });
+    }
+
+    // Sync disclosure indicator state from expandedOverlayIds prop.
+    const expandedIds = expandedOverlayIdsRef.current;
+    const progressMap = expandedOverlayProgressByIdRef.current;
+    progressMap.clear();
+    for (const id of expandedIds) {
+      progressMap.set(id, 1);
+    }
+    // Sync rendered expanded overlays so detail panels (with sub-bands) draw.
+    renderedExpandedOverlayIdsRef.current = expandedIds;
+
     // Sync eraChildAnimationRef from the optional opacity override.
     const opacityMap = eraChildOpacityRef.current;
     if (opacityMap) {
@@ -253,6 +287,7 @@ export function TimelineCanvasRenderSurface({
     sceneRef.current = scene;
     padRef.current = pad;
     eraChildOpacityRef.current = eraChildOpacityById;
+    expandedOverlayIdsRef.current = expandedOverlayIds ?? [];
     lastPointerRef.current = lastPointer ?? null;
     shellElementRef.current = shellElement;
     tooltipInteractiveContentElementRef.current =
@@ -263,6 +298,7 @@ export function TimelineCanvasRenderSurface({
     scene,
     pad,
     eraChildOpacityById,
+    expandedOverlayIds,
     lastPointer,
     shellElement,
     tooltipInteractiveContentElement,

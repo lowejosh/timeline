@@ -66,7 +66,7 @@ export function SetBuilderAiPromptButton({
 
         <Textarea
           aria-label="AI generation prompt"
-          className="h-72 resize-none rounded-md bg-background/75 px-3 py-3 font-mono text-[0.72rem] leading-relaxed"
+          className="h-72 resize-none rounded-md bg-background/75 px-3 py-3 font-mono text-[0.72rem] leading-relaxed selection:bg-primary/25"
           readOnly
           value={prompt}
         />

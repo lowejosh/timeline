@@ -1,5 +1,5 @@
 import { Save, Trash2 } from "lucide-react";
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { PageShell } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
@@ -74,15 +74,26 @@ export function SetBuilderPage({ editingSetId }: SetBuilderPageProps) {
     isEditing &&
     documents.some((candidate) => candidate.metadata.id === editingSetId);
 
-  useEffect(() => {
-    const next = cloneDocument(sourceDocument);
+  // Track the last document we passed to saveDraft so we can detect when
+  // sourceDocument changes only because of our own draft save (and skip the
+  // redundant reset that would otherwise create an infinite clone loop).
+  const lastDraftedDocRef = useRef<TimelineRawSetDocument | null>(null);
 
-    setDocument(next);
+  useEffect(() => {
+    // Skip when sourceDocument changed because we just saved this document.
+    // Without this guard, saveDraft → sourceDocument → setDocument(clone) →
+    // document changes → saveDraft → … loops indefinitely, and can also race
+    // against in-progress user input and overwrite recent edits.
+    if (sourceDocument === lastDraftedDocRef.current) {
+      return;
+    }
+    setDocument(cloneDocument(sourceDocument));
     setSaveError(null);
   }, [sourceDocument]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
+      lastDraftedDocRef.current = document;
       saveDraft(getDraftId(editingSetId), document);
     }, 700);
 

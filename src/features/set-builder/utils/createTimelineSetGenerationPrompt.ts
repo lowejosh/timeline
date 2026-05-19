@@ -34,6 +34,8 @@ Output requirements:
 - Keep ids stable, lowercase, URL-safe, and unique across the document.
 - Use concise but meaningful ids, e.g. "rome-republic-founded", "industrial-revolution-eras".
 - Metadata should include id, label, description, tags, order, and defaultEnabled.
+- Keep metadata.tags to at most 4 tags — pick the most useful ones only.
+- Keep metadata.description to 1 short sentence.
 - Preserve the same top-level shape: metadata, sources, categories, families, markers, overlays, overlayLaneBias.
 
 How the app displays this data:
@@ -75,9 +77,8 @@ Era families:
 - root should span the whole set and contain nested children.
 - Era nodes use: id, name, alternateName, startYear, endYear, color, description, sourceIds, image, approximateStart, approximateEnd, regionalScopeLabel, priority, children.
 - Use nesting to show structure, but avoid excessive depth.
-- Default era colors are fine for many nodes. Use custom colors sparingly for meaningful categories or major visual groups.
-- If choosing era colors, use bright, differentiable colors similar to these swatches: "rgb(64, 167, 226)", "rgb(232, 134, 69)", "rgb(88, 217, 69)", "rgb(191, 82, 224)", "rgb(229, 208, 67)", "rgb(63, 213, 188)", "rgb(227, 84, 93)", "rgb(81, 114, 225)".
-- Avoid dark, muddy, low-saturation, or near-black colors because the timeline renders spans with opacity and dark colors look heavy.
+- Era colors MUST be bright, saturated, and visually distinct. Every top-level era and major group should have an explicit color. Good era color examples: "rgb(64, 167, 226)", "rgb(232, 134, 69)", "rgb(88, 217, 69)", "rgb(191, 82, 224)", "rgb(229, 208, 67)", "rgb(63, 213, 188)", "rgb(227, 84, 93)", "rgb(81, 114, 225)". Child eras can inherit or use softer variants of their parent's color.
+- Do NOT use dark, muddy, near-black, or washed-out era colors. The timeline renders eras with opacity and dark colors look heavy and unreadable.
 - Do not create overlapping sibling eras. If two things overlap in time, either nest them under a broader parent when one contains the other, split the era sequence into non-overlapping intervals, or model overlapping context as overlays/bands instead of eras.
 - Use priority when dense era spans compete visually; higher priority should mean more important or more specific.
 
@@ -94,6 +95,7 @@ Overlays / context bands:
 - Use bands for broader context like movements, dynasties, wars, reigns, technological phases, cultural periods, or environmental conditions.
 - Nested overlays are allowed and should use children.
 - Use priority and overlayLaneBias when data is dense or when certain bands should appear more prominently/stably.
+- Overlay colors are more flexible than era colors. Muted, translucent, or thematic colors are fine as long as the bands are readable against the parchment background.
 
 Images:
 - Images are URL links only.
@@ -105,7 +107,7 @@ Quality bar:
 - Prioritize accuracy over volume.
 - Include enough eras, markers, and bands to make the set useful without making it noisy.
 - Make labels short enough for a timeline UI.
-- Descriptions should be clear, source-backed, and not overly long.
+- Descriptions should be clear, source-backed, and short — 1 to 2 sentences maximum.
 - Prefer fewer, better markers over dozens of low-value points.
 - Avoid decorative color noise. Use visual overrides only when they clarify meaning.
 - Check for duplicate ids, missing group references, and unknown sourceIds before returning.

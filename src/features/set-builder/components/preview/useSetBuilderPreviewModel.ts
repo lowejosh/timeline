@@ -4,11 +4,8 @@ import type { Era, TimelineMarker, TimelineOverlayBand } from "@/lib/catalog/era
 import { normalizeTimelineSetDocument } from "@/lib/catalog/setSchema";
 import type { TimelineRawSetDocument } from "@/lib/catalog/setSchema";
 import { compileTimelineCatalog } from "@/lib/catalog/timelineCatalog";
-import { TIMELINE_MIN_YEAR, TIMELINE_MAX_YEAR } from "@/lib/core/viewport";
-
 export type SetBuilderPreviewModel = {
-  rootEra: Era;
-  /** Direct children of rootEra — the era family roots. */
+  /** Era family roots — the top-level drillable eras for this set. */
   eras: Era[];
   markers: TimelineMarker[];
   overlayBands: TimelineOverlayBand[];
@@ -18,17 +15,7 @@ export type SetBuilderPreviewModel = {
   error: string | null;
 };
 
-const FALLBACK_ROOT_ERA: Era = {
-  id: "preview-fallback-root",
-  name: "Preview",
-  startYear: TIMELINE_MIN_YEAR,
-  endYear: TIMELINE_MAX_YEAR,
-  color: "rgba(0,0,0,0)",
-  children: [],
-};
-
 const FALLBACK_MODEL: SetBuilderPreviewModel = {
-  rootEra: FALLBACK_ROOT_ERA,
   eras: [],
   markers: [],
   overlayBands: [],
@@ -54,7 +41,6 @@ export function useSetBuilderPreviewModel(
       const endYear = spanPriority?.endYear ?? 2000;
 
       return {
-        rootEra: catalog.rootEra,
         eras: catalog.rootEra.children ?? [],
         markers: [...catalog.markers],
         overlayBands: [...catalog.overlays],

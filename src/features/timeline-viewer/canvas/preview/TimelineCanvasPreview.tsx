@@ -7,11 +7,13 @@ import {
   type PointerEvent,
 } from "react";
 
+import { ChevronLeft } from "lucide-react";
 import type {
   Era,
   TimelineMarker,
   TimelineOverlayBand,
 } from "@/lib/catalog/eras";
+import { findEraById } from "@/lib/catalog/eras";
 import { getEraChildOpacityTarget } from "@/lib/rendering/childLayers";
 import { getVisibleTimelineMarkers } from "@/lib/rendering/queries/markers";
 import { resolveTimelineOverlayTracks } from "@/lib/rendering/overlayTracks";
@@ -26,6 +28,10 @@ import type { TimelineCanvasScene } from "../model/TimelineCanvas.types";
 import { TimelineCanvasRenderSurface } from "../rendering/TimelineCanvasRenderSurface";
 import { TOOLTIP_EXIT_DURATION_MS } from "@/lib/rendering/canvas/constants";
 import type {
+  HoverRegion,
+  OverlayInteractionRegion,
+} from "@/lib/rendering/canvas/draw/drawContext";
+import type {
   HoveredTooltipState,
   RenderedTooltipState,
 } from "@/lib/rendering/canvas/tooltip";
@@ -34,9 +40,12 @@ import { isEquivalentHoveredTooltip } from "@/lib/rendering/canvas/tooltip";
 const PREVIEW_PAD = 20;
 const NOOP = () => {};
 
+/** Synthetic home era ID used when no era is drilled into. */
+const PREVIEW_HOME_ERA_ID = "preview-home";
+
 type Props = {
-  activeEra: Era;
-  siblingEras: Era[];
+  /** Top-level era families for this set. The preview manages its own drill state. */
+  eras: Era[];
   markers: TimelineMarker[];
   overlayBands: TimelineOverlayBand[];
   /** [startYear, endYear] used for initial fit and reset-to-fit. */
@@ -45,14 +54,13 @@ type Props = {
 
 /**
  * Self-contained interactive timeline preview with local viewport state.
- * Supports wheel zoom, trackpad zoom, horizontal pan, and reset-to-fit.
+ * Supports wheel zoom, trackpad zoom, horizontal pan, and era drill-down.
  *
  * Reuses `TimelineCanvasRenderSurface` (and thus the real draw path) but
- * carries no global stores, no sidebar state, and no drilldown hierarchy.
+ * carries no global stores, no sidebar state, and no external navigation.
  */
 export function TimelineCanvasPreview({
-  activeEra,
-  siblingEras,
+  eras,
   markers,
   overlayBands,
   initialRange,
@@ -74,10 +82,45 @@ export function TimelineCanvasPreview({
 
   const hasInitializedRef = useRef(false);
   const dragRef = useRef<{ pointerId: number; lastX: number } | null>(null);
+  const pointerDownRef = useRef<{ pointerId: number; startX: number; startY: number } | null>(null);
   const tooltipEnterFrameRef = useRef(0);
   const tooltipExitTimeoutRef = useRef<number | null>(null);
   const widthRef = useRef(size.width);
   widthRef.current = size.width;
+  const overlayInteractionRegionsRef = useRef<OverlayInteractionRegion[]>([]);
+  const hoverRegionsRef = useRef<HoverRegion[]>([]);
+  const [expandedOverlayIds, setExpandedOverlayIds] = useState<string[]>([]);
+
+  // --- Era drill-down state ----------------------------------------------
+  // Track the drilled-into era by ID so it survives document re-compiles
+  // (same era ID = stays drilled, removed era = falls back to home).
+  const [activeEraId, setActiveEraId] = useState<string | null>(null);
+
+  // Synthetic home era that acts as the invisible parent of all era families.
+  const homeEra = useMemo<Era>(
+    () => ({
+      id: PREVIEW_HOME_ERA_ID,
+      name: "Overview",
+      startYear: eras.reduce((m, e) => Math.min(m, e.startYear), Infinity),
+      endYear: eras.reduce((m, e) => Math.max(m, e.endYear), -Infinity),
+      color: "rgba(0,0,0,0)",
+      children: eras,
+    }),
+    [eras],
+  );
+
+  // Resolve the active era from the current era tree.
+  const activeEra = useMemo<Era>(() => {
+    if (!activeEraId) return homeEra;
+    for (const era of eras) {
+      const found = era.id === activeEraId ? era : findEraById(era, activeEraId);
+      if (found) return found;
+    }
+    return homeEra; // era was removed by a document edit
+  }, [activeEraId, eras, homeEra]);
+
+  const isAtHome = activeEra.id === PREVIEW_HOME_ERA_ID;
+  const siblingEras = isAtHome ? eras : (activeEra.children ?? []);
 
   const commitHoveredTooltip = useCallback(
     (nextTooltip: HoveredTooltipState | null) => {
@@ -212,6 +255,7 @@ export function TimelineCanvasPreview({
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);
     dragRef.current = { pointerId: event.pointerId, lastX: event.clientX };
+    pointerDownRef.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
     setLastPointer(null);
     commitHoveredTooltip(null);
   };
@@ -228,7 +272,6 @@ export function TimelineCanvasPreview({
       });
       return;
     }
-
     const deltaX = event.clientX - drag.lastX;
     dragRef.current = { ...drag, lastX: event.clientX };
     const innerW = Math.max(widthRef.current - PREVIEW_PAD * 2, 1);
@@ -241,6 +284,59 @@ export function TimelineCanvasPreview({
     if (dragRef.current?.pointerId === event.pointerId) dragRef.current = null;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    // Detect a click: pointer-down + up with minimal movement (≤5px).
+    const down = pointerDownRef.current;
+    const isClick =
+      down !== null &&
+      down.pointerId === event.pointerId &&
+      Math.abs(event.clientX - down.startX) <= 5 &&
+      Math.abs(event.clientY - down.startY) <= 5;
+    pointerDownRef.current = null;
+    if (!isClick) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // Hit-test overlay interaction regions.
+    for (const region of overlayInteractionRegionsRef.current) {
+      if (region.role !== "parent") continue;
+      if (x >= region.left && x <= region.right && y >= region.top && y <= region.bottom) {
+        setExpandedOverlayIds((current) =>
+          current.includes(region.id)
+            ? current.filter((id) => id !== region.id)
+            : [...current, region.id],
+        );
+        break;
+      }
+    }
+
+    // Hit-test era hover regions for drill-down (eras with children only).
+    for (const region of hoverRegionsRef.current) {
+      if (region.tooltip.kind !== "era") continue;
+      if (x >= region.left && x <= region.right && y >= region.top && y <= region.bottom) {
+        // Find the clicked era in the currently-displayed tree.
+        const eraId = region.id;
+        const clickedEra =
+          siblingEras.find((e) => e.id === eraId) ??
+          siblingEras.reduce<Era | undefined>(
+            (found, e) => found ?? findEraById(e, eraId),
+            undefined,
+          );
+        if (clickedEra && (clickedEra.children?.length ?? 0) > 0) {
+          setActiveEraId(clickedEra.id);
+          setViewport(
+            getViewportForRange(
+              clickedEra.startYear,
+              clickedEra.endYear,
+              widthRef.current,
+              0.08,
+            ),
+          );
+        }
+        break;
+      }
     }
   };
 
@@ -256,8 +352,8 @@ export function TimelineCanvasPreview({
   // needing a live animation system.
   const eraChildOpacityById = useMemo(() => {
     const map = new Map<string, number>();
-    const visit = (eras: Era[]) => {
-      for (const era of eras) {
+    const visit = (erasToVisit: Era[]) => {
+      for (const era of erasToVisit) {
         if (era.children?.length) {
           map.set(
             era.id,
@@ -325,9 +421,27 @@ export function TimelineCanvasPreview({
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerLeave}
     >
+      {!isAtHome ? (
+        <button
+          className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full border border-border/60 bg-background/80 px-2.5 py-1 text-[0.7rem] font-medium text-primary shadow-sm backdrop-blur-sm transition-opacity hover:bg-background"
+          onClick={() => {
+            setActiveEraId(null);
+            setViewport(
+              getViewportForRange(initialRange[0], initialRange[1], size.width, 0.08),
+            );
+          }}
+          type="button"
+        >
+          <ChevronLeft className="size-3" />
+          Overview
+        </button>
+      ) : null}
       <TimelineCanvasRenderSurface
         commitHoveredTooltip={commitHoveredTooltip}
         eraChildOpacityById={eraChildOpacityById}
+        expandedOverlayIds={expandedOverlayIds}
+        hoverRegionsRef={hoverRegionsRef}
+        overlayInteractionRegionsRef={overlayInteractionRegionsRef}
         hoveredTooltipRef={hoveredTooltipRef}
         lastPointer={lastPointer}
         pad={PREVIEW_PAD}
