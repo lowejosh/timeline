@@ -33,7 +33,7 @@ export function SetBuilderWorkspace({
         selectedTool={selectedTool}
       />
       <div className="h-full min-h-0 overflow-hidden max-lg:hidden">
-        <SetBuilderPreviewPane />
+        <SetBuilderPreviewPane document={document} />
       </div>
     </div>
   );
