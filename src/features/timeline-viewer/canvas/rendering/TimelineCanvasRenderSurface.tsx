@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type MutableRefObject } from "react";
 
 import type { Era } from "@/lib/catalog/eras";
 import { createTimelinePerfStats, createTimelineVerboseStats } from "@/lib/rendering/canvas/perf";
@@ -16,6 +16,10 @@ import type { AnimatedEraChildState } from "../animation/useEraChildAnimation";
 import { useCanvasBackingStore } from "../platform/useCanvasBackingStore";
 import { drawTimelineCanvasFrame } from "./drawTimelineCanvasFrame";
 import type { TimelineCanvasScene } from "../model/TimelineCanvas.types";
+import {
+  isEquivalentHoveredTooltip,
+  type HoveredTooltipState,
+} from "@/lib/rendering/canvas/tooltip";
 
 type Props = {
   scene: TimelineCanvasScene | null;
@@ -27,6 +31,15 @@ type Props = {
    * system.
    */
   eraChildOpacityById?: ReadonlyMap<string, number>;
+  commitHoveredTooltip?: (tooltip: HoveredTooltipState | null) => void;
+  hoveredTooltipRef?: MutableRefObject<HoveredTooltipState | null>;
+  lastPointer?: {
+    pointerType: string;
+    x: number;
+    y: number;
+  } | null;
+  shellElement?: HTMLDivElement | null;
+  tooltipInteractiveContentElement?: HTMLDivElement | null;
 };
 
 /**
@@ -37,7 +50,16 @@ type Props = {
  * Use `TimelineCanvasPreview` for a self-contained preview with viewport
  * state and pan/zoom gestures.
  */
-export function TimelineCanvasRenderSurface({ scene, pad, eraChildOpacityById }: Props) {
+export function TimelineCanvasRenderSurface({
+  commitHoveredTooltip,
+  eraChildOpacityById,
+  hoveredTooltipRef: externalHoveredTooltipRef,
+  lastPointer,
+  pad,
+  scene,
+  shellElement,
+  tooltipInteractiveContentElement,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Scene and pad kept in refs so the draw callback never captures stale values.
@@ -49,7 +71,14 @@ export function TimelineCanvasRenderSurface({ scene, pad, eraChildOpacityById }:
   // Stable perf placeholders — preview never measures perf.
   const perfStatsRef = useRef(createTimelinePerfStats());
   const verbosePerfStatsRef = useRef(createTimelineVerboseStats());
-  const hoveredTooltipRef = useRef(null);
+  const internalHoveredTooltipRef = useRef<HoveredTooltipState | null>(null);
+  const hoveredTooltipRef =
+    externalHoveredTooltipRef ?? internalHoveredTooltipRef;
+  const lastPointerRef = useRef(lastPointer ?? null);
+  const shellElementRef = useRef(shellElement);
+  const tooltipInteractiveContentElementRef = useRef(
+    tooltipInteractiveContentElement,
+  );
 
   // --- Animation state refs (empty — preview renders statically) ----------
   const axisTickAnimationRef = useRef<Map<string, AnimatedAxisTickState>>(new Map());
@@ -117,9 +146,70 @@ export function TimelineCanvasRenderSurface({ scene, pad, eraChildOpacityById }:
       }
     }
 
+    const resolveHoveredTooltipForCanvasDraw = (
+      x: number,
+      y: number,
+      pointerType: string,
+    ) => {
+      if (pointerType !== "mouse" && pointerType !== "pen") {
+        return null;
+      }
+
+      const previousTooltip = hoveredTooltipRef.current;
+      let selectedRegion: HoverRegion | null = null;
+      let selectedKindPriority = Number.POSITIVE_INFINITY;
+      let selectedDistance = Number.POSITIVE_INFINITY;
+      let selectedBias = Number.POSITIVE_INFINITY;
+
+      for (const region of hoverRegionsRef.current) {
+        if (
+          x < region.left ||
+          x > region.right ||
+          y < region.top ||
+          y > region.bottom
+        ) {
+          continue;
+        }
+
+        const kindPriority = region.tooltip.kind === "marker" ? 0 : 1;
+        const distance = Math.hypot(x - region.anchorX, y - region.anchorY);
+        const currentBias = previousTooltip?.id === region.id ? -0.25 : 0;
+        const isBetter =
+          kindPriority < selectedKindPriority ||
+          (kindPriority === selectedKindPriority &&
+            (distance < selectedDistance - 0.001 ||
+              (Math.abs(distance - selectedDistance) <= 0.001 &&
+                currentBias < selectedBias)));
+
+        if (isBetter) {
+          selectedRegion = region;
+          selectedKindPriority = kindPriority;
+          selectedDistance = distance;
+          selectedBias = currentBias;
+        }
+      }
+
+      if (!selectedRegion) {
+        return null;
+      }
+
+      const resolvedTooltip = {
+        id: selectedRegion.id,
+        anchorX:
+          selectedRegion.anchorMode === "follow-x" ? x : selectedRegion.anchorX,
+        anchorY: selectedRegion.anchorY,
+        placement: selectedRegion.placement,
+        tooltip: selectedRegion.tooltip,
+      } satisfies HoveredTooltipState;
+
+      return isEquivalentHoveredTooltip(previousTooltip, resolvedTooltip)
+        ? previousTooltip
+        : resolvedTooltip;
+    };
+
     drawTimelineCanvasFrame({
       canvas: canvasRef.current,
-      commitHoveredTooltip: () => {},
+      commitHoveredTooltip: commitHoveredTooltip ?? (() => {}),
       frameRefs: {
         axisTickAnimationRef,
         eraChildAnimationRef,
@@ -138,18 +228,19 @@ export function TimelineCanvasRenderSurface({ scene, pad, eraChildOpacityById }:
       isCosmicCalendarMode: false,
       isTouchTooltipPinned: false,
       isViewportInteractionActive: false,
-      lastPointer: null,
+      lastPointer: lastPointerRef.current,
       overviewReservedHeight: 0,
       overlayScrollOffset: 0,
       pad: padRef.current,
       perfMode: "off",
       perfStats: perfStatsRef.current,
-      resolveHoveredTooltipForCanvasDraw: () => null,
+      resolveHoveredTooltipForCanvasDraw,
       reserveAxisDateRow: true,
       scene: sceneRef.current,
-      shellElement: null,
+      shellElement: shellElementRef.current ?? null,
       theme: themeRef.current,
-      tooltipInteractiveContentElement: null,
+      tooltipInteractiveContentElement:
+        tooltipInteractiveContentElementRef.current ?? null,
       verbosePerfStats: verbosePerfStatsRef.current,
     });
   };
@@ -162,9 +253,20 @@ export function TimelineCanvasRenderSurface({ scene, pad, eraChildOpacityById }:
     sceneRef.current = scene;
     padRef.current = pad;
     eraChildOpacityRef.current = eraChildOpacityById;
+    lastPointerRef.current = lastPointer ?? null;
+    shellElementRef.current = shellElement;
+    tooltipInteractiveContentElementRef.current =
+      tooltipInteractiveContentElement;
     themeRef.current = readTimelineCanvasTheme();
     drawRef.current();
-  }, [scene, pad, eraChildOpacityById]);
+  }, [
+    scene,
+    pad,
+    eraChildOpacityById,
+    lastPointer,
+    shellElement,
+    tooltipInteractiveContentElement,
+  ]);
 
   return <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />;
 }

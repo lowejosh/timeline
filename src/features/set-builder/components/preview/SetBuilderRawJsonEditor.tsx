@@ -94,6 +94,7 @@ export function SetBuilderRawJsonEditor({
 }: SetBuilderRawJsonEditorProps) {
   const canonicalJson = useMemo(() => formatRawDocument(document), [document]);
   const gutterRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [text, setText] = useState(canonicalJson);
   const [status, setStatus] = useState<RawJsonStatus>(() =>
     parseRawJson(canonicalJson),
@@ -163,6 +164,11 @@ export function SetBuilderRawJsonEditor({
     });
   };
 
+  const handleSelectAll = () => {
+    textareaRef.current?.focus();
+    textareaRef.current?.select();
+  };
+
   return (
     <div className="flex h-full min-h-0 flex-col bg-background/30">
       <div className="min-h-0 flex-1 p-3">
@@ -180,7 +186,7 @@ export function SetBuilderRawJsonEditor({
           </div>
           <Textarea
             aria-label="Raw set configuration"
-            className="h-full min-h-0 resize-none rounded-none border-0 bg-transparent py-3 pl-14 pr-4 font-mono text-[0.78rem] leading-relaxed focus:ring-0"
+            className="h-full min-h-0 resize-none rounded-none border-0 bg-transparent py-3 pl-14 pr-4 font-mono text-[0.78rem] leading-relaxed selection:bg-primary/25 focus:ring-0"
             onChange={(event) => {
               setCopied(false);
               setText(event.target.value);
@@ -190,6 +196,7 @@ export function SetBuilderRawJsonEditor({
                 gutterRef.current.scrollTop = event.currentTarget.scrollTop;
               }
             }}
+            ref={textareaRef}
             spellCheck={false}
             value={text}
             wrap="off"
@@ -226,6 +233,14 @@ export function SetBuilderRawJsonEditor({
             </span>
           )}
         </div>
+        <Button
+          onClick={handleSelectAll}
+          size="pill"
+          type="button"
+          variant="subtle"
+        >
+          Select all
+        </Button>
         <Button onClick={handleCopy} size="pill" type="button" variant="subtle">
           {copied ? <Check className="size-3.5" /> : <Clipboard className="size-3.5" />}
           {copied ? "Copied" : "Copy"}

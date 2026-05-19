@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -20,8 +21,15 @@ import {
   type TimelineViewport,
 } from "@/lib/core/viewport";
 import { useWheelZoomPan } from "../interactions/useWheelZoomPan";
+import { TimelineTooltip } from "../components/TimelineTooltip";
 import type { TimelineCanvasScene } from "../model/TimelineCanvas.types";
 import { TimelineCanvasRenderSurface } from "../rendering/TimelineCanvasRenderSurface";
+import { TOOLTIP_EXIT_DURATION_MS } from "@/lib/rendering/canvas/constants";
+import type {
+  HoveredTooltipState,
+  RenderedTooltipState,
+} from "@/lib/rendering/canvas/tooltip";
+import { isEquivalentHoveredTooltip } from "@/lib/rendering/canvas/tooltip";
 
 const PREVIEW_PAD = 20;
 const NOOP = () => {};
@@ -50,15 +58,106 @@ export function TimelineCanvasPreview({
   initialRange,
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const tooltipInteractiveContentRef = useRef<HTMLDivElement | null>(null);
+  const hoveredTooltipRef = useRef<HoveredTooltipState | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [viewport, setViewport] = useState<TimelineViewport>(() =>
     getViewportForRange(initialRange[0], initialRange[1], 600, 0.08),
   );
+  const [lastPointer, setLastPointer] = useState<{
+    pointerType: string;
+    x: number;
+    y: number;
+  } | null>(null);
+  const [renderedTooltip, setRenderedTooltip] =
+    useState<RenderedTooltipState | null>(null);
 
   const hasInitializedRef = useRef(false);
   const dragRef = useRef<{ pointerId: number; lastX: number } | null>(null);
+  const tooltipEnterFrameRef = useRef(0);
+  const tooltipExitTimeoutRef = useRef<number | null>(null);
   const widthRef = useRef(size.width);
   widthRef.current = size.width;
+
+  const commitHoveredTooltip = useCallback(
+    (nextTooltip: HoveredTooltipState | null) => {
+      const currentTooltip = hoveredTooltipRef.current;
+
+      if (isEquivalentHoveredTooltip(currentTooltip, nextTooltip)) {
+        if (currentTooltip && nextTooltip && currentTooltip !== nextTooltip) {
+          hoveredTooltipRef.current = currentTooltip;
+        }
+
+        return;
+      }
+
+      if (tooltipExitTimeoutRef.current !== null) {
+        window.clearTimeout(tooltipExitTimeoutRef.current);
+        tooltipExitTimeoutRef.current = null;
+      }
+
+      if (tooltipEnterFrameRef.current) {
+        cancelAnimationFrame(tooltipEnterFrameRef.current);
+        tooltipEnterFrameRef.current = 0;
+      }
+
+      hoveredTooltipRef.current = nextTooltip;
+
+      if (!nextTooltip) {
+        setRenderedTooltip((current) =>
+          current
+            ? {
+                ...current,
+                phase: "exiting",
+              }
+            : null,
+        );
+
+        tooltipExitTimeoutRef.current = window.setTimeout(() => {
+          tooltipExitTimeoutRef.current = null;
+          setRenderedTooltip((current) =>
+            current?.phase === "exiting" ? null : current,
+          );
+        }, TOOLTIP_EXIT_DURATION_MS);
+
+        return;
+      }
+
+      setRenderedTooltip({
+        phase: "entering",
+        tooltipState: nextTooltip,
+      });
+
+      tooltipEnterFrameRef.current = requestAnimationFrame(() => {
+        tooltipEnterFrameRef.current = 0;
+        setRenderedTooltip((current) => {
+          if (!current) {
+            return current;
+          }
+
+          return isEquivalentHoveredTooltip(current.tooltipState, nextTooltip)
+            ? {
+                phase: "present",
+                tooltipState: nextTooltip,
+              }
+            : current;
+        });
+      });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (tooltipExitTimeoutRef.current !== null) {
+        window.clearTimeout(tooltipExitTimeoutRef.current);
+      }
+
+      if (tooltipEnterFrameRef.current) {
+        cancelAnimationFrame(tooltipEnterFrameRef.current);
+      }
+    };
+  }, []);
 
   // --- Resize observer ---------------------------------------------------
   useEffect(() => {
@@ -113,14 +212,28 @@ export function TimelineCanvasPreview({
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);
     dragRef.current = { pointerId: event.pointerId, lastX: event.clientX };
+    setLastPointer(null);
+    commitHoveredTooltip(null);
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (!drag || drag.pointerId !== event.pointerId) {
+      const rect = event.currentTarget.getBoundingClientRect();
+
+      setLastPointer({
+        pointerType: event.pointerType,
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      });
+      return;
+    }
+
     const deltaX = event.clientX - drag.lastX;
     dragRef.current = { ...drag, lastX: event.clientX };
     const innerW = Math.max(widthRef.current - PREVIEW_PAD * 2, 1);
+    setLastPointer(null);
+    commitHoveredTooltip(null);
     setViewport((current) => panByPixels(current, deltaX, innerW));
   };
 
@@ -129,6 +242,12 @@ export function TimelineCanvasPreview({
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+  };
+
+  const handlePointerLeave = () => {
+    dragRef.current = null;
+    setLastPointer(null);
+    commitHoveredTooltip(null);
   };
 
   // --- Era child opacity map ---------------------------------------------
@@ -204,12 +323,26 @@ export function TimelineCanvasPreview({
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerLeave}
     >
       <TimelineCanvasRenderSurface
+        commitHoveredTooltip={commitHoveredTooltip}
         eraChildOpacityById={eraChildOpacityById}
+        hoveredTooltipRef={hoveredTooltipRef}
+        lastPointer={lastPointer}
         pad={PREVIEW_PAD}
         scene={scene}
+        shellElement={containerRef.current}
+        tooltipInteractiveContentElement={tooltipInteractiveContentRef.current}
       />
+      {renderedTooltip ? (
+        <TimelineTooltip
+          height={size.height}
+          interactiveContentRef={tooltipInteractiveContentRef}
+          renderedTooltip={renderedTooltip}
+          width={size.width}
+        />
+      ) : null}
     </div>
   );
 }

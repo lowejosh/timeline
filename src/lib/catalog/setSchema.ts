@@ -253,12 +253,32 @@ function validateSourceIds(
   }
 }
 
+function normalizeCalendarEra(value: string): TimelineCalendarEra {
+  const normalized = value.toLocaleLowerCase();
+
+  if (normalized !== "ce" && normalized !== "bce") {
+    throw new Error(`Calendar era must be "ce" or "bce".`);
+  }
+
+  return normalized;
+}
+
+function normalizeElapsedReference(value: string): TimelineElapsedReference {
+  const normalized = value.toLocaleLowerCase();
+
+  if (normalized !== "ago" && normalized !== "after-big-bang") {
+    throw new Error(`Elapsed reference must be "ago" or "after-big-bang".`);
+  }
+
+  return normalized;
+}
+
 function normalizeRawExactTimestamp(
   timestamp: TimelineRawExactTimestamp,
 ): TimelineExactTimestamp {
   if (timestamp.kind === "calendar") {
     return createExactCalendarTimestamp({
-      era: timestamp.era,
+      era: normalizeCalendarEra(timestamp.era),
       year: timestamp.year,
       precision: timestamp.precision,
       month: timestamp.month,
@@ -272,7 +292,7 @@ function normalizeRawExactTimestamp(
   }
 
   return createExactElapsedTimestamp({
-    reference: timestamp.reference,
+    reference: normalizeElapsedReference(timestamp.reference),
     precision: timestamp.precision,
     years:
       timestamp.years === undefined
@@ -368,6 +388,7 @@ function resolveTimelinePoint(
 
   if (point.kind === "relative") {
     const value = parseFiniteNumber(point.value, label);
+    const reference = normalizeElapsedReference(point.reference);
 
     if (value < 0) {
       throw new Error(`${label} must be non-negative.`);
@@ -375,7 +396,7 @@ function resolveTimelinePoint(
 
     const years = convertRelativeValueToYears(point.unit, value);
 
-    return point.reference === "after-big-bang"
+    return reference === "after-big-bang"
       ? getTimelineYearFromYearsAfterBigBang(years)
       : getTimelineYearFromYearsAgo(years);
   }

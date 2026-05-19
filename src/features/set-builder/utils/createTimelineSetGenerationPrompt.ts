@@ -48,11 +48,12 @@ How the app displays this data:
 Time point rules:
 - For ordinary years, use numbers where BCE is negative and CE is positive. Example: 476 CE = 476, 44 BCE = -44.
 - For very ancient dates, use a relative point when clearer:
-  { "kind": "relative", "reference": "present", "unit": "years", "value": "120000" }
+  { "kind": "relative", "reference": "ago", "unit": "years", "value": "120000" }
   or
-  { "kind": "relative", "reference": "big-bang", "unit": "years", "value": "380000" }
+  { "kind": "relative", "reference": "after-big-bang", "unit": "years", "value": "380000" }
 - Use exact timestamps only when precision matters:
-  { "kind": "calendar", "era": "CE", "year": 1969, "precision": "minute", "month": 7, "day": 20, "hour": 20, "minute": 17 }
+  { "kind": "calendar", "era": "ce", "year": 1969, "precision": "minute", "month": 7, "day": 20, "hour": 20, "minute": 17 }
+- Calendar era should be lowercase "ce" or "bce".
 - Mark approximate starts/ends with approximateStart / approximateEnd, or approximate for markers.
 
 Sources:
@@ -75,6 +76,9 @@ Era families:
 - Era nodes use: id, name, alternateName, startYear, endYear, color, description, sourceIds, image, approximateStart, approximateEnd, regionalScopeLabel, priority, children.
 - Use nesting to show structure, but avoid excessive depth.
 - Default era colors are fine for many nodes. Use custom colors sparingly for meaningful categories or major visual groups.
+- If choosing era colors, use bright, differentiable colors similar to these swatches: "rgb(64, 167, 226)", "rgb(232, 134, 69)", "rgb(88, 217, 69)", "rgb(191, 82, 224)", "rgb(229, 208, 67)", "rgb(63, 213, 188)", "rgb(227, 84, 93)", "rgb(81, 114, 225)".
+- Avoid dark, muddy, low-saturation, or near-black colors because the timeline renders spans with opacity and dark colors look heavy.
+- Do not create overlapping sibling eras. If two things overlap in time, either nest them under a broader parent when one contains the other, split the era sequence into non-overlapping intervals, or model overlapping context as overlays/bands instead of eras.
 - Use priority when dense era spans compete visually; higher priority should mean more important or more specific.
 
 Markers:
@@ -93,6 +97,7 @@ Overlays / context bands:
 
 Images:
 - Images are URL links only.
+- Prefer stable Wikimedia Commons image URLs when suitable. Other stable museum, archive, library, university, or official image URLs are fine.
 - Use image objects only when you have a stable, relevant URL and a useful alt label.
 - Do not hotlink random unreliable images.
 
