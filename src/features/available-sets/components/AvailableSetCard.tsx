@@ -1,4 +1,9 @@
-import type { KeyboardEvent, MutableRefObject, PointerEvent } from "react";
+import type {
+  ComponentProps,
+  KeyboardEvent,
+  MutableRefObject,
+  PointerEvent,
+} from "react";
 import { createPortal } from "react-dom";
 import {
   AlertTriangle,
@@ -13,6 +18,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageIconButton } from "@/components/ui/page-icon-button";
 import type { TimelineSetDefinition } from "@/lib/catalog/setSchema";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import { cn } from "@/lib/utils";
@@ -44,6 +50,33 @@ type AvailableSetCardProps = {
   visibleSetIds: ReadonlySet<TimelineSetId>;
 };
 
+type AvailableSetActionButtonProps = {
+  children: ComponentProps<typeof PageIconButton>["children"];
+  label: string;
+  onClick: ComponentProps<typeof PageIconButton>["onClick"];
+  pressed?: boolean;
+};
+
+function AvailableSetActionButton({
+  children,
+  label,
+  onClick,
+  pressed,
+}: AvailableSetActionButtonProps) {
+  return (
+    <PageIconButton
+      className="text-muted-foreground hover:text-primary active:scale-95"
+      label={label}
+      onClick={onClick}
+      selected={pressed}
+      showSelectedTint={false}
+      type="button"
+    >
+      {children}
+    </PageIconButton>
+  );
+}
+
 export function AvailableSetCard({
   columnId,
   dragState,
@@ -72,7 +105,7 @@ export function AvailableSetCard({
         "flex w-full list-none select-none items-start gap-2 rounded-lg border border-border/60 bg-surface/20 px-2.5 py-2.5 transition-[background-color,border-color,box-shadow] duration-150 will-change-transform hover:border-border hover:bg-surface/50 sm:gap-3 sm:px-3 sm:py-3",
         isDragged &&
           "pointer-events-none cursor-grabbing bg-surface shadow-panel",
-        isEnabled && !isVisible && "pointer-events-auto opacity-50 grayscale-[0.25]",
+        isEnabled && !isVisible && "bg-surface/10",
       )}
       data-drag-state={isDragged ? "dragging" : dragState ? "shifting" : "idle"}
       key={setId}
@@ -96,25 +129,32 @@ export function AvailableSetCard({
           : undefined
       }
     >
-      <Button
-        aria-describedby={reorderHelpId}
-        aria-label={`Reorder ${set.metadata.label}`}
-        className="mt-0.5 cursor-grab touch-none rounded-full text-muted-foreground active:cursor-grabbing"
-        data-drag-handle="true"
-        onKeyDown={(event) => {
-          onReorderKeyDown(event, setId, columnId);
-        }}
-        onPointerDown={(event) => {
-          onDragHandlePointerDown(event, setId, columnId);
-        }}
-        size="icon"
-        type="button"
-        variant="ghost"
-      >
-        <GripVertical aria-hidden="true" className="size-4" />
-      </Button>
+      <div className={cn(isEnabled && !isVisible && "opacity-55")}>
+        <Button
+          aria-describedby={reorderHelpId}
+          aria-label={`Reorder ${set.metadata.label}`}
+          className="mt-0.5 cursor-grab touch-none rounded-full text-muted-foreground active:cursor-grabbing"
+          data-drag-handle="true"
+          onKeyDown={(event) => {
+            onReorderKeyDown(event, setId, columnId);
+          }}
+          onPointerDown={(event) => {
+            onDragHandlePointerDown(event, setId, columnId);
+          }}
+          size="icon"
+          type="button"
+          variant="ghost"
+        >
+          <GripVertical aria-hidden="true" className="size-4" />
+        </Button>
+      </div>
 
-      <div className="grid min-w-0 flex-1 gap-1">
+      <div
+        className={cn(
+          "grid min-w-0 flex-1 gap-1 transition-opacity duration-150",
+          isEnabled && !isVisible && "opacity-55 grayscale-[0.18]",
+        )}
+      >
         <span className="font-display text-sm font-semibold leading-tight text-primary">
           {set.metadata.label}
         </span>
@@ -160,74 +200,52 @@ export function AvailableSetCard({
       <div className="flex shrink-0 items-center gap-1 self-center">
         {isCustom ? (
           <>
-            <Button
-              aria-label={`Edit ${set.metadata.label}`}
-              className="rounded-full text-muted-foreground"
+            <AvailableSetActionButton
+              label={`Edit ${set.metadata.label}`}
               onClick={(event) => {
                 event.stopPropagation();
                 onEditCustomSet(setId);
               }}
-              size="icon"
-              type="button"
-              variant="glass"
             >
               <Pencil className="size-4" />
-            </Button>
-            <Button
-              aria-label={`Delete ${set.metadata.label}`}
-              className="rounded-full text-muted-foreground"
+            </AvailableSetActionButton>
+            <AvailableSetActionButton
+              label={`Delete ${set.metadata.label}`}
               onClick={(event) => {
                 event.stopPropagation();
                 onDeleteCustomSet(setId);
               }}
-              size="icon"
-              type="button"
-              variant="glass"
             >
               <Trash2 className="size-4" />
-            </Button>
+            </AvailableSetActionButton>
           </>
         ) : null}
 
         {isEnabled ? (
-          <Button
-            aria-label={
+          <AvailableSetActionButton
+            label={
               isVisible ? `Hide ${set.metadata.label}` : `Show ${set.metadata.label}`
             }
-            aria-pressed={isVisible}
-            className={cn(
-              "rounded-full text-muted-foreground",
-              isVisible && "text-muted-foreground/90",
-            )}
-            data-visible={isVisible ? "true" : "false"}
             onClick={(event) => {
               event.stopPropagation();
               onToggleVisible(setId, !isVisible);
             }}
-            size="icon"
-            type="button"
-            variant="glass"
+            pressed={isVisible}
           >
             {isVisible ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
-          </Button>
+          </AvailableSetActionButton>
         ) : null}
 
-        <Button
-          aria-label={isEnabled ? `Remove ${set.metadata.label}` : `Add ${set.metadata.label}`}
-          className={cn(
-            "rounded-full text-muted-foreground",
-            !isEnabled && "text-primary/70",
-          )}
-          data-variant={isEnabled ? "remove" : "add"}
-          onClick={() => {
+        <AvailableSetActionButton
+          label={isEnabled ? `Remove ${set.metadata.label}` : `Add ${set.metadata.label}`}
+          onClick={(event) => {
+            event.stopPropagation();
             onToggleDraft(setId, !isEnabled);
           }}
-          size="icon"
-          type="button"
-          variant="glass"
+          pressed={!isEnabled}
         >
           {isEnabled ? <Minus className="size-4" /> : <Plus className="size-4" />}
-        </Button>
+        </AvailableSetActionButton>
       </div>
     </li>
   );

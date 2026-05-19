@@ -13,7 +13,7 @@ import {
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import { useCustomSetCatalogStore } from "@/stores/customSetCatalog.store";
 import { useTimelineLayerStore } from "@/stores/timelineLayer.store";
-import { useTimelineNavigationStore } from "@/stores/timelineNavigation.store";
+import { useAppRouteNavigation } from "@/app/routePaths";
 import type { SetBuilderTool } from "./SetBuilder.types";
 import { SetBuilderWorkspace } from "./components/SetBuilderWorkspace";
 
@@ -25,12 +25,13 @@ function getDraftId(editingSetId: string | null) {
   return editingSetId ? `edit:${editingSetId}` : "create-set";
 }
 
-export function SetBuilderPage() {
+type SetBuilderPageProps = {
+  editingSetId: string | null;
+};
+
+export function SetBuilderPage({ editingSetId }: SetBuilderPageProps) {
   const titleId = useId();
-  const editingSetId = useTimelineNavigationStore(
-    (state) => state.editingCustomSetId,
-  );
-  const setActiveView = useTimelineNavigationStore((state) => state.setActiveView);
+  const routeNavigation = useAppRouteNavigation();
   const documents = useCustomSetCatalogStore((state) => state.documents);
   const drafts = useCustomSetCatalogStore((state) => state.drafts);
   const deleteCustomSet = useCustomSetCatalogStore((state) => state.deleteCustomSet);
@@ -79,7 +80,7 @@ export function SetBuilderPage() {
   }, [document, editingSetId, saveDraft]);
 
   const handleBack = () => {
-    setActiveView("available-sets");
+    routeNavigation.openSets();
   };
 
   const handleSave = () => {
@@ -111,7 +112,7 @@ export function SetBuilderPage() {
       applySetLibrary(nextEnabledSetIds, nextOrderedSetIds, nextCatalog);
       deleteDraft(getDraftId(editingSetId));
       setSaveError(null);
-      setActiveView("available-sets");
+      routeNavigation.openSets();
     } catch (error) {
       setSaveError(
         error instanceof Error ? error.message : "Could not save this set.",
@@ -125,7 +126,7 @@ export function SetBuilderPage() {
     }
 
     deleteCustomSet(editingSetId);
-    setActiveView("available-sets");
+    routeNavigation.openSets();
   };
 
   return (
@@ -151,7 +152,11 @@ export function SetBuilderPage() {
       }
       backLabel="Back to available sets"
       onBack={handleBack}
-      title={isEditing ? "Edit custom set" : "Create custom set"}
+      title={
+        isEditing
+          ? `Editing ${document.metadata.label || "custom set"}`
+          : "Create custom set"
+      }
       titleId={titleId}
     >
       <SetBuilderWorkspace

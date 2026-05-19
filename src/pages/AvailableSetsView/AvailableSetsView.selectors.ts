@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 
+import { useAppRouteNavigation, useRouteView } from "@/app/routePaths";
 import { getEraFamilyId, type TimelineSetId } from "@/lib/catalog/eras";
 import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import { shouldUseMobileTimelineDrawer } from "@/lib/app/layout";
@@ -13,8 +14,7 @@ import { useTimelineNavigationStore } from "@/stores/timelineNavigation.store";
 import { useTimelineUiStore } from "@/stores/timelineUi.store";
 import { useTimelineViewportStore } from "@/stores/timelineViewport.store";
 
-export const useActiveView = () =>
-  useTimelineNavigationStore((state) => state.activeView);
+export const useActiveView = useRouteView;
 
 export const useEnabledSetIds = () =>
   useTimelineLayerStore((state) => state.enabledSetIds);
@@ -41,15 +41,7 @@ export function useAvailableSetsActions(catalog: TimelineCatalogSnapshot) {
   const setActiveEraId = useTimelineNavigationStore(
     (state) => state.setActiveEraId,
   );
-  const setActiveView = useTimelineNavigationStore(
-    (state) => state.setActiveView,
-  );
-  const openCreateSetAction = useTimelineNavigationStore(
-    (state) => state.openCreateSet,
-  );
-  const openEditCustomSetAction = useTimelineNavigationStore(
-    (state) => state.openEditCustomSet,
-  );
+  const routeNavigation = useAppRouteNavigation();
   const orderedSetIds = useTimelineLayerStore((state) => state.orderedSetIds);
   const applySetLibrary = useTimelineLayerStore(
     (state) => state.applySetLibrary,
@@ -98,17 +90,17 @@ export function useAvailableSetsActions(catalog: TimelineCatalogSnapshot) {
   const closeSetManager = useCallback(() => {
     const { width, height } = getCurrentStageSize();
 
-    setActiveView("timeline");
+    routeNavigation.openTimeline();
     setIsSidebarOpen(!shouldUseMobileTimelineDrawer(width, height));
-  }, [setActiveView, setIsSidebarOpen]);
+  }, [routeNavigation, setIsSidebarOpen]);
   const openCreateSet = useCallback(() => {
-    openCreateSetAction();
-  }, [openCreateSetAction]);
+    routeNavigation.openCreateSet();
+  }, [routeNavigation]);
   const openEditCustomSet = useCallback(
     (setId: TimelineSetId) => {
-      openEditCustomSetAction(setId);
+      routeNavigation.openEditSet(setId);
     },
-    [openEditCustomSetAction],
+    [routeNavigation],
   );
   const toggleVisibleSet = useCallback(
     (setId: TimelineSetId, nextVisible: boolean) => {

@@ -6,11 +6,10 @@ import {
   HUMAN_EVOLUTION_GROUP_ID,
   useTimelineLayerStore,
 } from "@/stores/timelineLayer.store";
-import { useTimelineNavigationStore } from "@/stores/timelineNavigation.store";
 import { useTimelineUiStore } from "@/stores/timelineUi.store";
+import { useRouteView } from "./routePaths";
 
-export const useActiveView = () =>
-  useTimelineNavigationStore((state) => state.activeView);
+export const useActiveView = useRouteView;
 
 export const useIsSidebarOpen = () =>
   useTimelineUiStore((state) => state.isSidebarOpen);

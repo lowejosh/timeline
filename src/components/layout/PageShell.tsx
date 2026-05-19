@@ -1,7 +1,7 @@
 import { ChevronLeft } from "lucide-react";
 import type { Ref, ReactNode } from "react";
 
-import { Button } from "@/components/ui/button";
+import { PageIconButton } from "@/components/ui/page-icon-button";
 import { cn } from "@/lib/utils";
 
 type PageShellProps = {
@@ -44,16 +44,13 @@ export function PageShell({
         )}
       >
         <header className="flex min-w-0 items-center gap-3 border-b border-border/70 px-4 py-3 max-sm:flex-wrap">
-          <Button
-            aria-label={backLabel}
-            className="rounded-full"
+          <PageIconButton
+            label={backLabel}
             onClick={onBack}
-            size="icon"
             type="button"
-            variant="ghost"
           >
             <ChevronLeft className="size-4" />
-          </Button>
+          </PageIconButton>
           <div className="grid min-w-0 gap-1">
             <h1
               className="m-0 font-display text-base font-semibold leading-none text-primary"

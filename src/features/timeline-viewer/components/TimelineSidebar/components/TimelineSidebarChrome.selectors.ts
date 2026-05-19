@@ -1,12 +1,11 @@
 import { useCallback, useMemo } from "react";
 
+import { useAppRouteNavigation, useRouteView } from "@/app/routePaths";
 import { useTimelineLayerStore } from "@/stores/timelineLayer.store";
-import { useTimelineNavigationStore } from "@/stores/timelineNavigation.store";
 import { useTimelineUiStore } from "@/stores/timelineUi.store";
 import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 
-export const useSidebarActiveView = () =>
-  useTimelineNavigationStore((state) => state.activeView);
+export const useSidebarActiveView = useRouteView;
 
 export const useExpandedSetIds = () =>
   useTimelineLayerStore((state) => state.expandedSetIds);
@@ -15,13 +14,11 @@ export const useIsSidebarOpen = () =>
   useTimelineUiStore((state) => state.isSidebarOpen);
 
 export function useSidebarChromeActions(catalog: TimelineCatalogSnapshot) {
+  const routeNavigation = useAppRouteNavigation();
   const reorderSetsAction = useTimelineLayerStore((state) => state.reorderSets);
   const toggleEntry = useTimelineLayerStore((state) => state.toggleEntry);
   const toggleSetExpanded = useTimelineLayerStore(
     (state) => state.toggleSetExpanded,
-  );
-  const setActiveView = useTimelineNavigationStore(
-    (state) => state.setActiveView,
   );
   const setIsSidebarOpen = useTimelineUiStore(
     (state) => state.setIsSidebarOpen,
@@ -31,8 +28,8 @@ export function useSidebarChromeActions(catalog: TimelineCatalogSnapshot) {
   }, [setIsSidebarOpen]);
   const openSetManager = useCallback(() => {
     setIsSidebarOpen(false);
-    setActiveView("available-sets");
-  }, [setActiveView, setIsSidebarOpen]);
+    routeNavigation.openSets();
+  }, [routeNavigation, setIsSidebarOpen]);
   const reorderSets = useCallback(
     (nextSetIds: Parameters<typeof reorderSetsAction>[0]) => {
       reorderSetsAction(nextSetIds, catalog);

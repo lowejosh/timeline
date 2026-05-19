@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useMemo } from "react";
+import { Suspense, useEffect, useMemo } from "react";
+import { Outlet } from "@tanstack/react-router";
 
 import * as rx from "./App.selectors";
 import { useStandaloneViewportHeight } from "@/hooks/useStandaloneViewportHeight";
@@ -16,18 +17,6 @@ import {
 import { TimelineView } from "@/pages/TimelineView/TimelineView";
 import { getPrimaryShortcutModifierLabel } from "@/lib/app/timelineKeyboard";
 import { PwaInstallPrompt } from "@/components/misc";
-
-const AvailableSetsView = lazy(() =>
-  import("@/pages/AvailableSetsView/AvailableSetsView").then((module) => ({
-    default: module.AvailableSetsView,
-  })),
-);
-
-const SetBuilderView = lazy(() =>
-  import("@/pages/SetBuilderView/SetBuilderView").then((module) => ({
-    default: module.SetBuilderView,
-  })),
-);
 
 function App() {
   const catalog = useTimelineCatalog();
@@ -176,8 +165,7 @@ function App() {
         <div className="app-view-stack relative w-full h-full overflow-hidden">
           <TimelineView app={app} layout={layout} />
           <Suspense fallback={null}>
-            <AvailableSetsView />
-            <SetBuilderView />
+            <Outlet />
           </Suspense>
         </div>
       </section>
