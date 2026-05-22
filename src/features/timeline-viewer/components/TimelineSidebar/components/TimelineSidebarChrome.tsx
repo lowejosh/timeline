@@ -3,13 +3,14 @@ import * as rx from "./TimelineSidebarChrome.selectors";
 import { useTimelineSidebarEscape } from "../TimelineSidebar.hooks";
 import { Button } from "@/components/ui/button";
 import { ShortcutKey } from "@/components/ui/shortcut-key";
+import { Tooltip } from "@/components/ui/tooltip";
 import type { TimelineSidebarSetState } from "@/lib/app/sidebarModel";
 import type { TimelineLayerShortcutTarget } from "@/lib/app/timelineKeyboard";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import { TimelineSidebar } from "../TimelineSidebar";
 import { cn } from "@/lib/utils";
-import { Map } from "lucide-react";
+import { Map, Plus } from "lucide-react";
 
 type TimelineSidebarChromeProps = {
   isMapPreviewEnabled: boolean;
@@ -61,8 +62,7 @@ export function TimelineSidebarChrome({
           aria-label={isOpen ? "Hide layers controls" : "Show layers controls"}
           className={cn(
             "h-auto rounded-full px-3 py-2 text-xs",
-            isOpen &&
-              "bg-glass-selected border-border",
+            isOpen && "bg-glass-selected border-border",
           )}
           data-open={isOpen ? "true" : "false"}
           onClick={() => {
@@ -72,10 +72,53 @@ export function TimelineSidebarChrome({
           type="button"
           variant="glass"
         >
-          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden className="size-4 shrink-0">
-            <rect x="2" y="3.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', transform: isOpen ? 'translateY(4px) rotate(45deg)' : 'none', transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
-            <rect x="2" y="7.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', opacity: isOpen ? 0 : 1, transform: isOpen ? 'scaleX(0)' : 'none', transition: 'opacity 160ms ease, transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
-            <rect x="2" y="11.25" width="12" height="1.5" rx="0.75" style={{ transformBox: 'fill-box', transformOrigin: '50% 50%', transform: isOpen ? 'translateY(-4px) rotate(-45deg)' : 'none', transition: 'transform 220ms cubic-bezier(0.4,0,0.2,1)' }} />
+          <svg
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            aria-hidden
+            className="size-4 shrink-0"
+          >
+            <rect
+              x="2"
+              y="3.25"
+              width="12"
+              height="1.5"
+              rx="0.75"
+              style={{
+                transformBox: "fill-box",
+                transformOrigin: "50% 50%",
+                transform: isOpen ? "translateY(4px) rotate(45deg)" : "none",
+                transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
+              }}
+            />
+            <rect
+              x="2"
+              y="7.25"
+              width="12"
+              height="1.5"
+              rx="0.75"
+              style={{
+                transformBox: "fill-box",
+                transformOrigin: "50% 50%",
+                opacity: isOpen ? 0 : 1,
+                transform: isOpen ? "scaleX(0)" : "none",
+                transition:
+                  "opacity 160ms ease, transform 220ms cubic-bezier(0.4,0,0.2,1)",
+              }}
+            />
+            <rect
+              x="2"
+              y="11.25"
+              width="12"
+              height="1.5"
+              rx="0.75"
+              style={{
+                transformBox: "fill-box",
+                transformOrigin: "50% 50%",
+                transform: isOpen ? "translateY(-4px) rotate(-45deg)" : "none",
+                transition: "transform 220ms cubic-bezier(0.4,0,0.2,1)",
+              }}
+            />
           </svg>
           <span>Layers</span>
           {showShortcuts ? (
@@ -89,12 +132,13 @@ export function TimelineSidebarChrome({
           ) : null}
         </Button>
         <Button
-          aria-label={isMapPreviewEnabled ? "Hide map preview" : "Show map preview"}
+          aria-label={
+            isMapPreviewEnabled ? "Hide map preview" : "Show map preview"
+          }
           aria-pressed={isMapPreviewEnabled}
           className={cn(
             "h-auto rounded-full px-3 py-2 text-xs",
-            isMapPreviewEnabled &&
-              "bg-glass-selected border-border",
+            isMapPreviewEnabled && "bg-glass-selected border-border",
           )}
           onClick={onToggleMapPreview}
           size="pill"
@@ -112,6 +156,18 @@ export function TimelineSidebarChrome({
             </ShortcutKey>
           ) : null}
         </Button>
+        <Tooltip content="Create set" placement="bottom">
+          <Button
+            aria-label="Create set"
+            className="size-9 rounded-full p-0 text-primary"
+            onClick={actions.openCreateSet}
+            size="icon"
+            type="button"
+            variant="glass"
+          >
+            <Plus className="size-4 shrink-0" />
+          </Button>
+        </Tooltip>
       </div>
       <button
         aria-label="Close layers controls"

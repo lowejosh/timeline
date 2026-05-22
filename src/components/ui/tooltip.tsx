@@ -7,7 +7,7 @@ type TooltipProps = {
   children: React.ReactNode;
   className?: string;
   content: string;
-  placement?: "top" | "right";
+  placement?: "top" | "right" | "bottom";
   showOnFocus?: boolean;
 };
 
@@ -56,6 +56,20 @@ export function Tooltip({
       return;
     }
 
+    if (placement === "bottom") {
+      setPosition({
+        left: Math.max(
+          padding,
+          Math.min(anchor.x - width / 2, window.innerWidth - width - padding),
+        ),
+        top: Math.max(
+          padding,
+          Math.min(anchor.y, window.innerHeight - height - padding),
+        ),
+      });
+      return;
+    }
+
     setPosition({
       left: Math.max(
         padding,
@@ -75,6 +89,8 @@ export function Tooltip({
     setAnchor(
       placement === "right"
         ? { x: rect.right, y: rect.top + rect.height / 2 }
+        : placement === "bottom"
+          ? { x: rect.left + rect.width / 2, y: rect.bottom + 8 }
         : { x: rect.left + rect.width / 2, y: rect.top },
     );
   };
@@ -107,6 +123,8 @@ export function Tooltip({
                 placement === "top" &&
                   "pointer-events-none -translate-y-[calc(100%+0.5rem)] animate-popover-in",
                 placement === "right" &&
+                  "pointer-events-none animate-popover-in",
+                placement === "bottom" &&
                   "pointer-events-none animate-popover-in",
               )}
               ref={tooltipRef}

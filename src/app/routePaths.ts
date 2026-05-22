@@ -1,5 +1,10 @@
 import { useMemo } from "react";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  useCanGoBack,
+  useNavigate,
+  useRouter,
+  useRouterState,
+} from "@tanstack/react-router";
 
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 
@@ -35,10 +40,20 @@ export function useRouteView() {
 }
 
 export function useAppRouteNavigation() {
+  const canGoBack = useCanGoBack();
   const navigate = useNavigate();
+  const router = useRouter();
 
   return useMemo(
     () => ({
+      goBackOrOpenSets: () => {
+        if (canGoBack) {
+          router.history.back();
+          return;
+        }
+
+        void navigate({ to: APP_ROUTE_PATHS.sets });
+      },
       openCreateSet: () => {
         void navigate({ to: APP_ROUTE_PATHS.newSet });
       },
@@ -55,6 +70,6 @@ export function useAppRouteNavigation() {
         void navigate({ to: APP_ROUTE_PATHS.timeline });
       },
     }),
-    [navigate],
+    [canGoBack, navigate, router],
   );
 }

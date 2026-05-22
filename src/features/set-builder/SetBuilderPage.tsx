@@ -101,7 +101,7 @@ export function SetBuilderPage({ editingSetId }: SetBuilderPageProps) {
   }, [document, editingSetId, saveDraft]);
 
   const handleBack = () => {
-    routeNavigation.openSets();
+    routeNavigation.goBackOrOpenSets();
   };
 
   const handleSave = () => {
@@ -183,7 +183,7 @@ export function SetBuilderPage({ editingSetId }: SetBuilderPageProps) {
           <SetBuilderAiPromptButton document={document} />
         </>
       }
-      backLabel="Back to available sets"
+      backLabel="Back"
       onBack={handleBack}
       title={
         isEditing

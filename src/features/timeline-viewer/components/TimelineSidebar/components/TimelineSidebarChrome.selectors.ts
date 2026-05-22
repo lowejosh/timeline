@@ -30,6 +30,10 @@ export function useSidebarChromeActions(catalog: TimelineCatalogSnapshot) {
     setIsSidebarOpen(false);
     routeNavigation.openSets();
   }, [routeNavigation, setIsSidebarOpen]);
+  const openCreateSet = useCallback(() => {
+    setIsSidebarOpen(false);
+    routeNavigation.openCreateSet();
+  }, [routeNavigation, setIsSidebarOpen]);
   const reorderSets = useCallback(
     (nextSetIds: Parameters<typeof reorderSetsAction>[0]) => {
       reorderSetsAction(nextSetIds, catalog);
@@ -40,6 +44,7 @@ export function useSidebarChromeActions(catalog: TimelineCatalogSnapshot) {
   return useMemo(
     () => ({
       closeSidebar,
+      openCreateSet,
       openSetManager,
       reorderSets,
       setIsSidebarOpen,
@@ -48,6 +53,7 @@ export function useSidebarChromeActions(catalog: TimelineCatalogSnapshot) {
     }),
     [
       closeSidebar,
+      openCreateSet,
       openSetManager,
       reorderSets,
       setIsSidebarOpen,
