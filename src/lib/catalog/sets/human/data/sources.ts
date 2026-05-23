@@ -225,6 +225,13 @@ export const HUMAN_SOURCES = {
     citation: 'Encyclopaedia Britannica, "Middle East."',
     url: "https://www.britannica.com/place/Middle-East",
   },
+  britannicaMiddleAges: {
+    shortTitle: "Britannica: Middle Ages",
+    title: "Middle Ages",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Middle Ages."',
+    url: "https://www.britannica.com/event/Middle-Ages",
+  },
   britannicaOlympicGames: {
     shortTitle: "Britannica: Olympic Games",
     title: "Olympic Games",
@@ -245,6 +252,13 @@ export const HUMAN_SOURCES = {
     organization: "Encyclopaedia Britannica",
     citation: 'Encyclopaedia Britannica, "Revolutions of 1848."',
     url: "https://www.britannica.com/event/Revolutions-of-1848",
+  },
+  britannicaRenaissance: {
+    shortTitle: "Britannica: Renaissance",
+    title: "Renaissance",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Renaissance."',
+    url: "https://www.britannica.com/event/Renaissance",
   },
   britannicaRisorgimento: {
     shortTitle: "Britannica: Risorgimento",
@@ -346,6 +360,14 @@ export const HUMAN_SOURCES = {
     organization: "CERN",
     citation: 'CERN, "A short history of the Web."',
     url: "https://home.cern/science/computing/birth-web/short-history-web",
+  },
+  cambridgeWorldHistory5001500: {
+    shortTitle: "Cambridge: World History 500-1500",
+    title: "The Cambridge World History, Volume 5",
+    organization: "Cambridge University Press",
+    citation:
+      'Cambridge University Press, "The Cambridge World History, Volume 5."',
+    url: "https://www.cambridge.org/core/books/cambridge-world-history/581AF09C16985462BAF55767BDFEA178",
   },
   chogaMamiWikipedia: {
     shortTitle: "Wikipedia: Choga Mami",
@@ -588,6 +610,13 @@ export const HUMAN_SOURCES = {
       'Wikipedia contributors, "Late Period of ancient Egypt." In Wikipedia, The Free Encyclopedia.',
     url: "https://en.wikipedia.org/wiki/Late_Period_of_ancient_Egypt",
   },
+  locLateAntiquity: {
+    shortTitle: "LoC: Late Antiquity",
+    title: "Late Antiquity: A Resource Guide",
+    organization: "Library of Congress",
+    citation: 'Library of Congress, "Late Antiquity: A Resource Guide."',
+    url: "https://guides.loc.gov/late-antiquity",
+  },
   historyMoonLanding: {
     shortTitle: "History: 1969 Moon Landing",
     title: "1969 Moon Landing",
@@ -780,6 +809,14 @@ export const HUMAN_SOURCES = {
     organization: "Khan Academy",
     citation: 'Khan Academy, "Paleolithic technology, culture, and art."',
     url: "https://www.khanacademy.org/humanities/world-history/world-history-beginnings/origin-humans-early-societies/a/paleolithic-culture-and-technology",
+  },
+  khanPostClassicalRegionalInteractions: {
+    shortTitle: "Khan: 600-1450 interactions",
+    title: "600 - 1450 Regional and interregional interactions",
+    organization: "Khan Academy",
+    citation:
+      'Khan Academy, "600 - 1450 Regional and interregional interactions."',
+    url: "https://www.khanacademy.org/humanities/world-history/ancient-medieval/medieval",
   },
   khanRomanEmpire: {
     shortTitle: "Khan: Roman Empire",

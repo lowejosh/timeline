@@ -33,7 +33,7 @@ export function useEraChildAnimation(
     const animationStates = animationRef.current;
     const activeIds = new Set<string>();
     const now = performance.now();
-    const isZoomingIn = viewport.zoom > lastZoomRef.current;
+    const isZoomingOut = viewport.zoom < lastZoomRef.current;
 
     const visit = (eras: Era[]) => {
       for (const era of eras) {
@@ -47,7 +47,7 @@ export function useEraChildAnimation(
             pad,
             isAnimating,
             animationStates.get(era.id)?.target ?? 0,
-            isZoomingIn,
+            isZoomingOut,
           );
           const fadingOut =
             nextTarget < (animationStates.get(era.id)?.target ?? 0);

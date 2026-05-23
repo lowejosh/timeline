@@ -81,7 +81,7 @@ export function getEraChildOpacityTarget(
   pad: number,
   isAnimating: boolean,
   currentTarget = 0,
-  isZoomingIn = false,
+  isZoomingOut = false,
 ) {
   if ((era.children?.length ?? 0) === 0) return 0;
 
@@ -97,15 +97,15 @@ export function getEraChildOpacityTarget(
     ? ACTIVE_LAYER_TRIGGER_OUT
     : PREVIEW_LAYER_TRIGGER_OUT;
 
-  // only limit our fade in if we're zooming in to stop jumping content around
-  if (isZoomingIn) {
-    if (currentTarget >= 0.5) {
-      return fillRatio >= triggerOut ? 1 : 0;
-    }
-    return fillRatio >= triggerIn ? 1 : 0;
-  } else {
+  if (isZoomingOut) {
     return currentTarget >= 0.5 && fillRatio >= triggerOut ? 1 : 0;
   }
+
+  if (currentTarget >= 0.5) {
+    return fillRatio >= triggerOut ? 1 : 0;
+  }
+
+  return fillRatio >= triggerIn ? 1 : 0;
 }
 
 export function resolveTimelineEraLayersFromOpacityMap(

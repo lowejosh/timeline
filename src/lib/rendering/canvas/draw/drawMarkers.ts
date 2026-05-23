@@ -162,16 +162,17 @@ export function drawMarkers(
   for (const state of resolvedMarkerStates) {
     const markerHoverHalfWidth =
       state.labelOpacity > 0.01
-        ? Math.max(14, Math.min(state.width * 0.22, 26))
-        : 12;
+        ? Math.max(10, Math.min(state.width * 0.18, 18))
+        : 8;
+    const markerHoverTop = axisY - 8;
     const markerHoverBottom =
-      state.labelOpacity > 0.01 ? layout.markerDateY + 20 : axisY + 18;
+      state.labelOpacity > 0.01 ? layout.markerDateY + 12 : axisY + 12;
 
     hoverRegions.push({
       id: state.marker.id,
       left: state.x - markerHoverHalfWidth,
       right: state.x + markerHoverHalfWidth,
-      top: layout.majorTickTop - 10,
+      top: markerHoverTop,
       bottom: markerHoverBottom,
       anchorX: state.x,
       anchorY: axisY - 14,

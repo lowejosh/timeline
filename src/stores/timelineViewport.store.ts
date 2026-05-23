@@ -290,10 +290,17 @@ export const useTimelineViewportStore = create<TimelineViewportStore>(
           return;
         }
 
+        const isAtHomeViewport = areViewportsEqual(
+          current.viewport,
+          getHomeViewport(current.width, current.viewport.scaleMode),
+        );
+
         clearTransientMotion();
         set({
           isAnimating: false,
-          viewport: normalizeForWidth(current.viewport, safeWidth),
+          viewport: isAtHomeViewport
+            ? getHomeViewport(safeWidth, current.viewport.scaleMode)
+            : normalizeForWidth(current.viewport, safeWidth),
           width: safeWidth,
         });
       },
