@@ -155,5 +155,18 @@ export const HUMAN_SET = normalizeTimelineSetSource({
   overlayLaneBias: {
     "chinese-civilization": -250,
     "homo-sapiens": -7_000_000,
+    mesopotamia: -180,
+    "uruk-period": -180,
+    "jemdet-nasr-period": -180,
+    "sumerian-city-states": -180,
+    "akkadian-empire": -180,
+    "ur-iii-empire": -180,
+    "isin-larsa-period": -180,
+    "old-assyrian-period": -180,
+    "old-babylonian-empire": -180,
+    "kassite-babylonia": -180,
+    "middle-assyrian-empire": -180,
+    "neo-assyrian-empire": -180,
+    "neo-babylonian-empire": -180,
   },
 });

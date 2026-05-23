@@ -146,6 +146,7 @@ type TimelineDecorationBase = TimelineZoomVisibility &
     groupId?: string;
     setId?: TimelineSetId;
     subGroup?: string;
+    laneAffinityGroupId?: string;
     image?: TimelineTooltipImage;
     sourceIds?: string[];
   };

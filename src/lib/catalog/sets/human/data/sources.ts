@@ -97,6 +97,23 @@ export const HUMAN_SOURCES = {
     citation: 'Encyclopaedia Britannica, "Bronze Age."',
     url: "https://www.britannica.com/topic/Bronze-Age",
   },
+  natureFourPointTwoKaEvent: {
+    shortTitle: "Nature: 4.2 ka debate",
+    title: "Did a mega drought topple empires 4,200 years ago?",
+    organization: "Nature",
+    citation:
+      'Voosen, Paul. "Did a mega drought topple empires 4,200 years ago?" Nature.',
+    url: "https://www.nature.com/articles/d41586-022-00157-9",
+  },
+  journalArchaeologicalScienceAkkadianCollapse: {
+    shortTitle: "JAS: Akkadian collapse",
+    title:
+      "Impacts of long term climate change during the collapse of the Akkadian Empire",
+    organization: "Journal of Archaeological Science",
+    citation:
+      'Cookson, E., Hill, D. J., and Lawrence, D. "Impacts of long term climate change during the collapse of the Akkadian Empire." Journal of Archaeological Science.',
+    url: "https://www.sciencedirect.com/science/article/pii/S0305440318306198",
+  },
   britannicaCarthage: {
     shortTitle: "Britannica: Carthage",
     title: "Carthage",
@@ -124,6 +141,21 @@ export const HUMAN_SOURCES = {
     organization: "Encyclopaedia Britannica",
     citation: 'Encyclopaedia Britannica, "Encyclopédie."',
     url: "https://www.britannica.com/topic/Encyclopedie",
+  },
+  britannicaElam: {
+    shortTitle: "Britannica: Elam",
+    title: "Elam",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Elam."',
+    url: "https://www.britannica.com/place/Elam",
+  },
+  worldHistoryElam: {
+    shortTitle: "WHE: Elam",
+    title: "Elam: The Ancient High Country",
+    organization: "World History Encyclopedia",
+    citation:
+      'Mark, Joshua J. "Elam: The Ancient High Country." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/elam/",
   },
   britannicaGermanEmpire: {
     shortTitle: "Britannica: German Empire",
@@ -182,6 +214,41 @@ export const HUMAN_SOURCES = {
     organization: "Encyclopaedia Britannica",
     citation: 'Encyclopaedia Britannica, "Indus civilization."',
     url: "https://www.britannica.com/topic/Indus-civilization",
+  },
+  britannicaEbla: {
+    shortTitle: "Britannica: Ebla",
+    title: "Ebla",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Ebla."',
+    url: "https://www.britannica.com/place/Ebla",
+  },
+  britannicaKnossos: {
+    shortTitle: "Britannica: Knossos",
+    title: "Knossos",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Knossos."',
+    url: "https://www.britannica.com/place/Knossos",
+  },
+  britannicaSinaiticInscriptions: {
+    shortTitle: "Britannica: Sinaitic inscriptions",
+    title: "Sinaitic inscriptions",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Sinaitic inscriptions."',
+    url: "https://www.britannica.com/topic/Sinaitic-inscriptions",
+  },
+  britannicaMentuhotepII: {
+    shortTitle: "Britannica: Mentuhotep II",
+    title: "Mentuhotep II",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Mentuhotep II."',
+    url: "https://www.britannica.com/biography/Mentuhotep-II",
+  },
+  britannicaUgariticAlphabet: {
+    shortTitle: "Britannica: Ugaritic alphabet",
+    title: "Ugaritic alphabet",
+    organization: "Encyclopaedia Britannica",
+    citation: 'Encyclopaedia Britannica, "Ugaritic alphabet."',
+    url: "https://www.britannica.com/topic/Ugaritic-alphabet",
   },
   britannicaIranianRevolution: {
     shortTitle: "Britannica: Iranian Revolution",
@@ -966,6 +1033,22 @@ export const HUMAN_SOURCES = {
       'Knott, Elizabeth. "The Middle Babylonian / Kassite Period (ca. 1595–1155 B.C.) in Mesopotamia." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
     url: "https://www.metmuseum.org/essays/the-middle-babylonian-kassite-period-ca-1595-1155-b-c-in-mesopotamia",
   },
+  metOldAssyrianPeriod: {
+    shortTitle: "Met: Old Assyrian period",
+    title: "The Old Assyrian Period (ca. 2000–1600 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "The Old Assyrian Period (ca. 2000–1600 B.C.)." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/essays/the-old-assyrian-period",
+  },
+  metPhoenicians: {
+    shortTitle: "Met: Phoenicians",
+    title: "The Phoenicians (1500–300 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Department of Ancient Near Eastern Art. "The Phoenicians (1500–300 B.C.)." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
+    url: "https://www.metmuseum.org/essays/the-phoenicians-1500-300-b-c",
+  },
   metPrehistoricArt: {
     shortTitle: "Met: Prehistoric Art",
     title: "Introduction to Prehistoric Art, 20,000–8000 B.C.",
@@ -1544,6 +1627,13 @@ export const HUMAN_SOURCES = {
     citation: 'UNESCO World Heritage Centre, "Neolithic Site of Çatalhöyük."',
     url: "https://whc.unesco.org/en/list/1405/",
   },
+  unescoCaralSupe: {
+    shortTitle: "UNESCO: Caral-Supe",
+    title: "Sacred City of Caral-Supe",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Sacred City of Caral-Supe."',
+    url: "https://whc.unesco.org/en/list/1269/",
+  },
   unescoChauvet: {
     shortTitle: "UNESCO: Chauvet",
     title:
@@ -1559,6 +1649,28 @@ export const HUMAN_SOURCES = {
     organization: "UNESCO World Heritage Centre",
     citation: 'UNESCO World Heritage Centre, "Göbekli Tepe."',
     url: "https://whc.unesco.org/en/list/1572/",
+  },
+  unescoDholavira: {
+    shortTitle: "UNESCO: Dholavira",
+    title: "Dholavira: a Harappan City",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Dholavira: a Harappan City."',
+    url: "https://whc.unesco.org/en/list/1645/",
+  },
+  unescoDilmunBurialMounds: {
+    shortTitle: "UNESCO: Dilmun",
+    title: "Dilmun Burial Mounds",
+    organization: "UNESCO World Heritage Centre",
+    citation: 'UNESCO World Heritage Centre, "Dilmun Burial Mounds."',
+    url: "https://whc.unesco.org/en/list/1542/",
+  },
+  unescoMoenjodaro: {
+    shortTitle: "UNESCO: Moenjodaro",
+    title: "Archaeological Ruins at Moenjodaro",
+    organization: "UNESCO World Heritage Centre",
+    citation:
+      'UNESCO World Heritage Centre, "Archaeological Ruins at Moenjodaro."',
+    url: "https://whc.unesco.org/en/list/138/",
   },
   unescoMycenaeTiryns: {
     shortTitle: "UNESCO: Mycenae",
@@ -1615,6 +1727,21 @@ export const HUMAN_SOURCES = {
       'Mark, Joshua J. "Late Period of Ancient Egypt." World History Encyclopedia.',
     url: "https://www.worldhistory.org/Late_Period_of_Ancient_Egypt/",
   },
+  worldHistoryMari: {
+    shortTitle: "WHE: Mari",
+    title: "Mari",
+    organization: "World History Encyclopedia",
+    citation: 'Mark, Joshua J. "Mari." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/mari/",
+  },
+  worldHistoryMiddleKingdomEgypt: {
+    shortTitle: "WHE: Middle Kingdom",
+    title: "Middle Kingdom of Egypt",
+    organization: "World History Encyclopedia",
+    citation:
+      'Mark, Joshua J. "Middle Kingdom of Egypt." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Middle_Kingdom_of_Egypt/",
+  },
   worldHistoryNewKingdomEgypt: {
     shortTitle: "WHE: New Kingdom of Egypt",
     title: "New Kingdom of Egypt",
@@ -1622,6 +1749,43 @@ export const HUMAN_SOURCES = {
     citation:
       'Mark, Joshua J. "New Kingdom of Egypt." World History Encyclopedia.',
     url: "https://www.worldhistory.org/New_Kingdom_of_Egypt/",
+  },
+  worldHistoryOxus: {
+    shortTitle: "WHE: Oxus",
+    title: "Oxus",
+    organization: "World History Encyclopedia",
+    citation: 'Mark, Joshua J. "Oxus." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Oxus/",
+  },
+  worldHistoryPunt: {
+    shortTitle: "WHE: Punt",
+    title: "Punt",
+    organization: "World History Encyclopedia",
+    citation: 'Mark, Joshua J. "Punt." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/punt/",
+  },
+  worldHistoryUgarit: {
+    shortTitle: "WHE: Ugarit",
+    title: "Ugarit",
+    organization: "World History Encyclopedia",
+    citation: 'Cartwright, Mark. "Ugarit." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/ugarit/",
+  },
+  worldHistoryAmarnaLetters: {
+    shortTitle: "WHE: Amarna Letters",
+    title: "Amarna Letters",
+    organization: "World History Encyclopedia",
+    citation:
+      'Joshua J. Mark, "Amarna Letters." World History Encyclopedia.',
+    url: "https://www.worldhistory.org/Amarna_Letters/",
+  },
+  inaUluburunShipwreck: {
+    shortTitle: "INA: Uluburun shipwreck",
+    title: "Uluburun Late Bronze Age Shipwreck Excavation",
+    organization: "Institute of Nautical Archaeology",
+    citation:
+      'Institute of Nautical Archaeology, "Uluburun Late Bronze Age Shipwreck Excavation."',
+    url: "https://nauticalarch.org/projects/uluburun-late-bronze-age-shipwreck-excavation/",
   },
   britannicaCanaan: {
     shortTitle: "Britannica: Canaan",

@@ -1,6 +1,7 @@
 import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
 import { getEffectiveTimelinePriority } from "@/lib/catalog/timelineSets";
 import { getOverlayLaneStartBiasYears } from "@/lib/catalog/overlayLaneBias";
+import { assignBandsToLanesWithAffinity } from "./laneAffinity";
 
 export type AssignedTimelineOverlayBand = {
   band: TimelineOverlayBand;
@@ -35,28 +36,10 @@ function compareOverlayBandsForLaneAssignment(
 }
 
 function assignOverlayLanes(overlays: TimelineOverlayBand[]): CachedAssignment {
-  const laneEndYears: number[] = [];
-  const assigned = [...overlays]
-    .sort(compareOverlayBandsForLaneAssignment)
-    .map<AssignedTimelineOverlayBand>((band) => {
-      let laneIndex = laneEndYears.findIndex(
-        (laneEndYear) => band.startYear >= laneEndYear,
-      );
-
-      if (laneIndex === -1) {
-        laneIndex = laneEndYears.length;
-        laneEndYears.push(band.endYear);
-      } else {
-        laneEndYears[laneIndex] = band.endYear;
-      }
-
-      return { band, laneIndex };
-    });
-
-  return {
-    assigned,
-    laneCount: Math.max(laneEndYears.length, 1),
-  };
+  return assignBandsToLanesWithAffinity(
+    overlays,
+    compareOverlayBandsForLaneAssignment,
+  );
 }
 
 export function getAssignedOverlayLanes(

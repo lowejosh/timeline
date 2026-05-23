@@ -97,6 +97,7 @@ type TimelineRawDecorationBase = {
   priority?: number;
   groupId?: string;
   subGroup?: string;
+  laneAffinityGroupId?: string;
   image?: TimelineTooltipImage;
   sourceIds?: string[];
   minZoom?: number;
@@ -513,6 +514,13 @@ function normalizeOverlay(
     );
   }
 
+  if (overlay.laneAffinityGroupId !== undefined) {
+    assertNonEmptyString(
+      overlay.laneAffinityGroupId,
+      `Overlay ${overlay.id} laneAffinityGroupId`,
+    );
+  }
+
   validateSourceIds(
     overlay.sourceIds,
     availableSourceIds,
@@ -528,6 +536,7 @@ function normalizeOverlay(
     groupId,
     setId,
     subGroup: overlay.subGroup,
+    laneAffinityGroupId: overlay.laneAffinityGroupId,
     image: overlay.image,
     sourceIds: overlay.sourceIds,
     minZoom: overlay.minZoom,

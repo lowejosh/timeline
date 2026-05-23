@@ -9,6 +9,7 @@ import {
   type TimelineViewport,
   worldToScreen,
 } from "@/lib/core/viewport";
+import { assignBandsToLanesWithAffinity } from "../layout/laneAffinity";
 import type { ResolvedTimelineOverlayBand } from "../overlayTracks";
 import {
   AXIS_DATE_LABEL_HEIGHT,
@@ -257,29 +258,7 @@ export function assignNestedOverlayLanes(
     return cached;
   }
 
-  const laneEndYears: number[] = [];
-  const assigned = [...overlays].sort(compareOverlayBands).map((band) => {
-    let laneIndex = laneEndYears.findIndex(
-      (laneEndYear) => band.startYear >= laneEndYear,
-    );
-
-    if (laneIndex === -1) {
-      laneIndex = laneEndYears.length;
-      laneEndYears.push(band.endYear);
-    } else {
-      laneEndYears[laneIndex] = band.endYear;
-    }
-
-    return {
-      band,
-      laneIndex,
-    };
-  });
-
-  const computed = {
-    assigned,
-    laneCount: Math.max(laneEndYears.length, 1),
-  };
+  const computed = assignBandsToLanesWithAffinity(overlays, compareOverlayBands);
 
   nestedOverlayLaneAssignmentCache.set(overlays, computed);
   return computed;

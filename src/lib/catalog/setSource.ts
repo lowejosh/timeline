@@ -189,6 +189,7 @@ function toDocumentOverlay(
     priority: overlay.priority,
     groupId,
     subGroup: overlay.subGroup,
+    laneAffinityGroupId: overlay.laneAffinityGroupId,
     image: overlay.image,
     sourceIds: overlay.sourceIds,
     minZoom: overlay.minZoom,

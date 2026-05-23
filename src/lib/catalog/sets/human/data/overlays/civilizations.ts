@@ -4,10 +4,24 @@ import { commonsTooltipImage } from "@/lib/catalog/tooltipImages";
 
 const POST_CLASSICAL_MIN_ZOOM = 15;
 
+const LANE_AFFINITY = {
+  assyria: "assyria-sequence",
+  babylonia: "babylonia-sequence",
+  caliphates: "caliphate-sequence",
+  canaanPhoenicia: "canaan-phoenicia-sequence",
+  china: "china-dynastic-sequence",
+  elam: "elam-sequence",
+  egypt: "egyptian-dynastic-sequence",
+  maya: "maya-sequence",
+  phoenicia: "phoenicia-sequence",
+  rome: "rome-sequence",
+  southernMesopotamia: "southern-mesopotamian-sequence",
+} as const;
+
 const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
   {
     id: "uruk-period",
-    label: "Uruk period",
+    label: "Uruk Period",
     shortLabel: "Uruk",
     description:
       "Southern Mesopotamian phase in which Uruk culture saw the appearance of cities and the state, with proto-cuneiform emerging late in the period.",
@@ -17,7 +31,9 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     approximateEnd: true,
     color: "rgb(214, 166, 112)",
+    priority: 95,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.southernMesopotamia,
     sourceIds: ["urukPeriodWikipedia", "metUrukFirstCity"],
   },
   {
@@ -30,37 +46,43 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     endYear: bce(2_900),
     regionalScopeLabel: "Southern Mesopotamia",
     color: "rgb(208, 160, 108)",
+    priority: 90,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.southernMesopotamia,
     sourceIds: ["jemdetNasrPeriodWikipedia"],
   },
   {
     id: "sumerian-city-states",
-    label: "Early Dynastic Sumer",
-    shortLabel: "Early Dynastic",
+    label: "Sumerian City-States",
+    shortLabel: "Sumer",
     description:
-      "Southern Mesopotamian period when city-states dominated Mesopotamia and city rulers grew in importance.",
+      "Early Dynastic southern Mesopotamia, when rival Sumerian cities such as Uruk, Ur, Lagash, and Kish anchored a competitive urban world.",
     startYear: bce(2_900),
     endYear: bce(2_350),
     regionalScopeLabel: "Southern Mesopotamia",
     approximateStart: true,
     approximateEnd: true,
     color: "rgb(202, 156, 105)",
+    priority: 96,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.southernMesopotamia,
     sourceIds: ["metEarlyDynasticSculpture"],
   },
   {
     id: "akkadian-empire",
-    label: "Akkadian period",
+    label: "Akkadian Empire",
     shortLabel: "Akkad",
     description:
-      "Period named for Akkad, whose Semitic monarchs united the rival Sumerian cities by conquest.",
+      "Sargonic empire that united many rival Sumerian cities under Akkadian rule and made Mesopotamian kingship newly imperial in scale.",
     startYear: bce(2_350),
     endYear: bce(2_150),
     regionalScopeLabel: "Mesopotamia",
     approximateStart: true,
     approximateEnd: true,
     color: "rgb(190, 120, 92)",
+    priority: 96,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.southernMesopotamia,
     image: {
       src: commonsTooltipImage("Victory stele of Naram Sin 9071.jpg"),
       alt: "Victory Stele of Naram-Sin from the Akkadian period",
@@ -72,7 +94,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
   },
   {
     id: "ur-iii-empire",
-    label: "Ur III state",
+    label: "Ur III State",
     shortLabel: "Ur III",
     description:
       "State founded by Ur-Nammu, who brought southern Mesopotamian cities under the control of Ur and sponsored major temple building.",
@@ -82,12 +104,14 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     approximateEnd: true,
     color: "rgb(182, 144, 101)",
+    priority: 94,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.southernMesopotamia,
     sourceIds: ["metUrZiggurat", "metIsinLarsaOldBabylonian"],
   },
   {
     id: "isin-larsa-period",
-    label: "Isin-Larsa period",
+    label: "Isin-Larsa Cities",
     shortLabel: "Isin-Larsa",
     description:
       "Fragmented era following Ur III's collapse, when rival city-states, chiefly Isin and Larsa, competed for supremacy over southern Mesopotamia before Hammurabi's Babylon absorbed them.",
@@ -97,7 +121,9 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     approximateEnd: true,
     color: "rgb(176, 138, 96)",
+    priority: 90,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.southernMesopotamia,
     image: {
       src: commonsTooltipImage("Mésopotamie_Isin-Larsa.svg"),
       alt: "Map of the Isin-Larsa period city-states in southern Mesopotamia",
@@ -109,17 +135,19 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
   },
   {
     id: "old-assyrian-period",
-    label: "Old Assyrian period",
-    shortLabel: "Old Assyria",
+    label: "Old Assyrian Period",
+    shortLabel: "Old Assyrian",
     description:
-      "Assyrian city-state centered on Ashur that built extensive trading colonies reaching into Anatolia, running merchant caravans to Karum Kanesh while the great polities of the south rose and fell around it.",
-    startYear: bce(2_025),
-    endYear: bce(1_365),
+      "Merchant network centered on Ashur, whose caravans and family firms linked northern Mesopotamia with Anatolian trade colonies such as Kanesh.",
+    startYear: bce(2_000),
+    endYear: bce(1_600),
     regionalScopeLabel: "Northern Mesopotamia",
     approximateStart: true,
     approximateEnd: true,
     color: "rgb(162, 138, 160)",
+    priority: 90,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.assyria,
     image: {
       src: commonsTooltipImage("Ancient_Near_East_2000BC.svg"),
       alt: "Map of the ancient Near East c. 2000 BCE, showing Assyria and surrounding states",
@@ -127,20 +155,22 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
       height: 575,
       credit: "Wikimedia Commons",
     },
-    sourceIds: ["oldAssyrianEmpireWikipedia"],
+    sourceIds: ["metOldAssyrianPeriod"],
   },
   {
     id: "old-babylonian-empire",
-    label: "Old Babylonian period",
+    label: "Old Babylonian Kingdom",
     shortLabel: "Old Babylonian",
     description:
-      "Period when Hammurabi and his successors turned Babylon from a minor city into the political capital of Mesopotamia.",
+      "Amorite dynasty that turned Babylon from a rising city into the political center of southern Mesopotamia, especially under Hammurabi.",
     startYear: bce(1_894),
     endYear: bce(1_595),
     regionalScopeLabel: "Babylonia",
     approximateStart: true,
     color: "rgb(168, 132, 88)",
+    priority: 94,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.babylonia,
     image: {
       src: commonsTooltipImage(
         "F0182 Louvre Code Hammourabi Bas-relief Sb8 rwk.jpg",
@@ -154,7 +184,7 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
   },
   {
     id: "kassite-babylonia",
-    label: "Middle Babylonian / Kassite",
+    label: "Kassite Babylonia",
     shortLabel: "Kassites",
     description:
       "Long-lived Kassite rule in southern Mesopotamia, so enduring that it became virtually synonymous with the Middle Babylonian period.",
@@ -164,13 +194,15 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     approximateEnd: true,
     color: "rgb(154, 126, 96)",
+    priority: 92,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.babylonia,
     sourceIds: ["metMiddleBabylonianKassite"],
   },
   {
     id: "middle-assyrian-empire",
-    label: "Middle Assyrian period",
-    shortLabel: "Mid Assyria",
+    label: "Middle Assyrian State",
+    shortLabel: "Middle Assyria",
     description:
       "Assyrian revival from Ashur-uballit I through Tiglath-pileser I, conquering Mitanni and projecting power from the Euphrates to the Mediterranean.",
     startYear: bce(1_365),
@@ -178,9 +210,14 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Northern Mesopotamia",
     approximateStart: true,
     color: "rgb(141, 118, 138)",
+    priority: 93,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.assyria,
     sourceIds: ["metAssyria"],
   },
+];
+
+const NEO_MESOPOTAMIAN_OVERLAYS: TimelineOverlayBand[] = [
   {
     id: "neo-assyrian-empire",
     label: "Neo-Assyrian Empire",
@@ -191,7 +228,9 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     endYear: bce(612),
     regionalScopeLabel: "Northern Mesopotamia",
     color: "rgb(129, 106, 154)",
+    priority: 96,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.assyria,
     image: {
       src: commonsTooltipImage("Map of the Assyrian Empire.svg"),
       alt: "Map of the Neo-Assyrian Empire at its greatest extent",
@@ -211,7 +250,9 @@ const MESOPOTAMIA_SUB_BANDS: TimelineOverlayBand[] = [
     endYear: bce(539),
     regionalScopeLabel: "Babylonia",
     color: "rgb(153, 114, 172)",
+    priority: 94,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.babylonia,
     image: {
       src: commonsTooltipImage("Neo-Babylonian Empire (greatest extent).svg"),
       alt: "Map of the Neo-Babylonian Empire at its greatest extent",
@@ -236,6 +277,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     color: "rgb(146, 118, 88)",
     subGroup: "east-asia",
+    laneAffinityGroupId: LANE_AFFINITY.china,
     sourceIds: ["shangDynastyWikipedia"],
   },
   {
@@ -250,6 +292,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     color: "rgb(124, 136, 91)",
     subGroup: "east-asia",
+    laneAffinityGroupId: LANE_AFFINITY.china,
     sourceIds: ["zhouDynastyWikipedia"],
   },
   {
@@ -263,6 +306,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "China",
     color: "rgb(93, 126, 112)",
     subGroup: "east-asia",
+    laneAffinityGroupId: LANE_AFFINITY.china,
     image: {
       src: commonsTooltipImage("Terracotta Army Pit 1 - 11.jpg"),
       alt: "Terracotta warriors from the mausoleum of Qin Shi Huang",
@@ -284,6 +328,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     color: "rgb(72, 132, 108)",
     priority: 80,
     subGroup: "east-asia",
+    laneAffinityGroupId: LANE_AFFINITY.china,
     sourceIds: ["britannicaHanDynasty"],
   },
   {
@@ -299,6 +344,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
     subGroup: "east-asia",
+    laneAffinityGroupId: LANE_AFFINITY.china,
     image: {
       src: commonsTooltipImage("Establishment of the Tang Dynasty.svg"),
       alt: "Map of China during the transition from Sui to Tang rule",
@@ -321,6 +367,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 74,
     subGroup: "east-asia",
+    laneAffinityGroupId: LANE_AFFINITY.china,
     image: {
       src: commonsTooltipImage("Map of the Song Dynasty.png"),
       alt: "Map of the Song Dynasty in China",
@@ -343,6 +390,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 73,
     subGroup: "east-asia",
+    laneAffinityGroupId: LANE_AFFINITY.china,
     sourceIds: ["yuanDynastyWikipedia"],
   },
   {
@@ -358,6 +406,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 72,
     subGroup: "east-asia",
+    laneAffinityGroupId: LANE_AFFINITY.china,
     sourceIds: ["historyMingDynasty"],
   },
   {
@@ -373,6 +422,7 @@ const CHINESE_CIVILIZATION_SUB_BANDS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 71,
     subGroup: "east-asia",
+    laneAffinityGroupId: LANE_AFFINITY.china,
     sourceIds: ["qingDynastyWikipedia"],
   },
 ];
@@ -389,6 +439,7 @@ const MAYA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Mesoamerica",
     color: "rgb(172, 136, 100)",
     subGroup: "mesoamerica",
+    laneAffinityGroupId: LANE_AFFINITY.maya,
     sourceIds: ["preclassicMayaWikipedia"],
   },
   {
@@ -402,6 +453,7 @@ const MAYA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Mesoamerica",
     color: "rgb(137, 109, 88)",
     subGroup: "mesoamerica",
+    laneAffinityGroupId: LANE_AFFINITY.maya,
     sourceIds: ["historyOfMayaCivilizationWikipedia"],
   },
   {
@@ -415,6 +467,7 @@ const MAYA_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Mesoamerica",
     color: "rgb(118, 94, 78)",
     subGroup: "mesoamerica",
+    laneAffinityGroupId: LANE_AFFINITY.maya,
     sourceIds: ["historyOfMayaCivilizationWikipedia"],
   },
 ];
@@ -433,6 +486,7 @@ const EGYPT_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(186, 166, 106)",
     subGroup: "nile-valley",
+    laneAffinityGroupId: LANE_AFFINITY.egypt,
     sourceIds: ["earlyDynasticPeriodEgyptWikipedia"],
   },
   {
@@ -448,6 +502,7 @@ const EGYPT_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(177, 155, 99)",
     subGroup: "nile-valley",
+    laneAffinityGroupId: LANE_AFFINITY.egypt,
     sourceIds: ["oldKingdomEgyptWikipedia"],
   },
   {
@@ -463,6 +518,7 @@ const EGYPT_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(166, 143, 96)",
     subGroup: "nile-valley",
+    laneAffinityGroupId: LANE_AFFINITY.egypt,
     sourceIds: ["firstIntermediatePeriodEgyptWikipedia"],
   },
   {
@@ -478,6 +534,7 @@ const EGYPT_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(156, 132, 92)",
     subGroup: "nile-valley",
+    laneAffinityGroupId: LANE_AFFINITY.egypt,
     sourceIds: ["middleKingdomEgyptWikipedia"],
   },
   {
@@ -493,6 +550,7 @@ const EGYPT_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(147, 124, 88)",
     subGroup: "nile-valley",
+    laneAffinityGroupId: LANE_AFFINITY.egypt,
     sourceIds: ["worldHistorySecondIntermediatePeriodEgypt"],
   },
   {
@@ -508,6 +566,7 @@ const EGYPT_SUB_BANDS: TimelineOverlayBand[] = [
     approximateEnd: true,
     color: "rgb(138, 114, 84)",
     subGroup: "nile-valley",
+    laneAffinityGroupId: LANE_AFFINITY.egypt,
     sourceIds: ["worldHistoryNewKingdomEgypt"],
   },
   {
@@ -521,6 +580,7 @@ const EGYPT_SUB_BANDS: TimelineOverlayBand[] = [
     approximateStart: true,
     color: "rgb(130, 106, 82)",
     subGroup: "nile-valley",
+    laneAffinityGroupId: LANE_AFFINITY.egypt,
     sourceIds: ["worldHistoryThirdIntermediatePeriodEgypt"],
   },
   {
@@ -534,6 +594,7 @@ const EGYPT_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Nile Valley",
     color: "rgb(122, 99, 79)",
     subGroup: "nile-valley",
+    laneAffinityGroupId: LANE_AFFINITY.egypt,
     sourceIds: ["worldHistoryLatePeriodAncientEgypt"],
   },
   {
@@ -547,24 +608,112 @@ const EGYPT_SUB_BANDS: TimelineOverlayBand[] = [
     regionalScopeLabel: "Egypt",
     color: "rgb(114, 93, 76)",
     subGroup: "nile-valley",
+    laneAffinityGroupId: LANE_AFFINITY.egypt,
     sourceIds: ["worldHistoryPtolemaicDynasty"],
   },
 ];
 
-const CANAAN_PHOENICIA_SUB_BANDS: TimelineOverlayBand[] = [
+const ELAM_SUB_BANDS: TimelineOverlayBand[] = [
   {
-    id: "bronze-age-canaan",
-    label: "Bronze Age Canaan",
-    shortLabel: "Canaan",
+    id: "old-elamite-period",
+    label: "Old Elamite Period",
+    shortLabel: "Old Elamite",
     description:
-      "Network of Canaanite city-states along the Levantine coast and interior, trading with Egypt, Mesopotamia, and the Aegean from major centers including Ugarit, Byblos, and Hazor.",
+      "Early historical Elam, when dynasties associated with Awan, Shimashki, and Susa moved between highland and lowland centers beside Mesopotamia.",
+    startYear: bce(2_700),
+    endYear: bce(1_600),
+    regionalScopeLabel: "Southwestern Iran",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(170, 119, 146)",
+    priority: 89,
+    subGroup: "iranian-world",
+    laneAffinityGroupId: LANE_AFFINITY.elam,
+    sourceIds: ["worldHistoryElam"],
+  },
+  {
+    id: "middle-elamite-period",
+    label: "Middle Elamite Period",
+    shortLabel: "Middle Elamite",
+    description:
+      "Elam's classic imperial phase, with rulers of Anshan and Susa projecting power into Babylonia and leaving major monuments such as Chogha Zanbil.",
+    startYear: bce(1_500),
+    endYear: bce(1_100),
+    regionalScopeLabel: "Southwestern Iran",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(146, 101, 135)",
+    priority: 91,
+    subGroup: "iranian-world",
+    laneAffinityGroupId: LANE_AFFINITY.elam,
+    sourceIds: ["worldHistoryElam"],
+  },
+  {
+    id: "neo-elamite-period",
+    label: "Neo-Elamite Period",
+    shortLabel: "Neo-Elamite",
+    description:
+      "Later Elamite era after the Middle Elamite peak, marked by sparse early evidence, conflict with Assyria, and survival until Achaemenid conquest.",
+    startYear: bce(1_100),
+    endYear: bce(539),
+    regionalScopeLabel: "Southwestern Iran",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(121, 88, 130)",
+    priority: 90,
+    subGroup: "iranian-world",
+    laneAffinityGroupId: LANE_AFFINITY.elam,
+    sourceIds: ["worldHistoryElam"],
+  },
+];
+
+const CANAAN_SUB_BANDS: TimelineOverlayBand[] = [
+  {
+    id: "early-bronze-canaan",
+    label: "Early Bronze Canaan",
+    shortLabel: "Early Bronze",
+    description:
+      "Early urban and regional communities in the southern Levant, before the better-documented Middle and Late Bronze Age city-state world.",
     startYear: bce(3_000),
-    endYear: bce(1_200),
+    endYear: bce(2_000),
+    regionalScopeLabel: "Levant",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(183, 116, 121)",
+    subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.canaanPhoenicia,
+    sourceIds: ["britannicaCanaan"],
+  },
+  {
+    id: "middle-bronze-canaan",
+    label: "Middle Bronze Canaan",
+    shortLabel: "Middle Bronze",
+    description:
+      "A revived Canaanite urban landscape of fortified towns and regional powers across the southern Levant.",
+    startYear: bce(2_000),
+    endYear: bce(1_550),
     regionalScopeLabel: "Levant",
     approximateStart: true,
     approximateEnd: true,
     color: "rgb(165, 98, 118)",
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.canaanPhoenicia,
+    sourceIds: ["britannicaCanaan"],
+  },
+  {
+    id: "late-bronze-canaanite-city-states",
+    label: "Late Bronze City-States",
+    shortLabel: "City-States",
+    description:
+      "Levantine city-states along the coast and interior, tied into Egyptian, Mesopotamian, Anatolian, and Aegean diplomacy and exchange.",
+    startYear: bce(1_550),
+    endYear: bce(1_200),
+    regionalScopeLabel: "Levant",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(142, 83, 116)",
+    subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.canaanPhoenicia,
     image: {
       src: commonsTooltipImage("Canaanite_City_States_In_The_Bronze_Age.svg"),
       alt: "Map of Canaanite city-states in the Bronze Age",
@@ -574,19 +723,23 @@ const CANAAN_PHOENICIA_SUB_BANDS: TimelineOverlayBand[] = [
     },
     sourceIds: ["britannicaCanaan"],
   },
+];
+
+const PHOENICIA_SUB_BANDS: TimelineOverlayBand[] = [
   {
-    id: "phoenicia",
-    label: "Phoenicia",
-    shortLabel: "Phoenicia",
+    id: "phoenician-city-states",
+    label: "Phoenician City-States",
+    shortLabel: "City-States",
     description:
-      "Canaanite coastal cities, chiefly Tyre, Sidon, and Byblos, who gave the ancient world its alphabet, planted colonies from Cyprus to Spain, and traded cedar and Tyrian purple across the Mediterranean.",
+      "Iron Age Canaanite coastal cities, chiefly Tyre, Sidon, and Byblos, whose alphabet and seafaring linked the Levant to the wider Mediterranean.",
     startYear: bce(1_200),
-    endYear: bce(332),
-    regionalScopeLabel: "Levant",
+    endYear: bce(800),
+    regionalScopeLabel: "Levantine coast",
     approximateStart: true,
     approximateEnd: true,
-    color: "rgb(140, 85, 142)",
+    color: "rgb(148, 100, 173)",
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.phoenicia,
     image: {
       src: commonsTooltipImage("Phoenicia map-en.svg"),
       alt: "Map of Phoenicia and its major cities along the Levantine coast",
@@ -594,7 +747,30 @@ const CANAAN_PHOENICIA_SUB_BANDS: TimelineOverlayBand[] = [
       height: 405,
       credit: "Wikimedia Commons",
     },
-    sourceIds: ["worldHistoryPhoenicia"],
+    sourceIds: ["worldHistoryPhoenicia", "metPhoenicians"],
+  },
+  {
+    id: "phoenician-maritime-expansion",
+    label: "Phoenician Expansion",
+    shortLabel: "Expansion",
+    description:
+      "Phoenician maritime networks spread westward through trading stations and colonies, with cities such as Tyre and later Carthage connecting the Mediterranean.",
+    startYear: bce(800),
+    endYear: bce(332),
+    regionalScopeLabel: "Mediterranean",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(115, 81, 158)",
+    subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.phoenicia,
+    image: {
+      src: commonsTooltipImage("Phoenicia map-en.svg"),
+      alt: "Map of Phoenicia and its major cities along the Levantine coast",
+      width: 610,
+      height: 405,
+      credit: "Wikimedia Commons",
+    },
+    sourceIds: ["worldHistoryPhoenicia", "metPhoenicians"],
   },
 ];
 
@@ -602,28 +778,36 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
   {
     id: "mesopotamia",
     label: "Mesopotamia",
+    shortLabel: "Mesopotamia",
     description:
-      "Civilization of Mesopotamia shown here from early Sumer, the earliest known civilization in southern Mesopotamia, to the Persian conquest of Babylon.",
+      "Core Mesopotamian urban and imperial traditions centered on the Tigris-Euphrates heartland, from Uruk and Sumer through the Late Bronze Age Assyrian and Babylonian worlds.",
     startYear: bce(4_000),
-    endYear: bce(539),
-    regionalScopeLabel: "Mesopotamia",
+    endYear: bce(1_076),
+    regionalScopeLabel: "Tigris-Euphrates heartland",
     approximateStart: true,
-    color: "rgb(180, 120, 70)",
+    approximateEnd: true,
+    color: "rgb(189, 139, 91)",
     minZoom: 0,
-    priority: 95,
+    priority: 94,
     subGroup: "near-east",
     children: MESOPOTAMIA_SUB_BANDS,
     image: {
-      src: commonsTooltipImage(
-        "Myths of Babylonia and Assyria - Map of Babylonia and Assyria.png",
-      ),
-      alt: "Historical map of Babylonia and Assyria with major Mesopotamian cities",
-      width: 5937,
-      height: 4511,
+      src: commonsTooltipImage("Ancient_Near_East_2000BC.svg"),
+      alt: "Map of the ancient Near East c. 2000 BCE, showing Mesopotamia and surrounding states",
+      width: 800,
+      height: 575,
       credit: "Wikimedia Commons",
     },
-    sourceIds: ["britannicaSumer", "metBabylon"],
+    sourceIds: [
+      "metUrukFirstCity",
+      "metAkkadianPeriod",
+      "metIsinLarsaOldBabylonian",
+      "metOldAssyrianPeriod",
+      "metAssyria",
+      "metMiddleBabylonianKassite",
+    ],
   },
+  ...NEO_MESOPOTAMIAN_OVERLAYS,
   {
     id: "indus-valley-civilization",
     label: "Indus Valley Civilization",
@@ -688,6 +872,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 89,
     subGroup: "iranian-world",
+    children: ELAM_SUB_BANDS,
     image: {
       src: commonsTooltipImage("Elam Map-en.svg"),
       alt: "Map of Elam in southwestern Iran",
@@ -695,7 +880,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
       height: 480,
       credit: "Wikimedia Commons",
     },
-    sourceIds: ["historyOfElamWikipedia"],
+    sourceIds: ["britannicaElam", "worldHistoryElam"],
   },
   {
     id: "kingdom-of-kush",
@@ -818,21 +1003,56 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     sourceIds: ["unescoMycenaeTiryns"],
   },
   {
-    id: "canaan-phoenicia",
-    label: "Canaan and Phoenicia",
-    shortLabel: "Canaan / Phoenicia",
+    id: "canaan",
+    label: "Canaan",
+    shortLabel: "Canaan",
     description:
-      "Levantine coastal civilization whose Bronze Age city-states gave way to the Phoenician maritime world, source of the alphabet and one of antiquity's great seafaring cultures.",
+      "Bronze Age Levantine cultures and city-states, best treated as a regional world rather than a single kingdom or empire.",
     startYear: bce(3_000),
-    endYear: bce(332),
+    endYear: bce(1_200),
     regionalScopeLabel: "Levant",
     approximateStart: true,
-    color: "rgb(148, 92, 130)",
+    approximateEnd: true,
+    color: "rgb(163, 93, 118)",
     minZoom: 0,
     priority: 91,
     subGroup: "near-east",
-    children: CANAAN_PHOENICIA_SUB_BANDS,
-    sourceIds: ["britannicaCanaan", "worldHistoryPhoenicia"],
+    laneAffinityGroupId: LANE_AFFINITY.canaanPhoenicia,
+    children: CANAAN_SUB_BANDS,
+    image: {
+      src: commonsTooltipImage("Canaanite_City_States_In_The_Bronze_Age.svg"),
+      alt: "Map of Canaanite city-states in the Bronze Age",
+      width: 269,
+      height: 600,
+      credit: "Wikimedia Commons",
+    },
+    sourceIds: ["britannicaCanaan"],
+  },
+  {
+    id: "phoenicia",
+    label: "Phoenicia",
+    shortLabel: "Phoenicia",
+    description:
+      "Iron Age Levantine coastal city-states whose seafaring, alphabetic writing, and colonies tied the eastern Mediterranean to western networks.",
+    startYear: bce(1_200),
+    endYear: bce(332),
+    regionalScopeLabel: "Levant and Mediterranean",
+    approximateStart: true,
+    approximateEnd: true,
+    color: "rgb(130, 88, 166)",
+    minZoom: 0,
+    priority: 90,
+    subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.canaanPhoenicia,
+    children: PHOENICIA_SUB_BANDS,
+    image: {
+      src: commonsTooltipImage("Phoenicia map-en.svg"),
+      alt: "Map of Phoenicia and its major cities along the Levantine coast",
+      width: 610,
+      height: 405,
+      credit: "Wikimedia Commons",
+    },
+    sourceIds: ["worldHistoryPhoenicia", "metPhoenicians"],
   },
   {
     id: "olmec-civilization",
@@ -965,6 +1185,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 84,
     subGroup: "mediterranean",
+    laneAffinityGroupId: LANE_AFFINITY.rome,
     image: {
       src: commonsTooltipImage("Mediterranean at 218 BC-en.svg"),
       alt: "Map of Mediterranean powers in 218 BCE, including the Roman Republic",
@@ -1003,6 +1224,7 @@ export const ANCIENT_CIVILIZATION_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: 0,
     priority: 78,
     subGroup: "mediterranean",
+    laneAffinityGroupId: LANE_AFFINITY.rome,
     image: {
       src: commonsTooltipImage("RomanEmpire 117.svg"),
       alt: "Map of the Roman Empire at its maximum extent in 117 CE",
@@ -1119,6 +1341,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.caliphates,
     image: {
       src: commonsTooltipImage("Rashidun Caliphate (greatest extent).svg"),
       alt: "Map of the Rashidun Caliphate at its greatest extent",
@@ -1141,6 +1364,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 76,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.caliphates,
     image: {
       src: commonsTooltipImage("Umayyad-caliphate.svg"),
       alt: "Map of the Umayyad Caliphate",
@@ -1163,6 +1387,7 @@ export const POST_CLASSICAL_EARLY_MODERN_OVERLAYS: TimelineOverlayBand[] = [
     minZoom: POST_CLASSICAL_MIN_ZOOM,
     priority: 75,
     subGroup: "near-east",
+    laneAffinityGroupId: LANE_AFFINITY.caliphates,
     image: {
       src: commonsTooltipImage("Abbasid Caliphate 900-es.svg"),
       alt: "Map of the Abbasid Caliphate around 900 CE",
