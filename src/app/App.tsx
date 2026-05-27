@@ -1,7 +1,10 @@
 import { Suspense, useEffect, useMemo } from "react";
 import { Outlet } from "@tanstack/react-router";
+import { Plus } from "lucide-react";
 
 import * as rx from "./App.selectors";
+import { Button } from "@/components/ui/button";
+import { Tooltip } from "@/components/ui/tooltip";
 import { useStandaloneViewportHeight } from "@/hooks/useStandaloneViewportHeight";
 import { useTimelineAppState } from "@/hooks/useTimelineAppState";
 import { useTimelineCatalog } from "@/hooks/useTimelineCatalog";
@@ -143,6 +146,18 @@ function App() {
                 actions.setIsCosmicCalendarMode((current) => !current);
               }}
             />
+            <Tooltip className="order-4" content="Create set" placement="bottom">
+              <Button
+                aria-label="Create set"
+                className="rounded-full text-primary"
+                onClick={actions.openCreateSet}
+                size="icon"
+                type="button"
+                variant="glass"
+              >
+                <Plus className="size-4 shrink-0" />
+              </Button>
+            </Tooltip>
           </div>
         </>
       ) : null}

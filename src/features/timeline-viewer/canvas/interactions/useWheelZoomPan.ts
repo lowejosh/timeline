@@ -196,6 +196,7 @@ export function useWheelZoomPan({
     motion.lastFrameTime = now;
 
     if (Math.abs(zoomStep) > 0.00001 || Math.abs(panStep) > 0.001) {
+      latest.markViewportInteraction("mouse-wheel");
       latest.onContinuousViewportChange((current) => {
         let next = current;
 

@@ -3,14 +3,13 @@ import * as rx from "./TimelineSidebarChrome.selectors";
 import { useTimelineSidebarEscape } from "../TimelineSidebar.hooks";
 import { Button } from "@/components/ui/button";
 import { ShortcutKey } from "@/components/ui/shortcut-key";
-import { Tooltip } from "@/components/ui/tooltip";
 import type { TimelineSidebarSetState } from "@/lib/app/sidebarModel";
 import type { TimelineLayerShortcutTarget } from "@/lib/app/timelineKeyboard";
 import type { TimelineSetId } from "@/lib/core/timelineTypes";
 import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import { TimelineSidebar } from "../TimelineSidebar";
 import { cn } from "@/lib/utils";
-import { Map, Plus } from "lucide-react";
+import { Map } from "lucide-react";
 
 type TimelineSidebarChromeProps = {
   isMapPreviewEnabled: boolean;
@@ -156,18 +155,6 @@ export function TimelineSidebarChrome({
             </ShortcutKey>
           ) : null}
         </Button>
-        <Tooltip content="Create set" placement="bottom">
-          <Button
-            aria-label="Create set"
-            className="size-9 rounded-full p-0 text-primary"
-            onClick={actions.openCreateSet}
-            size="icon"
-            type="button"
-            variant="glass"
-          >
-            <Plus className="size-4 shrink-0" />
-          </Button>
-        </Tooltip>
       </div>
       <button
         aria-label="Close layers controls"

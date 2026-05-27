@@ -7,7 +7,7 @@ import {
   useTimelineLayerStore,
 } from "@/stores/timelineLayer.store";
 import { useTimelineUiStore } from "@/stores/timelineUi.store";
-import { useRouteView } from "./routePaths";
+import { useAppRouteNavigation, useRouteView } from "./routePaths";
 
 export const useActiveView = useRouteView;
 
@@ -64,6 +64,7 @@ export function useTimelineSearchScope(catalog: TimelineCatalogSnapshot) {
 }
 
 export function useAppActions() {
+  const { openCreateSet } = useAppRouteNavigation();
   const closeKeyboardHelp = useTimelineUiStore(
     (state) => state.closeKeyboardHelp,
   );
@@ -93,6 +94,7 @@ export function useAppActions() {
   return useMemo(
     () => ({
       closeKeyboardHelp,
+      openCreateSet,
       setIsCosmicCalendarMode,
       setIsKeyboardHelpOpen,
       setIsMapPreviewEnabled,
@@ -104,6 +106,7 @@ export function useAppActions() {
     }),
     [
       closeKeyboardHelp,
+      openCreateSet,
       setIsCosmicCalendarMode,
       setIsKeyboardHelpOpen,
       setIsMapPreviewEnabled,
