@@ -49,12 +49,12 @@ function SetBuilderToolButton({
         aria-label={label}
         aria-pressed={selected}
         className={cn(
-          "group relative flex h-16 w-full cursor-pointer items-center justify-center overflow-hidden border-0 border-b border-border/60 bg-transparent p-0 text-muted-foreground transition-[background-color,color] duration-200 ease-out hover:bg-surface/45 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
-          "before:absolute before:inset-y-1.5 before:left-0 before:w-1 before:-translate-x-full before:rounded-r-full before:bg-primary before:opacity-0 before:transition-[opacity,transform,height,inset] before:duration-250 before:ease-out hover:before:translate-x-0 hover:before:opacity-60",
+          "group relative flex h-16 w-full cursor-pointer items-center justify-center overflow-hidden border-0 border-b border-border/60 bg-transparent p-0 text-muted-foreground transition-[background-color,color] duration-200 ease-out hover:bg-surface/45 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 max-sm:h-11 max-sm:border-b-0 max-sm:border-r max-sm:last:border-r-0",
+          "before:absolute before:inset-y-1.5 before:left-0 before:w-1 before:-translate-x-full before:rounded-r-full before:bg-primary before:opacity-0 before:transition-[opacity,transform,height,inset] before:duration-250 before:ease-out hover:before:translate-x-0 hover:before:opacity-60 max-sm:before:inset-x-2 max-sm:before:bottom-0 max-sm:before:left-2 max-sm:before:top-auto max-sm:before:h-1 max-sm:before:w-auto max-sm:before:translate-x-0 max-sm:before:translate-y-full max-sm:before:rounded-r-none max-sm:before:rounded-t-full max-sm:hover:before:translate-y-0",
           exiting &&
             "bg-surface/20 before:translate-x-0 before:opacity-0",
           selected &&
-            "bg-surface/70 text-primary hover:bg-surface/75 before:inset-y-0 before:translate-x-0 before:opacity-100",
+            "bg-surface/70 text-primary hover:bg-surface/75 before:inset-y-0 before:translate-x-0 before:opacity-100 max-sm:before:inset-x-2 max-sm:before:bottom-0 max-sm:before:top-auto max-sm:before:h-1 max-sm:before:translate-y-0",
         )}
         data-selected={selected ? "true" : "false"}
         onClick={onClick}
@@ -95,7 +95,7 @@ export function SetBuilderToolRail({
   return (
     <nav
       aria-label="Custom set editing tools"
-      className="grid h-full content-start overflow-hidden border-r border-border/70 bg-card/40"
+      className="grid h-full content-start overflow-hidden border-r border-border/70 bg-card/40 max-sm:grid-cols-4 max-sm:border-b max-sm:border-r-0"
     >
       {SET_BUILDER_TOOL_SEQUENCE.map((id) => (
         <SetBuilderToolButton

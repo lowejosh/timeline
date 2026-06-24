@@ -204,7 +204,7 @@ export function SetBuilderRawJsonEditor({
         </div>
       </div>
 
-      <footer className="flex shrink-0 items-center gap-2 border-t border-border/70 bg-card/95 px-3 py-3">
+      <footer className="flex shrink-0 items-center gap-2 border-t border-border/70 bg-card/95 px-3 py-3 max-sm:flex-wrap max-sm:py-2">
         <div className="min-w-0 flex-1">
           {status.tone === "error" ? (
             <Popover>
@@ -234,6 +234,7 @@ export function SetBuilderRawJsonEditor({
           )}
         </div>
         <Button
+          className="max-sm:px-2.5"
           onClick={handleSelectAll}
           size="pill"
           type="button"
@@ -241,11 +242,18 @@ export function SetBuilderRawJsonEditor({
         >
           Select all
         </Button>
-        <Button onClick={handleCopy} size="pill" type="button" variant="subtle">
+        <Button
+          className="max-sm:px-2.5"
+          onClick={handleCopy}
+          size="pill"
+          type="button"
+          variant="subtle"
+        >
           {copied ? <Check className="size-3.5" /> : <Clipboard className="size-3.5" />}
           {copied ? "Copied" : "Copy"}
         </Button>
         <Button
+          className="max-sm:px-2.5"
           disabled={!isDirty}
           onClick={handleDiscard}
           size="pill"
@@ -256,6 +264,7 @@ export function SetBuilderRawJsonEditor({
           Discard
         </Button>
         <Button
+          className="max-sm:px-2.5"
           disabled={!status.document || !isDirty}
           onClick={handleSave}
           size="pill"

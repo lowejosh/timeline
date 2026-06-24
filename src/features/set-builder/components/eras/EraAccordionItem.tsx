@@ -52,12 +52,12 @@ export function EraAccordionItem({
     <div
       className={cn(
         "grid gap-3",
-        depth > 0 && "border-l border-border/70 pl-4",
+        depth > 0 && "border-l border-border/70 pl-4 max-sm:pl-3",
       )}
     >
       <Collapsible onOpenChange={setIsOpen} open={isOpen}>
         <div className="overflow-hidden rounded-md border border-border/70 bg-surface/25">
-          <div className="flex min-h-12 items-center gap-2 border-b border-border/60 bg-surface/35 px-3">
+          <div className="flex min-h-12 items-center gap-2 border-b border-border/60 bg-surface/35 px-3 max-sm:min-h-11 max-sm:px-2">
             <CollapsibleTrigger asChild>
               <button
                 aria-label={isOpen ? "Collapse era" : "Expand era"}
@@ -96,7 +96,7 @@ export function EraAccordionItem({
           </div>
 
           <CollapsibleContent>
-            <div className="grid gap-5 p-4">
+            <div className="grid gap-5 p-4 max-sm:gap-4 max-sm:p-3">
               <Field htmlFor={`${era.id}-name`} label="Name" required>
                 <Input
                   className="h-10 rounded-md bg-background/70"
@@ -111,7 +111,7 @@ export function EraAccordionItem({
                 />
               </Field>
 
-              <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+              <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1 max-sm:gap-3">
                 <Field
                   htmlFor={`${era.id}-alternate-name`}
                   label="Alternate name"
@@ -144,7 +144,7 @@ export function EraAccordionItem({
                 </Field>
               </div>
 
-              <div className="flex items-stretch gap-4 max-sm:flex-col">
+              <div className="flex items-stretch gap-4 max-sm:flex-col max-sm:gap-3">
                 <div className="flex min-w-0 flex-1">
                   <TimePointField
                     approximate={era.approximateStart}

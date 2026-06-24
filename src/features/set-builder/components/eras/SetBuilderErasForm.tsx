@@ -47,8 +47,8 @@ export function SetBuilderErasForm({
   };
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <div className="grid w-full gap-4">
+    <div className="h-full overflow-y-auto p-6 max-sm:h-auto max-sm:overflow-visible max-sm:p-3">
+      <div className="grid w-full gap-4 max-sm:gap-3">
         {eras.length > 0 ? (
           <div className="grid gap-3">
             {eras.map((era) => (

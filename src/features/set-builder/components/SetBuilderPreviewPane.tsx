@@ -13,6 +13,7 @@ import { SetBuilderRawJsonEditor } from "./preview/SetBuilderRawJsonEditor";
 import { useSetBuilderPreviewModel } from "./preview/useSetBuilderPreviewModel";
 
 type SetBuilderPreviewPaneProps = {
+  className?: string;
   document: TimelineRawSetDocument;
   onDocumentChange: (document: TimelineRawSetDocument) => void;
 };
@@ -25,6 +26,7 @@ const PREVIEW_MODES = [
 ] as const satisfies readonly { label: string; value: PreviewMode }[];
 
 export function SetBuilderPreviewPane({
+  className,
   document,
   onDocumentChange,
 }: SetBuilderPreviewPaneProps) {
@@ -78,8 +80,13 @@ export function SetBuilderPreviewPane({
   })();
 
   return (
-    <section className="grid h-full min-h-0 w-full grid-rows-[auto_minmax(0,1fr)] border-l border-border/70">
-      <header className="flex min-w-0 items-center gap-3 border-b border-border/70 bg-card/80 px-3 py-2">
+    <section
+      className={cn(
+        "grid h-full min-h-0 w-full grid-rows-[auto_minmax(0,1fr)] border-l border-border/70 max-sm:border-l-0",
+        className,
+      )}
+    >
+      <header className="flex min-w-0 items-center gap-3 border-b border-border/70 bg-card/80 px-3 py-2 max-sm:py-1.5">
         <div className="grid gap-2">
           <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             Builder output

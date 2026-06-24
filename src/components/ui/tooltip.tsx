@@ -29,9 +29,28 @@ export function Tooltip({
   showOnFocus = true,
 }: TooltipProps) {
   const [anchor, setAnchor] = React.useState<TooltipAnchor | null>(null);
+  const [canShowTooltip, setCanShowTooltip] = React.useState(true);
   const [position, setPosition] = React.useState<TooltipPosition | null>(null);
   const anchorRef = React.useRef<HTMLSpanElement | null>(null);
   const tooltipRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    const updateCanShowTooltip = () => {
+      setCanShowTooltip(mediaQuery.matches);
+      if (!mediaQuery.matches) {
+        setAnchor(null);
+      }
+    };
+
+    updateCanShowTooltip();
+    mediaQuery.addEventListener("change", updateCanShowTooltip);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateCanShowTooltip);
+    };
+  }, []);
 
   React.useLayoutEffect(() => {
     if (!anchor || !tooltipRef.current) {
@@ -80,6 +99,10 @@ export function Tooltip({
   }, [anchor, placement]);
 
   const updateAnchor = () => {
+    if (!canShowTooltip) {
+      return;
+    }
+
     const rect = anchorRef.current?.getBoundingClientRect();
 
     if (!rect) {
@@ -103,7 +126,7 @@ export function Tooltip({
           setAnchor(null);
         }}
         onFocus={() => {
-          if (showOnFocus) {
+          if (showOnFocus && canShowTooltip) {
             updateAnchor();
           }
         }}

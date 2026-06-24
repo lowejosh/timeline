@@ -176,8 +176,8 @@ export function SetBuilderMetadataForm({
   };
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <div className="grid w-full gap-6">
+    <div className="h-full overflow-y-auto p-6 max-sm:h-auto max-sm:overflow-visible max-sm:p-3">
+      <div className="grid w-full gap-6 max-sm:gap-4">
         <Field htmlFor="set-builder-name" label="Set name">
           <Input
             autoComplete="off"

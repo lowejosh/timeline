@@ -257,8 +257,8 @@ export function TimePointField({
       label={label}
       required={required}
     >
-      <div className="grid h-full content-start gap-3 rounded-md border border-border/70 bg-surface/25 p-3">
-        <div className="grid grid-cols-[minmax(0,1fr)_9rem] gap-2 max-sm:grid-cols-1">
+      <div className="grid h-full content-start gap-3 rounded-md border border-border/70 bg-surface/25 p-3 max-sm:gap-2.5 max-sm:p-2.5">
+        <div className="grid grid-cols-[minmax(0,1fr)_9rem] gap-2 max-sm:grid-cols-[minmax(0,1fr)_7rem]">
           <label className="grid gap-1.5" htmlFor={`${id}-value`}>
             <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
               {state.mode === "years-ago" || state.mode === "after-big-bang"

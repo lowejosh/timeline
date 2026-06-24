@@ -66,10 +66,10 @@ export function SetBuilderFormPanel({
     );
 
   return (
-    <section className="flex h-full min-h-0 flex-col overflow-hidden">
-      <div className="min-h-0 flex-1 overflow-hidden">{content}</div>
+    <section className="flex h-full min-h-0 flex-col overflow-hidden max-sm:h-auto max-sm:overflow-visible">
+      <div className="min-h-0 flex-1 overflow-hidden max-sm:overflow-visible">{content}</div>
       {nextTool ? (
-        <footer className="flex shrink-0 justify-end border-t border-border/70 px-6 py-4">
+        <footer className="flex shrink-0 justify-end border-t border-border/70 px-6 py-4 max-sm:px-3 max-sm:py-2.5">
           <Button
             onClick={() => onSelectTool(nextTool)}
             size="pill"

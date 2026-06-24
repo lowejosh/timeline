@@ -1,4 +1,11 @@
-import type { CSSProperties, ReactNode, RefObject } from "react";
+import {
+  useEffect,
+  useRef,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+  type WheelEvent,
+} from "react";
 
 import type { TimelineSetDefinition } from "@/lib/catalog/setSchema";
 import { cn } from "@/lib/utils";
@@ -12,11 +19,42 @@ type AvailableSetsColumnProps = {
   dragState: DragState | null;
   emptyMessage: string;
   renderSetCard: (set: TimelineSetDefinition, columnId: ColumnId) => ReactNode;
+  scrollContainerRef: RefObject<HTMLElement | null>;
   sets: TimelineSetDefinition[];
   title: string;
   titleId: string;
   variant?: "plain" | "divided";
 };
+
+const SCROLL_EDGE_TOLERANCE = 1;
+
+function canScroll(element: HTMLElement, deltaY: number) {
+  if (deltaY < 0) {
+    return element.scrollTop > SCROLL_EDGE_TOLERANCE;
+  }
+
+  if (deltaY > 0) {
+    return (
+      element.scrollTop + element.clientHeight <
+      element.scrollHeight - SCROLL_EDGE_TOLERANCE
+    );
+  }
+
+  return false;
+}
+
+function handOffScroll(
+  source: HTMLElement,
+  target: HTMLElement | null,
+  deltaY: number,
+) {
+  if (!target || deltaY === 0 || canScroll(source, deltaY) || !canScroll(target, deltaY)) {
+    return false;
+  }
+
+  target.scrollTop += deltaY;
+  return true;
+}
 
 export function AvailableSetsColumn({
   children,
@@ -26,11 +64,14 @@ export function AvailableSetsColumn({
   dragState,
   emptyMessage,
   renderSetCard,
+  scrollContainerRef,
   sets,
   title,
   titleId,
   variant = "plain",
 }: AvailableSetsColumnProps) {
+  const lastTouchYRef = useRef<number | null>(null);
+  const dragStateRef = useRef<DragState | null>(dragState);
   const isDropTarget =
     dragState !== null && dragState.targetColumn === columnId;
   const isSourceColumn =
@@ -96,6 +137,76 @@ export function AvailableSetsColumn({
     ];
   })();
 
+  useEffect(() => {
+    dragStateRef.current = dragState;
+  }, [dragState]);
+
+  useEffect(() => {
+    const element = columnRef.current;
+
+    if (!element) {
+      return;
+    }
+
+    const handleTouchStart = (event: globalThis.TouchEvent) => {
+      lastTouchYRef.current = event.touches[0]?.clientY ?? null;
+    };
+
+    const handleTouchMove = (event: globalThis.TouchEvent) => {
+      if (dragStateRef.current) {
+        return;
+      }
+
+      const currentY = event.touches[0]?.clientY ?? null;
+      const lastY = lastTouchYRef.current;
+
+      if (currentY === null || lastY === null) {
+        lastTouchYRef.current = currentY;
+        return;
+      }
+
+      const deltaY = lastY - currentY;
+
+      if (handOffScroll(element, scrollContainerRef.current, deltaY)) {
+        event.preventDefault();
+      }
+
+      lastTouchYRef.current = currentY;
+    };
+
+    const handleTouchEnd = () => {
+      lastTouchYRef.current = null;
+    };
+
+    element.addEventListener("touchstart", handleTouchStart);
+    element.addEventListener("touchmove", handleTouchMove, { passive: false });
+    element.addEventListener("touchend", handleTouchEnd);
+    element.addEventListener("touchcancel", handleTouchEnd);
+
+    return () => {
+      element.removeEventListener("touchstart", handleTouchStart);
+      element.removeEventListener("touchmove", handleTouchMove);
+      element.removeEventListener("touchend", handleTouchEnd);
+      element.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [columnRef, scrollContainerRef]);
+
+  const handleWheel = (event: WheelEvent<HTMLUListElement>) => {
+    if (dragState) {
+      return;
+    }
+
+    if (
+      handOffScroll(
+        event.currentTarget,
+        scrollContainerRef.current,
+        event.deltaY,
+      )
+    ) {
+      event.preventDefault();
+    }
+  };
+
   return (
     <section
       aria-labelledby={titleId}
@@ -126,11 +237,12 @@ export function AvailableSetsColumn({
       <ul
         aria-labelledby={titleId}
         className={cn(
-          "m-0 grid min-h-48 content-start items-start gap-2 overflow-y-auto overflow-x-clip overscroll-contain p-0 pb-1 pt-4 [scrollbar-width:thin]",
+          "m-0 grid min-h-48 content-start items-start gap-2 overflow-y-auto overflow-x-clip overscroll-y-auto p-0 pb-1 pt-4 [scrollbar-width:thin]",
           dragState && "max-h-none overflow-visible",
           !dragState && "max-h-[32rem]",
         )}
         data-dragging={dragState ? "true" : "false"}
+        onWheel={handleWheel}
         ref={columnRef}
       >
         {listItems}

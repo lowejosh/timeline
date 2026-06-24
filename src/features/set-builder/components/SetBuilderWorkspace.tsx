@@ -20,7 +20,7 @@ export function SetBuilderWorkspace({
   selectedTool,
 }: SetBuilderWorkspaceProps) {
   return (
-    <div className="grid h-full min-h-0 grid-cols-[4.5rem_minmax(0,1fr)_minmax(18rem,42%)] overflow-hidden rounded-md border border-border/60 bg-surface/10 max-lg:grid-cols-[4.25rem_minmax(0,1fr)]">
+    <div className="grid h-full min-h-0 grid-cols-[4.5rem_minmax(0,1fr)_minmax(18rem,42%)] overflow-hidden rounded-md border border-border/60 bg-surface/10 max-lg:grid-cols-[4.25rem_minmax(0,1fr)] max-sm:h-auto max-sm:min-h-full max-sm:grid-cols-1 max-sm:grid-rows-[2.75rem_auto_auto] max-sm:overflow-visible max-sm:rounded-none max-sm:border-0 max-sm:bg-transparent">
       <SetBuilderToolRail
         onSelectTool={onSelectTool}
         selectedTool={selectedTool}
@@ -33,6 +33,12 @@ export function SetBuilderWorkspace({
         selectedTool={selectedTool}
       />
       <div className="h-full min-h-0 overflow-hidden max-lg:hidden">
+        <SetBuilderPreviewPane
+          document={document}
+          onDocumentChange={onDocumentChange}
+        />
+      </div>
+      <div className="hidden h-[24rem] min-h-0 overflow-hidden rounded-md border border-border/60 bg-card/60 max-sm:block">
         <SetBuilderPreviewPane
           document={document}
           onDocumentChange={onDocumentChange}

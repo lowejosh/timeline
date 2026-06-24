@@ -261,6 +261,7 @@ export function AvailableSetsPage({
             dragState={dragState}
             emptyMessage="Drag sets here to show them in Layers."
             renderSetCard={renderSetCard}
+            scrollContainerRef={scrollContainerRef}
             sets={enabledSets}
             title="Selected"
             titleId={selectedTitleId}
@@ -273,6 +274,7 @@ export function AvailableSetsPage({
             dragState={dragState}
             emptyMessage="No available sets match this search or filter."
             renderSetCard={renderSetCard}
+            scrollContainerRef={scrollContainerRef}
             sets={visibleAvailableSets}
             title="Available"
             titleId={availableTitleId}

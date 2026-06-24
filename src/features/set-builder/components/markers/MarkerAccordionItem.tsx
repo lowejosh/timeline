@@ -44,7 +44,7 @@ export function MarkerAccordionItem({
   return (
     <Collapsible onOpenChange={setIsOpen} open={isOpen}>
       <div className="overflow-hidden rounded-md border border-border/70 bg-surface/25">
-        <div className="flex min-h-12 items-center gap-2 border-b border-border/60 bg-surface/35 px-3">
+        <div className="flex min-h-12 items-center gap-2 border-b border-border/60 bg-surface/35 px-3 max-sm:min-h-11 max-sm:px-2">
           <CollapsibleTrigger asChild>
             <button
               aria-label={isOpen ? "Collapse marker" : "Expand marker"}
@@ -83,7 +83,7 @@ export function MarkerAccordionItem({
         </div>
 
         <CollapsibleContent>
-          <div className="grid gap-5 p-4">
+          <div className="grid gap-5 p-4 max-sm:gap-4 max-sm:p-3">
             <Field htmlFor={`${marker.id}-label`} label="Label" required>
               <Input
                 className="h-10 rounded-md bg-background/70"
