@@ -9,6 +9,7 @@ type PageShellProps = {
   backLabel: string;
   children?: ReactNode;
   className?: string;
+  contentClassName?: string;
   description?: string;
   footer?: ReactNode;
   onBack: () => void;
@@ -23,6 +24,7 @@ export function PageShell({
   backLabel,
   children,
   className,
+  contentClassName,
   description,
   footer,
   onBack,
@@ -72,10 +74,11 @@ export function PageShell({
         </header>
         <div
           className={cn(
-            "grid h-full min-h-0 gap-4 overflow-auto p-4 max-sm:gap-3 max-sm:p-3",
+            "timeline-scrollbar grid h-full min-h-0 gap-4 overflow-auto p-4 max-sm:gap-3 max-sm:p-3",
             sidebar
               ? "grid-cols-[minmax(0,1fr)_22rem] max-lg:grid-cols-1"
               : "grid-cols-1",
+            contentClassName,
           )}
           ref={scrollRef}
         >

@@ -57,8 +57,8 @@ export const SUBYEAR_LABEL_MIN_CLEARANCE_PX = 12;
 export const subyearPrimaryFont = (fontSans: string) => `11px ${fontSans}`;
 export const subyearSecondaryFont = (fontSans: string) => `10px ${fontSans}`;
 
-export const ERA_CHILD_FADE_IN_DURATION_MS = 100;
-export const ERA_CHILD_FADE_OUT_DURATION_MS = 60;
+export const ERA_CHILD_FADE_IN_DURATION_MS = 220;
+export const ERA_CHILD_FADE_OUT_DURATION_MS = 160;
 export const MARKER_PRIORITY_BOOST_SMOOTHING_MS = 130;
 export const EXPANDED_OVERLAY_ANIMATION_SMOOTHING_MS = 170;
 export const CONTEXT_BAND_LABEL_TRANSITION_DURATION_MS = 160;

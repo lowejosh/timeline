@@ -19,10 +19,6 @@ const ACTIVE_LAYER_FADE_IN_START = 0.48;
 const ACTIVE_LAYER_FADE_IN_END = 0.78;
 const PREVIEW_LAYER_FADE_IN_START = 0.54;
 const PREVIEW_LAYER_FADE_IN_END = 0.84;
-const ACTIVE_LAYER_TRIGGER_IN = 0.68;
-const ACTIVE_LAYER_TRIGGER_OUT = 0.62;
-const PREVIEW_LAYER_TRIGGER_IN = 0.74;
-const PREVIEW_LAYER_TRIGGER_OUT = 0.68;
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));
@@ -56,13 +52,11 @@ export function getEraChildOpacity(
   viewport: TimelineViewport,
   width: number,
   pad: number,
-  isAnimating: boolean,
+  _isAnimating: boolean,
 ) {
   if ((era.children?.length ?? 0) === 0) return 0;
 
   const isActive = era.id === activeEraId;
-
-  if (isActive && isAnimating) return 1;
 
   const fillRatio = getVisibleEraFillRatio(era, viewport, width, pad);
 
@@ -79,7 +73,7 @@ export function getEraChildOpacityTarget(
   viewport: TimelineViewport,
   width: number,
   pad: number,
-  isAnimating: boolean,
+  _isAnimating: boolean,
   currentTarget = 0,
   isZoomingOut = false,
 ) {
@@ -87,25 +81,18 @@ export function getEraChildOpacityTarget(
 
   const isActive = era.id === activeEraId;
 
-  if (isActive && isAnimating) return 1;
-
   const fillRatio = getVisibleEraFillRatio(era, viewport, width, pad);
-  const triggerIn = isActive
-    ? ACTIVE_LAYER_TRIGGER_IN
-    : PREVIEW_LAYER_TRIGGER_IN;
-  const triggerOut = isActive
-    ? ACTIVE_LAYER_TRIGGER_OUT
-    : PREVIEW_LAYER_TRIGGER_OUT;
+  const nextTarget = interpolateOpacity(
+    fillRatio,
+    isActive ? ACTIVE_LAYER_FADE_IN_START : PREVIEW_LAYER_FADE_IN_START,
+    isActive ? ACTIVE_LAYER_FADE_IN_END : PREVIEW_LAYER_FADE_IN_END,
+  );
 
-  if (isZoomingOut) {
-    return currentTarget >= 0.5 && fillRatio >= triggerOut ? 1 : 0;
+  if (isZoomingOut && currentTarget <= 0.001) {
+    return 0;
   }
 
-  if (currentTarget >= 0.5) {
-    return fillRatio >= triggerOut ? 1 : 0;
-  }
-
-  return fillRatio >= triggerIn ? 1 : 0;
+  return nextTarget;
 }
 
 export function resolveTimelineEraLayersFromOpacityMap(

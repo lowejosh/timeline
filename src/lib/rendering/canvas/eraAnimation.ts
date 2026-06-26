@@ -11,7 +11,7 @@ import {
 import { clamp01, interpolateProgress, smoothstep01 } from "@/lib/core/easing";
 
 export function getEraInlineLabelVisibility(childOpacity: number) {
-  return 1 - smoothstep01((childOpacity - 0.12) / 0.36);
+  return 1 - smoothstep01((childOpacity - 0.04) / 0.24);
 }
 
 export function getEraBackdropResetAlpha(depth: number, opacity: number) {

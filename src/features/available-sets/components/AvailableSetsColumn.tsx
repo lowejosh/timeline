@@ -211,7 +211,7 @@ export function AvailableSetsColumn({
     <section
       aria-labelledby={titleId}
       className={cn(
-        "grid min-w-0 content-start gap-0",
+        "grid h-full min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)] content-start gap-0 max-sm:h-auto max-sm:grid-rows-none",
         variant === "divided" &&
           "border-l border-border/70 pl-5 max-sm:border-l-0 max-sm:border-t max-sm:pl-0 max-sm:pt-4",
       )}
@@ -237,9 +237,8 @@ export function AvailableSetsColumn({
       <ul
         aria-labelledby={titleId}
         className={cn(
-          "m-0 grid min-h-48 content-start items-start gap-2 overflow-y-auto overflow-x-clip overscroll-y-auto p-0 pb-1 pt-4 [scrollbar-width:thin]",
+          "timeline-scrollbar m-0 grid h-full min-h-0 content-start items-start gap-2 overflow-y-auto overflow-x-clip overscroll-y-contain p-0 pb-1 pt-4 max-sm:max-h-[32rem] max-sm:min-h-48",
           dragState && "max-h-none overflow-visible",
-          !dragState && "max-h-[32rem]",
         )}
         data-dragging={dragState ? "true" : "false"}
         onWheel={handleWheel}

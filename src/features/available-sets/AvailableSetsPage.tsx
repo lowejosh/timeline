@@ -241,6 +241,7 @@ export function AvailableSetsPage({
         }
         backLabel="Back to layers"
         className="w-[min(92rem,100%)]"
+        contentClassName="overflow-hidden max-sm:overflow-auto"
         description="Drag with the handle to add, remove, and order timeline layers."
         footer={<AvailableSetsActions onApply={handleApply} onClose={onClose} />}
         onBack={handleApply}
@@ -253,7 +254,7 @@ export function AvailableSetsPage({
           move it between selected and available.
         </p>
 
-        <div className="grid grid-cols-2 items-start gap-5 max-sm:grid-cols-1 max-sm:gap-3">
+        <div className="grid h-full min-h-0 grid-cols-2 items-stretch gap-5 max-sm:h-auto max-sm:grid-cols-1 max-sm:gap-3">
           <AvailableSetsColumn
             columnId="enabled"
             columnRef={enabledColumnRef}
