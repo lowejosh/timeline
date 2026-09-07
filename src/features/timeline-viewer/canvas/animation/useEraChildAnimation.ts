@@ -34,6 +34,8 @@ export function useEraChildAnimation(
     const activeIds = new Set<string>();
     const now = performance.now();
     const isZoomingOut = viewport.zoom < lastZoomRef.current;
+    const followViewport = isAnimating || isViewportInteractionActiveRef.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let didFollowViewport = false;
 
     const visit = (eras: Era[]) => {
       for (const era of eras) {
@@ -60,6 +62,11 @@ export function useEraChildAnimation(
               : ERA_CHILD_FADE_IN_DURATION_MS,
             hasInitialized: initializedRef.current,
           });
+          if (followViewport && nextState.current !== nextTarget) {
+            nextState.current = nextTarget;
+            nextState.from = nextTarget;
+            didFollowViewport = true;
+          }
           animationStates.set(era.id, nextState);
 
           if (nextState.target > 0 || nextState.current > 0.001) {
@@ -70,6 +77,7 @@ export function useEraChildAnimation(
     };
 
     visit(siblingEras);
+    if (didFollowViewport) invalidateCanvas("era-child-viewport");
 
     for (const [eraId, state] of [...animationStates.entries()]) {
       if (!activeIds.has(eraId) && isViewportInteractionActiveRef.current) {

@@ -1,3 +1,7 @@
+import { normalizePreciseTimelineYear, splitTimelineYear, toApproximateTimelineYear, addPreciseTimelineYears, subtractPreciseTimelineYears, comparePreciseTimelineYears, type PreciseTimelineYear } from "./time/preciseYear";
+export { normalizePreciseTimelineYear, splitTimelineYear, toApproximateTimelineYear, addPreciseTimelineYears, subtractPreciseTimelineYears, comparePreciseTimelineYears } from "./time/preciseYear";
+export type { PreciseTimelineYear } from "./time/preciseYear";
+import { durationInSeconds, durationInYears, minimumViewportDuration } from "./time/duration";
 import { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "./timelineYears";
 import {
   getLogarithmicAxisRangeFactor,
@@ -16,16 +20,11 @@ export type TimelineViewport = {
 
 export type TimelineScaleMode = "linear" | "logarithmic";
 
-export type PreciseTimelineYear = {
-  wholeYear: number;
-  fraction: number;
-};
 
 export const MIN_ZOOM = 0;
 export const MAX_ZOOM = 80;
 export const BASE_YEARS_PER_PIXEL = 50_000_000;
 export const HOME_RANGE: [number, number] = [-5000, TIMELINE_MAX_YEAR];
-const DAYS_PER_YEAR = 365.2425;
 const HOURS_PER_DAY = 24;
 const SECONDS_PER_HOUR = 3600;
 const MICROSECONDS_PER_SECOND = 1_000_000;
@@ -45,12 +44,7 @@ const PRIMORDIAL_PRECISION_YEARS_PER_PIXEL_FACTOR = 0.125;
 export { TIMELINE_MAX_YEAR, TIMELINE_MIN_YEAR } from "./timelineYears";
 
 export function getMinVisibleRangeMicrosecondsForWidth(width: number) {
-  const safeWidth = Math.max(width, 1);
-
-  return Math.max(
-    MIN_VISIBLE_RANGE_MICROSECONDS,
-    safeWidth / MAX_ZOOM_MICROSECOND_TICK_SPACING_PX,
-  );
+  return durationInSeconds(minimumViewportDuration(width)) * MICROSECONDS_PER_SECOND;
 }
 
 export function getMinVisibleRangeHoursForWidth(width: number) {
@@ -62,7 +56,7 @@ export function getMinVisibleRangeDaysForWidth(width: number) {
 }
 
 function getMinVisibleRangeYearsForWidth(width: number) {
-  return getMinVisibleRangeDaysForWidth(width) / DAYS_PER_YEAR;
+  return durationInYears(minimumViewportDuration(width));
 }
 
 function getTimelineScaleMode(viewport: TimelineViewport): TimelineScaleMode {
@@ -81,68 +75,6 @@ function getViewportSpanFactor(width: number, scaleMode: TimelineScaleMode) {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
-}
-
-export function normalizePreciseTimelineYear(
-  wholeYear: number,
-  fraction: number,
-): PreciseTimelineYear {
-  let nextWholeYear = Math.trunc(wholeYear);
-  let nextFraction = fraction;
-
-  if (!Number.isFinite(nextFraction)) {
-    nextFraction = 0;
-  }
-
-  if (nextFraction >= 1 || nextFraction < 0) {
-    const carry = Math.floor(nextFraction);
-    nextWholeYear += carry;
-    nextFraction -= carry;
-  }
-
-  if (nextFraction < 0) {
-    nextWholeYear -= 1;
-    nextFraction += 1;
-  }
-
-  return {
-    wholeYear: nextWholeYear,
-    fraction: nextFraction,
-  };
-}
-
-export function splitTimelineYear(year: number): PreciseTimelineYear {
-  const wholeYear = Math.floor(year);
-
-  return normalizePreciseTimelineYear(wholeYear, year - wholeYear);
-}
-
-export function toApproximateTimelineYear(year: PreciseTimelineYear) {
-  return year.wholeYear + year.fraction;
-}
-
-export function addPreciseTimelineYears(
-  year: PreciseTimelineYear,
-  deltaYears: number,
-) {
-  return normalizePreciseTimelineYear(
-    year.wholeYear,
-    year.fraction + deltaYears,
-  );
-}
-
-export function subtractPreciseTimelineYears(
-  left: PreciseTimelineYear,
-  right: PreciseTimelineYear,
-) {
-  return left.wholeYear - right.wholeYear + (left.fraction - right.fraction);
-}
-
-export function comparePreciseTimelineYears(
-  left: PreciseTimelineYear,
-  right: PreciseTimelineYear,
-) {
-  return left.wholeYear - right.wholeYear || left.fraction - right.fraction;
 }
 
 export function getViewportCenterYear(
@@ -173,6 +105,18 @@ function createViewportFromCenterYear(
     zoom,
     ...(scaleMode === "logarithmic" ? { scaleMode } : {}),
   };
+}
+
+export function interpolateViewport(from: TimelineViewport, to: TimelineViewport, progress: number): TimelineViewport {
+  if (progress >= 1) return { ...to };
+  if (progress <= 0) return { ...from };
+  const origin = getViewportCenterYear(from);
+  const delta = subtractPreciseTimelineYears(getViewportCenterYear(to), origin);
+  return createViewportFromCenterYear(
+    addPreciseTimelineYears(origin, delta * progress),
+    from.zoom + (to.zoom - from.zoom) * progress,
+    to.scaleMode ?? "linear",
+  );
 }
 
 export function getMinZoomForWidth(

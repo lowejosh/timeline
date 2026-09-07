@@ -110,6 +110,7 @@ export function getTimelineLayout(
     reserveAxisDateRow?: boolean;
     overviewReservedHeight?: number;
     expandedExtraHeight?: number;
+    centerOverlays?: boolean;
   },
 ): TimelineCanvasLayout {
   const reserveAxisDateRow = options?.reserveAxisDateRow ?? true;
@@ -119,6 +120,7 @@ export function getTimelineLayout(
   );
   const effectiveHeight = Math.max(height - overviewReservedHeight, 0);
   const expandedExtraHeight = options?.expandedExtraHeight ?? 0;
+  const compactReading = !!options?.centerOverlays && effectiveHeight < 280;
   const overlayHeight =
     overlayLaneCount > 0
       ? overlayLaneCount * OVERLAY_LANE_HEIGHT +
@@ -164,8 +166,10 @@ export function getTimelineLayout(
   const axisLabelTopY = reserveAxisDateRow ? dateLabelY : yearLabelY;
   const markerDateY = axisLabelTopY - markerToAxisLabelGap - MARKER_DATE_HEIGHT;
   const markerLabelY = markerDateY - markerLabelRowGap - MARKER_LABEL_HEIGHT;
-  const axisY = markerLabelY - axisToMarkerLabelGap;
-  const majorTickTop = axisY - AXIS_MAJOR_TICK_TOP_OFFSET;
+  const axisY = compactReading
+    ? Math.max(overlayClipTop + 56, axisLabelTopY - 18)
+    : markerLabelY - axisToMarkerLabelGap;
+  const majorTickTop = axisY - (compactReading ? 12 : AXIS_MAJOR_TICK_TOP_OFFSET);
   const majorTickBottom = Math.min(
     axisY + AXIS_MAJOR_TICK_BOTTOM_OFFSET,
     axisLabelTopY - AXIS_TICK_TO_LABEL_GAP,
@@ -175,14 +179,17 @@ export function getTimelineLayout(
     markerLabelY - MARKER_STEM_TO_LABEL_GAP,
   );
   const baseOverlayBottom =
-    overlayLaneCount > 0 ? majorTickTop - OVERLAY_PANEL_GAP : majorTickTop;
+    overlayLaneCount > 0 ? majorTickTop - (compactReading ? 12 : OVERLAY_PANEL_GAP) : majorTickTop;
   const overlayClipBottom = Math.max(overlayClipTop, baseOverlayBottom);
   const visibleOverlayHeight = Math.max(overlayClipBottom - overlayClipTop, 0);
-  const overlayScrollMax = Math.max(overlayHeight - visibleOverlayHeight, 0);
-  const overlayScrollOffset = Math.min(
-    Math.max(requestedOverlayScrollOffset, 0),
-    overlayScrollMax,
-  );
+  // Reading mode can place either the first or last lane at the visual center.
+  // Normal explorer scrolling keeps its existing bottom-aligned bounds.
+  const scrollMin = options?.centerOverlays ? -visibleOverlayHeight / 2 : 0;
+  const scrollMax = options?.centerOverlays
+    ? overlayHeight - visibleOverlayHeight / 2
+    : Math.max(overlayHeight - visibleOverlayHeight, 0);
+  const overlayScrollMax = Math.max(scrollMax - scrollMin, 0);
+  const overlayScrollOffset = Math.min(Math.max(requestedOverlayScrollOffset, scrollMin), scrollMax);
   const overlayBottom = baseOverlayBottom + overlayScrollOffset;
   const overlayTop = overlayBottom - overlayHeight;
 

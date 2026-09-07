@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getViewportForRange,
+  interpolateViewport,
   normalizeViewport,
   panByPixels,
   zoomAtPosition,
-  type TimelineScaleMode,
   type TimelineViewport,
 } from "../lib/core/viewport";
 
 type AnimationTarget = {
-  centerYear: number;
-  zoom: number;
-  scaleMode?: TimelineScaleMode;
+  target: TimelineViewport;
   startTime: number;
   duration: number;
   from: TimelineViewport;
@@ -59,16 +57,8 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
       // ease-out cubic
       const t = 1 - (1 - rawT) ** 3;
 
-      const centerYear =
-        anim.from.centerYear + (anim.centerYear - anim.from.centerYear) * t;
-      const zoom = anim.from.zoom + (anim.zoom - anim.from.zoom) * t;
-
       const next = normalizeViewport(
-        {
-          centerYear,
-          zoom,
-          scaleMode: anim.scaleMode ?? anim.from.scaleMode,
-        },
+          interpolateViewport(anim.from, anim.target, t),
         Math.max(width, 1),
       );
       setViewport((current) =>
@@ -177,9 +167,7 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
       setIsAnimating(true);
       setViewport((current) => {
         animationRef.current = {
-          centerYear: target.centerYear,
-          zoom: target.zoom,
-          scaleMode: target.scaleMode,
+          target,
           startTime: performance.now(),
           duration: ANIMATION_DURATION,
           from: { ...current },
@@ -198,9 +186,7 @@ export function useAnimatedViewport(initial: TimelineViewport, width: number) {
       setIsAnimating(true);
       setViewport((current) => {
         animationRef.current = {
-          centerYear: normalizedTarget.centerYear,
-          zoom: normalizedTarget.zoom,
-          scaleMode: normalizedTarget.scaleMode,
+          target: normalizedTarget,
           startTime: performance.now(),
           duration: ANIMATION_DURATION,
           from: { ...current },

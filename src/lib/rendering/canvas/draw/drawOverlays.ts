@@ -1,3 +1,5 @@
+import { getGuidedBandEmphasis, getGuidedLabelAlpha } from "@/lib/rendering/guidedFocus";
+import type { TimelineOverlayBand } from "@/lib/core/timelineTypes";
 import { clamp01, smoothstep01 } from "@/lib/core/easing";
 import { resolveOverlayLabelHoverBounds } from "@/lib/rendering/overlayLabelHover";
 import {
@@ -42,6 +44,22 @@ import {
 } from "../constants";
 import type { TimelineTooltipContent } from "@/lib/app/tooltipModel";
 import type { CanvasDrawContext } from "./drawContext";
+
+function drawGuidedOverlayBand(params: Parameters<typeof drawPaperOverlayBand>[0], band: TimelineOverlayBand, cx: CanvasDrawContext, parentId?: string) {
+  const emphasis = getGuidedBandEmphasis(cx.guidedFocus, band.id, band.startYear, band.endYear, parentId);
+  if (!emphasis.muted) { drawPaperOverlayBand(params); return; }
+  const isSubject = cx.guidedFocus?.subjectIds.includes(parentId ?? band.id);
+  const isContext = cx.guidedFocus?.contextIds?.includes(parentId ?? band.id);
+  drawPaperOverlayBand({ ...params, alpha: params.alpha * (isSubject ? 0.22 : isContext ? 0.23 : 0.1) });
+  const highlightedWidth = Math.min(params.width, cx.toX(emphasis.highlightedEnd) - params.x);
+  if (emphasis.highlightedEnd <= band.startYear || highlightedWidth <= 0) return;
+  cx.context.save();
+  cx.context.beginPath();
+  cx.context.rect(params.x, params.y, highlightedWidth, params.height);
+  cx.context.clip();
+  drawPaperOverlayBand(params);
+  cx.context.restore();
+}
 
 type DrawOverlayLabelParams = {
   fullLabel: string;
@@ -137,6 +155,26 @@ function drawOverlayLabel(
     y + OVERLAY_LANE_HEIGHT / 2,
   );
   context.restore();
+}
+
+function drawPresentedOverlayLabel(params: DrawOverlayLabelParams, band: TimelineOverlayBand, cx: CanvasDrawContext, parentId?: string) {
+  drawOverlayLabel(params, cx);
+  if (!cx.guidedFocus) return;
+  const emphasis = getGuidedBandEmphasis(cx.guidedFocus, band.id, band.startYear, band.endYear, parentId);
+  const width = Math.min(params.renderWidth, cx.toX(emphasis.highlightedEnd) - params.renderX);
+  if (emphasis.highlightedEnd <= band.startYear || width <= 0) return;
+  // The text crosses a moving color boundary: choose its ink separately on each side.
+  cx.context.save();
+  cx.context.beginPath();
+  cx.context.rect(params.renderX, params.y, width, OVERLAY_LANE_HEIGHT);
+  cx.context.clip();
+  drawOverlayLabel({
+    ...params,
+    fillStyle: getOverlayLabelPaint(band.color, OVERLAY_BAND_ALPHA, cx.labelColor, cx.paper).fillStyle,
+    hoverId: undefined,
+    tooltip: undefined,
+  }, cx);
+  cx.context.restore();
 }
 
 type DrawAnimatedOverlayDisclosureIndicatorParams = {
@@ -239,13 +277,13 @@ export function drawOverlays(cx: CanvasDrawContext): void {
       context.save();
       const overlayBandOpacity = OVERLAY_BAND_ALPHA;
       const overlayLabelPaint = getOverlayLabelPaint(
-        overlay.band.color,
-        overlayBandOpacity,
+        cx.guidedFocus ? labelColor : overlay.band.color,
+        cx.guidedFocus ? 0 : overlayBandOpacity,
         labelColor,
         paper,
       );
 
-      drawPaperOverlayBand({
+      drawGuidedOverlayBand({
         context,
         x: overlay.renderX,
         y,
@@ -256,7 +294,22 @@ export function drawOverlays(cx: CanvasDrawContext): void {
           overlayBandOpacity *
           overlay.renderAlphaMultiplier *
           overlayState.currentOpacity,
-      });
+      }, overlay.band, cx);
+
+      if (cx.guidedFocus?.bandId === overlay.band.id) {
+        const chapterX = cx.toX(cx.guidedFocus.revealYear);
+        if (chapterX >= overlay.renderX && chapterX <= overlay.renderX + bandWidth) {
+          context.save();
+          context.strokeStyle = overlay.band.color;
+          context.fillStyle = paper;
+          context.globalAlpha = overlayState.currentOpacity;
+          context.lineWidth = 1.5;
+          context.beginPath();
+          context.arc(chapterX, y - 4, 3, 0, Math.PI * 2);
+          context.fill(); context.stroke();
+          context.restore();
+        }
+      }
 
       const iconLayout = resolveOverlayGroupIconLayout({
         groupId: overlay.band.groupId,
@@ -281,7 +334,7 @@ export function drawOverlays(cx: CanvasDrawContext): void {
 
       const fullLabel = overlay.band.label;
       const shortLabel = overlay.band.shortLabel ?? fullLabel;
-      drawOverlayLabel(
+      drawPresentedOverlayLabel(
         {
           fullLabel,
           shortLabel,
@@ -291,12 +344,13 @@ export function drawOverlays(cx: CanvasDrawContext): void {
           labelRightInset: labelInsets.right,
           y,
           fillStyle: overlayLabelPaint.fillStyle,
-          alpha: 0.82 * overlayState.currentOpacity,
+          alpha: 0.82 * overlayState.currentOpacity * getGuidedLabelAlpha(cx.guidedFocus, overlay.band.id),
           hoverId: isVisibleOverlay ? overlay.band.id : undefined,
           tooltip: isVisibleOverlay
             ? getOverlayTooltipContent(overlay.band)
             : undefined,
         },
+        overlay.band,
         cx,
       );
 
@@ -457,8 +511,8 @@ export function drawOverlays(cx: CanvasDrawContext): void {
       const childConnectorX = renderX + renderWidth / 2;
       const childBandOpacity = OVERLAY_BAND_ALPHA;
       const childLabelPaint = getOverlayLabelPaint(
-        child.band.color,
-        childBandOpacity,
+        cx.guidedFocus ? labelColor : child.band.color,
+        cx.guidedFocus ? 0 : childBandOpacity,
         labelColor,
         paper,
       );
@@ -505,7 +559,7 @@ export function drawOverlays(cx: CanvasDrawContext): void {
       context.restore();
 
       context.save();
-      drawPaperOverlayBand({
+      drawGuidedOverlayBand({
         context,
         x: renderX,
         y: childRenderY,
@@ -513,7 +567,7 @@ export function drawOverlays(cx: CanvasDrawContext): void {
         height: OVERLAY_LANE_HEIGHT,
         bandColor: child.band.color,
         alpha: childBandOpacity * childReveal,
-      });
+      }, child.band, cx, expandedOverlayDetail.parent.band.id);
 
       const childIconLayout = resolveOverlayGroupIconLayout({
         groupId: child.band.groupId,
@@ -539,7 +593,7 @@ export function drawOverlays(cx: CanvasDrawContext): void {
       const shortLabel = child.band.shortLabel ?? fullLabel;
 
       if (childLabelReveal > 0.01) {
-        drawOverlayLabel(
+        drawPresentedOverlayLabel(
           {
             fullLabel,
             shortLabel,
@@ -549,11 +603,13 @@ export function drawOverlays(cx: CanvasDrawContext): void {
             labelRightInset: childLabelInsets.right,
             y: childRenderY,
             fillStyle: childLabelPaint.fillStyle,
-            alpha: 0.8 * childReveal * childLabelReveal,
+            alpha: 0.8 * childReveal * childLabelReveal * getGuidedLabelAlpha(cx.guidedFocus, child.band.id, expandedOverlayDetail.parent.band.id),
             hoverId: child.band.id,
             tooltip: childTooltip,
           },
+          child.band,
           cx,
+          expandedOverlayDetail.parent.band.id,
         );
       }
 

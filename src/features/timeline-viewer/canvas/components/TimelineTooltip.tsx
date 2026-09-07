@@ -1,10 +1,15 @@
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
   type RefObject,
 } from "react";
+
+import { ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { placeTimelineTooltip, type TooltipBounds } from "@/lib/rendering/tooltipPlacement";
 
 import type { RenderedTooltipState } from "@/lib/rendering/canvas/tooltip";
 import { OverlayGroupIconSvg } from "./OverlayGroupIconSvg";
@@ -21,7 +26,6 @@ type TimelineTooltipProps = {
   width: number;
 };
 
-const TOOLTIP_IMAGE_DELAY_MS = 420;
 const MAX_TRACKED_TOOLTIP_IMAGE_SRCS = 160;
 
 const loadedTooltipImageSrcs = new Set<string>();
@@ -68,61 +72,7 @@ function rememberTooltipImageSrc(cache: Set<string>, src: string) {
   }
 }
 
-let cachedSafeViewportInsets: {
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-} | null = null;
-
-function getSafeViewportInsets() {
-  if (typeof window === "undefined") {
-    return { top: 0, right: 0, bottom: 0, left: 0 };
-  }
-
-  if (cachedSafeViewportInsets) {
-    return cachedSafeViewportInsets;
-  }
-
-  const rootStyles = getComputedStyle(document.documentElement);
-  const readInset = (name: string) => {
-    const value = Number.parseFloat(rootStyles.getPropertyValue(name));
-    return Number.isFinite(value) ? value : 0;
-  };
-  const visualViewport = window.visualViewport;
-  const viewportTop = visualViewport?.offsetTop ?? 0;
-  const viewportLeft = visualViewport?.offsetLeft ?? 0;
-  const viewportHeight = visualViewport?.height ?? window.innerHeight;
-  const viewportWidth = visualViewport?.width ?? window.innerWidth;
-
-  cachedSafeViewportInsets = {
-    top: Math.max(readInset("--safe-area-top"), viewportTop) + 10,
-    right:
-      Math.max(
-        readInset("--safe-area-right"),
-        Math.max(window.innerWidth - (viewportLeft + viewportWidth), 0),
-      ) + 10,
-    bottom:
-      Math.max(
-        readInset("--safe-area-bottom"),
-        Math.max(window.innerHeight - (viewportTop + viewportHeight), 0),
-      ) + 10,
-    left: Math.max(readInset("--safe-area-left"), viewportLeft) + 10,
-  };
-
-  // Invalidate on resize
-  window.addEventListener(
-    "resize",
-    () => {
-      cachedSafeViewportInsets = null;
-    },
-    { once: true },
-  );
-
-  return cachedSafeViewportInsets;
-}
-
-function useDelayedTooltipImage({
+function useTooltipImage({
   enabled,
   src,
   tooltipId,
@@ -149,15 +99,7 @@ function useDelayedTooltipImage({
       return;
     }
 
-    setStatus("waiting");
-
-    const timeout = window.setTimeout(() => {
-      setStatus((current) => (current === "waiting" ? "loading" : current));
-    }, TOOLTIP_IMAGE_DELAY_MS);
-
-    return () => {
-      window.clearTimeout(timeout);
-    };
+    setStatus("loading");
   }, [enabled, src, tooltipId]);
 
   return {
@@ -180,86 +122,21 @@ function useDelayedTooltipImage({
   };
 }
 
-function getTooltipStyle({
-  height,
-  measuredHeight,
-  renderedTooltip,
-  width,
-}: {
-  height: number;
+function getTooltipStyle({ bounds, measuredHeight, renderedTooltip }: {
+  bounds: TooltipBounds;
   measuredHeight: number;
   renderedTooltip: RenderedTooltipState;
-  width: number;
 }): CSSProperties {
-  const displayedTooltip = renderedTooltip.tooltipState;
-  const safeViewportInsets = getSafeViewportInsets();
-  const tooltipHorizontalPadding = 10;
-  const tooltipWidth = Math.min(
-    TOOLTIP_MAX_WIDTH,
-    Math.max(
-      width - safeViewportInsets.left - safeViewportInsets.right - 24,
-      220,
-    ),
-  );
-  const centeredMinX = safeViewportInsets.left + tooltipWidth * 0.5;
-  const centeredMaxX = width - safeViewportInsets.right - tooltipWidth * 0.5;
-  const horizontalPlacement =
-    displayedTooltip.anchorX < centeredMinX
-      ? "left"
-      : displayedTooltip.anchorX > centeredMaxX
-        ? "right"
-        : "center";
-  const anchorY = displayedTooltip.anchorY;
-  const availableAbove = anchorY - safeViewportInsets.top - TOOLTIP_OFFSET;
-  const availableBelow =
-    height - safeViewportInsets.bottom - anchorY - TOOLTIP_OFFSET;
-  const preferBelow = displayedTooltip.placement === "below";
-  // When height is known, use exact fit check; otherwise fall back to a heuristic
-  const fitsAbove =
-    measuredHeight > 0
-      ? availableAbove >= measuredHeight
-      : availableAbove >= 80;
-  const fitsBelow =
-    measuredHeight > 0
-      ? availableBelow >= measuredHeight
-      : availableBelow >= 80;
-  const shouldPlaceBelow = (preferBelow && fitsBelow) || !fitsAbove;
-
-  // Compute exact top so the tooltip never clips past a safe edge
-  let tooltipTop: number;
-  if (shouldPlaceBelow) {
-    tooltipTop = anchorY + TOOLTIP_OFFSET;
-    if (measuredHeight > 0) {
-      tooltipTop = Math.min(
-        tooltipTop,
-        height - safeViewportInsets.bottom - measuredHeight,
-      );
-    }
-  } else {
-    tooltipTop = anchorY - TOOLTIP_OFFSET - measuredHeight;
-    tooltipTop = Math.max(tooltipTop, safeViewportInsets.top);
-  }
-
-  const translateX = horizontalPlacement === "center" ? "-50%" : "0%";
-  const motionOffset = shouldPlaceBelow ? "-4px" : "4px";
-  const isTransitioning = renderedTooltip.phase !== "present";
-
+  const state = renderedTooltip.tooltipState;
+  const { placeBelow, ...placement } = placeTimelineTooltip({
+    bounds, measuredHeight, anchorX: state.anchorX, anchorY: state.anchorY,
+    preferredBelow: state.placement === "below",
+    maxWidth: TOOLTIP_MAX_WIDTH, offset: TOOLTIP_OFFSET,
+  });
   return {
-    ...(horizontalPlacement === "right"
-      ? { right: safeViewportInsets.right + tooltipHorizontalPadding }
-      : {
-          left:
-            horizontalPlacement === "center"
-              ? displayedTooltip.anchorX
-              : safeViewportInsets.left + tooltipHorizontalPadding,
-        }),
-    top: tooltipTop,
-    width: `${tooltipWidth}px`,
-    maxWidth: `${tooltipWidth}px`,
-    transform: isTransitioning
-      ? `translate(${translateX}, ${motionOffset}) scale(0.965)`
-      : `translate(${translateX}, 0px) scale(1)`,
-    transformOrigin: shouldPlaceBelow ? "top center" : "bottom center",
+    ...placement,
+    transform: renderedTooltip.phase === "present" ? "translateY(0)" : `translateY(${placeBelow ? -4 : 4}px)`,
+    transformOrigin: placeBelow ? "top center" : "bottom center",
   };
 }
 
@@ -273,6 +150,43 @@ export function TimelineTooltip({
   const tooltipImage = tooltip.image;
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [measuredHeight, setMeasuredHeight] = useState(0);
+  const [bounds, setBounds] = useState<TooltipBounds>({ left: 10, top: 64, right: width - 10, bottom: height - 10 });
+
+  useLayoutEffect(() => {
+    const updateBounds = () => {
+      const parent = tooltipRef.current?.offsetParent;
+      if (!(parent instanceof HTMLElement)) return;
+      const rect = parent.getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const left = viewport?.offsetLeft ?? 0;
+      const top = viewport?.offsetTop ?? 0;
+      const right = left + (viewport?.width ?? window.innerWidth);
+      const bottom = top + (viewport?.height ?? window.innerHeight);
+      const styles = getComputedStyle(document.documentElement);
+      const inset = (side: string) => Number.parseFloat(styles.getPropertyValue(`--safe-area-${side}`)) || 0;
+      // Reserve the actual floating controls, including safe areas and font scaling.
+      const controlsBottom = Math.max(top, ...Array.from(document.querySelectorAll("[data-timeline-controls]"), el => el.getBoundingClientRect().bottom));
+      setBounds({
+        left: Math.max(0, left - rect.left, inset("left") - rect.left) + 10,
+        top: Math.max(0, controlsBottom - rect.top, top + inset("top") - rect.top) + 10,
+        right: Math.min(width, right - rect.left - inset("right")) - 10,
+        bottom: Math.min(height, bottom - rect.top - inset("bottom")) - 10,
+      });
+    };
+    updateBounds();
+    window.addEventListener("resize", updateBounds);
+    window.visualViewport?.addEventListener("resize", updateBounds);
+    window.visualViewport?.addEventListener("scroll", updateBounds);
+    return () => {
+      window.removeEventListener("resize", updateBounds);
+      window.visualViewport?.removeEventListener("resize", updateBounds);
+      window.visualViewport?.removeEventListener("scroll", updateBounds);
+    };
+  }, [width, height]);
+
+  useEffect(() => {
+    tooltipRef.current?.scrollTo({ top: 0 });
+  }, [renderedTooltip.tooltipState.id]);
 
   useEffect(() => {
     const el = tooltipRef.current;
@@ -285,7 +199,7 @@ export function TimelineTooltip({
   }, []);
 
   const { markErrored, markLoaded, shouldRenderImage, showSkeleton } =
-    useDelayedTooltipImage({
+    useTooltipImage({
       enabled: renderedTooltip.phase === "present",
       src: tooltipImage?.src,
       tooltipId: renderedTooltip.tooltipState.id,
@@ -293,20 +207,25 @@ export function TimelineTooltip({
 
   return (
     <div
-      ref={tooltipRef}
+      ref={(element) => {
+        tooltipRef.current = element;
+        interactiveContentRef.current = element;
+      }}
+      onPointerDown={(event) => event.stopPropagation()}
+      onWheel={(event) => event.stopPropagation()}
       className={cn(
         "absolute z-[50] rounded-lg border border-border bg-glass p-3 text-foreground shadow-glass backdrop-blur-md transition-[opacity,transform] duration-200 ease-out",
-        "pointer-events-none",
+        "pointer-events-auto overflow-y-auto overscroll-contain touch-pan-y break-words timeline-scrollbar motion-reduce:transition-none",
         renderedTooltip.phase === "present"
           ? "opacity-100"
           : "opacity-0 will-change-[transform,opacity]",
       )}
+      data-timeline-tooltip
       data-phase={renderedTooltip.phase}
       style={getTooltipStyle({
-        height,
+        bounds,
         measuredHeight,
         renderedTooltip,
-        width,
       })}
     >
       <div className="flex items-start gap-2">
@@ -383,7 +302,7 @@ export function TimelineTooltip({
         </figure>
       ) : null}
       {tooltipImage || tooltip.sources.length > 0 ? (
-        <div ref={interactiveContentRef}>
+        <div>
           {tooltipImage ? (
             <div
               className="mt-1 text-[0.64rem] font-medium leading-tight text-muted-foreground"
@@ -406,37 +325,28 @@ export function TimelineTooltip({
             </div>
           ) : null}
           {tooltip.sources.length > 0 ? (
-            <div className="mt-2">
-              <div className="mb-1 text-[0.62rem] font-semibold uppercase leading-none tracking-[0.08em] text-muted-foreground">
-                Sources
-              </div>
-              <ul className="m-0 list-none p-0">
-                {tooltip.sources.map((source) => (
-                  <li className="mt-1 first:mt-0" key={source.id}>
-                    {source.url ? (
-                      <a
-                        className="pointer-events-auto block text-[0.71rem] font-medium leading-snug text-foreground/90 no-underline hover:underline"
-                        href={source.url}
-                        rel="noreferrer"
-                        target="_blank"
-                      >
-                        {source.shortTitle}
-                      </a>
-                    ) : (
-                      <span className="block text-[0.71rem] font-medium leading-snug text-foreground/90">
-                        {source.shortTitle}
-                      </span>
-                    )}
-                    <span className="block text-[0.66rem] leading-tight text-muted-foreground">
-                      {source.organization}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <TooltipSources key={renderedTooltip.tooltipState.id} sources={tooltip.sources} />
           ) : null}
         </div>
       ) : null}
     </div>
   );
+}
+
+function TooltipSources({ sources }: { sources: RenderedTooltipState["tooltipState"]["tooltip"]["sources"] }) {
+  const list = <ul className="m-0 list-none p-0">
+    {sources.map(source => <li className="mt-2 first:mt-0" key={source.id}>
+      {source.url ? <a className="block py-1 text-[0.71rem] font-medium leading-snug text-foreground/90 hover:underline" href={source.url} rel="noreferrer" target="_blank">{source.shortTitle}</a>
+        : <span className="block text-[0.71rem] font-medium leading-snug">{source.shortTitle}</span>}
+      <span className="block text-[0.66rem] leading-tight text-muted-foreground">{source.organization}</span>
+    </li>)}
+  </ul>;
+  if (sources.length === 1) return <div className="mt-2 border-t border-border/60 pt-2">{list}</div>;
+  return <Collapsible className="mt-2 border-t border-border/60 pt-1">
+    <CollapsibleTrigger className="group flex cursor-pointer min-h-9 w-full items-center justify-between text-xs font-semibold text-muted-foreground">
+      Sources ({sources.length})
+      <ChevronDown className="size-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180 motion-reduce:transition-none" />
+    </CollapsibleTrigger>
+    <CollapsibleContent className="motion-reduce:animate-none"><div className="pb-1 pt-1">{list}</div></CollapsibleContent>
+  </Collapsible>;
 }

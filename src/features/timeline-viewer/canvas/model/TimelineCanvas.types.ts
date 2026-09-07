@@ -1,3 +1,4 @@
+import type { GuidedTimelineFocus } from "@/lib/rendering/guidedFocus";
 import type { ResolvedTimelineOverlayBand } from "@/lib/rendering/overlayTracks";
 import type { TimelineViewport } from "@/lib/core/viewport";
 import type { EdgeRailSide } from "../interactions/edgeInteraction";
@@ -23,6 +24,7 @@ export type TimelineCanvasProps = {
   enabledGroupIds: ReadonlySet<string>;
   overlayVisibilityTransitionKey: string;
   parentEra: Era | null;
+  guidedFocus?: GuidedTimelineFocus;
   isCosmicCalendarMode: boolean;
   isMapPreviewEnabled: boolean;
   isAnimating: boolean;

@@ -1,3 +1,4 @@
+import type { GuidedTimelineFocus } from "@/lib/rendering/guidedFocus";
 import type { RefObject } from "react";
 import type { Era, TimelineMarker } from "@/lib/core/timelineTypes";
 import type { PreciseTimelineYear } from "@/lib/core/viewport";
@@ -127,5 +128,6 @@ export type CanvasDrawContext = {
   preferredAxisLabelStepRef: RefObject<number | undefined>;
 
   // Display modes
+  guidedFocus?: GuidedTimelineFocus;
   isCosmicCalendarMode: boolean;
 };

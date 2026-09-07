@@ -84,13 +84,13 @@ export function useTouchGestures({
       y: touch.clientY - rect.top,
     });
 
-    const isMapPreviewGesture = (event: TouchEvent) =>
+    const isEmbeddedContentGesture = (event: TouchEvent) =>
       event
         .composedPath()
         .some(
           (target) =>
             target instanceof HTMLElement &&
-            target.dataset.mapPreview === "true",
+            (target.dataset.mapPreview === "true" || target.hasAttribute("data-timeline-tooltip")),
         );
 
     const stopActiveCanvasDrag = () => {
@@ -182,7 +182,7 @@ export function useTouchGestures({
     };
 
     const handleTouchStart = (event: TouchEvent) => {
-      if (isMapPreviewGesture(event)) {
+      if (isEmbeddedContentGesture(event)) {
         return;
       }
 
@@ -217,7 +217,7 @@ export function useTouchGestures({
     };
 
     const handleTouchMove = (event: TouchEvent) => {
-      if (isMapPreviewGesture(event)) {
+      if (isEmbeddedContentGesture(event)) {
         return;
       }
 
@@ -301,7 +301,7 @@ export function useTouchGestures({
     };
 
     const handleTouchEnd = (event: TouchEvent) => {
-      if (isMapPreviewGesture(event)) {
+      if (isEmbeddedContentGesture(event)) {
         return;
       }
 
@@ -328,7 +328,7 @@ export function useTouchGestures({
     };
 
     const handleTouchCancel = (event: TouchEvent) => {
-      if (isMapPreviewGesture(event)) {
+      if (isEmbeddedContentGesture(event)) {
         return;
       }
 

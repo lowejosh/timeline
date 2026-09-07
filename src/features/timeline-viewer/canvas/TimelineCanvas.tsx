@@ -100,6 +100,7 @@ export function TimelineCanvas({
   enabledGroupIds,
   overlayVisibilityTransitionKey,
   parentEra,
+  guidedFocus,
   isCosmicCalendarMode,
   isMapPreviewEnabled,
   isAnimating,
@@ -144,6 +145,7 @@ export function TimelineCanvas({
   const suppressTooltipUntilMoveRef = useRef(false);
   const tooltipExitTimeoutRef = useRef<number | null>(null);
   const tooltipEnterFrameRef = useRef(0);
+  const pendingHoverRef = useRef<{ tooltip: HoveredTooltipState; timer: number } | null>(null);
   const lastPointerRef = useRef<{
     x: number;
     y: number;
@@ -192,6 +194,7 @@ export function TimelineCanvas({
         cancelAnimationFrame(tooltipEnterFrameRef.current);
       }
 
+      if (pendingHoverRef.current) window.clearTimeout(pendingHoverRef.current.timer);
       publishMapPreviewYear(null);
     };
   }, []);
@@ -215,6 +218,7 @@ export function TimelineCanvas({
     resolvedOverlayBands,
     visibleMarkers,
   } = useTimelineCanvasScene({
+    guidedFocus,
     enabledGroupIds,
     expandedOverlayIds,
     height,
@@ -235,7 +239,7 @@ export function TimelineCanvas({
     }
     return map;
   }, [resolvedOverlayBands]);
-  const commitHoveredTooltip = useCallback(
+  const showHoveredTooltip = useCallback(
     (nextTooltip: HoveredTooltipState | null) => {
       const currentTooltip = hoveredTooltipRef.current;
 
@@ -303,6 +307,33 @@ export function TimelineCanvas({
     },
     [],
   );
+  const commitHoveredTooltip = useCallback((nextTooltip: HoveredTooltipState | null) => {
+    const pending = pendingHoverRef.current;
+    const immediate = !nextTooltip || isTouchTooltipPinnedRef.current || lastPointerRef.current?.pointerType === "touch";
+    if (immediate || hoveredTooltipRef.current?.id === nextTooltip?.id) {
+      if (pending) window.clearTimeout(pending.timer);
+      pendingHoverRef.current = null;
+      showHoveredTooltip(nextTooltip);
+      return;
+    }
+    if (pending?.tooltip.id === nextTooltip.id) { pending.tooltip = nextTooltip; return; }
+    if (pending) window.clearTimeout(pending.timer);
+    showHoveredTooltip(null);
+    pendingHoverRef.current = {
+      tooltip: nextTooltip,
+      timer: window.setTimeout(() => {
+        const ready = pendingHoverRef.current;
+        pendingHoverRef.current = null;
+        if (ready) showHoveredTooltip(ready.tooltip);
+      }, 220),
+    };
+  }, [showHoveredTooltip]);
+  const guidedChapterKey = guidedFocus?.stopKey;
+  useEffect(() => {
+    if (guidedChapterKey === undefined) return;
+    isTouchTooltipPinnedRef.current = false;
+    commitHoveredTooltip(null);
+  }, [guidedChapterKey, commitHoveredTooltip]);
   const highlightedMarkerId =
     hoveredTooltip?.tooltip.kind === "marker" ? hoveredTooltip.id : null;
   const resolveTooltipAtPoint = useCallback(
@@ -406,6 +437,7 @@ export function TimelineCanvas({
         },
         hoveredTooltipRef,
         invalidateReasons,
+        guidedFocus,
         isCosmicCalendarMode,
         isTouchTooltipPinned: isTouchTooltipPinnedRef.current,
         isViewportInteractionActive: isViewportInteractionActiveRef.current,
@@ -436,6 +468,7 @@ export function TimelineCanvas({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       commitHoveredTooltip,
+      guidedFocus,
       isCosmicCalendarMode,
       overlayScrollOffset,
       overviewReservedHeight,
@@ -617,6 +650,7 @@ export function TimelineCanvas({
     expandedOverlayExtraHeight,
     overlayVisibilityTransitionKey,
     scheduleRedraw,
+    !!guidedFocus,
   );
   const axisTickAnimationRef = useAxisTickAnimation(
     axisTickTargets,

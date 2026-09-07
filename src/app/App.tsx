@@ -1,4 +1,7 @@
-import { Suspense, useEffect, useMemo } from "react";
+import { ExperienceMenu } from "@/features/guided-experiences/ExperienceMenu";
+import { GuidedExperienceView } from "@/features/guided-experiences/GuidedExperienceView";
+import type { GuidedExperience } from "@/features/guided-experiences/experiences";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { Outlet } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 
@@ -22,6 +25,7 @@ import { getPrimaryShortcutModifierLabel } from "@/lib/app/timelineKeyboard";
 import { PwaInstallPrompt } from "@/components/misc";
 
 function App() {
+  const [experience, setExperience] = useState<GuidedExperience | null>(null);
   const catalog = useTimelineCatalog();
   const app = useTimelineAppState(catalog);
   const activeView = rx.useActiveView();
@@ -65,7 +69,7 @@ function App() {
   }, [actions, activeView]);
 
   useTimelineKeyboardShortcuts({
-    enabled: shortcutUiEnabled,
+    enabled: shortcutUiEnabled && !experience,
     isHelpOpen: isKeyboardHelpOpen,
     isSidebarOpen,
     onCloseHelp: actions.closeKeyboardHelp,
@@ -92,7 +96,10 @@ function App() {
     >
       {activeView === "timeline" ? (
         <>
-          <div className="absolute right-[var(--app-chrome-right)] top-[var(--app-chrome-top)] z-[5] flex items-start justify-end gap-2">
+          <div
+            data-timeline-controls
+            className="absolute right-[var(--app-chrome-right)] top-[var(--app-chrome-top)] z-[5] flex items-start justify-end gap-2"
+          >
             {shortcutUiEnabled ? (
               <>
                 <TimelineKeyboardHelpButton
@@ -137,6 +144,13 @@ function App() {
                 variant={shouldUseMobileSearchDialog ? "mobile" : "desktop"}
               />
             ) : null}
+            {/* <ExperienceMenu onSelect={(selected) => {
+              app.animated.cancelTransientMotion();
+              actions.setIsSearchOpen(false);
+              actions.setIsKeyboardHelpOpen(false);
+              actions.setIsSettingsOpen(false);
+              setExperience(selected);
+            }} /> */}
             <TimelineSettings
               className="order-3"
               isCosmicCalendarMode={isCosmicCalendarMode}
@@ -146,7 +160,11 @@ function App() {
                 actions.setIsCosmicCalendarMode((current) => !current);
               }}
             />
-            <Tooltip className="order-4" content="Create set" placement="bottom">
+            <Tooltip
+              className="order-4"
+              content="Create set"
+              placement="bottom"
+            >
               <Button
                 aria-label="Create set"
                 className="rounded-full text-primary"
@@ -191,6 +209,14 @@ function App() {
         onClose={actions.closeKeyboardHelp}
       />
       <PwaInstallPrompt />
+      {experience && (
+        <GuidedExperienceView
+          key={experience.id}
+          experience={experience}
+          catalog={catalog}
+          onClose={() => setExperience(null)}
+        />
+      )}
     </main>
   );
 }

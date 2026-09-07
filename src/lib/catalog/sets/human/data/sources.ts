@@ -1,4 +1,79 @@
 export const HUMAN_SOURCES = {
+  metSafavids: {
+    shortTitle: "Met: Safavid Iran", title: "The Art of the Safavids before 1600",
+    organization: "The Metropolitan Museum of Art",
+    citation: "The Metropolitan Museum of Art, The Art of the Safavids before 1600 (2002).",
+    url: "https://www.metmuseum.org/essays/the-art-of-the-safavids-before-1600",
+  },
+  iranicaChronology: {
+    shortTitle: "Iranica: Iranian chronology", title: "Chronology of Iranian History, Part 1",
+    organization: "Encyclopaedia Iranica",
+    citation: "Encyclopaedia Iranica, Chronology of Iranian History, Part 1.",
+    url: "https://www.iranicaonline.org/articles/chronology-of-iranian-history-part-1/",
+  },
+  metHittites: {
+    shortTitle: "Met: Hittites",
+    title: "The Hittites",
+    organization: "The Metropolitan Museum of Art",
+    citation: "The Metropolitan Museum of Art, \"The Hittites.\"",
+    url: "https://www.metmuseum.org/essays/the-hittites",
+  },
+  snlNabopolassar: {
+    shortTitle: "SNL: Nabopolassar",
+    title: "Nabopolassar",
+    organization: "Store norske leksikon",
+    citation: "Store norske leksikon, \"Nabopolassar.\"",
+    url: "https://snl.no/Nabopolassar",
+  },
+  uioLinearB: {
+    shortTitle: "Oslo: Linear B archives",
+    title: "DAMOS: Content",
+    organization: "University of Oslo",
+    citation: "University of Oslo, \"DAMOS: Content.\"",
+    url: "https://damos.hf.uio.no/about/content/",
+  },
+  amarnaProjectHistory: {
+    shortTitle: "Amarna Project: city history",
+    title: "History and Nature",
+    organization: "Amarna Project",
+    citation: "Amarna Project, \"History and Nature.\"",
+    url: "https://www.amarnaproject.com/discover-amarna/history-and-nature/",
+  },
+  morganEnheduanna: {
+    shortTitle: "Morgan: Enheduanna",
+    title: "She Who Wrote: Introduction",
+    organization: "The Morgan Library & Museum",
+    citation: "The Morgan Library & Museum, \"She Who Wrote: Introduction.\"",
+    url: "https://www.themorgan.org/exhibitions/online/she-who-wrote/introduction",
+  },
+  uclEgyptChronology: {
+    shortTitle: "UCL: Egyptian chronology",
+    title: "Egyptian Chronology",
+    organization: "University College London",
+    citation: "University College London, \"Egyptian Chronology.\"",
+    url: "https://www.ucl.ac.uk/museums-static/digitalegypt/chronology/index.html",
+  },
+  metEgyptLatePeriod: {
+    shortTitle: "Met: Late Period Egypt",
+    title: "Egypt in the Late Period (ca. 664?332 B.C.)",
+    organization: "The Metropolitan Museum of Art",
+    citation: "The Metropolitan Museum of Art, \"Egypt in the Late Period (ca. 664?332 B.C.).\"",
+    url: "https://www.metmuseum.org/essays/egypt-in-the-late-period-ca-712-332-b-c",
+  },
+  metHatshepsut: {
+    shortTitle: "Met: Hatshepsut",
+    title: "Hatshepsut: From Queen to Pharaoh",
+    organization: "The Metropolitan Museum of Art",
+    citation: "The Metropolitan Museum of Art, \"Hatshepsut: From Queen to Pharaoh.\"",
+    url: "https://www.metmuseum.org/exhibitions/listings/2006/hatshepsut",
+  },
+  pbsPuntExpedition: {
+    shortTitle: "NOVA: Expedition to Punt",
+    title: "The Expedition to Punt",
+    organization: "PBS NOVA",
+    citation: "PBS NOVA, \"The Expedition to Punt.\"",
+    url: "https://www.pbs.org/wgbh/nova/ancient/expedition-punt.html",
+  },
   appleIPhoneIntroduction: {
     shortTitle: "Apple: iPhone introduced",
     title: "Apple Reinvents the Phone with iPhone",
@@ -975,7 +1050,7 @@ export const HUMAN_SOURCES = {
     organization: "The Metropolitan Museum of Art",
     citation:
       'Department of Ancient Near Eastern Art. "Assyria, 1365–609 B.C." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
-    url: "https://www.metmuseum.org/toah/hd/assy/hd_assy.htm",
+    url: "https://www.metmuseum.org/essays/assyria-1365-609-b-c",
   },
   metBabylon: {
     shortTitle: "Met: Babylon",
@@ -983,7 +1058,7 @@ export const HUMAN_SOURCES = {
     organization: "The Metropolitan Museum of Art",
     citation:
       'Seymour, Michael. "Babylon." In Heilbrunn Timeline of Art History. The Metropolitan Museum of Art.',
-    url: "https://www.metmuseum.org/toah/hd/babl/hd_babl.htm",
+    url: "https://www.metmuseum.org/essays/babylon",
   },
   metByzantium: {
     shortTitle: "Met: Byzantium",

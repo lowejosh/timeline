@@ -1,3 +1,5 @@
+import { fitEraLabel } from "@/lib/rendering/eraLabel";
+import { smoothstep01 } from "@/lib/core/easing";
 import { shouldHideOverlappedEraLabel } from "@/lib/rendering/childLayers";
 import { resolveContextBandRenderState } from "@/lib/rendering/contextBands";
 import { resolveTextHoverBounds } from "@/lib/rendering/overlayLabelHover";
@@ -22,7 +24,7 @@ import type { CanvasDrawContext } from "./drawContext";
 
 type EraLayer = CanvasDrawContext["paintOrderedEraLayers"][number];
 
-function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
+function renderEra(layer: EraLayer, cx: CanvasDrawContext, fillOnly: boolean): void {
   const {
     context,
     eraScreenSpanById,
@@ -63,33 +65,47 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
 
   const axisY = layout.axisY;
 
-  context.save();
-  const backdropResetAlpha =
-    getEraBackdropResetAlpha(layer.depth, opacity) *
-    renderState.alphaMultiplier;
+  if (fillOnly) {
+    context.save();
+    const backdropResetAlpha =
+      getEraBackdropResetAlpha(layer.depth, opacity) *
+      renderState.alphaMultiplier;
 
-  if (backdropResetAlpha > 0.001) {
-    context.globalAlpha = backdropResetAlpha;
-    context.fillStyle = background;
+    if (backdropResetAlpha > 0.001) {
+      context.globalAlpha = backdropResetAlpha;
+      context.fillStyle = background;
+      context.fillRect(
+        renderState.renderLeft,
+        0,
+        renderState.renderWidth,
+        sceneHeight,
+      );
+    }
+
+    context.globalAlpha = opacity * ERA_BAND_ALPHA * renderState.alphaMultiplier;
+    context.fillStyle = era.color;
     context.fillRect(
       renderState.renderLeft,
       0,
       renderState.renderWidth,
       sceneHeight,
     );
+    context.restore();
+
+    return;
   }
 
-  context.globalAlpha = opacity * ERA_BAND_ALPHA * renderState.alphaMultiplier;
-  context.fillStyle = era.color;
-  context.fillRect(
-    renderState.renderLeft,
-    0,
-    renderState.renderWidth,
-    sceneHeight,
-  );
-  context.restore();
+  if (cx.guidedFocus && sceneHeight < 280) return;
 
-  const shouldHideInlineLabel = breadcrumbChainIds.has(era.id);
+  const hasReadableChildren = era.children?.some(child => {
+    const span = eraScreenSpanById.get(child.id);
+    return Math.min(span?.x1 ?? toX(child.endYear), sceneWidth - pad) -
+      Math.max(span?.x0 ?? toX(child.startYear), pad) >= 56;
+  });
+  const labelChildOpacity = hasReadableChildren ? layer.childOpacity : 0;
+  // A preview breadcrumb appears before the children finish fading in.
+  // Keep the in-place parent label until that handoff is complete.
+  const shouldHideInlineLabel = breadcrumbChainIds.has(era.id) && labelChildOpacity >= 0.98;
   const isPrimordialEra = EARLY_UNIVERSE_BAND_EXPANSION_IDS.has(era.id);
 
   // When the primordial detail strip is active and already labels this era,
@@ -122,23 +138,21 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     usesExpandedPrimordialLabel || usesCompactPrimordialLabel
       ? (EARLY_UNIVERSE_INLINE_LABELS[era.id] ?? era.name)
       : era.name;
-  const labelText = era.alternateName
-    ? `${baseLabelText}\n${era.alternateName}`
-    : baseLabelText;
+  const labelText = baseLabelText;
   const labelMinWidth = usesForcedPrimordialLabel
     ? 8
     : usesExpandedPrimordialLabel
       ? EARLY_UNIVERSE_EXPANDED_LABEL_MIN_WIDTH_PX
       : usesCompactPrimordialLabel
         ? EARLY_UNIVERSE_COMPACT_LABEL_MIN_WIDTH_PX
-        : 60;
+        : 36;
   const labelFadeWidth = usesForcedPrimordialLabel
     ? 18
     : usesExpandedPrimordialLabel
       ? EARLY_UNIVERSE_EXPANDED_LABEL_FADE_WIDTH_PX
       : usesCompactPrimordialLabel
         ? EARLY_UNIVERSE_COMPACT_LABEL_FADE_WIDTH_PX
-        : 120;
+        : 20;
   const labelFont = usesForcedPrimordialLabel
     ? `9px ${fontSans}`
     : usesExpandedPrimordialLabel || usesCompactPrimordialLabel
@@ -150,21 +164,27 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     (!shouldHideInlineLabel || allowsNormalPrimordialLabelBypass)
   ) {
     const labelX = Math.max(x0, pad) / 2 + Math.min(x1, sceneWidth - pad) / 2;
-    const labelBaselineY = axisY - 44;
-    const labelVisibility = getEraInlineLabelVisibility(layer.childOpacity);
+    const labelBaselineY = axisY - 44 - labelChildOpacity * 24;
+    const labelVisibility = getEraInlineLabelVisibility(labelChildOpacity);
     const labelAlpha =
       Math.min((visibleEraWidth - labelMinWidth) / labelFadeWidth, 1) *
-      labelVisibility *
-      (usesForcedPrimordialLabel ? 0.68 : 0.28 + Math.min(opacity, 1) * 0.22);
+      labelVisibility * smoothstep01(opacity) *
+      (usesForcedPrimordialLabel ? 0.68 : 0.58);
 
     context.save();
     context.font = labelFont;
-    const lines = labelText.split("\n");
+    const lines = fitEraLabel(labelText, Math.max(visibleEraWidth - 12, 0), text => context.measureText(text).width);
+    const alternateFont = `italic 10px ${fontSans}`;
+    context.font = alternateFont;
+    const alternateLines = era.alternateName ? fitEraLabel(era.alternateName, Math.max(visibleEraWidth - 12, 0), text => context.measureText(text).width) : [];
+    context.font = labelFont;
     let maxWidth = 0;
     for (const line of lines) {
       const metrics = context.measureText(line);
       maxWidth = Math.max(maxWidth, metrics.width);
     }
+    context.font = alternateFont;
+    for (const line of alternateLines) maxWidth = Math.max(maxWidth, context.measureText(line).width);
     const labelMetrics = {
       width: maxWidth,
       actualBoundingBoxAscent: 10,
@@ -192,6 +212,9 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     }
 
     context.save();
+    context.beginPath();
+    context.rect(Math.max(x0, pad), 0, visibleEraWidth, sceneHeight);
+    context.clip();
     context.globalAlpha = labelAlpha;
     context.font = labelFont;
     context.fillStyle = labelColor;
@@ -199,20 +222,19 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext): void {
     context.textBaseline = "bottom";
 
     const lineHeight = 12; // approximate line height
-    let currentY = labelBaselineY;
+    let currentY = labelBaselineY - (lines.length + alternateLines.length - 1) * lineHeight;
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (i === 1) {
-        // alternate name
-        context.font = `italic 9px ${fontSans}`;
-      }
       context.fillText(line, labelX, currentY);
       currentY += lineHeight;
     }
+    context.font = alternateFont;
+    context.globalAlpha = labelAlpha * 0.85;
+    for (const line of alternateLines) { context.fillText(line, labelX, currentY); currentY += lineHeight; }
     context.restore();
 
-    if (labelAlpha > 0.01) {
-      const totalHeight = lines.length * 12;
+    if (labelAlpha > 0.12) {
+      const totalHeight = (lines.length + alternateLines.length) * 12;
       const labelTop = labelBaselineY - totalHeight + 4;
       const labelBottom = labelBaselineY + 2;
       const hoverBounds = resolveTextHoverBounds({
@@ -254,7 +276,12 @@ export function drawEras(cx: CanvasDrawContext): void {
   } = cx;
 
   for (const layer of paintOrderedEraLayers) {
-    renderEra(layer, cx);
+    renderEra(layer, cx, true);
+  }
+
+  // Paint labels after every backdrop so child fills cannot erase parent text.
+  for (const layer of paintOrderedEraLayers) {
+    renderEra(layer, cx, false);
   }
 
   if (

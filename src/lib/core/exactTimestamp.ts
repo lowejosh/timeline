@@ -1,3 +1,4 @@
+import { duration, durationInYears } from "./time/duration";
 import {
   getTimelineYearFromAstronomicalYearValue,
   getTimelineYearFromYearsAfterBigBang,
@@ -7,7 +8,8 @@ import {
   normalizePreciseTimelineYear,
   splitTimelineYear,
   type PreciseTimelineYear,
-} from "./viewport";
+  toApproximateTimelineYear,
+} from "./time/preciseYear";
 
 export type TimelineElapsedReference = "ago" | "after-big-bang";
 export type TimelineTimestampPrecision =
@@ -57,7 +59,6 @@ export type TimelineExactTimestampFormatOptions = {
 };
 
 const numberFormatter = new Intl.NumberFormat("en-US");
-const AVERAGE_DAYS_PER_YEAR = 365.2425;
 const MONTH_LABELS = [
   "Jan",
   "Feb",
@@ -410,7 +411,7 @@ export function createExactElapsedTimestamp(
   return { ...timestamp, kind: "elapsed" };
 }
 
-export function getTimelineYearFromCalendarTimestamp(
+export function getPreciseTimelineYearFromCalendarTimestamp(
   timestamp: TimelineCalendarTimestamp,
 ) {
   const normalized = normalizeCalendarTimestamp(timestamp);
@@ -431,35 +432,16 @@ export function getTimelineYearFromCalendarTimestamp(
   const yearDurationMs = end - start;
   const elapsedMs = date.getTime() - start + normalized.microsecond / 1_000;
 
-  return timelineYear + elapsedMs / yearDurationMs;
+  return normalizePreciseTimelineYear(timelineYear, elapsedMs / yearDurationMs);
 }
 
-export function getTimelineYearFromElapsedTimestamp(
-  timestamp: TimelineElapsedTimestamp,
-) {
-  const normalized = normalizeElapsedTimestamp(timestamp);
-  const totalYears =
-    Number(normalized.years) +
-    Number(normalized.days) / AVERAGE_DAYS_PER_YEAR +
-    Number(normalized.hours) / 24 / AVERAGE_DAYS_PER_YEAR +
-    Number(normalized.minutes) / 60 / 24 / AVERAGE_DAYS_PER_YEAR +
-    Number(normalized.seconds) / 60 / 60 / 24 / AVERAGE_DAYS_PER_YEAR +
-    Number(normalized.milliseconds) /
-      1_000 /
-      60 /
-      60 /
-      24 /
-      AVERAGE_DAYS_PER_YEAR +
-    Number(normalized.microseconds) /
-      1_000_000 /
-      60 /
-      60 /
-      24 /
-      AVERAGE_DAYS_PER_YEAR;
+/** Approximate years are an index only; exact coordinates remain authoritative. */
+export function getTimelineYearFromCalendarTimestamp(timestamp: TimelineCalendarTimestamp) {
+  return toApproximateTimelineYear(getPreciseTimelineYearFromCalendarTimestamp(timestamp));
+}
 
-  return normalized.reference === "after-big-bang"
-    ? getTimelineYearFromYearsAfterBigBang(totalYears)
-    : getTimelineYearFromYearsAgo(totalYears);
+export function getTimelineYearFromElapsedTimestamp(timestamp: TimelineElapsedTimestamp) {
+  return toApproximateTimelineYear(getPreciseTimelineYearFromElapsedTimestamp(timestamp));
 }
 
 export function getPreciseTimelineYearFromElapsedTimestamp(
@@ -472,23 +454,8 @@ export function getPreciseTimelineYearFromElapsedTimestamp(
       : getTimelineYearFromYearsAgo(0),
   );
   const wholeYears = Number(normalized.years);
-  const fractionalYears =
-    Number(normalized.days) / AVERAGE_DAYS_PER_YEAR +
-    Number(normalized.hours) / 24 / AVERAGE_DAYS_PER_YEAR +
-    Number(normalized.minutes) / 60 / 24 / AVERAGE_DAYS_PER_YEAR +
-    Number(normalized.seconds) / 60 / 60 / 24 / AVERAGE_DAYS_PER_YEAR +
-    Number(normalized.milliseconds) /
-      1_000 /
-      60 /
-      60 /
-      24 /
-      AVERAGE_DAYS_PER_YEAR +
-    Number(normalized.microseconds) /
-      1_000_000 /
-      60 /
-      60 /
-      24 /
-      AVERAGE_DAYS_PER_YEAR;
+  const microseconds = (((normalized.days * 24n + normalized.hours) * 60n + normalized.minutes) * 60n + normalized.seconds) * 1_000_000n + normalized.milliseconds * 1_000n + normalized.microseconds;
+  const fractionalYears = durationInYears(duration(microseconds, -6));
 
   return normalized.reference === "after-big-bang"
     ? normalizePreciseTimelineYear(
@@ -513,7 +480,7 @@ export function getPreciseTimelineYearFromExactTimestamp(
   timestamp: TimelineExactTimestamp,
 ): PreciseTimelineYear {
   return timestamp.kind === "calendar"
-    ? splitTimelineYear(getTimelineYearFromCalendarTimestamp(timestamp))
+    ? getPreciseTimelineYearFromCalendarTimestamp(timestamp)
     : getPreciseTimelineYearFromElapsedTimestamp(timestamp);
 }
 

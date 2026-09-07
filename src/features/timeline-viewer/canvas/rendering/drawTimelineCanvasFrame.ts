@@ -1,3 +1,4 @@
+import type { GuidedTimelineFocus } from "@/lib/rendering/guidedFocus";
 import type { MutableRefObject, RefObject } from "react";
 
 import { compareEraPriorityAscending, type Era } from "@/lib/catalog/eras";
@@ -94,6 +95,7 @@ export type DrawTimelineCanvasFrameArgs = {
   commitHoveredTooltip: (tooltip: HoveredTooltipState | null) => void;
   frameRefs: TimelineCanvasFrameRefs;
   invalidateReasons: string[];
+  guidedFocus?: GuidedTimelineFocus;
   isCosmicCalendarMode: boolean;
   isTouchTooltipPinned: boolean;
   isViewportInteractionActive: boolean;
@@ -123,6 +125,7 @@ export function drawTimelineCanvasFrame({
   frameRefs,
   invalidateReasons,
   isCosmicCalendarMode,
+  guidedFocus,
   isTouchTooltipPinned,
   isViewportInteractionActive,
   lastPointer,
@@ -286,6 +289,7 @@ export function drawTimelineCanvasFrame({
       reserveAxisDateRow,
       overviewReservedHeight,
       expandedExtraHeight: expandedOverlayLayoutExtraHeight,
+      centerOverlays: !!guidedFocus,
     },
   );
   const overlayBottomY = getOverlayLaneY(layout, 0);
@@ -457,6 +461,7 @@ export function drawTimelineCanvasFrame({
     markPerf,
     isViewportInteractionActive,
     preferredAxisLabelStepRef: frameRefs.preferredAxisLabelStepRef,
+    guidedFocus,
     isCosmicCalendarMode,
   };
 

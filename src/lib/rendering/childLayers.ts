@@ -52,7 +52,6 @@ export function getEraChildOpacity(
   viewport: TimelineViewport,
   width: number,
   pad: number,
-  _isAnimating: boolean,
 ) {
   if ((era.children?.length ?? 0) === 0) return 0;
 
@@ -176,7 +175,6 @@ export function resolveTimelineEraLayers(
         viewport,
         width,
         pad,
-        isAnimating,
       );
 
       return {

@@ -18,26 +18,6 @@ const COLD_WAR_DIGITAL_AGE_HANDOFF_AT = createExactCalendarTimestamp({
 const COLD_WAR_DIGITAL_AGE_HANDOFF_YEAR = getTimelineYearFromExactTimestamp(
   COLD_WAR_DIGITAL_AGE_HANDOFF_AT,
 );
-const IPHONE_INTRODUCED_AT = createExactCalendarTimestamp({
-  era: "ce",
-  year: 2007,
-  month: 1,
-  day: 9,
-  precision: "day",
-});
-const IPHONE_INTRODUCED_YEAR =
-  getTimelineYearFromExactTimestamp(IPHONE_INTRODUCED_AT);
-const CHATGPT_INTRODUCED_AT = createExactCalendarTimestamp({
-  era: "ce",
-  year: 2022,
-  month: 11,
-  day: 30,
-  precision: "day",
-});
-const CHATGPT_INTRODUCED_YEAR = getTimelineYearFromExactTimestamp(
-  CHATGPT_INTRODUCED_AT,
-);
-
 const HUMAN_HISTORY_COLORS = {
   paleolithic: "rgb(64, 167, 226)",
   epipaleolithic: "rgb(232, 134, 69)",
@@ -77,10 +57,6 @@ const HUMAN_HISTORY_COLORS = {
   postwarOrder: "rgb(232, 199, 69)",
   coldWarAndDecolonization: "rgb(223, 83, 181)",
   digitalAge: "rgb(58, 206, 223)",
-  openWebEra: "rgb(85, 170, 238)",
-  mobileComputingEra: "rgb(96, 214, 122)",
-  algorithmicEra: "rgb(240, 176, 66)",
-  aiAndAutomationEra: "rgb(197, 96, 232)",
 } as const;
 
 export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
@@ -198,7 +174,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
         scheme: "archaeological",
         image: {
           src: commonsTooltipImage(
-            "Çatalhöyük after the first excavations by James Mellaart and his team..jpg",
+            "Ã‡atalhÃ¶yÃ¼k after the first excavations by James Mellaart and his team..jpg",
           ),
           alt: "Excavated Neolithic houses at Catalhoyuk",
           width: 1799,
@@ -713,56 +689,7 @@ export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
           "cernBirthWeb",
           "openAiIntroducingChatGpt",
         ],
-        children: [
-          {
-            id: "open-web-era",
-            name: "Open Web Era",
-            startYear: COLD_WAR_DIGITAL_AGE_HANDOFF_YEAR,
-            endYear: IPHONE_INTRODUCED_YEAR,
-            exactEndTime: IPHONE_INTRODUCED_AT,
-            color: HUMAN_HISTORY_COLORS.openWebEra,
-            description:
-              "The web escapes the lab and becomes a public medium for pages, portals, search, and early online communities.",
-            scheme: "world-history",
-            sourceIds: ["cernShortHistoryWeb", "cernBirthWeb"],
-          },
-          {
-            id: "mobile-computing-era",
-            name: "Mobile Computing Era",
-            startYear: IPHONE_INTRODUCED_YEAR,
-            exactStartTime: IPHONE_INTRODUCED_AT,
-            endYear: ce(2012),
-            color: HUMAN_HISTORY_COLORS.mobileComputingEra,
-            description:
-              "Smartphones put full internet access, apps, maps, cameras, and constant connectivity in a pocket.",
-            scheme: "world-history",
-            sourceIds: ["appleIPhoneIntroduction"],
-          },
-          {
-            id: "algorithmic-era",
-            name: "Algorithmic Era",
-            startYear: ce(2012),
-            endYear: CHATGPT_INTRODUCED_YEAR,
-            exactEndTime: CHATGPT_INTRODUCED_AT,
-            color: HUMAN_HISTORY_COLORS.algorithmicEra,
-            description:
-              "Big data, ranking systems, recommendation feeds, and automated targeting increasingly shape what people see, buy, and do online.",
-            scheme: "world-history",
-            sourceIds: ["trustMeBro"],
-          },
-          {
-            id: "ai-and-automation-era",
-            name: "AI and Automation Era",
-            startYear: CHATGPT_INTRODUCED_YEAR,
-            exactStartTime: CHATGPT_INTRODUCED_AT,
-            endYear: CURRENT_YEAR,
-            color: HUMAN_HISTORY_COLORS.aiAndAutomationEra,
-            description:
-              "Generative AI and increasingly autonomous software move into mainstream writing, coding, search, and office work.",
-            scheme: "world-history",
-            sourceIds: ["openAiIntroducingChatGpt", "oecdAiWipsProgram"],
-          },
-        ],
+
       },
     ],
   },

@@ -23,6 +23,8 @@ export function drawMarkers(
     markerPriorityBoostRef,
     fontSans,
   } = cx;
+  // Short reading-mode canvases reserve room for the bands and year axis.
+  if (cx.guidedFocus && cx.sceneHeight < 280) return [];
   const axisY = layout.axisY;
 
   const visibleMarkerPositions = getVisibleMarkerPositions(

@@ -372,7 +372,7 @@ export function useWheelZoomPan({
     }
 
     const handleNativeWheel = (event: globalThis.WheelEvent) => {
-      if (isInsideMapPreview(event)) {
+      if ((event.target instanceof Element && event.target.closest("[data-timeline-tooltip]")) || isInsideMapPreview(event)) {
         return;
       }
 

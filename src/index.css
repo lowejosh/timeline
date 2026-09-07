@@ -47,7 +47,7 @@
     monospace;
 }
 
-/* ── CSS custom properties kept for runtime reads (canvas theme, legacy refs) ── */
+/* â”€â”€ CSS custom properties kept for runtime reads (canvas theme, legacy refs) â”€â”€ */
 :root {
   --background: #f4ecdd;
   --foreground: #201913;
@@ -92,7 +92,7 @@
   --font-mono:
     'SF Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas,
     monospace;
-  /* ── Design token shorthands — mirrors THEME in theme.ts for runtime readers ── */
+  /* â”€â”€ Design token shorthands â€” mirrors THEME in theme.ts for runtime readers â”€â”€ */
   --glass-base: rgba(251, 247, 239, 0.5);
   --glass-hover: rgba(255, 251, 244, 0.62);
   --glass-active: rgba(255, 251, 244, 0.58);
@@ -246,7 +246,7 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
-/* ── App layout shell ─────────────────────────────────────────────────────── */
+/* â”€â”€ App layout shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .app-shell {
   padding-top: env(safe-area-inset-top, 0px);
   --app-chrome-left: calc(env(safe-area-inset-left, 0px) + 0.75rem);

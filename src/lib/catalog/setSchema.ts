@@ -405,6 +405,13 @@ function resolveTimelinePoint(
   return getTimelineYearFromExactTimestamp(normalizeRawExactTimestamp(point));
 }
 
+/** An explicit or inline exact timestamp is authoritative; numeric years are derived indexes. */
+function resolveCatalogPoint(point: TimelineRawTimelinePoint, exact: TimelineRawExactTimestamp | undefined, label: string) {
+  const timestamp = exact ?? (typeof point !== "number" && point.kind !== "relative" ? point : undefined);
+  const exactTime = timestamp ? normalizeRawExactTimestamp(timestamp) : undefined;
+  return { year: exactTime ? getTimelineYearFromExactTimestamp(exactTime) : resolveTimelinePoint(point, label), exactTime };
+}
+
 function normalizeGroupNode(
   node: TimelineRawDecorationGroup,
   categoryId: string,
@@ -471,6 +478,7 @@ function normalizeMarker(
     `Marker ${marker.id}`,
   );
 
+  const point = resolveCatalogPoint(marker.year, marker.exactTime, `Marker ${marker.id} year`);
   return {
     id: marker.id,
     label: marker.label,
@@ -485,10 +493,8 @@ function normalizeMarker(
     minZoom: marker.minZoom,
     maxZoom: marker.maxZoom,
     regionalScopeLabel: marker.regionalScopeLabel,
-    year: resolveTimelinePoint(marker.year, `Marker ${marker.id} year`),
-    exactTime: marker.exactTime
-      ? normalizeRawExactTimestamp(marker.exactTime)
-      : undefined,
+    year: point.year,
+    exactTime: point.exactTime,
     approximate: marker.approximate,
     color: marker.color,
     dateLabel: marker.dateLabel,
@@ -527,6 +533,8 @@ function normalizeOverlay(
     `Overlay ${overlay.id}`,
   );
 
+  const start = resolveCatalogPoint(overlay.startYear, overlay.exactStartTime, `overlay ${overlay.id} start`);
+  const end = resolveCatalogPoint(overlay.endYear, overlay.exactEndTime, `overlay ${overlay.id} end`);
   return {
     id: overlay.id,
     label: overlay.label,
@@ -542,20 +550,10 @@ function normalizeOverlay(
     minZoom: overlay.minZoom,
     maxZoom: overlay.maxZoom,
     regionalScopeLabel: overlay.regionalScopeLabel,
-    startYear: resolveTimelinePoint(
-      overlay.startYear,
-      `Overlay ${overlay.id} startYear`,
-    ),
-    endYear: resolveTimelinePoint(
-      overlay.endYear,
-      `Overlay ${overlay.id} endYear`,
-    ),
-    exactStartTime: overlay.exactStartTime
-      ? normalizeRawExactTimestamp(overlay.exactStartTime)
-      : undefined,
-    exactEndTime: overlay.exactEndTime
-      ? normalizeRawExactTimestamp(overlay.exactEndTime)
-      : undefined,
+    startYear: start.year,
+    endYear: end.year,
+    exactStartTime: start.exactTime,
+    exactEndTime: end.exactTime,
     approximateStart: overlay.approximateStart,
     approximateEnd: overlay.approximateEnd,
     color: overlay.color,
@@ -581,18 +579,16 @@ function normalizeEraNode(
   assertNonEmptyString(era.name, `Era ${era.id} name`);
   validateSourceIds(era.sourceIds, availableSourceIds, `Era ${era.id}`);
 
+  const start = resolveCatalogPoint(era.startYear, era.exactStartTime, `era ${era.id} start`);
+  const end = resolveCatalogPoint(era.endYear, era.exactEndTime, `era ${era.id} end`);
   return {
     id: era.id,
     name: era.name,
     alternateName: era.alternateName,
-    startYear: resolveTimelinePoint(era.startYear, `Era ${era.id} startYear`),
-    endYear: resolveTimelinePoint(era.endYear, `Era ${era.id} endYear`),
-    exactStartTime: era.exactStartTime
-      ? normalizeRawExactTimestamp(era.exactStartTime)
-      : undefined,
-    exactEndTime: era.exactEndTime
-      ? normalizeRawExactTimestamp(era.exactEndTime)
-      : undefined,
+    startYear: start.year,
+    endYear: end.year,
+    exactStartTime: start.exactTime,
+    exactEndTime: end.exactTime,
     color: era.color,
     timeLabel: era.timeLabel,
     description: era.description,

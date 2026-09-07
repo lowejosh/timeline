@@ -1,7 +1,9 @@
+import type { GuidedTimelineFocus } from "@/lib/rendering/guidedFocus";
 import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type RefObject,
 } from "react";
@@ -14,7 +16,7 @@ import {
   getTimelineLayout,
   resolveExpandedOverlayDetails,
 } from "@/lib/rendering/canvas/overlayLayout";
-import { AXIS_TICK_OVERSCAN_PX } from "@/lib/rendering/canvas/constants";
+import { AXIS_TICK_OVERSCAN_PX, OVERLAY_LANE_HEIGHT, OVERLAY_LANE_GAP } from "@/lib/rendering/canvas/constants";
 import {
   EARLY_UNIVERSE_END_YEAR,
   EARLY_UNIVERSE_START_YEAR,
@@ -35,6 +37,7 @@ import {
 import type { TimelineMarker, TimelineOverlayBand } from "@/lib/catalog/eras";
 
 type UseTimelineCanvasSceneArgs = {
+  guidedFocus?: GuidedTimelineFocus;
   enabledGroupIds: ReadonlySet<string>;
   expandedOverlayIds: readonly string[];
   height: number;
@@ -49,6 +52,7 @@ type UseTimelineCanvasSceneArgs = {
 };
 
 export function useTimelineCanvasScene({
+  guidedFocus,
   enabledGroupIds,
   expandedOverlayIds,
   height,
@@ -163,14 +167,17 @@ export function useTimelineCanvasScene({
       0,
     );
   }, [expandedOverlayIds, resolvedOverlayBands, viewport, width, pad]);
+  const centerOverlays = !!guidedFocus;
   const overlayInteractionLayout = useMemo(
     () =>
       getTimelineLayout(height, overlayLaneCount, overlayScrollOffset, {
         reserveAxisDateRow,
         overviewReservedHeight,
         expandedExtraHeight: expandedOverlayExtraHeight,
+        centerOverlays,
       }),
     [
+      centerOverlays,
       expandedOverlayExtraHeight,
       height,
       overlayLaneCount,
@@ -186,8 +193,10 @@ export function useTimelineCanvasScene({
         reserveAxisDateRow,
         overviewReservedHeight,
         expandedExtraHeight: expandedOverlayExtraHeight,
+        centerOverlays,
       }).overlayScrollOffset,
     [
+      centerOverlays,
       expandedOverlayExtraHeight,
       height,
       overlayLaneCount,
@@ -196,8 +205,12 @@ export function useTimelineCanvasScene({
     ],
   );
 
+  const focusFrameRef = useRef(0);
+  const offsetRef = useRef(overlayScrollOffset);
+  useEffect(() => { offsetRef.current = overlayScrollOffset; }, [overlayScrollOffset]);
   const adjustOverlayScrollOffset = useCallback(
     (deltaY: number) => {
+      cancelAnimationFrame(focusFrameRef.current);
       if (overlayInteractionLayout.overlayScrollMax <= 0) {
         return;
       }
@@ -213,6 +226,33 @@ export function useTimelineCanvasScene({
     setOverlayScrollOffset((current) => clampOverlayScrollOffset(current));
   }, [clampOverlayScrollOffset]);
 
+  const hasFramed = useRef(false);
+  const lastFocusRequest = useRef<string | null>(null);
+  const focusLane = resolvedOverlayBands.find(item => item.band.id === guidedFocus?.bandId)?.laneIndex;
+  const focusKey = guidedFocus?.stopKey;
+  const focusTarget = focusLane === undefined ? undefined : clampOverlayScrollOffset(
+    (overlayInteractionLayout.overlayClipTop - overlayInteractionLayout.overlayClipBottom) / 2
+    + OVERLAY_LANE_HEIGHT / 2 + focusLane * (OVERLAY_LANE_HEIGHT + OVERLAY_LANE_GAP),
+  );
+  useEffect(() => {
+    if (focusKey === undefined || focusTarget === undefined) return;
+    const request = `${focusKey}:${width}:${height}`;
+    if (lastFocusRequest.current === request) return;
+    lastFocusRequest.current = request;
+    const from = offsetRef.current;
+    const started = performance.now();
+    const instant = !hasFramed.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    hasFramed.current = true;
+    const tick = (now: number) => {
+      const t = instant ? 1 : Math.min((now - started) / 350, 1);
+      setOverlayScrollOffset(from + (focusTarget - from) * (1 - (1 - t) ** 3));
+      if (t < 1) focusFrameRef.current = requestAnimationFrame(tick);
+    };
+    if (instant) tick(started);
+    else focusFrameRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(focusFrameRef.current);
+  }, [focusKey, focusTarget, width, height]);
+
   useEffect(() => {
     const surface = surfaceRef.current;
 
@@ -221,6 +261,7 @@ export function useTimelineCanvasScene({
     }
 
     const handleOverlayWheel = (event: globalThis.WheelEvent) => {
+      if (event.target instanceof Element && event.target.closest("[data-timeline-tooltip]")) return;
       if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
         return;
       }

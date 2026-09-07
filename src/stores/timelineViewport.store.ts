@@ -3,17 +3,15 @@ import { create } from "zustand";
 import {
   getHomeViewport,
   getViewportForRange,
+  interpolateViewport,
   normalizeViewport,
   panByPixels,
   zoomAtPosition,
-  type TimelineScaleMode,
   type TimelineViewport,
 } from "@/lib/core/viewport";
 
 type AnimationTarget = {
-  centerYear: number;
-  zoom: number;
-  scaleMode?: TimelineScaleMode;
+  target: TimelineViewport;
   startTime: number;
   duration: number;
   from: TimelineViewport;
@@ -128,15 +126,8 @@ export const useTimelineViewportStore = create<TimelineViewportStore>(
         const elapsed = currentTime - anim.startTime;
         const rawT = Math.min(elapsed / anim.duration, 1);
         const t = 1 - (1 - rawT) ** 3;
-        const centerYear =
-          anim.from.centerYear + (anim.centerYear - anim.from.centerYear) * t;
-        const zoom = anim.from.zoom + (anim.zoom - anim.from.zoom) * t;
         const next = normalizeForWidth(
-          {
-            centerYear,
-            zoom,
-            scaleMode: anim.scaleMode ?? anim.from.scaleMode,
-          },
+          interpolateViewport(anim.from, anim.target, t),
           width,
         );
 
@@ -192,9 +183,7 @@ export const useTimelineViewportStore = create<TimelineViewportStore>(
         );
 
         animationTarget = {
-          centerYear: target.centerYear,
-          zoom: target.zoom,
-          scaleMode: target.scaleMode,
+          target,
           startTime: now(),
           duration: ANIMATION_DURATION,
           from: { ...viewport },
@@ -209,9 +198,7 @@ export const useTimelineViewportStore = create<TimelineViewportStore>(
         const normalizedTarget = normalizeForWidth(target, width);
 
         animationTarget = {
-          centerYear: normalizedTarget.centerYear,
-          zoom: normalizedTarget.zoom,
-          scaleMode: normalizedTarget.scaleMode,
+          target: normalizedTarget,
           startTime: now(),
           duration: ANIMATION_DURATION,
           from: { ...viewport },

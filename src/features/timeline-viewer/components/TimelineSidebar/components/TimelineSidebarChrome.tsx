@@ -46,6 +46,7 @@ export function TimelineSidebarChrome({
   return (
     <>
       <div
+        data-timeline-controls
         className={cn(
           "absolute left-[var(--app-chrome-left)] top-[var(--app-chrome-top)] z-[4] flex items-center gap-2",
           "transition-[opacity,transform] duration-200",

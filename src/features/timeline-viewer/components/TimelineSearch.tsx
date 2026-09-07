@@ -67,6 +67,7 @@ export function TimelineSearch({
   variant = "desktop",
 }: TimelineSearchProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const searchRef = useRef<HTMLDivElement | null>(null);
   const resultButtonRefs = useRef(new Map<string, HTMLButtonElement>());
   const dialogTitleId = useId();
   const resultsId = useId();
@@ -99,6 +100,19 @@ export function TimelineSearch({
     },
     [isOpen],
   );
+
+  useEffect(() => {
+    if (!isOpen) return;
+    // Capture also sees taps consumed by the canvas gesture handlers.
+    const dismissOutside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !searchRef.current?.contains(event.target)) {
+        inputRef.current?.blur();
+        onOpenChange(false);
+      }
+    };
+    document.addEventListener("pointerdown", dismissOutside, true);
+    return () => document.removeEventListener("pointerdown", dismissOutside, true);
+  }, [isOpen, onOpenChange]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -322,61 +336,66 @@ export function TimelineSearch({
           <div
             aria-labelledby={dialogTitleId}
             aria-modal="true"
-            className="fixed inset-0 z-[60] grid grid-rows-[auto_1fr] bg-popover/95 text-popover-foreground backdrop-blur-md"
+            className="fixed inset-0 z-[60] bg-overlay-scrim backdrop-blur-sm touch-pan-y"
+            onPointerDown={(event) => {
+              if (event.target === event.currentTarget) onOpenChange(false);
+            }}
             role="dialog"
           >
-            <h2 className="sr-only" id={dialogTitleId}>
-              Search timeline
-            </h2>
-            <div className="flex items-center gap-2 border-b border-border/70 px-3 pb-3 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)]">
-              <div className="flex h-10 min-w-0 flex-1 items-center overflow-hidden rounded-full border border-border/80 bg-surface/70 shadow-glass">
-                <Search className="ml-3 size-4 shrink-0 text-muted-foreground" />
-                <input
-                  aria-activedescendant={
-                    results[activeIndex]
-                      ? `timeline-search-result-${results[activeIndex].id}`
-                      : undefined
-                  }
-                  aria-autocomplete="list"
-                  aria-controls={resultsId}
-                  aria-expanded={hasResultsPanel}
-                  aria-label="Search timeline markers and bands"
-                  className="min-w-0 flex-1 border-0 bg-transparent px-2 py-1 text-[16px] font-semibold text-foreground outline-none placeholder:text-muted-foreground/70"
-                  onChange={(event) => {
-                    setQuery(event.currentTarget.value);
-                  }}
-                  onKeyDown={handleInputKeyDown}
-                  placeholder="Search timeline"
-                  ref={setInputRef}
-                  role="combobox"
-                  value={query}
-                />
-              </div>
-              <Button
-                aria-label="Close search"
-                className="rounded-full"
-                onClick={() => {
-                  onOpenChange(false);
-                }}
-                size="icon"
-                type="button"
-                variant="ghost"
-              >
-                <X className="size-4" />
-              </Button>
-            </div>
-            <div
-              className="min-h-0 overflow-hidden px-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-2"
-              id={resultsId}
-              role="listbox"
-            >
-              {hasQuery ? (
-                renderResults("max-h-full")
-              ) : (
-                <div className="px-3 py-5 text-[0.82rem] font-semibold text-muted-foreground">
-                  Search visible timeline layers
+            <div ref={searchRef} className="mx-auto grid max-h-[75dvh] w-full max-w-xl grid-rows-[auto_minmax(0,1fr)] rounded-b-xl border-b border-border bg-popover text-popover-foreground shadow-panel">
+              <h2 className="sr-only" id={dialogTitleId}>
+                Search timeline
+              </h2>
+              <div className="flex items-center gap-2 border-b border-border/70 px-3 pb-3 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)]">
+                <div className="flex h-10 min-w-0 flex-1 items-center overflow-hidden rounded-full border border-border/80 bg-surface/70 shadow-glass">
+                  <Search className="ml-3 size-4 shrink-0 text-muted-foreground" />
+                  <input
+                    aria-activedescendant={
+                      results[activeIndex]
+                        ? `timeline-search-result-${results[activeIndex].id}`
+                        : undefined
+                    }
+                    aria-autocomplete="list"
+                    aria-controls={resultsId}
+                    aria-expanded={hasResultsPanel}
+                    aria-label="Search timeline markers and bands"
+                    className="min-w-0 flex-1 border-0 bg-transparent px-2 py-1 text-[16px] font-semibold text-foreground outline-none placeholder:text-muted-foreground/70"
+                    onChange={(event) => {
+                      setQuery(event.currentTarget.value);
+                    }}
+                    onKeyDown={handleInputKeyDown}
+                    placeholder="Search timeline"
+                    ref={setInputRef}
+                    role="combobox"
+                    value={query}
+                  />
                 </div>
-              )}
+                <Button
+                  aria-label="Close search"
+                  className="rounded-full"
+                  onClick={() => {
+                    onOpenChange(false);
+                  }}
+                  size="icon"
+                  type="button"
+                  variant="ghost"
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
+              <div
+                className="min-h-0 overflow-hidden px-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-2"
+                id={resultsId}
+                role="listbox"
+              >
+                {hasQuery ? (
+                  renderResults("max-h-full")
+                ) : (
+                  <div className="px-3 py-5 text-[0.82rem] font-semibold text-muted-foreground">
+                    Search visible timeline layers
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ) : null}
@@ -385,7 +404,7 @@ export function TimelineSearch({
   }
 
   return (
-    <div className={cn(className)}>
+    <div ref={searchRef} className={cn("touch-pan-y", className)}>
       <div
         className={cn(
           "relative flex items-center justify-end transition-[width] duration-300 ease-out",
@@ -414,7 +433,7 @@ export function TimelineSearch({
                 aria-controls={resultsId}
                 aria-expanded={hasResultsPanel}
                 aria-label="Search timeline markers and bands"
-                className="min-w-0 flex-1 border-0 bg-transparent px-2 py-1 text-sm font-semibold text-foreground outline-none placeholder:text-muted-foreground/70"
+                className="min-w-0 flex-1 border-0 bg-transparent px-2 py-1 text-[16px] font-semibold text-foreground outline-none placeholder:text-muted-foreground/70"
                 onChange={(event) => {
                   setQuery(event.currentTarget.value);
                 }}
