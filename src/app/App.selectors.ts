@@ -23,6 +23,9 @@ export const useIsSearchOpen = () =>
 export const useIsSettingsOpen = () =>
   useTimelineUiStore((state) => state.isSettingsOpen);
 
+export const useIsZoomColorsEnabled = () =>
+  useTimelineUiStore((state) => state.isZoomColorsEnabled);
+
 export const useIsCosmicCalendarMode = () =>
   useTimelineUiStore((state) => state.isCosmicCalendarMode);
 
@@ -80,6 +83,7 @@ export function useAppActions() {
   const setIsSidebarOpen = useTimelineUiStore(
     (state) => state.setIsSidebarOpen,
   );
+  const setIsZoomColorsEnabled = useTimelineUiStore((state) => state.setIsZoomColorsEnabled);
   const setIsCosmicCalendarMode = useTimelineUiStore(
     (state) => state.setIsCosmicCalendarMode,
   );
@@ -96,6 +100,7 @@ export function useAppActions() {
       closeKeyboardHelp,
       openCreateSet,
       setIsCosmicCalendarMode,
+      setIsZoomColorsEnabled,
       setIsKeyboardHelpOpen,
       setIsMapPreviewEnabled,
       setIsSearchOpen,
@@ -108,6 +113,7 @@ export function useAppActions() {
       closeKeyboardHelp,
       openCreateSet,
       setIsCosmicCalendarMode,
+      setIsZoomColorsEnabled,
       setIsKeyboardHelpOpen,
       setIsMapPreviewEnabled,
       setIsSearchOpen,

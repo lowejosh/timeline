@@ -1,3 +1,6 @@
+import { useTimelineVisibilityState } from "@/hooks/useTimelineVisibilityState";
+import { useTimelineLayerStore } from "@/stores/timelineLayer.store";
+import { filterHiddenOverlayBands } from "@/lib/app/timelineVisibility";
 import { Crosshair } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TimelineCanvas } from "@/features/timeline-viewer/canvas";
@@ -21,6 +24,24 @@ function ExperienceCanvas({ experience, stop, catalog, width, height, frameReque
   const [initial] = useState(() => getExperienceViewport(stop, innerWidth));
   const camera = useAnimatedViewport(initial, innerWidth);
   const { animateToViewport, updateViewport, cancelTransientMotion } = camera;
+  const manualGroups = useTimelineLayerStore(state => state.manualEnabledGroupIds);
+  const evolutionMode = useTimelineLayerStore(state => state.humanEvolutionToggleMode);
+  const [suppressed, setSuppressed] = useState<ReadonlySet<string>>(new Set());
+  const visibleSets = useMemo(() => new Set(content.overlays.flatMap(band => band.setId ? [band.setId] : [])), [content]);
+  const guideGroups = useMemo(() => {
+    const groups = new Set(manualGroups);
+    for (const band of content.overlays) {
+      if (experience.subjectIds.includes(band.id) && band.groupId) groups.add(band.groupId);
+    }
+    return groups;
+  }, [manualGroups, content, experience]);
+  const visibility = useTimelineVisibilityState({
+    catalog, canvasPad: pad, innerWidth, viewportWidth: width, viewport: camera.viewport,
+    visibleSetIds: visibleSets, manualEnabledGroupIds: guideGroups,
+    humanEvolutionToggleMode: evolutionMode, autoSuppressedGroupIds: suppressed,
+    setAutoSuppressedGroupIds: setSuppressed, overlayVisibilityTransitionSeed: 0,
+  });
+  const overlays = useMemo(() => filterHiddenOverlayBands(content.overlays, visibility.autoHiddenOverlayIds), [content, visibility.autoHiddenOverlayIds]);
   const [revealYear, setRevealYear] = useState(stop.year);
   const revealRef = useRef(stop.year);
   const firstFrame = useRef(true);
@@ -67,7 +88,7 @@ function ExperienceCanvas({ experience, stop, catalog, width, height, frameReque
     width={width} height={height} pad={pad}
     viewport={camera.viewport} isAnimating={camera.isAnimating}
     activeEra={content.era} activeChain={[]} siblingEras={content.era.children ?? []} parentEra={null}
-    markers={markers} overlayBands={content.overlays} enabledGroupIds={content.enabledGroupIds}
+    markers={markers} overlayBands={overlays} enabledGroupIds={visibility.renderEnabledGroupIds}
     overlayVisibilityTransitionKey={`experience:${experience.id}`}
     guidedFocus={focus} isCosmicCalendarMode={false} isMapPreviewEnabled={false}
     onViewportChange={move} onContinuousViewportChange={camera.updateViewportDirect}

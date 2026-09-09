@@ -1,3 +1,4 @@
+import { ExperienceMenu } from "@/features/guided-experiences/ExperienceMenu";
 import { GuidedExperienceView } from "@/features/guided-experiences/GuidedExperienceView";
 import type { GuidedExperience } from "@/features/guided-experiences/experiences";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -32,6 +33,7 @@ function App() {
   const isKeyboardHelpOpen = rx.useIsKeyboardHelpOpen();
   const isSearchOpen = rx.useIsSearchOpen();
   const isSettingsOpen = rx.useIsSettingsOpen();
+  const isZoomColorsEnabled = rx.useIsZoomColorsEnabled();
   const isCosmicCalendarMode = rx.useIsCosmicCalendarMode();
   const isMapPreviewEnabled = rx.useIsMapPreviewEnabled();
   const searchScope = rx.useTimelineSearchScope(catalog);
@@ -143,16 +145,18 @@ function App() {
                 variant={shouldUseMobileSearchDialog ? "mobile" : "desktop"}
               />
             ) : null}
-            {/* <ExperienceMenu onSelect={(selected) => {
+            <ExperienceMenu onSelect={(selected) => {
               app.animated.cancelTransientMotion();
               actions.setIsSearchOpen(false);
               actions.setIsKeyboardHelpOpen(false);
               actions.setIsSettingsOpen(false);
               setExperience(selected);
-            }} /> */}
+            }} />
             <TimelineSettings
               className="order-3"
               isCosmicCalendarMode={isCosmicCalendarMode}
+              isZoomColorsEnabled={isZoomColorsEnabled}
+              onZoomColorsEnabledChange={actions.setIsZoomColorsEnabled}
               isOpen={isSettingsOpen}
               onOpenChange={actions.setIsSettingsOpen}
               onToggleCosmicCalendarMode={() => {

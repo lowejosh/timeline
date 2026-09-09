@@ -40,20 +40,12 @@ export const MARKER_DATE_HEIGHT = 10;
 export const COMFORTABLE_MARKER_TO_AXIS_LABEL_GAP = 6;
 export const COMPACT_MARKER_TO_AXIS_LABEL_GAP = 4;
 
-export const AXIS_LABEL_OCCUPIED_PADDING = 28;
-export const AXIS_LABEL_CLEARANCE_FADE_START = -14;
-export const AXIS_LABEL_CLEARANCE_FADE_END = 40;
+export const AXIS_LABEL_OCCUPIED_PADDING = 12;
+export const AXIS_LABEL_CLEARANCE_FADE_START = 0;
+export const AXIS_LABEL_CLEARANCE_FADE_END = 24;
 export const AXIS_DUPLICATE_LABEL_MIN_GAP = 18;
-export const AXIS_TICK_ANIMATION_SMOOTHING_MS = 120;
-export const AXIS_TICK_LABEL_FADE_IN_SMOOTHING_MS = 90;
-export const AXIS_TICK_LABEL_FADE_OUT_SMOOTHING_MS = 185;
-export const AXIS_TICK_OVERSCAN_PX = 160;
-export const AXIS_LABEL_HYSTERESIS_KEEP_RATIO = 0.86;
-export const AXIS_SUBYEAR_SECONDARY_STEP_RATIO = 0.7;
-export const AXIS_LABEL_SECONDARY_STEP_RATIO = 0.82;
 export const EDGE_AXIS_LABEL_SNAP_TOLERANCE_PX = 2;
 export const SUBYEAR_EDGE_LABEL_MIN_SPACING_PX = 72;
-export const SUBYEAR_LABEL_MIN_CLEARANCE_PX = 12;
 export const subyearPrimaryFont = (fontSans: string) => `11px ${fontSans}`;
 export const subyearSecondaryFont = (fontSans: string) => `10px ${fontSans}`;
 
@@ -83,6 +75,7 @@ export const EXPANDED_OVERLAY_LABEL_REVEAL_DURATION = 0.28;
 export const EXPANDED_OVERLAY_INTERACTION_REVEAL_THRESHOLD = 0.35;
 
 export const ERA_BAND_ALPHA = 0.33;
+export const EXPERIMENTAL_ERA_BAND_ALPHA = 0.38;
 export const OVERLAY_BAND_ALPHA = 1;
 export const OVERLAY_BAND_SIDE_PADDING = 5;
 export const OVERLAY_BAND_DISCLOSURE_RESERVED_WIDTH = 18;

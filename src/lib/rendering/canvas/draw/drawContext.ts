@@ -5,7 +5,7 @@ import type { PreciseTimelineYear } from "@/lib/core/viewport";
 import type { ResolvedTimelineEraLayer } from "@/lib/rendering/childLayers";
 import type { ResolvedTimelineOverlayBand } from "@/lib/rendering/overlayTracks";
 import type { AnimatedOverlayBandState } from "@/lib/rendering/animation/overlayBand";
-import type { AnimatedAxisTickState } from "@/lib/rendering/animation/axisTickState";
+import type { AxisTickScreenState } from "@/lib/rendering/axisTickStates";
 import type { MarkerPriorityBoostState } from "@/lib/rendering/animation/markerPriorityBoost";
 import type { ExpandedOverlayLayoutResult } from "@/lib/rendering/expandedOverlayLayout";
 import type {
@@ -99,7 +99,7 @@ export type CanvasDrawContext = {
   animatedOverlayLaneCount: number;
   resolvedOverlayLayout: ExpandedOverlayLayoutResult;
   expandedOverlayExpansionStates: ExpandedOverlayExpansionState[];
-  resolvedAxisTickStates: AnimatedAxisTickState[];
+  resolvedAxisTickStates: AxisTickScreenState[];
   primordialDetailStripSegments: PrimordialDetailStripSegment[];
   renderedPrimordialDetailStripSegments: PrimordialDetailStripSegment[];
   primordialDetailStripOpacity: number;
@@ -125,9 +125,9 @@ export type CanvasDrawContext = {
 
   // Interaction state
   isViewportInteractionActive: boolean;
-  preferredAxisLabelStepRef: RefObject<number | undefined>;
 
   // Display modes
   guidedFocus?: GuidedTimelineFocus;
   isCosmicCalendarMode: boolean;
+  isZoomColorsEnabled: boolean;
 };

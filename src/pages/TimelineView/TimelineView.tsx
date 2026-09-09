@@ -24,6 +24,7 @@ export function TimelineView({ app, layout }: TimelineViewProps) {
 
   return (
     <div
+      onContextMenuCapture={(event) => event.preventDefault()}
       className={cn(
         "absolute inset-0 h-full w-full transition-[transform,opacity] duration-300 ease-out",
         activeView === "available-sets"

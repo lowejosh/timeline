@@ -122,6 +122,7 @@ export function drawMarkers(
     context.strokeStyle = line;
     context.globalAlpha = 0.18 + stemProgress * 0.72;
     context.lineWidth = 1.5;
+    if (marker.approximate) context.setLineDash([2, 3]);
 
     if (stemProgress > 0.001) {
       context.beginPath();
@@ -137,7 +138,14 @@ export function drawMarkers(
       context.globalAlpha = 1;
       context.beginPath();
       context.arc(x, axisY, dotRadius, 0, Math.PI * 2);
-      context.fill();
+      if (marker.approximate) {
+        context.setLineDash([]);
+        context.strokeStyle = markerDotColor;
+        context.lineWidth = 1.2;
+        context.stroke();
+      } else {
+        context.fill();
+      }
     }
 
     context.restore();

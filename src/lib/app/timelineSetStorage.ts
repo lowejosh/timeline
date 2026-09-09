@@ -151,12 +151,14 @@ function migrateLegacyLayerStorageState(): TimelineLayerStorageState {
     state.orderedIdsByScope![SET_ORDER_SCOPE] = setOrder;
   }
 
-  const legacyHumanEvolutionToggleMode =
-    typeof window === "undefined"
-      ? null
-      : window.localStorage.getItem(
-          LEGACY_STORAGE_KEYS.humanEvolutionToggleMode,
-        );
+  let legacyHumanEvolutionToggleMode: string | null = null;
+  try {
+    if (typeof window !== "undefined") {
+      legacyHumanEvolutionToggleMode = window.localStorage.getItem(LEGACY_STORAGE_KEYS.humanEvolutionToggleMode);
+    }
+  } catch {
+    // Storage can be unavailable; keep the default preference.
+  }
 
   if (isStoredLayerToggleMode(legacyHumanEvolutionToggleMode)) {
     state.toggleModesByScope![GROUP_AUTO_TOGGLE_SCOPE] = {
@@ -373,5 +375,15 @@ export function writeStoredMapPreviewEnabled(value: boolean) {
     [MAP_PREVIEW_ENABLED_UI_KEY]: value,
   };
 
+  writeLayerStorageState(state);
+}
+
+export function readStoredZoomColorsEnabled(): boolean {
+  return readLayerStorageState().ui?.zoomColorsEnabled === true;
+}
+
+export function writeStoredZoomColorsEnabled(value: boolean) {
+  const state = readLayerStorageState();
+  state.ui = { ...(state.ui ?? {}), zoomColorsEnabled: value };
   writeLayerStorageState(state);
 }

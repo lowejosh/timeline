@@ -1,3 +1,5 @@
+import { useTimeRuler } from "./interactions/useTimeRuler";
+import { useTimelineUiStore } from "@/stores/timelineUi.store";
 import {
   useCallback,
   useEffect,
@@ -16,7 +18,6 @@ import { useMarkerPriorityBoost } from "./animation/useMarkerPriorityBoost";
 import type { Era } from "@/lib/catalog/eras";
 import { useTimelineCanvasScene } from "./scene/useTimelineCanvasScene";
 import { useEraChildAnimation } from "./animation/useEraChildAnimation";
-import { useAxisTickAnimation } from "./animation/useAxisTickAnimation";
 import { useCanvasBackingStore } from "./platform/useCanvasBackingStore";
 import { useViewportInteractionState } from "./interactions/useViewportInteractionState";
 import { useEdgeRailInteraction } from "./interactions/useEdgeRailInteraction";
@@ -117,6 +118,7 @@ export function TimelineCanvas({
   onReleaseMomentum,
   expandOverlayRequest,
 }: TimelineCanvasProps) {
+  const isZoomColorsEnabled = useTimelineUiStore((state) => state.isZoomColorsEnabled);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const tooltipInteractiveContentRef = useRef<HTMLDivElement | null>(null);
@@ -151,7 +153,6 @@ export function TimelineCanvas({
     y: number;
     pointerType: string;
   } | null>(null);
-  const preferredAxisLabelStepRef = useRef<number | undefined>(undefined);
   const primordialDetailStripAnimationRef = useRef<{
     opacity: number;
     target: number;
@@ -231,6 +232,7 @@ export function TimelineCanvas({
     viewport,
     width,
   });
+  const ruler = useTimeRuler(viewport, width, height, pad, overlayInteractionLayout.axisY);
   reserveAxisDateRowRef.current = reserveAxisDateRow;
   const overlayColorMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -423,7 +425,6 @@ export function TimelineCanvas({
         canvas: canvasRef.current,
         commitHoveredTooltip,
         frameRefs: {
-          axisTickAnimationRef,
           eraChildAnimationRef,
           expandedOverlayProgressByIdRef,
           hoverRegionsRef,
@@ -431,7 +432,6 @@ export function TimelineCanvas({
           markerPriorityBoostRef,
           overlayBandAnimationRef,
           overlayInteractionRegionsRef,
-          preferredAxisLabelStepRef,
           primordialDetailStripAnimationRef,
           renderedExpandedOverlayIdsRef,
         },
@@ -439,6 +439,7 @@ export function TimelineCanvas({
         invalidateReasons,
         guidedFocus,
         isCosmicCalendarMode,
+        isZoomColorsEnabled,
         isTouchTooltipPinned: isTouchTooltipPinnedRef.current,
         isViewportInteractionActive: isViewportInteractionActiveRef.current,
         lastPointer: dragStateRef.current ? null : lastPointerRef.current,
@@ -470,6 +471,7 @@ export function TimelineCanvas({
       commitHoveredTooltip,
       guidedFocus,
       isCosmicCalendarMode,
+      isZoomColorsEnabled,
       overlayScrollOffset,
       overviewReservedHeight,
       pad,
@@ -652,10 +654,6 @@ export function TimelineCanvas({
     scheduleRedraw,
     !!guidedFocus,
   );
-  const axisTickAnimationRef = useAxisTickAnimation(
-    axisTickTargets,
-    scheduleRedraw,
-  );
   const {
     progressByIdRef: expandedOverlayProgressByIdRef,
     renderedIdsRef: renderedExpandedOverlayIdsRef,
@@ -780,6 +778,7 @@ export function TimelineCanvas({
     lastSceneDiagnosticsRef.current = nextSceneDiagnostics;
 
     sceneRef.current = {
+      axisTicks: axisTickTargets,
       width,
       height,
       viewport,
@@ -838,6 +837,15 @@ export function TimelineCanvas({
   }, [publishCurrentMapPreviewYear]);
 
   const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (event.button !== 0 && event.button !== 2) return;
+    if (ruler.start(event)) {
+      stopEdgeRailInteraction();
+      onViewportGestureStart?.();
+      lastPointerRef.current = null;
+      commitHoveredTooltip(null);
+      return;
+    }
+    ruler.clear();
     event.preventDefault();
     stopEdgeRailInteraction();
     recordVerboseInteractionEvent("pointer-down");
@@ -860,6 +868,7 @@ export function TimelineCanvas({
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (ruler.move(event)) return;
     const dragState = dragStateRef.current;
     if (!dragState || dragState.pointerId !== event.pointerId || !width) return;
 
@@ -918,6 +927,10 @@ export function TimelineCanvas({
   };
 
   const handlePointerUp = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (ruler.end(event)) {
+      onViewportGestureEnd?.();
+      return;
+    }
     if (dragStateRef.current?.pointerId === event.pointerId) {
       recordVerboseInteractionEvent("pointer-up");
       const dragState = dragStateRef.current;
@@ -1011,6 +1024,7 @@ export function TimelineCanvas({
   };
 
   const handleShellPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (ruler.pointer.current !== null) return;
     if (event.pointerType === "touch") {
       return;
     }
@@ -1152,13 +1166,24 @@ export function TimelineCanvas({
     <div
       className="relative w-full h-full"
       ref={shellRef}
+      onContextMenuCapture={(event) => event.preventDefault()}
       onPointerLeave={handleShellPointerLeave}
       onPointerMove={handleShellPointerMove}
     >
       <canvas
-        aria-label="Interactive timeline canvas"
+        aria-label="Interactive timeline canvas. Right-drag to measure time; click or press Escape to clear."
+        onContextMenu={(event) => event.preventDefault()}
+        style={ruler.isDragging ? { cursor: "crosshair" } : undefined}
+        onLostPointerCapture={(event) => { if (ruler.end(event)) onViewportGestureEnd?.(); }}
         className="absolute inset-0 w-full h-full block border-0 outline-none touch-none cursor-grab overscroll-none active:cursor-grabbing"
         onKeyDown={(event) => {
+          if (event.key === "Escape" && ruler.hasMeasurement) {
+            event.preventDefault();
+            event.stopPropagation();
+            ruler.clear();
+            onViewportGestureEnd?.();
+            return;
+          }
           if (!width) return;
 
           if (event.key === "h" || event.key === "H") {
@@ -1205,6 +1230,7 @@ export function TimelineCanvas({
         ref={canvasRef}
         tabIndex={0}
       />
+      {ruler.overlay}
       {mapPreviewDashedLineX !== null ? (
         <div
           aria-hidden="true"

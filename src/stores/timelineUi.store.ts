@@ -3,6 +3,8 @@ import { create } from "zustand";
 import { shouldUseMobileTimelineDrawer } from "@/lib/app/layout";
 import {
   readStoredMapPreviewEnabled,
+  readStoredZoomColorsEnabled,
+  writeStoredZoomColorsEnabled,
   readStoredSidebarOpen,
   writeStoredMapPreviewEnabled,
   writeStoredSidebarOpen,
@@ -10,6 +12,7 @@ import {
 
 type TimelineUiState = {
   isCosmicCalendarMode: boolean;
+  isZoomColorsEnabled: boolean;
   isKeyboardHelpOpen: boolean;
   isMapPreviewEnabled: boolean;
   isSearchOpen: boolean;
@@ -19,6 +22,7 @@ type TimelineUiState = {
 };
 
 type TimelineUiActions = {
+  setIsZoomColorsEnabled: (value: boolean) => void;
   closeKeyboardHelp: () => void;
   resolveInitialSidebarVisibility: (width: number, height: number) => void;
   setIsCosmicCalendarMode: (
@@ -65,6 +69,11 @@ function shouldStartWithSidebarOpen() {
 export const useTimelineUiStore = create<TimelineUiStore>((set, get) => ({
   hasResolvedInitialSidebarVisibility: false,
   isCosmicCalendarMode: false,
+  isZoomColorsEnabled: readStoredZoomColorsEnabled(),
+  setIsZoomColorsEnabled: (value) => {
+    writeStoredZoomColorsEnabled(value);
+    set({ isZoomColorsEnabled: value });
+  },
   isKeyboardHelpOpen: false,
   isMapPreviewEnabled: readStoredMapPreviewEnabled(),
   isSearchOpen: false,

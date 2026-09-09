@@ -1,8 +1,9 @@
+import { drawGuidedCursor } from "@/lib/rendering/canvas/draw/drawGuidedCursor";
 import type { GuidedTimelineFocus } from "@/lib/rendering/guidedFocus";
 import type { MutableRefObject, RefObject } from "react";
 
 import { compareEraPriorityAscending, type Era } from "@/lib/catalog/eras";
-import type { AnimatedAxisTickState } from "@/lib/rendering/animation/axisTickState";
+import { resolveViewportAxisTicks } from "@/lib/rendering/viewportAxisTicks";
 import type { MarkerPriorityBoostState } from "@/lib/rendering/animation/markerPriorityBoost";
 import type { AnimatedOverlayBandState } from "@/lib/rendering/animation/overlayBand";
 import {
@@ -77,7 +78,6 @@ type PrimordialDetailStripAnimationState = {
 };
 
 export type TimelineCanvasFrameRefs = {
-  axisTickAnimationRef: RefObject<Map<string, AnimatedAxisTickState>>;
   eraChildAnimationRef: RefObject<Map<string, AnimatedEraChildState>>;
   expandedOverlayProgressByIdRef: RefObject<Map<string, number>>;
   hoverRegionsRef: MutableRefObject<HoverRegion[]>;
@@ -85,7 +85,6 @@ export type TimelineCanvasFrameRefs = {
   markerPriorityBoostRef: RefObject<Map<string, MarkerPriorityBoostState>>;
   overlayBandAnimationRef: RefObject<Map<string, AnimatedOverlayBandState>>;
   overlayInteractionRegionsRef: MutableRefObject<OverlayInteractionRegion[]>;
-  preferredAxisLabelStepRef: MutableRefObject<number | undefined>;
   primordialDetailStripAnimationRef: MutableRefObject<PrimordialDetailStripAnimationState>;
   renderedExpandedOverlayIdsRef: RefObject<string[]>;
 };
@@ -97,6 +96,7 @@ export type DrawTimelineCanvasFrameArgs = {
   invalidateReasons: string[];
   guidedFocus?: GuidedTimelineFocus;
   isCosmicCalendarMode: boolean;
+  isZoomColorsEnabled?: boolean;
   isTouchTooltipPinned: boolean;
   isViewportInteractionActive: boolean;
   lastPointer: LastPointerState | null;
@@ -125,6 +125,7 @@ export function drawTimelineCanvasFrame({
   frameRefs,
   invalidateReasons,
   isCosmicCalendarMode,
+  isZoomColorsEnabled = false,
   guidedFocus,
   isTouchTooltipPinned,
   isViewportInteractionActive,
@@ -247,7 +248,7 @@ export function drawTimelineCanvasFrame({
         visibleEraCount: visibleEraLayers.length,
         visibleOverlayCount: sceneResolvedOverlayBands.length,
         visibleMarkerCount: sceneVisibleMarkers.length,
-        axisTickCount: frameRefs.axisTickAnimationRef.current.size,
+        axisTickCount: scene.axisTicks?.length ?? 0,
       }
     : null;
   let perfPhaseStart = drawStart;
@@ -321,11 +322,7 @@ export function drawTimelineCanvasFrame({
       compareEraPriorityAscending(left.era, right.era) ||
       left.depth - right.depth,
   );
-  const resolvedAxisTickStates = [
-    ...frameRefs.axisTickAnimationRef.current.values(),
-  ]
-    .filter((tick) => tick.visibleProgress > 0.01 || tick.labelOpacity > 0.01)
-    .sort((left, right) => left.step - right.step || left.year - right.year);
+  const resolvedAxisTickStates = scene.axisTicks ?? resolveViewportAxisTicks(sceneViewport, innerWidth);
   const sceneMaxZoom = getMaxZoomForTimelineViewport(sceneViewport, innerWidth);
   const allowPrimordialSyntheticDetail =
     sceneViewport.zoom >=
@@ -460,9 +457,9 @@ export function drawTimelineCanvasFrame({
     fromX,
     markPerf,
     isViewportInteractionActive,
-    preferredAxisLabelStepRef: frameRefs.preferredAxisLabelStepRef,
     guidedFocus,
     isCosmicCalendarMode,
+    isZoomColorsEnabled,
   };
 
   drawBackground(cx);
@@ -473,6 +470,7 @@ export function drawTimelineCanvasFrame({
   drawAxis(cx);
   markPerf("axisMs");
   const resolvedMarkerStates = drawMarkers(cx);
+  drawGuidedCursor(cx);
   markPerf("markerMs");
 
   frameRefs.hoverRegionsRef.current = cx.hoverRegions;

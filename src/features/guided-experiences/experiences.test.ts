@@ -27,3 +27,14 @@ it("grows subject emphasis without clipping future band geometry, and rewinds de
   expect(getGuidedBandEmphasis(undefined, band.id, band.startYear, band.endYear)).toEqual({ muted: false, highlightedEnd: band.endYear });
 });
 
+
+it("keeps chapters chronological and their focus bands present in the camera frame", () => {
+  for (const [index, stop] of experience.stops.entries()) {
+    if (index) expect(stop.year).toBeGreaterThanOrEqual(experience.stops[index - 1].year);
+    const band = STATIC_TIMELINE_CATALOG.overlays.find(band => band.id === stop.focusBandId)!;
+    expect(band).toBeDefined();
+    const halfSpan = (stop.range[1] - stop.range[0]) / 2;
+    expect(band.startYear).toBeLessThan(stop.year + halfSpan);
+    expect(band.endYear).toBeGreaterThan(stop.year - halfSpan);
+  }
+});

@@ -1,3 +1,4 @@
+import { useTimelineUiStore } from "@/stores/timelineUi.store";
 import {
   useCallback,
   useEffect,
@@ -65,6 +66,7 @@ export function TimelineCanvasPreview({
   overlayBands,
   initialRange,
 }: Props) {
+  const isZoomColorsEnabled = useTimelineUiStore((state) => state.isZoomColorsEnabled);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const tooltipInteractiveContentRef = useRef<HTMLDivElement | null>(null);
   const hoveredTooltipRef = useRef<HoveredTooltipState | null>(null);
@@ -444,6 +446,7 @@ export function TimelineCanvasPreview({
         </button>
       ) : null}
       <TimelineCanvasRenderSurface
+        isZoomColorsEnabled={isZoomColorsEnabled}
         commitHoveredTooltip={commitHoveredTooltip}
         eraChildOpacityById={eraChildOpacityById}
         expandedOverlayIds={expandedOverlayIds}

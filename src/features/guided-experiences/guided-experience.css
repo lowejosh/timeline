@@ -12,8 +12,8 @@
 .journey-exit { justify-self: start; color: var(--muted-foreground); font-size: 12px; }
 .journey-chapters { position: relative; justify-self: end; }
 .journey-chapters-button { color: var(--muted-foreground); font-size: 12px; }
-.journey-chapter-menu { position: absolute; top: calc(100% + 8px); right: 0; width: min(340px, calc(100vw - 32px)); max-height: 65dvh; overflow-y: auto; overscroll-behavior: contain; background: var(--popover); border: 1px solid var(--border); box-shadow: var(--shadow-panel); border-radius: 12px; padding: 6px; }
-.journey-chapter-menu button { display: flex; gap: 12px; width: 100%; padding: 12px; border-radius: 7px; text-align: left; cursor: pointer; }
+.journey-chapter-menu { position: absolute; top: calc(100% + 8px); right: 0; width: min(290px, calc(100vw - 32px)); max-height: 65dvh; overflow-y: auto; overscroll-behavior: contain; background: var(--popover); border: 1px solid var(--border); box-shadow: var(--shadow-panel); border-radius: 12px; padding: 6px; }
+.journey-chapter-menu button { display: flex; gap: 8px; width: 100%; padding: 7px 9px; border-radius: 7px; text-align: left; cursor: pointer; }
 .journey-chapter-menu button:hover, .journey-chapter-menu button[aria-current] { background: var(--muted); }
 .journey-chapter-number { color: var(--journey-accent); font: 11px var(--font-mono); padding-top: 2px; }
 .journey-chapter-menu strong { display: block; font-size: 12px; font-weight: 550; }
@@ -96,4 +96,78 @@
 
 @media (max-height: 580px) and (min-width: 540px) {
   .journey-reading-detail[hidden] { display: block; }
+}
+
+@media (max-width: 640px) {
+  .journey-progress button { width: 20px; }
+  .journey-count { display: block; margin-left: 7px; font-size: 9px; }
+}
+
+/* Shared media rail: large enough to inspect, with a full-size view on demand. */
+.journey-reader { width: min(1140px, calc(100% - 48px)); max-height: min(440px, 46dvh); }
+.journey-story { gap: 28px; }
+.guide-gallery { width: min(46%, 480px); flex-shrink: 0; min-width: 0; }
+.guide-gallery-tabs { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+.guide-gallery-tabs button { min-height: 32px; padding: 5px 9px; border-radius: 6px; cursor: pointer; font-size: 11px; color: var(--muted-foreground); }
+.guide-gallery-tabs button[aria-pressed=true] { color: var(--foreground); background: var(--muted); }
+.guide-gallery-tabs .guide-gallery-expand { margin-left: auto; }
+.guide-gallery figure { margin: 0; }
+.guide-gallery img, .guide-map > svg { display: block; width: 100%; height: 250px; object-fit: contain; background: var(--glass); border: 1px solid var(--border); border-radius: 8px; }
+.guide-gallery figcaption { padding: 8px 1px 2px; font-size: 10px; line-height: 1.5; color: var(--muted-foreground); }
+.guide-gallery figcaption strong { display: block; font-size: 11px; color: var(--foreground); font-weight: 500; }
+.guide-gallery figcaption p { margin: 5px 0; }
+.guide-gallery figcaption a, .guide-image-fallback a { text-decoration: underline; text-underline-offset: 2px; }
+.guide-image-fallback { display: grid; place-content: center; height: 250px; font-size: 12px; }
+.guide-map-camera { transition: transform 650ms cubic-bezier(.2,.75,.25,1); }
+.guide-map-place { transition: opacity 450ms ease; }
+.guide-gallery-dialog { width: min(1100px, 94vw); max-height: 92dvh; padding: 22px; overflow-y: auto; background: var(--background); color: var(--foreground); border: 1px solid var(--border); border-radius: 12px; margin: auto; }
+.guide-gallery-dialog::backdrop { background: rgb(0 0 0 / .55); backdrop-filter: blur(4px); }
+.guide-gallery-dialog > button { display: flex; margin: 0 0 10px auto; padding: 8px; cursor: pointer; }
+.guide-gallery-dialog > figure > img, .guide-gallery-dialog .guide-map > svg { height: min(65dvh, 720px); }
+@media (max-width: 640px) {
+  .journey-reader { width: 100%; max-height: 46dvh; }
+  .journey-story { flex-direction: column; gap: 12px; }
+  .guide-gallery { width: 100%; }
+  .guide-gallery img, .guide-map > svg { height: 210px; }
+  .guide-gallery-dialog > figure > img, .guide-gallery-dialog .guide-map > svg { height: 60dvh; }
+}
+@media (max-height: 580px) and (min-width: 540px) {
+  .journey-reader { width: 100%; max-height: none; }
+  .journey-story { flex-direction: column; gap: 12px; }
+  .guide-gallery { width: 100%; }
+  .guide-gallery img, .guide-map > svg { height: 190px; }
+  .guide-gallery-dialog > figure > img, .guide-gallery-dialog .guide-map > svg { height: 60dvh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .guide-map-camera, .guide-map-place { transition: none; }
+}
+
+.guide-map { position: relative; }
+.guide-map > svg { touch-action: none; cursor: grab; }
+.guide-map > svg:active { cursor: grabbing; }
+.guide-map-controls { position: absolute; top: 8px; right: 8px; display: flex; gap: 3px; padding: 3px; border: 1px solid var(--border); border-radius: 7px; background: var(--background); }
+.guide-map-controls button { display: grid; place-items: center; width: 30px; height: 30px; cursor: pointer; border-radius: 4px; }
+.guide-map-controls button:hover { background: var(--muted); }
+.guide-gallery-dialog > button svg { width: 18px; height: 18px; }
+
+.guide-gallery > figure:not(.guide-map) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+.guide-gallery > figure:not(.guide-map) > img { height: 205px; }
+.guide-gallery > figure:not(.guide-map) > figcaption { padding-top: 0; }
+.guide-gallery > .guide-map > svg { height: 205px; }
+.journey-description { line-height: 1.6; }
+@media (max-width: 640px) {
+  .journey-reader { max-height: 52dvh; }
+  .guide-gallery > figure:not(.guide-map) { grid-template-columns: minmax(90px, .8fr) minmax(0, 1.2fr); gap: 10px; }
+  .guide-gallery > figure:not(.guide-map) > img, .guide-gallery > .guide-map > svg { height: 145px; }
+  .journey-region { margin-bottom: 6px; }
+}
+
+/* Letterbox space uses the same sea colour as the SVG viewport. */
+.guide-map > svg { background: var(--background); }
+.journey[open][data-exiting=true] { animation: journey-close 190ms ease-in forwards; pointer-events: none; }
+.journey[data-exiting=true]::backdrop { animation: journey-backdrop-close 190ms ease-in forwards; }
+@keyframes journey-close { to { opacity: 0; transform: translateY(7px); } }
+@keyframes journey-backdrop-close { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .journey[open][data-exiting=true], .journey[data-exiting=true]::backdrop { animation: none; }
 }

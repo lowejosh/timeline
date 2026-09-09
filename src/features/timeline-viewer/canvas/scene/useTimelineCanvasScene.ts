@@ -1,3 +1,4 @@
+import { arrangeGuidedTracks } from "@/lib/rendering/guidedTracks";
 import type { GuidedTimelineFocus } from "@/lib/rendering/guidedFocus";
 import {
   useCallback,
@@ -10,30 +11,14 @@ import {
 
 import { getVisibleTimelineMarkers } from "@/lib/rendering/queries/markers";
 import { resolveTimelineOverlayTracks } from "@/lib/rendering/overlayTracks";
-import { resolveAxisTickRenderStates } from "@/lib/rendering/axisTickStates";
+import { resolveViewportAxisTicks } from "@/lib/rendering/viewportAxisTicks";
 import {
   getExpandedOverlayPanelHeight,
   getTimelineLayout,
   resolveExpandedOverlayDetails,
 } from "@/lib/rendering/canvas/overlayLayout";
-import { AXIS_TICK_OVERSCAN_PX, OVERLAY_LANE_HEIGHT, OVERLAY_LANE_GAP } from "@/lib/rendering/canvas/constants";
-import {
-  EARLY_UNIVERSE_END_YEAR,
-  EARLY_UNIVERSE_START_YEAR,
-} from "@/lib/catalog/sets/cosmic/index";
-import {
-  comparePreciseTimelineYears,
-  getMinZoomForWidth,
-  getViewportCenterYear,
-  getVisibleRangePrecise,
-  screenToWorldPrecise,
-  splitTimelineYear,
-  subtractPreciseTimelineYears,
-  TIMELINE_MAX_YEAR,
-  TIMELINE_MIN_YEAR,
-  toApproximateTimelineYear,
-  type TimelineViewport,
-} from "@/lib/core/viewport";
+import { OVERLAY_LANE_HEIGHT, OVERLAY_LANE_GAP } from "@/lib/rendering/canvas/constants";
+import type { TimelineViewport } from "@/lib/core/viewport";
 import type { TimelineMarker, TimelineOverlayBand } from "@/lib/catalog/eras";
 
 type UseTimelineCanvasSceneArgs = {
@@ -72,68 +57,11 @@ export function useTimelineCanvasScene({
       return [];
     }
 
-    const innerWidth = width - pad * 2;
-    const [preciseRangeStart, preciseRangeEnd] = getVisibleRangePrecise(
-      viewport,
-      innerWidth,
-    );
-    const tickRangeStart = screenToWorldPrecise(
-      -AXIS_TICK_OVERSCAN_PX,
-      viewport,
-      innerWidth,
-    );
-    const tickRangeEnd = screenToWorldPrecise(
-      innerWidth + AXIS_TICK_OVERSCAN_PX,
-      viewport,
-      innerWidth,
-    );
-    const tickStart = Math.max(
-      toApproximateTimelineYear(tickRangeStart),
-      TIMELINE_MIN_YEAR,
-    );
-    const tickEnd = Math.min(
-      toApproximateTimelineYear(tickRangeEnd),
-      TIMELINE_MAX_YEAR,
-    );
-    const visibleSpan = Math.max(
-      Math.abs(
-        subtractPreciseTimelineYears(preciseRangeEnd, preciseRangeStart),
-      ),
-      1e-18,
-    );
-    const earlyUniverseOverlapStart = Math.max(
-      tickStart,
-      EARLY_UNIVERSE_START_YEAR,
-    );
-    const earlyUniverseOverlapEnd = Math.min(tickEnd, EARLY_UNIVERSE_END_YEAR);
-    const earlyUniverseOverlap = Math.max(
-      0,
-      earlyUniverseOverlapEnd - earlyUniverseOverlapStart,
-    );
-    const startsAtBigBang =
-      comparePreciseTimelineYears(
-        preciseRangeStart,
-        splitTimelineYear(TIMELINE_MIN_YEAR),
-      ) === 0;
-    const isFullyZoomedOut =
-      viewport.zoom <=
-      getMinZoomForWidth(innerWidth, viewport.scaleMode ?? "linear") + 0.001;
-    const isPrimordialFocused =
-      !isFullyZoomedOut &&
-      (startsAtBigBang || earlyUniverseOverlap / visibleSpan >= 0.75);
-
-    return resolveAxisTickRenderStates(tickStart, tickEnd, innerWidth, {
-      elapsedReference: isPrimordialFocused ? "after-big-bang" : "ago",
-      elapsedSubYearReference: isPrimordialFocused ? "after-big-bang" : "ago",
-      preciseStartYear: preciseRangeStart,
-      preciseEndYear: preciseRangeEnd,
-      preciseAnchorYear: getViewportCenterYear(viewport),
-      scaleMode: "logarithmic",
-    });
+    return resolveViewportAxisTicks(viewport, width - pad * 2);
   }, [pad, viewport, width]);
 
   const reserveAxisDateRow = useMemo(
-    () => axisTickTargets.some((tick) => tick.labelStep < 1),
+    () => axisTickTargets.some((tick) => tick.labelStep < 1 && tick.labelOpacity > 0.01),
     [axisTickTargets],
   );
   const visibleMarkers = useMemo(
@@ -143,15 +71,15 @@ export function useTimelineCanvasScene({
   );
   const resolvedOverlayBands = useMemo(
     () =>
-      resolveTimelineOverlayTracks(
+      arrangeGuidedTracks(resolveTimelineOverlayTracks(
         overlayBands,
         viewport,
         width,
         pad,
         typeof window === "undefined" ? 1 : window.devicePixelRatio || 1,
         enabledGroupIds,
-      ),
-    [enabledGroupIds, overlayBands, pad, viewport, width],
+      ), guidedFocus?.subjectIds),
+    [enabledGroupIds, overlayBands, pad, viewport, width, guidedFocus?.subjectIds],
   );
   const overlayLaneCount = resolvedOverlayBands[0]?.laneCount ?? 0;
   const expandedOverlayExtraHeight = useMemo(() => {
@@ -207,10 +135,16 @@ export function useTimelineCanvasScene({
 
   const focusFrameRef = useRef(0);
   const offsetRef = useRef(overlayScrollOffset);
+  const wheelFrameRef = useRef(0);
+  const wheelTargetRef = useRef<number | null>(null);
+  useEffect(() => () => { cancelAnimationFrame(wheelFrameRef.current); }, []);
   useEffect(() => { offsetRef.current = overlayScrollOffset; }, [overlayScrollOffset]);
   const adjustOverlayScrollOffset = useCallback(
     (deltaY: number) => {
       cancelAnimationFrame(focusFrameRef.current);
+      cancelAnimationFrame(wheelFrameRef.current);
+      wheelFrameRef.current = 0;
+      wheelTargetRef.current = null;
       if (overlayInteractionLayout.overlayScrollMax <= 0) {
         return;
       }
@@ -228,7 +162,9 @@ export function useTimelineCanvasScene({
 
   const hasFramed = useRef(false);
   const lastFocusRequest = useRef<string | null>(null);
-  const focusLane = resolvedOverlayBands.find(item => item.band.id === guidedFocus?.bandId)?.laneIndex;
+  const subjectLanes = resolvedOverlayBands.filter(item => guidedFocus?.subjectIds.includes(item.band.id)).map(item => item.laneIndex);
+  const focusLane = subjectLanes.length ? (Math.min(...subjectLanes) + Math.max(...subjectLanes)) / 2
+    : resolvedOverlayBands.find(item => item.band.id === guidedFocus?.bandId)?.laneIndex;
   const focusKey = guidedFocus?.stopKey;
   const focusTarget = focusLane === undefined ? undefined : clampOverlayScrollOffset(
     (overlayInteractionLayout.overlayClipTop - overlayInteractionLayout.overlayClipBottom) / 2
@@ -239,6 +175,9 @@ export function useTimelineCanvasScene({
     const request = `${focusKey}:${width}:${height}`;
     if (lastFocusRequest.current === request) return;
     lastFocusRequest.current = request;
+    cancelAnimationFrame(wheelFrameRef.current);
+    wheelFrameRef.current = 0;
+    wheelTargetRef.current = null;
     const from = offsetRef.current;
     const started = performance.now();
     const instant = !hasFramed.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -260,6 +199,29 @@ export function useTimelineCanvasScene({
       return;
     }
 
+    const animateWheel = (delta: number) => {
+      cancelAnimationFrame(focusFrameRef.current);
+      const target = clampOverlayScrollOffset((wheelTargetRef.current ?? offsetRef.current) + delta);
+      wheelTargetRef.current = target;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        setOverlayScrollOffset(target);
+        offsetRef.current = target;
+        wheelTargetRef.current = null;
+        return;
+      }
+      if (wheelFrameRef.current) return;
+      let last = performance.now();
+      const tick = (now: number) => {
+        const goal = clampOverlayScrollOffset(wheelTargetRef.current ?? offsetRef.current);
+        const next = offsetRef.current + (goal - offsetRef.current) * (1 - Math.exp(-Math.min(now - last, 40) / 55));
+        last = now;
+        offsetRef.current = Math.abs(goal - next) < 0.2 ? goal : next;
+        setOverlayScrollOffset(offsetRef.current);
+        if (offsetRef.current !== goal) wheelFrameRef.current = requestAnimationFrame(tick);
+        else { wheelFrameRef.current = 0; wheelTargetRef.current = null; }
+      };
+      wheelFrameRef.current = requestAnimationFrame(tick);
+    };
     const handleOverlayWheel = (event: globalThis.WheelEvent) => {
       if (event.target instanceof Element && event.target.closest("[data-timeline-tooltip]")) return;
       if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
@@ -279,7 +241,9 @@ export function useTimelineCanvasScene({
       event.preventDefault();
       event.stopImmediatePropagation();
       onOverlayScroll("overlay-wheel-scroll");
-      adjustOverlayScrollOffset(-event.deltaY);
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2
+        ? overlayInteractionLayout.overlayClipBottom - overlayInteractionLayout.overlayClipTop : 1;
+      animateWheel(-Math.max(-240, Math.min(240, event.deltaY * unit)));
     };
 
     surface.addEventListener("wheel", handleOverlayWheel, {
@@ -293,7 +257,7 @@ export function useTimelineCanvasScene({
       });
     };
   }, [
-    adjustOverlayScrollOffset,
+    clampOverlayScrollOffset,
     onOverlayScroll,
     overlayInteractionLayout.overlayClipBottom,
     overlayInteractionLayout.overlayClipTop,

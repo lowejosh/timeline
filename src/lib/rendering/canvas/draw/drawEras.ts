@@ -19,7 +19,8 @@ import {
   EARLY_UNIVERSE_INLINE_LABELS,
   FORCED_PRIMORDIAL_LABEL_IDS,
 } from "../primordial";
-import { ERA_BAND_ALPHA } from "../constants";
+import { ERA_BAND_ALPHA, EXPERIMENTAL_ERA_BAND_ALPHA } from "../constants";
+import { getEraZoomFill } from "../eraZoomGradient";
 import type { CanvasDrawContext } from "./drawContext";
 
 type EraLayer = CanvasDrawContext["paintOrderedEraLayers"][number];
@@ -82,8 +83,11 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext, fillOnly: boolean): v
       );
     }
 
-    context.globalAlpha = opacity * ERA_BAND_ALPHA * renderState.alphaMultiplier;
-    context.fillStyle = era.color;
+    const bandAlpha = cx.isZoomColorsEnabled ? EXPERIMENTAL_ERA_BAND_ALPHA : ERA_BAND_ALPHA;
+    context.globalAlpha = opacity * bandAlpha * renderState.alphaMultiplier;
+    context.fillStyle = cx.isZoomColorsEnabled
+      ? getEraZoomFill(context, era.color, sceneHeight, axisY, sceneViewport.zoom, era.id)
+      : era.color;
     context.fillRect(
       renderState.renderLeft,
       0,

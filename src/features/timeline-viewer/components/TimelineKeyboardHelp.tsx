@@ -106,6 +106,8 @@ export function TimelineKeyboardHelp({
     { label: "Zoom In", keys: ["+", "↑"] },
     { label: "Zoom Out", keys: ["-", "↓"] },
     { label: "Fast Zoom", keys: ["Shift", "+/-"] },
+    { label: "Measure Time", keys: ["Right-drag"] },
+    { label: "Clear Measurement", keys: ["Esc"] },
     { label: "Pan Left / Right", keys: ["←", "→"] },
     { label: "Fast Pan", keys: ["Shift", "←/→"] },
     { label: "Home", keys: ["H", "Home"] },

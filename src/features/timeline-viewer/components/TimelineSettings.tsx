@@ -16,6 +16,8 @@ const APP_VERSION = "v0.3.0";
 type TimelineSettingsProps = {
   className?: string;
   isCosmicCalendarMode: boolean;
+  isZoomColorsEnabled: boolean;
+  onZoomColorsEnabledChange: (enabled: boolean) => void;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   onToggleCosmicCalendarMode: () => void;
@@ -24,6 +26,8 @@ type TimelineSettingsProps = {
 export function TimelineSettings({
   className,
   isCosmicCalendarMode,
+  isZoomColorsEnabled,
+  onZoomColorsEnabledChange,
   isOpen: isOpenProp,
   onOpenChange: onOpenChangeProp,
   onToggleCosmicCalendarMode,
@@ -33,6 +37,8 @@ export function TimelineSettings({
   const setIsOpen = onOpenChangeProp ?? setIsOpenLocal;
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const titleId = useId();
+  const zoomColorsLabelId = useId();
+  const zoomColorsDescriptionId = useId();
   const cosmicCalendarLabelId = useId();
   const cosmicCalendarDescriptionId = useId();
 
@@ -90,6 +96,24 @@ export function TimelineSettings({
             checked={isCosmicCalendarMode}
             onClick={onToggleCosmicCalendarMode}
           />
+        </div>
+
+        <div className="mt-3 border-t border-border/60 pt-3">
+          <h3 className="mb-2 text-[0.7rem] font-semibold text-muted-foreground">Experimental</h3>
+          <div className="flex items-center justify-between gap-3 py-1">
+            <div className="flex flex-col gap-1 font-sans text-[0.78rem] leading-snug text-foreground">
+              <span id={zoomColorsLabelId}>Zoom colours</span>
+              <span id={zoomColorsDescriptionId} className="text-[0.68rem] text-muted-foreground">
+                Change era colours as you zoom.
+              </span>
+            </div>
+            <Switch
+              aria-labelledby={zoomColorsLabelId}
+              aria-describedby={zoomColorsDescriptionId}
+              checked={isZoomColorsEnabled}
+              onClick={() => onZoomColorsEnabledChange(!isZoomColorsEnabled)}
+            />
+          </div>
         </div>
 
         <p className="mt-3 border-t border-border/60 pt-2.5 text-[0.66rem] leading-snug text-muted-foreground/70">

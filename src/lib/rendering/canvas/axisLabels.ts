@@ -6,13 +6,9 @@ import {
   AXIS_DUPLICATE_LABEL_MIN_GAP,
   AXIS_LABEL_CLEARANCE_FADE_END,
   AXIS_LABEL_CLEARANCE_FADE_START,
-  AXIS_LABEL_HYSTERESIS_KEEP_RATIO,
   AXIS_LABEL_OCCUPIED_PADDING,
-  AXIS_LABEL_SECONDARY_STEP_RATIO,
-  AXIS_SUBYEAR_SECONDARY_STEP_RATIO,
   CALENDAR_DAY_STEP,
   SUBYEAR_EDGE_LABEL_MIN_SPACING_PX,
-  SUBYEAR_LABEL_MIN_CLEARANCE_PX,
 } from "./constants";
 
 export type AxisLabelCandidate = {
@@ -23,6 +19,7 @@ export type AxisLabelCandidate = {
   alpha: number;
   step: number;
   pixelsPerStep: number;
+  priority?: number;
 };
 
 export function resolveAxisTickYear(
@@ -36,20 +33,6 @@ export function resolveAxisTickYear(
   }
 
   return tick.year;
-}
-
-export function makeAxisTickKey(
-  tick: Pick<
-    AxisTickRenderState,
-    "step" | "year" | "wholeYear" | "yearFraction"
-  >,
-) {
-  const yearKey =
-    tick.wholeYear !== undefined && tick.yearFraction !== undefined
-      ? `${tick.wholeYear}:${tick.yearFraction.toPrecision(15)}`
-      : tick.year.toPrecision(15);
-
-  return `${tick.step.toPrecision(15)}:${yearKey}`;
 }
 
 export function getCalendarAxisLabelText(
@@ -84,11 +67,11 @@ export function getCalendarEdgeAxisLabelText(
   };
 }
 
-const TICK_SCALE_LOG_MIN = Math.log(3);
-const TICK_SCALE_LOG_RANGE = Math.log(8_000) - TICK_SCALE_LOG_MIN;
+const TICK_SCALE_LOG_MIN = Math.log(4.5);
+const TICK_SCALE_LOG_RANGE = Math.log(280) - TICK_SCALE_LOG_MIN;
 
 export function getTickScaleProgress(pixelsPerStep: number) {
-  if (pixelsPerStep <= 3) return 0;
+  if (pixelsPerStep <= 4.5) return 0;
 
   return Math.min(
     1,
@@ -146,176 +129,6 @@ export function getPreferredAxisEdgeLabelStep(ticks: AxisTickRenderState[]) {
   )[0]?.[0];
 }
 
-export function getAllowedAxisLabelSteps(
-  candidates: AxisLabelCandidate[],
-  useSubYearAxis: boolean,
-  options: { preferredStep?: number } = {},
-) {
-  const stepMetrics = new Map<
-    number,
-    { score: number; maxWidth: number; minPixelsPerStep: number }
-  >();
-
-  for (const candidate of candidates) {
-    const existing = stepMetrics.get(candidate.step);
-
-    stepMetrics.set(candidate.step, {
-      score: (existing?.score ?? 0) + candidate.alpha,
-      maxWidth: Math.max(existing?.maxWidth ?? 0, candidate.width),
-      minPixelsPerStep: Math.min(
-        existing?.minPixelsPerStep ?? Number.POSITIVE_INFINITY,
-        candidate.pixelsPerStep,
-      ),
-    });
-  }
-
-  const entries = [...stepMetrics.entries()].map(([step, metrics]) => ({
-    step,
-    ...metrics,
-  }));
-  const allowedSteps = new Set<number>();
-
-  if (entries.length === 0) {
-    return { allowedSteps, primaryStep: undefined as number | undefined };
-  }
-
-  const pickPreferredEntry = (
-    candidatesByScore: typeof entries,
-    readableSubYearEntries: typeof entries = candidatesByScore,
-  ) => {
-    const strongestEntry = candidatesByScore[0];
-    const preferredEntry =
-      options.preferredStep === undefined
-        ? undefined
-        : entries.find((entry) => entry.step === options.preferredStep);
-
-    if (!preferredEntry) {
-      return strongestEntry;
-    }
-
-    if (useSubYearAxis) {
-      const readablePreferred = readableSubYearEntries.find(
-        (entry) => entry.step === preferredEntry.step,
-      );
-      const strongestReadable = readableSubYearEntries[0] ?? strongestEntry;
-
-      if (
-        readablePreferred &&
-        readablePreferred.score >=
-          strongestReadable.score * AXIS_LABEL_HYSTERESIS_KEEP_RATIO
-      ) {
-        return readablePreferred;
-      }
-
-      return strongestReadable;
-    }
-
-    const strongestScaleDistance = Math.abs(
-      Math.log(strongestEntry.step / preferredEntry.step),
-    );
-
-    if (
-      strongestScaleDistance <= Math.log(3) &&
-      preferredEntry.score >=
-        strongestEntry.score * AXIS_LABEL_HYSTERESIS_KEEP_RATIO
-    ) {
-      return preferredEntry;
-    }
-
-    return strongestEntry;
-  };
-
-  if (useSubYearAxis) {
-    const readableEntries = entries
-      .filter(
-        (entry) =>
-          entry.step < 1 &&
-          entry.minPixelsPerStep >=
-            entry.maxWidth + SUBYEAR_LABEL_MIN_CLEARANCE_PX,
-      )
-      .sort(
-        (left, right) => left.step - right.step || right.score - left.score,
-      );
-    const preferredEntry = pickPreferredEntry(
-      entries.sort(
-        (left, right) => right.score - left.score || right.step - left.step,
-      ),
-      readableEntries,
-    );
-
-    allowedSteps.add(preferredEntry.step);
-
-    const sortedReadableEntries = [...readableEntries].sort(
-      (left, right) => right.score - left.score || right.step - left.step,
-    );
-
-    for (const entry of sortedReadableEntries) {
-      if (entry.step === preferredEntry.step) {
-        continue;
-      }
-
-      const ratio = entry.score / preferredEntry.score;
-      const isAdjacentScale =
-        Math.abs(Math.log(entry.step / preferredEntry.step)) <= Math.log(3);
-
-      if (
-        ratio >= AXIS_SUBYEAR_SECONDARY_STEP_RATIO &&
-        isAdjacentScale &&
-        allowedSteps.size < 2
-      ) {
-        allowedSteps.add(entry.step);
-      }
-    }
-
-    return { allowedSteps, primaryStep: preferredEntry.step };
-  }
-
-  const sortedEntries = entries.sort(
-    (left, right) => right.score - left.score || right.step - left.step,
-  );
-  const primaryEntry = pickPreferredEntry(sortedEntries);
-
-  allowedSteps.add(primaryEntry.step);
-
-  for (const entry of sortedEntries.slice(1)) {
-    const ratio = entry.score / primaryEntry.score;
-    const isAdjacentScale =
-      Math.abs(Math.log(entry.step / primaryEntry.step)) <= Math.log(3);
-
-    if (
-      ratio >= AXIS_LABEL_SECONDARY_STEP_RATIO &&
-      isAdjacentScale &&
-      allowedSteps.size < 2
-    ) {
-      allowedSteps.add(entry.step);
-    }
-  }
-
-  return { allowedSteps, primaryStep: primaryEntry.step };
-}
-
-export function getPrimaryAxisLabelStepFromResolvedLabels(
-  labels: AxisLabelCandidate[],
-  preferredStep?: number,
-) {
-  if (labels.length === 0) {
-    return preferredStep;
-  }
-
-  const scores = new Map<number, number>();
-
-  for (const label of labels) {
-    scores.set(label.step, (scores.get(label.step) ?? 0) + label.alpha);
-  }
-
-  return [...scores.entries()].sort(
-    (left, right) =>
-      right[1] - left[1] ||
-      (preferredStep !== undefined && left[0] === preferredStep ? -1 : 0) ||
-      right[0] - left[0],
-  )[0]?.[0];
-}
-
 function getIntervalClearance(
   left: number,
   right: number,
@@ -342,7 +155,7 @@ export function resolveAxisLabelCandidates(
 
   for (const candidate of [...candidates].sort((left, right) => {
     return (
-      right.alpha - left.alpha || right.step - left.step || left.x - right.x
+      (right.priority ?? right.step) - (left.priority ?? left.step) || left.x - right.x
     );
   })) {
     const minPadding =
@@ -407,58 +220,25 @@ export function resolveAxisLabelCandidates(
   return resolvedAxisLabels;
 }
 
-function relaxOccupiedBounds(
-  bounds: Array<{ left: number; right: number }>,
-  inset: number,
-) {
-  return bounds.flatMap((bound) => {
-    const left = bound.left + inset;
-    const right = bound.right - inset;
-
-    return left < right ? [{ left, right }] : [];
-  });
+const textWidths = new WeakMap<CanvasRenderingContext2D, { epoch: number; values: Map<string, number> }>();
+let fontEpoch = 0;
+if (typeof document !== "undefined") {
+  document.fonts?.addEventListener("loadingdone", () => { fontEpoch++; });
 }
 
-export function resolveAxisLabelCandidatesWithFallback(
-  candidates: AxisLabelCandidate[],
-  occupiedSeed: Array<{ left: number; right: number }> = [],
-  options: {
-    dedupeByTextOnly?: boolean;
-    relaxedSpacing?: boolean;
-    centerX?: number;
-  } = {},
-) {
-  const resolved = resolveAxisLabelCandidates(
-    candidates,
-    occupiedSeed,
-    options,
-  );
-
-  if (resolved.length > 0 || candidates.length === 0) {
-    return resolved;
+export function measureAxisText(context: CanvasRenderingContext2D, text: string) {
+  let cache = textWidths.get(context);
+  if (!cache || cache.epoch !== fontEpoch) {
+    cache = { epoch: fontEpoch, values: new Map() };
+    textWidths.set(context, cache);
   }
-
-  const relaxedResolved = resolveAxisLabelCandidates(
-    candidates,
-    relaxOccupiedBounds(occupiedSeed, 18),
-    { ...options, relaxedSpacing: true },
-  );
-
-  if (relaxedResolved.length > 0) {
-    return relaxedResolved;
-  }
-
-  const fallbackCandidate = [...candidates].sort(
-    (left, right) =>
-      right.alpha - left.alpha ||
-      Math.abs(left.x - (options.centerX ?? 0)) -
-        Math.abs(right.x - (options.centerX ?? 0)) ||
-      left.x - right.x,
-  )[0];
-
-  return fallbackCandidate
-    ? [{ ...fallbackCandidate, alpha: fallbackCandidate.alpha * 0.9 }]
-    : [];
+  const key = `${context.font}\n${text}`;
+  const existing = cache.values.get(key);
+  if (existing !== undefined) return existing;
+  const width = context.measureText(text).width;
+  if (cache.values.size >= 2048) cache.values.delete(cache.values.keys().next().value!);
+  cache.values.set(key, width);
+  return width;
 }
 
 export function measureAxisLabelWidth(
@@ -471,13 +251,13 @@ export function measureAxisLabelWidth(
   const previousFont = context.font;
 
   context.font = primaryFont;
-  const primaryWidth = primaryText ? context.measureText(primaryText).width : 0;
+  const primaryWidth = primaryText ? measureAxisText(context, primaryText) : 0;
 
   let secondaryWidth = 0;
 
   if (secondaryText) {
     context.font = secondaryFont;
-    secondaryWidth = context.measureText(secondaryText).width;
+    secondaryWidth = measureAxisText(context, secondaryText);
   }
 
   context.font = previousFont;

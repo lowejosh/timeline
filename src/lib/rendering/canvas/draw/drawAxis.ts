@@ -1,3 +1,5 @@
+import { findEraAtYear } from "../overlayLayout";
+import { formatMeasuredSpan } from "@/lib/rendering/timeMeasurement";
 import {
   formatTimelineElapsedAxisLabel,
   formatTimelineElapsedAxisLabelLines,
@@ -12,21 +14,17 @@ import {
   subtractPreciseTimelineYears,
   TIMELINE_MIN_YEAR,
   toApproximateTimelineYear,
-  worldPreciseToScreen,
-  worldToScreen,
   type PreciseTimelineYear,
 } from "@/lib/core/viewport";
 import {
   type AxisLabelCandidate,
-  getAllowedAxisLabelSteps,
   getCalendarAxisLabelText,
   getCalendarEdgeAxisLabelText,
   getPreferredAxisEdgeLabelStep,
-  getPrimaryAxisLabelStepFromResolvedLabels,
   getTickScaleProgress,
   measureAxisLabelWidth,
+  measureAxisText,
   resolveAxisLabelCandidates,
-  resolveAxisLabelCandidatesWithFallback,
   resolveAxisTickYear,
 } from "../axisLabels";
 import {
@@ -52,14 +50,12 @@ export function drawAxis(cx: CanvasDrawContext): void {
     sceneViewport,
     layout,
     line,
-    lineSoft,
     labelColor,
     resolvedAxisTickStates,
     breadcrumbChain,
     sceneActiveEra,
     toX,
     fromX,
-    preferredAxisLabelStepRef,
     fontSans,
   } = cx;
   const axisY = layout.axisY;
@@ -69,12 +65,13 @@ export function drawAxis(cx: CanvasDrawContext): void {
   // --- Breadcrumb ---
   {
     const projectLabel = "a timeline project";
-    const rootLabel = breadcrumbChain[0]?.name ?? sceneActiveEra.name;
+    const centralEra = cx.guidedFocus ? findEraAtYear(sceneActiveEra.children ?? [], sceneViewport.centerYear) : undefined;
+    const rootLabel = centralEra?.name ?? breadcrumbChain[0]?.name ?? sceneActiveEra.name;
     const trailLabel = breadcrumbChain
       .slice(1)
       .map((era) => era.name)
       .join(" • ");
-    const trailText = trailLabel ? ` • ${trailLabel}` : "";
+    const trailText = !cx.guidedFocus && trailLabel ? ` • ${trailLabel}` : "";
     const breadcrumbFont = `500 12px ${fontSans}`;
 
     context.save();
@@ -89,8 +86,8 @@ export function drawAxis(cx: CanvasDrawContext): void {
     context.fillStyle = labelColor;
     context.textAlign = "left";
     context.textBaseline = "top";
-    const rootWidth = context.measureText(rootLabel).width;
-    const trailWidth = trailText ? context.measureText(trailText).width : 0;
+    const rootWidth = measureAxisText(context, rootLabel);
+    const trailWidth = trailText ? measureAxisText(context, trailText) : 0;
     const startX = sceneWidth / 2 - (rootWidth + trailWidth) / 2;
 
     context.globalAlpha = breadcrumbChain.length > 1 ? 0.9 : 0.76;
@@ -101,6 +98,11 @@ export function drawAxis(cx: CanvasDrawContext): void {
       context.fillText(trailText, startX + rootWidth, layout.breadcrumbY);
     }
 
+    context.font = `10px ${fontSans}`;
+    context.textAlign = "center";
+    context.globalAlpha = 0.5;
+    const span = subtractPreciseTimelineYears(fromX(sceneWidth - pad), fromX(pad));
+    context.fillText(formatMeasuredSpan(span), sceneWidth / 2, layout.breadcrumbY + 19);
     context.restore();
   }
 
@@ -227,15 +229,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
     const majorExtraBelow = layout.majorTickBottom - (axisY + 10);
 
     for (const tick of resolvedAxisTickStates) {
-      const x =
-        pad +
-        (tick.wholeYear !== undefined && tick.yearFraction !== undefined
-          ? worldPreciseToScreen(
-              { wholeYear: tick.wholeYear, fraction: tick.yearFraction },
-              sceneViewport,
-              innerWidth,
-            )
-          : worldToScreen(tick.year, sceneViewport, innerWidth));
+      const x = pad + tick.x;
 
       if (x < pad - 32 || x > sceneWidth - pad + 32) continue;
 
@@ -260,20 +254,17 @@ export function drawAxis(cx: CanvasDrawContext): void {
       const baseFade =
         edgeFade * (1 - emphasisProgress + emphasisProgress * boundaryFade);
       const overlayFade = edgeFade * boundaryFade;
-      const baseMinorExtent = 2.4 + 10.4 * Math.pow(scaleProgress, 0.88);
-      const minorExtent =
-        baseMinorExtent * (0.42 + tick.visibleProgress * 0.58);
+      const baseMinorExtent = 2 + 10.8 * Math.pow(scaleProgress, 0.88);
+      const minorExtent = baseMinorExtent * (0.2 + tick.visibleProgress * 0.8);
       const top = axisY - minorExtent - majorExtraAbove * emphasisProgress;
       const bottom = axisY + minorExtent + majorExtraBelow * emphasisProgress;
 
       if (baseFade > 0.01) {
-        context.strokeStyle = lineSoft;
-        const minorOpacity =
-          0.16 +
-          0.24 * Math.pow(scaleProgress, 0.82) +
-          tick.visibleProgress * 0.08;
-        context.globalAlpha =
-          (minorOpacity + emphasisProgress * 0.08) * baseFade;
+        // Use the main ink colour; lineSoft already contains alpha and made
+        // the fine divisions almost invisible when multiplied by their fade.
+        context.strokeStyle = line;
+        const minorOpacity = 0.12 + 0.15 * Math.pow(scaleProgress, 0.9);
+        context.globalAlpha = minorOpacity * baseFade * tick.visibleProgress;
         context.beginPath();
         context.moveTo(x, top);
         context.lineTo(x, bottom);
@@ -283,7 +274,10 @@ export function drawAxis(cx: CanvasDrawContext): void {
       if (emphasisProgress > 0.01 && overlayFade > 0.01) {
         context.strokeStyle = line;
         context.globalAlpha =
-          (0.3 + tick.labelOpacity * 0.24) * emphasisProgress * overlayFade;
+          (0.22 + tick.labelOpacity * 0.16) *
+          emphasisProgress *
+          overlayFade *
+          tick.visibleProgress;
         context.beginPath();
         context.moveTo(x, top);
         context.lineTo(x, bottom);
@@ -380,30 +374,23 @@ export function drawAxis(cx: CanvasDrawContext): void {
     if (tick.labelOpacity <= 0.01) continue;
 
     const tickYear = resolveAxisTickYear(tick);
-    const resolvedX =
-      pad +
-      (tick.wholeYear !== undefined && tick.yearFraction !== undefined
-        ? worldPreciseToScreen(
-            { wholeYear: tick.wholeYear, fraction: tick.yearFraction },
-            sceneViewport,
-            innerWidth,
-          )
-        : worldToScreen(tick.year, sceneViewport, innerWidth));
+    const resolvedX = pad + tick.x;
 
     if (resolvedX < pad - 80 || resolvedX > sceneWidth - pad + 80) continue;
 
-    if (useSubYearAxis && tick.labelStep >= 1) continue;
+    const labelStep = useSubYearAxis
+      ? Math.min(tick.labelStep, edgeLabelStep)
+      : tick.labelStep;
 
     const calendarLabel = useCalendarSubYearAxis
-      ? getCalendarAxisLabelText(tickYear, tick.labelStep)
+      ? getCalendarAxisLabelText(tickYear, labelStep)
       : null;
     const elapsedLabel = useElapsedSubYearAxis
-      ? formatElapsedAxisLabel(tickYear, tick.labelStep)
+      ? formatElapsedAxisLabel(tickYear, labelStep)
       : null;
     const labelText = calendarLabel
       ? calendarLabel.text
-      : (elapsedLabel?.primaryText ??
-        formatAxisLabel(tickYear, tick.labelStep));
+      : (elapsedLabel?.primaryText ?? formatAxisLabel(tickYear, labelStep));
     const secondaryText =
       calendarLabel?.secondaryText ?? elapsedLabel?.secondaryText;
 
@@ -422,7 +409,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
             ? SUBYEAR_PRIMARY_FONT
             : `13px ${fontSans}`;
 
-          return context.measureText(labelText).width;
+          return measureAxisText(context, labelText);
         })();
 
     const distToMin = Math.abs(resolvedX - edgeLabelLeftX);
@@ -444,16 +431,12 @@ export function drawAxis(cx: CanvasDrawContext): void {
         secondaryText,
         width: labelWidth,
         alpha: labelAlpha,
-        step: tick.labelStep,
+        step: labelStep,
+        priority: tick.step,
         pixelsPerStep: tick.pixelsPerStep,
       });
     }
   }
-
-  const { allowedSteps: allowedLabelSteps, primaryStep: primaryAllowedStep } =
-    getAllowedAxisLabelSteps(axisLabelCandidates, useSubYearAxis, {
-      preferredStep: preferredAxisLabelStepRef.current,
-    });
 
   const primaryEdgeLabelEntries = [
     {
@@ -532,7 +515,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
             ? SUBYEAR_PRIMARY_FONT
             : `13px ${fontSans}`;
 
-          return context.measureText(edgeLabel.text).width;
+          return measureAxisText(context, edgeLabel.text);
         })();
     const left =
       edgeLabel.align === "left"
@@ -546,22 +529,13 @@ export function drawAxis(cx: CanvasDrawContext): void {
     primaryOccupiedBounds.push({ left, right });
   }
 
-  const resolvedAxisLabels = resolveAxisLabelCandidatesWithFallback(
-    axisLabelCandidates.filter(
-      (candidate) =>
-        allowedLabelSteps.size === 0 || allowedLabelSteps.has(candidate.step),
-    ),
+  const resolvedAxisLabels = resolveAxisLabelCandidates(
+    axisLabelCandidates,
     primaryOccupiedBounds,
     {
       dedupeByTextOnly: useSubYearAxis,
       relaxedSpacing: useSubYearAxis,
-      centerX: sceneWidth / 2,
     },
-  );
-
-  preferredAxisLabelStepRef.current = getPrimaryAxisLabelStepFromResolvedLabels(
-    resolvedAxisLabels,
-    primaryAllowedStep,
   );
 
   for (const label of resolvedAxisLabels.sort(
@@ -611,7 +585,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
       if (x < pad - 80 || x > sceneWidth - pad + 80) continue;
 
       const labelText = formatTimelineYear(year, 1);
-      const labelWidth = context.measureText(labelText).width;
+      const labelWidth = measureAxisText(context, labelText);
       const boundaryFade =
         Math.min(
           Math.max(0, (x - pad) / 60),
@@ -654,7 +628,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
     const yearOccupiedBounds: Array<{ left: number; right: number }> = [];
 
     for (const edgeLabel of yearEdgeLabelEntries) {
-      const labelWidth = context.measureText(edgeLabel.text).width;
+      const labelWidth = measureAxisText(context, edgeLabel.text);
       const left =
         edgeLabel.align === "left"
           ? edgeLabel.x - AXIS_LABEL_OCCUPIED_PADDING

@@ -8,7 +8,6 @@ import {
 } from "@/lib/rendering/canvas/theme";
 import type { HoverRegion, OverlayInteractionRegion } from "@/lib/rendering/canvas/draw/drawContext";
 import type { PrimordialDetailStripSegment } from "@/lib/rendering/canvas/primordial";
-import type { AnimatedAxisTickState } from "@/lib/rendering/animation/axisTickState";
 import type { MarkerPriorityBoostState } from "@/lib/rendering/animation/markerPriorityBoost";
 import type { AnimatedOverlayBandState } from "@/lib/rendering/animation/overlayBand";
 import { getOverlayLaneY, getTimelineLayout } from "@/lib/rendering/canvas/overlayLayout";
@@ -22,6 +21,7 @@ import {
 } from "@/lib/rendering/canvas/tooltip";
 
 type Props = {
+  isZoomColorsEnabled?: boolean;
   scene: TimelineCanvasScene | null;
   pad: number;
   /**
@@ -57,6 +57,7 @@ type Props = {
  * state and pan/zoom gestures.
  */
 export function TimelineCanvasRenderSurface({
+  isZoomColorsEnabled = false,
   commitHoveredTooltip,
   eraChildOpacityById,
   expandedOverlayIds,
@@ -90,7 +91,6 @@ export function TimelineCanvasRenderSurface({
   );
 
   // --- Animation state refs (empty — preview renders statically) ----------
-  const axisTickAnimationRef = useRef<Map<string, AnimatedAxisTickState>>(new Map());
   const eraChildAnimationRef = useRef<Map<string, AnimatedEraChildState>>(new Map());
   const expandedOverlayProgressByIdRef = useRef<Map<string, number>>(new Map());
   const internalHoverRegionsRef = useRef<HoverRegion[]>([]);
@@ -102,7 +102,6 @@ export function TimelineCanvasRenderSurface({
   const overlayInteractionRegionsRef =
     externalOverlayInteractionRegionsRef ?? internalOverlayInteractionRegionsRef;
   const expandedOverlayIdsRef = useRef(expandedOverlayIds ?? []);
-  const preferredAxisLabelStepRef = useRef<number | undefined>(undefined);
   const primordialDetailStripAnimationRef = useRef<{
     opacity: number;
     target: number;
@@ -245,7 +244,6 @@ export function TimelineCanvasRenderSurface({
       canvas: canvasRef.current,
       commitHoveredTooltip: commitHoveredTooltip ?? (() => {}),
       frameRefs: {
-        axisTickAnimationRef,
         eraChildAnimationRef,
         expandedOverlayProgressByIdRef,
         hoverRegionsRef,
@@ -253,13 +251,13 @@ export function TimelineCanvasRenderSurface({
         markerPriorityBoostRef,
         overlayBandAnimationRef,
         overlayInteractionRegionsRef,
-        preferredAxisLabelStepRef,
         primordialDetailStripAnimationRef,
         renderedExpandedOverlayIdsRef,
       },
       hoveredTooltipRef,
       invalidateReasons: [],
       isCosmicCalendarMode: false,
+      isZoomColorsEnabled,
       isTouchTooltipPinned: false,
       isViewportInteractionActive: false,
       lastPointer: lastPointerRef.current,
@@ -295,6 +293,7 @@ export function TimelineCanvasRenderSurface({
     themeRef.current = readTimelineCanvasTheme();
     drawRef.current();
   }, [
+    isZoomColorsEnabled,
     scene,
     pad,
     eraChildOpacityById,

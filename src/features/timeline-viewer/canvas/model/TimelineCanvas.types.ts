@@ -1,3 +1,4 @@
+import type { AxisTickScreenState } from "@/lib/rendering/axisTickStates";
 import type { GuidedTimelineFocus } from "@/lib/rendering/guidedFocus";
 import type { ResolvedTimelineOverlayBand } from "@/lib/rendering/overlayTracks";
 import type { TimelineViewport } from "@/lib/core/viewport";
@@ -81,6 +82,7 @@ export type PinchZoomState = {
 };
 
 export type TimelineCanvasScene = {
+  axisTicks?: AxisTickScreenState[];
   width: number;
   height: number;
   viewport: TimelineViewport;
