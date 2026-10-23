@@ -145,13 +145,13 @@ function App() {
                 variant={shouldUseMobileSearchDialog ? "mobile" : "desktop"}
               />
             ) : null}
-            <ExperienceMenu onSelect={(selected) => {
+            {/* <ExperienceMenu onSelect={(selected) => {
               app.animated.cancelTransientMotion();
               actions.setIsSearchOpen(false);
               actions.setIsKeyboardHelpOpen(false);
               actions.setIsSettingsOpen(false);
               setExperience(selected);
-            }} />
+            }} /> */}
             <TimelineSettings
               className="order-3"
               isCosmicCalendarMode={isCosmicCalendarMode}
