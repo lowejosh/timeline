@@ -22,9 +22,9 @@ const HUMAN_HISTORY_COLORS = {
   paleolithic: "rgb(64, 167, 226)",
   epipaleolithic: "rgb(232, 134, 69)",
   neolithic: "rgb(88, 217, 69)",
-  prePotteryNeolithicA: "rgb(191, 82, 224)",
-  prePotteryNeolithicB: "rgb(229, 208, 67)",
-  potteryNeolithic: "rgb(63, 213, 188)",
+  prePotteryNeolithicA: "rgb(131, 232, 111)",
+  prePotteryNeolithicB: "rgb(79, 204, 61)",
+  potteryNeolithic: "rgb(65, 178, 49)",
   chalcolithic: "rgb(230, 92, 45)",
   bronzeAge: "rgb(218, 154, 31)",
   earlyBronzeAge: "rgb(243, 199, 74)",
@@ -54,9 +54,9 @@ const HUMAN_HISTORY_COLORS = {
   highIndustrializationAndEmpire: "rgb(103, 77, 220)",
   warAndCrisis: "rgb(166, 70, 190)",
   contemporaryHistory: "rgb(58, 217, 159)",
-  postwarOrder: "rgb(232, 199, 69)",
-  coldWarAndDecolonization: "rgb(223, 83, 181)",
-  digitalAge: "rgb(58, 206, 223)",
+  postwarOrder: "rgb(105, 232, 181)",
+  coldWarAndDecolonization: "rgb(48, 204, 151)",
+  digitalAge: "rgb(36, 178, 139)",
 } as const;
 
 export const HUMAN_HISTORY_ERA_DEFINITIONS: EraDefinition[] = [
