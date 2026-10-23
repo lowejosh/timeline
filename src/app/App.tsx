@@ -1,4 +1,3 @@
-import { ExperienceMenu } from "@/features/guided-experiences/ExperienceMenu";
 import { GuidedExperienceView } from "@/features/guided-experiences/GuidedExperienceView";
 import type { GuidedExperience } from "@/features/guided-experiences/experiences";
 import { Suspense, useEffect, useMemo, useState } from "react";
