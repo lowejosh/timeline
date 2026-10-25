@@ -24,6 +24,8 @@ export function TimelineView({ app, layout }: TimelineViewProps) {
 
   return (
     <div
+      aria-hidden={activeView !== "timeline"}
+      inert={activeView !== "timeline"}
       onContextMenuCapture={(event) => event.preventDefault()}
       className={cn(
         "absolute inset-0 h-full w-full transition-[transform,opacity] duration-300 ease-out",

@@ -21,6 +21,7 @@ import {
 } from "@/features/timeline-viewer/components";
 import { TimelineView } from "@/pages/TimelineView/TimelineView";
 import { getPrimaryShortcutModifierLabel } from "@/lib/app/timelineKeyboard";
+import { useChartStore } from "@/features/timeline-charts/chartStore";
 import { PwaInstallPrompt } from "@/components/misc";
 
 function App() {
@@ -77,6 +78,11 @@ function App() {
     onHelpOpenChange: actions.setIsKeyboardHelpOpen,
     onHomeRange: app.handleHomeRange,
     onLayerShortcut: app.handleLayerShortcut,
+    onChartsToggle: () => {
+      actions.setIsSidebarOpen(false);
+      const charts = useChartStore.getState();
+      charts.setMenuOpen(!charts.isMenuOpen);
+    },
     onMapPreviewToggle: () => {
       actions.setIsMapPreviewEnabled((current) => !current);
     },
@@ -84,7 +90,10 @@ function App() {
     onNavigationFrame: app.handleKeyboardNavigationFrame,
     onSearchToggle: actions.toggleSearch,
     onSettingsOpenChange: actions.setIsSettingsOpen,
-    onSidebarOpenChange: actions.setIsSidebarOpen,
+    onSidebarOpenChange: (value) => {
+      useChartStore.getState().setMenuOpen(false);
+      actions.setIsSidebarOpen(value);
+    },
   });
 
   return (
@@ -96,6 +105,8 @@ function App() {
     >
       {activeView === "timeline" ? (
         <>
+          <h1 className="sr-only">a timeline project</h1>
+          <a href="#timeline-canvas" className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-16 focus:z-50 focus:rounded focus:bg-card focus:p-3">Skip to timeline</a>
           <div
             data-timeline-controls
             className="absolute right-[var(--app-chrome-right)] top-[var(--app-chrome-top)] z-[5] flex items-start justify-end gap-2"

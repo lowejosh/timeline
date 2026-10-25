@@ -10,6 +10,8 @@ import type { TimelineCatalogSnapshot } from "@/lib/catalog/timelineCatalog";
 import { TimelineSidebar } from "../TimelineSidebar";
 import { cn } from "@/lib/utils";
 import { Map } from "lucide-react";
+import { ChartMenu } from "@/features/timeline-charts/ChartMenu";
+import { useChartStore } from "@/features/timeline-charts/chartStore";
 
 type TimelineSidebarChromeProps = {
   isMapPreviewEnabled: boolean;
@@ -47,6 +49,8 @@ export function TimelineSidebarChrome({
     <>
       <div
         data-timeline-controls
+        aria-hidden={activeView !== "timeline" || (mode === "drawer" && isOpen)}
+        inert={activeView !== "timeline" || (mode === "drawer" && isOpen)}
         className={cn(
           "absolute left-[var(--app-chrome-left)] top-[var(--app-chrome-top)] z-[4] flex items-center gap-2",
           "transition-[opacity,transform] duration-200",
@@ -66,6 +70,7 @@ export function TimelineSidebarChrome({
           )}
           data-open={isOpen ? "true" : "false"}
           onClick={() => {
+            useChartStore.getState().setMenuOpen(false);
             actions.setIsSidebarOpen((current) => !current);
           }}
           size="pill"
@@ -131,6 +136,7 @@ export function TimelineSidebarChrome({
             </ShortcutKey>
           ) : null}
         </Button>
+        <ChartMenu showShortcuts={showShortcuts} onOpenChange={(open) => { if (open) actions.closeSidebar(); }} />
         <Button
           aria-label={
             isMapPreviewEnabled ? "Hide map preview" : "Show map preview"
@@ -159,6 +165,8 @@ export function TimelineSidebarChrome({
       </div>
       <button
         aria-label="Close layers controls"
+        aria-hidden={!isOpen || activeView !== "timeline"}
+        inert={!isOpen || activeView !== "timeline"}
         className={cn(
           "focus-ring-none absolute inset-0 hidden border-0 bg-transparent p-0 transition-opacity duration-200",
           mode === "drawer" && "z-[6] block",
@@ -174,7 +182,8 @@ export function TimelineSidebarChrome({
         type="button"
       />
       <div
-        aria-hidden={!isOpen}
+        aria-hidden={!isOpen || activeView !== "timeline"}
+        inert={!isOpen || activeView !== "timeline"}
         className={cn(
           "absolute origin-top-left transition-[opacity,transform] duration-300 ease-out",
           mode === "drawer" ? "z-[7]" : "z-[3]",

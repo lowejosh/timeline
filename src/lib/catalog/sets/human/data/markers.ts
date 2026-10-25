@@ -8,3 +8,4 @@ export { IRON_AGE_MARKERS } from "./markers/ironAge";
 export { NEOLITHIC_MARKERS } from "./markers/neolithic";
 export { PALEOLITHIC_MARKERS } from "./markers/paleolithic";
 export { POST_CLASSICAL_MARKERS } from "./markers/postClassical";
+export { TECHNOLOGY_MARKERS } from "./markers/technology";

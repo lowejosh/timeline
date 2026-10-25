@@ -87,6 +87,13 @@ import type {
   TimelineSceneDiagnosticsSnapshot,
 } from "./model/TimelineCanvas.types";
 
+import { getChart } from "@/features/timeline-charts/chartCatalog";
+import { useChartStore } from "@/features/timeline-charts/chartStore";
+import { useChartData } from "@/features/timeline-charts/useChartData";
+import type { ChartRenderState } from "@/features/timeline-charts/drawChart";
+import { chartReadoutAt, projectChart, withChartDomain } from "@/features/timeline-charts/chartGeometry";
+import { ChartAxisMotion } from "@/features/timeline-charts/chartAxisMotion";
+
 export function TimelineCanvas({
   width,
   height,
@@ -118,8 +125,21 @@ export function TimelineCanvas({
   onReleaseMomentum,
   expandOverlayRequest,
 }: TimelineCanvasProps) {
+  const activeChartIds = useChartStore(state => state.activeChartIds);
+  const fitChartVisible = useChartStore(state => state.fitVisible);
+  const showChartUncertainty = useChartStore(state => state.showUncertainty);
+  const selectedCharts = useMemo(() => !guidedFocus && !isCosmicCalendarMode
+    ? activeChartIds.flatMap(id => { const chart = getChart(id); return chart ? [chart] : []; }) : [],
+    [activeChartIds, guidedFocus, isCosmicCalendarMode]);
+  const firstChartResult = useChartData(selectedCharts[0]?.id ?? null);
+  const secondChartResult = useChartData(selectedCharts[1]?.id ?? null);
+  const chartStates = useMemo(() => selectedCharts.flatMap((chart, index): ChartRenderState[] => {
+    const data = index === 0 ? firstChartResult.data : secondChartResult.data;
+    return data ? [{ chart, data, side: index === 0 ? "left" : "right", fitVisible: fitChartVisible, showUncertainty: showChartUncertainty }] : [];
+  }), [selectedCharts, firstChartResult.data, secondChartResult.data, fitChartVisible, showChartUncertainty]);
   const isZoomColorsEnabled = useTimelineUiStore((state) => state.isZoomColorsEnabled);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const chartAxisMotionRef = useRef(new ChartAxisMotion());
   const shellRef = useRef<HTMLDivElement | null>(null);
   const tooltipInteractiveContentRef = useRef<HTMLDivElement | null>(null);
   const themeRef = useRef<TimelineCanvasTheme>(DEFAULT_TIMELINE_THEME);
@@ -422,6 +442,9 @@ export function TimelineCanvas({
   const drawCanvas = useCallback(
     (invalidateReasons: string[] = []) => {
       const { hasActiveFrameAnimation } = drawTimelineCanvasFrame({
+        chartAxisMotion: chartAxisMotionRef.current,
+        chartReducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+        chartStates,
         canvas: canvasRef.current,
         commitHoveredTooltip,
         frameRefs: {
@@ -469,6 +492,9 @@ export function TimelineCanvas({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       commitHoveredTooltip,
+      chartStates,
+      fitChartVisible,
+      showChartUncertainty,
       guidedFocus,
       isCosmicCalendarMode,
       isZoomColorsEnabled,
@@ -1014,6 +1040,19 @@ export function TimelineCanvas({
           isTouchTooltipPinnedRef.current = false;
           setExpandedOverlayIds([]);
           commitHoveredTooltip(null);
+          if (event.pointerType === "touch") {
+            for (const state of chartStates) {
+              const targetProjection = projectChart(state.chart, state.data, viewport, width, pad, width < 640 ? 110 : 100, overlayInteractionLayout.overlayClipBottom - 12, fitChartVisible, showChartUncertainty);
+              const projection = withChartDomain(targetProjection, chartAxisMotionRef.current.getDomain(state.chart.id) ?? targetProjection.domain);
+              const year = screenToWorld(localX - pad, viewport, width - pad * 2);
+              if (chartReadoutAt(projection, state.data, year, localX, localY)) {
+                lastPointerRef.current = { x: localX, y: localY, pointerType: "touch" };
+                isTouchTooltipPinnedRef.current = true;
+                scheduleRedraw("chart-tap");
+                break;
+              }
+            }
+          }
         }
       }
     }
@@ -1047,6 +1086,7 @@ export function TimelineCanvas({
       y,
       pointerType: event.pointerType,
     };
+    if (chartStates.length) scheduleRedraw("chart-pointer-move");
 
     if (dragStateRef.current?.pointerId === event.pointerId) {
       commitHoveredTooltip(null);
@@ -1102,6 +1142,7 @@ export function TimelineCanvas({
 
     lastPointerRef.current = null;
     commitHoveredTooltip(null);
+    if (chartStates.length) scheduleRedraw("chart-pointer-leave");
   };
 
   const handleDoubleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -1171,11 +1212,13 @@ export function TimelineCanvas({
       onPointerMove={handleShellPointerMove}
     >
       <canvas
-        aria-label="Interactive timeline canvas. Right-drag to measure time; click or press Escape to clear."
+        id="timeline-canvas"
+        aria-label="Interactive history timeline"
+        aria-describedby="timeline-canvas-instructions"
         onContextMenu={(event) => event.preventDefault()}
         style={ruler.isDragging ? { cursor: "crosshair" } : undefined}
         onLostPointerCapture={(event) => { if (ruler.end(event)) onViewportGestureEnd?.(); }}
-        className="absolute inset-0 w-full h-full block border-0 outline-none touch-none cursor-grab overscroll-none active:cursor-grabbing"
+        className="absolute inset-0 w-full h-full block border-0 outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary touch-none cursor-grab overscroll-none active:cursor-grabbing"
         onKeyDown={(event) => {
           if (event.key === "Escape" && ruler.hasMeasurement) {
             event.preventDefault();
@@ -1230,6 +1273,11 @@ export function TimelineCanvas({
         ref={canvasRef}
         tabIndex={0}
       />
+      <p id="timeline-canvas-instructions" className="sr-only">
+        Use the left and right arrow keys to pan, plus and minus to zoom, and Escape to move up a level.
+        Search to find historical events and bands. Press C for charts or L for layers.
+        Right-drag to measure time; click or press Escape to clear the measurement.
+      </p>
       {ruler.overlay}
       {mapPreviewDashedLineX !== null ? (
         <div

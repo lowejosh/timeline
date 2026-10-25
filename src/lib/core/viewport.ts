@@ -354,6 +354,19 @@ export function worldToScreen(
   return worldPreciseToScreen(splitTimelineYear(year), viewport, width);
 }
 
+/** Reuses viewport normalization when projecting a series of points in one frame. */
+export function createWorldToScreen(viewport: TimelineViewport, width: number) {
+  const safeWidth = Math.max(width, 1);
+  const normalized = normalizeViewport(viewport, safeWidth);
+  const centerYear = getViewportCenterYear(normalized);
+  const scaleMode = getTimelineScaleMode(normalized);
+  return (year: number) => safeWidth / 2 + getScreenDeltaForYearDelta(
+    subtractPreciseTimelineYears(splitTimelineYear(year), centerYear),
+    normalized.zoom,
+    scaleMode,
+  );
+}
+
 export function screenToWorldPrecise(
   x: number,
   viewport: TimelineViewport,

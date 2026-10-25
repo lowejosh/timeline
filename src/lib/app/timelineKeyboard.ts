@@ -35,7 +35,6 @@ const LAYER_SHORTCUT_KEYS = [
   "9",
   "A",
   "B",
-  "C",
   "D",
   "E",
   "G",

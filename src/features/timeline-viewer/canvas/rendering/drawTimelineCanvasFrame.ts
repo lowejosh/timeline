@@ -1,4 +1,6 @@
 import { drawGuidedCursor } from "@/lib/rendering/canvas/draw/drawGuidedCursor";
+import { drawChart, drawChartReadouts, type ChartRenderState } from "@/features/timeline-charts/drawChart";
+import type { ChartAxisMotion } from "@/features/timeline-charts/chartAxisMotion";
 import type { GuidedTimelineFocus } from "@/lib/rendering/guidedFocus";
 import type { MutableRefObject, RefObject } from "react";
 
@@ -90,6 +92,9 @@ export type TimelineCanvasFrameRefs = {
 };
 
 export type DrawTimelineCanvasFrameArgs = {
+  chartAxisMotion?: ChartAxisMotion;
+  chartReducedMotion?: boolean;
+  chartStates?: readonly ChartRenderState[];
   canvas: HTMLCanvasElement | null;
   commitHoveredTooltip: (tooltip: HoveredTooltipState | null) => void;
   frameRefs: TimelineCanvasFrameRefs;
@@ -120,6 +125,9 @@ export type DrawTimelineCanvasFrameArgs = {
 };
 
 export function drawTimelineCanvasFrame({
+  chartAxisMotion,
+  chartReducedMotion = false,
+  chartStates = [],
   canvas,
   commitHoveredTooltip,
   frameRefs,
@@ -466,11 +474,14 @@ export function drawTimelineCanvasFrame({
   drawEras(cx);
   markPerf("eraMs");
   drawOverlays(cx);
+  chartAxisMotion?.retain(isCosmicCalendarMode ? [] : chartStates.map(state => state.chart.id));
+  const chartProjections = !isCosmicCalendarMode ? chartStates.map(state => drawChart(cx, state, chartAxisMotion, chartReducedMotion)) : [];
   markPerf("overlayMs");
   drawAxis(cx);
   markPerf("axisMs");
   const resolvedMarkerStates = drawMarkers(cx);
   drawGuidedCursor(cx);
+  if (!isCosmicCalendarMode) drawChartReadouts(cx, chartStates, chartProjections, lastPointer);
   markPerf("markerMs");
 
   frameRefs.hoverRegionsRef.current = cx.hoverRegions;
@@ -557,6 +568,6 @@ export function drawTimelineCanvasFrame({
 
   return {
     hasActiveFrameAnimation:
-      cx.frameFlags.hasActivePrimordialDetailStripAnimation,
+      cx.frameFlags.hasActivePrimordialDetailStripAnimation || chartProjections.some(projection => projection?.axisAnimating),
   };
 }

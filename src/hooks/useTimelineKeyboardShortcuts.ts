@@ -20,6 +20,7 @@ type UseTimelineKeyboardShortcutsOptions = {
   onHomeRange: () => void;
   onLayerShortcut: (normalizedKey: string) => boolean;
   onMapPreviewToggle: () => void;
+  onChartsToggle: () => void;
   onNavigationEnd: () => void;
   onNavigationFrame: (frame: KeyboardNavigationFrame) => void;
   onSearchToggle: () => void;
@@ -47,7 +48,7 @@ function isEditableShortcutTarget(target: EventTarget | null) {
   }
 
   return Boolean(
-    target.closest('input, textarea, select, [contenteditable="true"]'),
+    target.closest('input:not([type="checkbox"]):not([type="radio"]), textarea, select, [contenteditable="true"]'),
   );
 }
 
@@ -122,6 +123,7 @@ export function useTimelineKeyboardShortcuts({
   onHomeRange,
   onLayerShortcut,
   onMapPreviewToggle,
+  onChartsToggle,
   onNavigationEnd,
   onNavigationFrame,
   onSearchToggle,
@@ -138,6 +140,7 @@ export function useTimelineKeyboardShortcuts({
     onHomeRange,
     onLayerShortcut,
     onMapPreviewToggle,
+    onChartsToggle,
     onNavigationEnd,
     onNavigationFrame,
     onSearchToggle,
@@ -163,6 +166,7 @@ export function useTimelineKeyboardShortcuts({
       onHomeRange,
       onLayerShortcut,
       onMapPreviewToggle,
+    onChartsToggle,
       onNavigationEnd,
       onNavigationFrame,
       onSearchToggle,
@@ -179,6 +183,7 @@ export function useTimelineKeyboardShortcuts({
     onHomeRange,
     onLayerShortcut,
     onMapPreviewToggle,
+    onChartsToggle,
     onNavigationEnd,
     onNavigationFrame,
     onSearchToggle,
@@ -361,7 +366,21 @@ export function useTimelineKeyboardShortcuts({
         return;
       }
 
+      // Let controls and overview rulers handle their own arrow-key navigation.
+      if (event.target instanceof HTMLElement && (
+        (isNavigationKey(normalizedKey) && event.target.closest('button, input, [role="dialog"]')) ||
+        ((isNavigationKey(normalizedKey) || normalizedKey === "home" || normalizedKey === "end") && event.target.closest("[data-timeline-local-keys]"))
+      )) {
+        return;
+      }
+
       if (event.altKey || event.metaKey || event.ctrlKey) {
+        return;
+      }
+
+      if (normalizedKey === "c") {
+        claimKeyboardEvent(event);
+        latest.onChartsToggle();
         return;
       }
 
@@ -426,7 +445,7 @@ export function useTimelineKeyboardShortcuts({
         return;
       }
 
-      if (isNavigationKey(normalizedKey)) {
+      if (isNavigationKey(normalizedKey) && pressedKeysRef.current.has(normalizedKey)) {
         claimKeyboardEvent(event);
         pressedKeysRef.current.delete(normalizedKey);
       }

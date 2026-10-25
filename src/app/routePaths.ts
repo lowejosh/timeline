@@ -19,6 +19,7 @@ export const APP_ROUTE_PATHS = {
 export type AppRouteView = "timeline" | "available-sets" | "create-set";
 
 export function getRouteView(pathname: string): AppRouteView {
+  pathname = pathname.replace(/\/+$/, "") || "/";
   if (pathname === APP_ROUTE_PATHS.sets) {
     return "available-sets";
   }

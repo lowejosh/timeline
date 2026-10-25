@@ -256,7 +256,9 @@ export function TimelineOverviewRuler({
     <div className="relative z-0 w-full bg-transparent" style={{ height }}>
       <div
         aria-label="Timeline overview ruler. Click or drag anywhere to recenter and scrub the timeline window."
-        className="relative w-full h-full overflow-hidden border-0 bg-transparent outline-none cursor-pointer touch-none data-[dragging=true]:cursor-grabbing"
+        role="group"
+        data-timeline-local-keys
+        className="focus-ring relative w-full h-full overflow-hidden border-0 bg-transparent cursor-pointer touch-none data-[dragging=true]:cursor-grabbing"
         data-dragging={isDragging ? "true" : "false"}
         data-following={isFollowingDrag ? "true" : "false"}
         data-settling={isSettling ? "true" : "false"}

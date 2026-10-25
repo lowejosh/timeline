@@ -12,6 +12,7 @@ import {
   NEOLITHIC_MARKERS,
   PALEOLITHIC_MARKERS,
   POST_CLASSICAL_MARKERS,
+  TECHNOLOGY_MARKERS,
 } from "./data/markers";
 import {
   CIVILIZATION_OVERLAYS,
@@ -42,6 +43,7 @@ const humanHistoryMarkers = [
   ...HISTORICAL_TURNING_POINT_MARKERS,
   ...CLASSICAL_ANTIQUITY_MARKERS,
   ...POST_CLASSICAL_MARKERS,
+  ...TECHNOLOGY_MARKERS,
 ];
 
 export const HUMAN_SET = normalizeTimelineSetSource({

@@ -480,12 +480,13 @@ export function TimelineSidebar({
       return;
     }
 
-    if ((event.target as HTMLElement).closest("button, input, label")) {
+    if ((event.target as HTMLElement).closest("button:not([data-layer-drag-handle]), input, label")) {
       return;
     }
 
     event.preventDefault();
     event.stopPropagation();
+    if (event.currentTarget instanceof HTMLButtonElement) event.currentTarget.focus({ preventScroll: true });
 
     const layout = measureSetLayout();
 
@@ -590,9 +591,9 @@ export function TimelineSidebar({
         )}
       >
         <header className="flex items-baseline justify-between gap-2 px-0.5">
-          <h1 className="m-0 font-display text-base font-semibold leading-none text-foreground">
+          <h2 className="m-0 font-display text-base font-semibold leading-none text-foreground">
             Layers
-          </h1>
+          </h2>
           <span className="shrink-0 text-[0.56rem] font-semibold uppercase leading-none tracking-[0.08em] text-muted-foreground">
             {pluralize(sets.length, "set")}
           </span>
@@ -662,104 +663,95 @@ export function TimelineSidebar({
                   }}
                   open={expanded}
                 >
-                  <CollapsibleTrigger asChild>
-                    <div
-                      aria-label={`${expanded ? "Collapse" : "Expand"} ${set.label}`}
-                      className={cn(
-                        "focus-ring-none grid cursor-grab touch-none select-none grid-cols-[auto_1fr_auto] items-center gap-2 rounded-md px-2 py-2 transition-colors duration-150 hover:bg-surface/40",
-                        expanded && "bg-surface/20",
-                        isDragged && "cursor-grabbing",
-                        mode === "drawer" &&
-                          "pl-[calc(env(safe-area-inset-left,0px)+0.62rem)]",
-                      )}
-                      data-expanded={expanded ? "true" : "false"}
-                      role="button"
+                  <div
+                    className={cn(
+                      "grid cursor-grab touch-none select-none grid-cols-[auto_1fr] items-center gap-2 rounded-md px-2 py-2 transition-colors duration-150 hover:bg-surface/40",
+                      expanded && "bg-surface/20",
+                      isDragged && "cursor-grabbing",
+                      mode === "drawer" && "pl-[calc(env(safe-area-inset-left,0px)+0.62rem)]",
+                    )}
+                    data-expanded={expanded ? "true" : "false"}
+                    onPointerDown={(event) => handlePointerDown(event, set.id)}
+                  >
+                    <span
+                      className="inline-flex items-center"
                       onClick={(event) => {
-                        if (dragMovedRef.current) {
-                          // Consume the flag so the next click works normally.
-                          dragMovedRef.current = false;
-                          event.preventDefault();
-                        }
+                        event.stopPropagation();
                       }}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          onToggleSetExpanded(set.id, !expanded);
-                        }
-
-                        if (event.key === "ArrowUp") {
-                          event.preventDefault();
-                          handleMoveSetByKeyboard(set.id, -1);
-                        }
-
-                        if (event.key === "ArrowDown") {
-                          event.preventDefault();
-                          handleMoveSetByKeyboard(set.id, 1);
-                        }
-                      }}
-                      onPointerDown={(event) => {
-                        handlePointerDown(event, set.id);
-                      }}
-                      tabIndex={0}
                     >
-                      <span
-                        className="inline-flex items-center"
+                      <Checkbox
+                        aria-label={`${set.enabled ? "Hide" : "Show"} ${set.label}`}
+                        checked={set.enabled}
+                        onChange={(event) => {
+                          onToggleSet(set.id, event.currentTarget.checked);
+                        }}
+                      />
+                    </span>
+
+                    <CollapsibleTrigger asChild>
+                      <button
+                        type="button"
+                        data-layer-drag-handle
+                        onPointerDown={(event) => handlePointerDown(event, set.id)}
+                        aria-label={`${expanded ? "Collapse" : "Expand"} ${set.label}`}
+                        className="flex min-w-0 items-center justify-between gap-2 rounded text-left cursor-grab active:cursor-grabbing"
                         onClick={(event) => {
-                          event.stopPropagation();
+                          if (dragMovedRef.current) {
+                            dragMovedRef.current = false;
+                            event.preventDefault();
+                          }
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                            event.preventDefault();
+                            handleMoveSetByKeyboard(set.id, event.key === "ArrowUp" ? -1 : 1);
+                          }
                         }}
                       >
-                        <Checkbox
-                          aria-label={`${set.enabled ? "Hide" : "Show"} ${set.label}`}
-                          checked={set.enabled}
-                          onChange={(event) => {
-                            onToggleSet(set.id, event.currentTarget.checked);
-                          }}
-                        />
-                      </span>
-
-                      <span className="grid min-w-0 gap-0.5">
-                        <span
-                          className="min-w-0 flex-1 text-[0.76rem] font-semibold leading-tight text-foreground"
-                          title={set.description}
-                        >
-                          {set.label}
-                          {(eraObscuredCounts.get(set.id) ?? 0) > 0 ? (
-                            <Tooltip
-                              content={`${eraObscuredCounts.get(set.id)} era${eraObscuredCounts.get(set.id) !== 1 ? "s" : ""} covered by higher-priority sets`}
-                            >
-                              <span
-                                aria-hidden="true"
-                                className="ml-1 inline-flex align-middle text-warning"
-                              >
-                                <AlertTriangle className="size-3 fill-warning/20 stroke-[1.8]" />
-                              </span>
-                            </Tooltip>
-                          ) : null}
-                        </span>
-                        <span className="text-[0.6rem] font-semibold leading-tight tracking-[0.01em] text-muted-foreground">
-                          {formatSetMeta(set)}
-                        </span>
-                      </span>
-
-                      <span className="inline-flex shrink-0 items-center gap-1.5">
-                        {showShortcuts && setShortcut ? (
-                          <ShortcutKey
-                            className="border-border/70 bg-surface/70 text-muted-foreground"
-                            size="sm"
+                        <span className="grid min-w-0 gap-0.5">
+                          <span
+                            className="min-w-0 flex-1 text-[0.76rem] font-semibold leading-tight text-foreground"
+                            title={set.description}
                           >
-                            {setShortcut}
-                          </ShortcutKey>
-                        ) : null}
-                        <ChevronDown
-                          aria-hidden="true"
-                          className={cn(
-                            "size-4 text-muted-foreground transition-transform duration-200",
-                            expanded && "rotate-180",
-                          )}
-                        />
-                      </span>
-                    </div>
-                  </CollapsibleTrigger>
+                            {set.label}
+                            {(eraObscuredCounts.get(set.id) ?? 0) > 0 ? (
+                              <Tooltip
+                                content={`${eraObscuredCounts.get(set.id)} era${eraObscuredCounts.get(set.id) !== 1 ? "s" : ""} covered by higher-priority sets`}
+                              >
+                                <span
+                                  aria-hidden="true"
+                                  className="ml-1 inline-flex align-middle text-warning"
+                                >
+                                  <AlertTriangle className="size-3 fill-warning/20 stroke-[1.8]" />
+                                </span>
+                              </Tooltip>
+                            ) : null}
+                          </span>
+                          <span className="text-[0.6rem] font-semibold leading-tight tracking-[0.01em] text-muted-foreground">
+                            {formatSetMeta(set)}
+                          </span>
+                        </span>
+
+                        <span className="inline-flex shrink-0 items-center gap-1.5">
+                          {showShortcuts && setShortcut ? (
+                            <ShortcutKey
+                              className="border-border/70 bg-surface/70 text-muted-foreground"
+                              size="sm"
+                            >
+                              {setShortcut}
+                            </ShortcutKey>
+                          ) : null}
+                          <ChevronDown
+                            aria-hidden="true"
+                            className={cn(
+                              "size-4 text-muted-foreground transition-transform duration-200",
+                              expanded && "rotate-180",
+                            )}
+                          />
+                        </span>
+                      </button>
+                    </CollapsibleTrigger>
+                  </div>
 
                   <CollapsibleContent>
                     <ul className="m-0 grid list-none gap-0 border-t border-border/50 p-0">

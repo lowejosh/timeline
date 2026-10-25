@@ -83,7 +83,7 @@ export function PageShell({
           ref={scrollRef}
         >
           {children ? (
-            <main className="h-full min-h-0 min-w-0">{children}</main>
+            <div className="h-full min-h-0 min-w-0">{children}</div>
           ) : null}
           {sidebar ? <aside className="min-w-0">{sidebar}</aside> : null}
         </div>

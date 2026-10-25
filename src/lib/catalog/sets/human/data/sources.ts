@@ -1,4 +1,167 @@
 export const HUMAN_SOURCES = {
+  scienceXianrendongPottery: {
+    shortTitle: "Science: early pottery",
+    title: "Early Pottery at 20,000 Years Ago in Xianrendong Cave, China",
+    organization: "Science",
+    citation: "Wu, Xiaohong, et al. Early Pottery at 20,000 Years Ago in Xianrendong Cave, China. Science 336 (2012), 1696–1700. doi:10.1126/science.1218643.",
+    url: "https://doi.org/10.1126/science.1218643",
+  },
+  cambridgeTextileIndustry: {
+    shortTitle: "Cambridge: textile industry",
+    title: "Textiles",
+    organization: "University of Cambridge, Cambridge Group for the History of Population and Social Structure",
+    citation: "University of Cambridge, Occupational Structure of Britain: Textiles. Section on the spinning jenny (circa 1764).",
+    url: "https://www.campop.geog.cam.ac.uk/research/occupations/outputs/onlineatlas/textiles.pdf",
+  },
+  whoSmallpoxVaccinationHistory: {
+    shortTitle: "WHO: smallpox vaccination",
+    title: "History of smallpox vaccination",
+    organization: "World Health Organization",
+    citation: "World Health Organization, \"History of smallpox vaccination.\"",
+    url: "https://www.who.int/news-room/spotlight/history-of-vaccination/history-of-smallpox-vaccination",
+  },
+  asmePerkinsRefrigeration: {
+    shortTitle: "ASME: refrigeration",
+    title: "The Perkins Vapor-Compression Cycle for Refrigeration",
+    organization: "American Society of Mechanical Engineers",
+    citation: "ASME, \"#274 Perkins Vapor-Compression Cycle for Refrigeration.\"",
+    url: "https://www.asme.org/about-asme/engineering-history/landmarks/274-perkins-vapor-compression-cycle-for-refrigeration",
+  },
+  harvardSurgicalAnesthesia: {
+    shortTitle: "Harvard: surgical anaesthesia",
+    title: "Surgical Anesthesia",
+    organization: "Harvard University",
+    citation: "Harvard Gazette, \"Surgical Anesthesia,\" October 12, 2011.",
+    url: "https://news.harvard.edu/gazette/story/2011/10/surgical-anesthesia/",
+  },
+  scienceMuseumHenryBessemer: {
+    shortTitle: "Science Museum: Bessemer",
+    title: "Henry Bessemer 1813–1898",
+    organization: "Science Museum Group",
+    citation: "Science Museum Group Collection, \"Henry Bessemer 1813–1898.\"",
+    url: "https://collection.sciencemuseumgroup.org.uk/people/ap24523/bessemer-henry",
+  },
+  listerAntisepticPrinciple: {
+    shortTitle: "Lister: antiseptic surgery",
+    title: "On the Antiseptic Principle in the Practice of Surgery",
+    organization: "British Medical Journal",
+    citation: "Lister, Joseph, \"On the Antiseptic Principle in the Practice of Surgery\" (1867). Reprinted in Clinical Orthopaedics and Related Research (2010).",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC2895849/",
+  },
+  smithsonianPearlStreetStation: {
+    shortTitle: "Smithsonian: Pearl Street",
+    title: "Lighting a Revolution: 19th Century Promotion",
+    organization: "Smithsonian National Museum of American History",
+    citation: "Smithsonian National Museum of American History, \"Lighting a Revolution: 19th Century Promotion.\"",
+    url: "https://www.americanhistory.si.edu/lighting/scripts/s19c.htm",
+  },
+  acsBakelite: {
+    shortTitle: "ACS: Bakelite",
+    title: "Leo Hendrick Baekeland and the Invention of Bakelite",
+    organization: "American Chemical Society",
+    citation: "American Chemical Society, National Historic Chemical Landmarks, \"Leo Hendrick Baekeland and the Invention of Bakelite.\"",
+    url: "https://www.acs.org/education/whatischemistry/landmarks/bakelite.html",
+  },
+  oxfordPenicillinTrial: {
+    shortTitle: "Oxford: penicillin trials",
+    title: "On this site: Penicillin - a historic first",
+    organization: "University of Oxford, Nuffield Department of Primary Care Health Sciences",
+    citation: "Morrish, Sarah, \"On this site: Penicillin - a historic first.\" University of Oxford, 2018.",
+    url: "https://www.phc.ox.ac.uk/blog/on-this-site-penicillin-a-historic-first",
+  },
+  britishMuseumLydianCoinage: {
+    shortTitle: "British Museum: Lydian coinage",
+    title: "Lydian",
+    organization: "The British Museum",
+    citation: 'The British Museum, Collections Online, "Lydian."',
+    url: "https://www.britishmuseum.org/collection/term/x107891",
+  },
+  smithsonianPapermakingOrigins: {
+    shortTitle: "Smithsonian: early papermaking",
+    title: "On the origin of papermaking in the light of scientific research on recent archaeological discoveries",
+    organization: "Smithsonian Museum Conservation Institute",
+    citation:
+      'Pan, Jixing, "On the origin of papermaking in the light of scientific research on recent archaeological discoveries." Abstract in the Smithsonian Museum Conservation Institute database.',
+    url: "https://mci.si.edu/node/1246765",
+  },
+  britishLibraryDiamondSutra: {
+    shortTitle: "British Library: Diamond Sutra",
+    title: "Buddhist texts: The Diamond Sūtra",
+    organization: "British Library, International Dunhuang Programme",
+    citation:
+      'International Dunhuang Programme, "Buddhist texts: The Diamond Sūtra."',
+    url: "https://idp.bl.uk/discover/learning/buddhism-on-the-silk-roads/articles/buddhism-on-the-ground/buddhist-texts-the-diamond-sutra/",
+  },
+  bangladeshBankCurrencyHistory: {
+    shortTitle: "Bangladesh Bank: paper currency",
+    title: "Commemorative Coins and Notes of Bangladesh Bank",
+    organization: "Bangladesh Bank, Taka Museum",
+    citation:
+      "Ahmed, Bulbul, Commemorative Coins and Notes of Bangladesh Bank. Bangladesh Bank, April 2013. Historical introduction on paper currency.",
+    url: "https://www.bb.org.bd/pub/special/coins_banknotes_book2013.pdf",
+  },
+  asianArtMuseumPrinting: {
+    shortTitle: "Asian Art Museum: movable type",
+    title: "The Invention of Woodblock Printing in the Tang (618–906) and Song (960–1279) Dynasties",
+    organization: "Asian Art Museum",
+    citation:
+      'Asian Art Museum, "The Invention of Woodblock Printing in the Tang (618–906) and Song (960–1279) Dynasties."',
+    url: "https://education.asianart.org/resources/the-invention-of-woodblock-printing-in-the-tang-and-song-dynasties/",
+  },
+  columbiaSongGunpowder: {
+    shortTitle: "Columbia: gunpowder",
+    title: "Technological Advances during the Song: Gunpowder",
+    organization: "Columbia University, Asia for Educators",
+    citation:
+      'Columbia University, Asia for Educators, "Technological Advances during the Song: Gunpowder."',
+    url: "https://afe.easia.columbia.edu/songdynasty-module/tech-gunpowder.html",
+  },
+  columbiaSongCompass: {
+    shortTitle: "Columbia: mariner's compass",
+    title: "Technological Advances during the Song: Shipbuilding and the Compass",
+    organization: "Columbia University, Asia for Educators",
+    citation:
+      'Columbia University, Asia for Educators, "Technological Advances during the Song: Shipbuilding and the Compass."',
+    url: "https://afe.easia.columbia.edu/songdynasty-module/tech-compass.html",
+  },
+  collegeOptometristsSpectacles: {
+    shortTitle: "College of Optometrists: spectacles",
+    title: "The history of spectacles",
+    organization: "College of Optometrists, British Optical Association Museum",
+    citation:
+      'College of Optometrists, British Optical Association Museum, "The history of spectacles."',
+    url: "https://www.college-optometrists.org/the-british-optical-association-museum/the-history-of-spectacles",
+  },
+  europeanaSpectacles: {
+    shortTitle: "Europeana: early spectacles",
+    title: "The history of spectacles",
+    organization: "Europeana",
+    citation: 'Europeana, "The history of spectacles."',
+    url: "https://www.europeana.eu/nl/stories/the-history-of-spectacles",
+  },
+  metDaguerrePhotography: {
+    shortTitle: "Met: daguerreotype photography",
+    title: "Daguerre (1787–1851) and the Invention of Photography",
+    organization: "The Metropolitan Museum of Art",
+    citation:
+      'Daniel, Malcolm, "Daguerre (1787–1851) and the Invention of Photography." Heilbrunn Timeline of Art History, October 2004.',
+    url: "https://www.metmuseum.org/essays/daguerre-1787-1851-and-the-invention-of-photography",
+  },
+  basfAmmoniaSynthesis: {
+    shortTitle: "BASF: industrial ammonia synthesis",
+    title: "Fertilizer out of thin air",
+    organization: "BASF",
+    citation: 'BASF, "Fertilizer out of thin air."',
+    url: "https://www.basf.com/gb/en/media/science-around-us/fertilizer-out-of-thin-air",
+  },
+  smithsonianContainerShipping: {
+    shortTitle: "Smithsonian: container shipping",
+    title: "Transforming the Waterfront",
+    organization: "Smithsonian National Museum of American History",
+    citation:
+      'Smithsonian National Museum of American History, "Transforming the Waterfront." America on the Move.',
+    url: "https://americanhistory.si.edu/explore/exhibitions/america-on-the-move/online/transforming-waterfront",
+  },
   metSafavids: {
     shortTitle: "Met: Safavid Iran", title: "The Art of the Safavids before 1600",
     organization: "The Metropolitan Museum of Art",
