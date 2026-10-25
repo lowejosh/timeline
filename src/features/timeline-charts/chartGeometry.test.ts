@@ -4,7 +4,7 @@ import { createWorldToScreen, getViewportForRange, worldToScreen } from "@/lib/c
 import { getTimelineYearDelta } from "@/lib/core/timelineYears";
 import { CHARTS, type ChartData, type ChartPoint } from "./chartCatalog";
 import { chartWindow, clipChartPoints, clipChartLine, clipChartRibbon, fitChartDomain, nearestChartPoint, projectChart, chartReadoutAt } from "./chartGeometry";
-import { chartLineDash } from "./drawChart";
+import { chartLineDash, reduceToPixels } from "./drawChart";
 
 import co2Snapshot from "../../../public/data/charts/co2.json";
 import populationSnapshot from "../../../public/data/charts/population.json";
@@ -117,6 +117,36 @@ describe("bundled scientific snapshots", () => {
 
 
 describe("source segments", () => {
+  it.each([20_000, 1_000_000, 500_000_000])("retains the modern CO₂ rise in a %s-year view", span => {
+    const data = co2Snapshot as unknown as ChartData;
+    const chart = CHARTS.find(chart => chart.id === "co2")!;
+    const projection = projectChart(chart, data, getViewportForRange(-span, 2026, 1000, 0), 1100, 50, 100, 600, false, false);
+    const observed = projection.segments.find(segment => segment.id === "observed-co2")!;
+    expect(observed.drawable).toBe(true);
+    expect(observed.plot.at(-1)!.x - observed.plot[0].x).toBeLessThan(4);
+    const rendered = clipChartLine(reduceToPixels(observed.plot), projection.domain).flat();
+    expect(Math.max(...rendered.map(point => point.value))).toBeCloseTo(425.62167, 5);
+    expect(rendered.at(-1)!.value).toBeCloseTo(425.62167, 5);
+    expect(Math.max(...rendered.map(point => projection.toY(point.value))) - Math.min(...rendered.map(point => projection.toY(point.value)))).toBeGreaterThan(10);
+  });
+
+  it("preserves extrema and the final observation when dates collapse to one X coordinate", () => {
+    const points: ChartPoint[] = [[1958, 315, 310, 320], [2000, 450, 445, 455], [2025, 425, 420, 430]];
+    const plotted = clipChartPoints(points, () => 100, 50, 1050);
+    const rendered = clipChartLine(reduceToPixels(plotted), [150, 500]).flat();
+    expect(Math.max(...rendered.map(point => point.value))).toBe(450);
+    expect(rendered[0].value).toBe(315);
+    expect(rendered.at(-1)).toEqual({ x: 100, value: 425 });
+    expect(plotted.at(-1)!.high).toBe(430);
+  });
+
+  it("still excludes modern CO₂ observations when their dates are outside the view", () => {
+    const data = co2Snapshot as unknown as ChartData;
+    const chart = CHARTS.find(chart => chart.id === "co2")!;
+    const projection = projectChart(chart, data, getViewportForRange(-5000, -1000, 1000, 0), 1100, 50, 100, 600, false, false);
+    expect(projection.segments.some(segment => segment.id === "observed-co2")).toBe(false);
+  });
+
   it("does not draw or inspect the gap between geological and annual temperatures", () => {
     const data = temperatureSnapshot as unknown as ChartData;
     const chart = CHARTS.find(chart => chart.id === "temperature")!;

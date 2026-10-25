@@ -99,6 +99,14 @@ export function clipChartPoints(points: readonly ChartPoint[], toX: (year: numbe
     const a = projected[i - 1];
     const b = projected[i];
     if (b.x < left || a.x > right) continue;
+    // At very wide zoom, separate dates can project to the same X coordinate.
+    // Preserve both values so a compressed spike retains its vertical extent.
+    if (a.x === b.x) {
+      const previous = result[result.length - 1];
+      if (!previous || previous.x !== a.x || previous.value !== a.value) result.push(a);
+      result.push(b);
+      continue;
+    }
     const start = atX(a, b, Math.max(left, a.x));
     const end = atX(a, b, Math.min(right, b.x));
     const previous = result[result.length - 1];
@@ -124,8 +132,9 @@ export function projectChart(chart: ChartDefinition, data: ChartData, viewport: 
   const segments = chartSegments(data).map(segment => {
     const points = chartWindow(segment.points, start, end);
     const plot = clipChartPoints(points, toX, pad, width - pad);
-    const coverageWidth = plot.length ? plot[plot.length - 1].x - plot[0].x : 0;
-    return { ...segment, record: segment.points, points, plot, drawable: plot.length >= 2 && coverageWidth >= 4 };
+    // A subpixel source can still carry a visible vertical change. Culling on
+    // horizontal width drops modern observations before the older record.
+    return { ...segment, record: segment.points, points, plot, drawable: plot.length >= 2 };
   }).filter(segment => segment.points.length > 0);
   const points = segments.flatMap(segment => segment.points);
   // Edge values are interpolated only for geometry; readouts still use actual observations.

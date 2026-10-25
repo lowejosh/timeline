@@ -19,7 +19,7 @@ export function chartLineDash(style: "solid" | "dashed" | "dotted", points: Char
   return style === "dashed" ? [10, 7] : style === "dotted" ? [2, 6] : [];
 }
 
-function reduceToPixels(points: ChartPlotPoint[]) {
+export function reduceToPixels(points: ChartPlotPoint[]) {
   const plotted: ChartPlotPoint[] = [];
   for (let i = 0; i < points.length;) {
     let j = i + 1;

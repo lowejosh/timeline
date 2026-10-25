@@ -33,6 +33,11 @@ Source identities and links remain available in the menu. Paths and uncertainty
 ribbons are clipped to the visible X range before drawing; distant bracketing
 points never reach Canvas. A reusable viewport projection avoids normalizing the
 same viewport for each chart point.
+Source segments remain drawable even when their horizontal span is less than a
+pixel. Per-pixel reduction preserves their first, last, minimum and maximum
+values, so the modern CO₂ rise becomes a thin vertical stroke at its actual date
+instead of disappearing before the older record. Equal projected X coordinates
+also retain their vertical extent. No minimum time width is imposed.
 
 Each source is rendered independently. No path or uncertainty ribbon connects
 separate records, fills a source gap, or extrapolates beyond the last point.
