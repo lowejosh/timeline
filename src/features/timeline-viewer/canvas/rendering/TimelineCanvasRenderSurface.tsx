@@ -22,6 +22,7 @@ import {
 
 type Props = {
   isZoomColorsEnabled?: boolean;
+  isMagneticPolarityEnabled?: boolean;
   scene: TimelineCanvasScene | null;
   pad: number;
   /**
@@ -58,6 +59,7 @@ type Props = {
  */
 export function TimelineCanvasRenderSurface({
   isZoomColorsEnabled = false,
+  isMagneticPolarityEnabled = false,
   commitHoveredTooltip,
   eraChildOpacityById,
   expandedOverlayIds,
@@ -258,6 +260,7 @@ export function TimelineCanvasRenderSurface({
       invalidateReasons: [],
       isCosmicCalendarMode: false,
       isZoomColorsEnabled,
+      isMagneticPolarityEnabled,
       isTouchTooltipPinned: false,
       isViewportInteractionActive: false,
       lastPointer: lastPointerRef.current,
@@ -294,6 +297,7 @@ export function TimelineCanvasRenderSurface({
     drawRef.current();
   }, [
     isZoomColorsEnabled,
+    isMagneticPolarityEnabled,
     scene,
     pad,
     eraChildOpacityById,

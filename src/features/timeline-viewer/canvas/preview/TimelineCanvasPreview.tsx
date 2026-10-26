@@ -66,6 +66,7 @@ export function TimelineCanvasPreview({
   overlayBands,
   initialRange,
 }: Props) {
+  const isMagneticPolarityEnabled = useTimelineUiStore((state) => state.isMagneticPolarityEnabled);
   const isZoomColorsEnabled = useTimelineUiStore((state) => state.isZoomColorsEnabled);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const tooltipInteractiveContentRef = useRef<HTMLDivElement | null>(null);
@@ -447,6 +448,7 @@ export function TimelineCanvasPreview({
       ) : null}
       <TimelineCanvasRenderSurface
         isZoomColorsEnabled={isZoomColorsEnabled}
+        isMagneticPolarityEnabled={isMagneticPolarityEnabled}
         commitHoveredTooltip={commitHoveredTooltip}
         eraChildOpacityById={eraChildOpacityById}
         expandedOverlayIds={expandedOverlayIds}

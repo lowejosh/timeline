@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { useTimelineUiStore } from "@/stores/timelineUi.store";
 
 const APP_VERSION = "v0.3.0";
 
@@ -36,6 +37,10 @@ export function TimelineSettings({
   const isOpen = isOpenProp ?? isOpenLocal;
   const setIsOpen = onOpenChangeProp ?? setIsOpenLocal;
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const isMagneticPolarityEnabled = useTimelineUiStore((state) => state.isMagneticPolarityEnabled);
+  const setIsMagneticPolarityEnabled = useTimelineUiStore((state) => state.setIsMagneticPolarityEnabled);
+  const polarityLabelId = useId();
+  const polarityDescriptionId = useId();
   const titleId = useId();
   const zoomColorsLabelId = useId();
   const zoomColorsDescriptionId = useId();
@@ -96,6 +101,22 @@ export function TimelineSettings({
             checked={isCosmicCalendarMode}
             onClick={onToggleCosmicCalendarMode}
           />
+        </div>
+
+        <div className="mt-3 flex items-center justify-between gap-3 border-t border-border/60 pt-3">
+          <div className="flex flex-col gap-1 font-sans text-[0.78rem] leading-snug text-foreground">
+            <span id={polarityLabelId}>Magnetic reversals</span>
+            <span id={polarityDescriptionId} className="text-[0.68rem] text-muted-foreground">
+              Polarity ribbon along the axis. Past 82.9 million years.
+            </span>
+            <a className="w-fit text-[0.68rem] text-muted-foreground underline underline-offset-2"
+              href="https://pmagpy.github.io/Essentials-JupyterBook/chapter15/" target="_blank" rel="noreferrer">
+              GTS2020 · PmagPy
+            </a>
+          </div>
+          <Switch aria-labelledby={polarityLabelId} aria-describedby={polarityDescriptionId}
+            checked={isMagneticPolarityEnabled}
+            onClick={() => setIsMagneticPolarityEnabled(!isMagneticPolarityEnabled)} />
         </div>
 
         <div className="mt-3 border-t border-border/60 pt-3">

@@ -13,7 +13,6 @@ import {
   HISTORICAL_BASEMAP_SOURCE_URL,
   MAP_HEIGHT,
   MAP_WIDTH,
-  MAX_POINTS_PER_RING,
   MAX_RENDERED_SLICE_CACHE_SIZE,
 } from "./MapPreview.const";
 import { waitForMapIdle } from "./MapPreview.utils";
@@ -221,10 +220,10 @@ function ringToPath(ring: GeoJsonPosition[]) {
     return "";
   }
 
-  const stride = Math.max(1, Math.ceil(ring.length / MAX_POINTS_PER_RING));
+  // Keep the source geometry intact; fixed strides cut off coastline corners.
   let path = "";
 
-  for (let index = 0; index < ring.length; index += stride) {
+  for (let index = 0; index < ring.length; index += 1) {
     const [x, y] = projectPosition(ring[index]);
     path += `${path ? "L" : "M"}${x.toFixed(2)} ${y.toFixed(2)}`;
   }

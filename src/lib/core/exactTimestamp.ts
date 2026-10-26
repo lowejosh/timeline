@@ -1,5 +1,6 @@
 import { duration, durationInYears } from "./time/duration";
 import {
+  getAstronomicalTimelineYear,
   getTimelineYearFromAstronomicalYearValue,
   getTimelineYearFromYearsAfterBigBang,
   getTimelineYearFromYearsAgo,
@@ -457,15 +458,17 @@ export function getPreciseTimelineYearFromElapsedTimestamp(
   const microseconds = (((normalized.days * 24n + normalized.hours) * 60n + normalized.minutes) * 60n + normalized.seconds) * 1_000_000n + normalized.milliseconds * 1_000n + normalized.microseconds;
   const fractionalYears = durationInYears(duration(microseconds, -6));
 
-  return normalized.reference === "after-big-bang"
-    ? normalizePreciseTimelineYear(
-        anchor.wholeYear + wholeYears,
-        anchor.fraction + fractionalYears,
-      )
-    : normalizePreciseTimelineYear(
-        anchor.wholeYear - wholeYears,
-        anchor.fraction - fractionalYears,
-      );
+  // Subtract elapsed time in astronomical coordinates, where year zero exists.
+  // Keep the fraction split so microsecond differences survive in deep time.
+  const direction = normalized.reference === "after-big-bang" ? 1 : -1;
+  const result = normalizePreciseTimelineYear(
+    getAstronomicalTimelineYear(anchor.wholeYear) + direction * wholeYears,
+    anchor.fraction + direction * fractionalYears,
+  );
+  return {
+    wholeYear: getTimelineYearFromAstronomicalYearValue(result.wholeYear),
+    fraction: result.fraction,
+  };
 }
 
 export function getTimelineYearFromExactTimestamp(

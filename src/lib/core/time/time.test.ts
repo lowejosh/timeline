@@ -48,3 +48,17 @@ describe("time precision", () => {
     expect(catalog.overlays[0].exactStartTime).toEqual(exact);
   });
 });
+
+it("round-trips elapsed years across BCE/CE without losing a year", async () => {
+  const { yearsAgo } = await import("../timelineDateBuilders");
+  const { getYearsAgoFromPresent, getYearsAfterBigBang } = await import("../timelineYears");
+  const { formatTimelinePointLabel } = await import("@/lib/rendering/bands");
+  for (const age of [790_000, 400_000, 300_000, 50_000, 2_000]) {
+    expect(getYearsAgoFromPresent(yearsAgo(age))).toBeCloseTo(age, 6);
+  }
+  expect(formatTimelinePointLabel(yearsAgo(790_000), { approximate: true })).toBe("~790k years ago");
+  expect(formatTimelinePointLabel(yearsAgo(400_000), { approximate: true })).toBe("~400k years ago");
+  const { UNIVERSE_AGE_YEARS } = await import("../timelineYears");
+  const recent = getPreciseTimelineYearFromElapsedTimestamp({ kind: "elapsed", reference: "after-big-bang", precision: "year", years: BigInt(UNIVERSE_AGE_YEARS - 100) });
+  expect(getYearsAfterBigBang(recent)).toBeCloseTo(UNIVERSE_AGE_YEARS - 100, 5);
+});

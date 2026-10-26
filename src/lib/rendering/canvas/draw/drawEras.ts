@@ -1,4 +1,4 @@
-import { fitEraLabel } from "@/lib/rendering/eraLabel";
+import { fitEraLabel, placeEraLabelBlock } from "@/lib/rendering/eraLabel";
 import { smoothstep01 } from "@/lib/core/easing";
 import { shouldHideOverlappedEraLabel } from "@/lib/rendering/childLayers";
 import { resolveContextBandRenderState } from "@/lib/rendering/contextBands";
@@ -168,7 +168,7 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext, fillOnly: boolean): v
     (!shouldHideInlineLabel || allowsNormalPrimordialLabelBypass)
   ) {
     const labelX = Math.max(x0, pad) / 2 + Math.min(x1, sceneWidth - pad) / 2;
-    const labelBaselineY = axisY - 44 - labelChildOpacity * 24;
+    let labelBaselineY = axisY - 44 - labelChildOpacity * 24;
     const labelVisibility = getEraInlineLabelVisibility(labelChildOpacity);
     const labelAlpha =
       Math.min((visibleEraWidth - labelMinWidth) / labelFadeWidth, 1) *
@@ -177,10 +177,25 @@ function renderEra(layer: EraLayer, cx: CanvasDrawContext, fillOnly: boolean): v
 
     context.save();
     context.font = labelFont;
-    const lines = fitEraLabel(labelText, Math.max(visibleEraWidth - 12, 0), text => context.measureText(text).width);
+    let lines = fitEraLabel(labelText, Math.max(visibleEraWidth - 12, 0), text => context.measureText(text).width);
     const alternateFont = `italic 10px ${fontSans}`;
     context.font = alternateFont;
-    const alternateLines = era.alternateName ? fitEraLabel(era.alternateName, Math.max(visibleEraWidth - 12, 0), text => context.measureText(text).width) : [];
+    let alternateLines = era.alternateName ? fitEraLabel(era.alternateName, Math.max(visibleEraWidth - 12, 0), text => context.measureText(text).width) : [];
+    if (cx.animatedOverlayLaneCount > 0 && !cx.guidedFocus) {
+      const alternateLineCount = alternateLines.length;
+      const placed = placeEraLabelBlock(lines, alternateLines, labelBaselineY,
+        layout.overlayClipBottom + 6, layout.majorTickTop - 4);
+      lines = placed.lines;
+      alternateLines = placed.alternateLines;
+      labelBaselineY = placed.baseline;
+      if (lines.length === 0) { context.restore(); return; }
+      if (alternateLines.length > 0 && placed.alternateLines.length < alternateLineCount) {
+        // Preserve the subtitle as a single abbreviated line when it cannot wrap.
+        let alternate = era.alternateName ?? "";
+        while (alternate && context.measureText(`${alternate}…`).width > visibleEraWidth - 12) alternate = alternate.slice(0, -1);
+        alternateLines = alternate ? [`${alternate.trimEnd()}…`] : [];
+      }
+    }
     context.font = labelFont;
     let maxWidth = 0;
     for (const line of lines) {

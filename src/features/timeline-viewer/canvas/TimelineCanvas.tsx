@@ -137,6 +137,7 @@ export function TimelineCanvas({
     const data = index === 0 ? firstChartResult.data : secondChartResult.data;
     return data ? [{ chart, data, side: index === 0 ? "left" : "right", fitVisible: fitChartVisible, showUncertainty: showChartUncertainty }] : [];
   }), [selectedCharts, firstChartResult.data, secondChartResult.data, fitChartVisible, showChartUncertainty]);
+  const isMagneticPolarityEnabled = useTimelineUiStore((state) => state.isMagneticPolarityEnabled);
   const isZoomColorsEnabled = useTimelineUiStore((state) => state.isZoomColorsEnabled);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const chartAxisMotionRef = useRef(new ChartAxisMotion());
@@ -463,6 +464,7 @@ export function TimelineCanvas({
         guidedFocus,
         isCosmicCalendarMode,
         isZoomColorsEnabled,
+        isMagneticPolarityEnabled,
         isTouchTooltipPinned: isTouchTooltipPinnedRef.current,
         isViewportInteractionActive: isViewportInteractionActiveRef.current,
         lastPointer: dragStateRef.current ? null : lastPointerRef.current,
@@ -498,6 +500,7 @@ export function TimelineCanvas({
       guidedFocus,
       isCosmicCalendarMode,
       isZoomColorsEnabled,
+      isMagneticPolarityEnabled,
       overlayScrollOffset,
       overviewReservedHeight,
       pad,

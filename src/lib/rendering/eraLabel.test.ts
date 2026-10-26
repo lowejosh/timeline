@@ -18,3 +18,13 @@ it("keeps parent and child labels complementary throughout the handoff", () => {
     expect(getEraInlineLabelVisibility(progress) + smoothstep01(progress)).toBeCloseTo(1);
   }
 });
+
+it("keeps a wrapped era title below the bands and above the ticks", async () => {
+  const { placeEraLabelBlock } = await import("./eraLabel");
+  const block = placeEraLabelBlock(["Post-classical", "History"], ["Middle", "Ages"], 456, 434, 472);
+  expect(block.lines).toEqual(["Post-classical", "History"]);
+  expect(block.alternateLines).toHaveLength(1);
+  const count = block.lines.length + block.alternateLines.length;
+  expect(block.baseline - (count - 1) * 12 - 10).toBeGreaterThanOrEqual(434);
+  expect(block.baseline).toBeLessThanOrEqual(472);
+});

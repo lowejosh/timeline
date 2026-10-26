@@ -4,6 +4,8 @@ import { shouldUseMobileTimelineDrawer } from "@/lib/app/layout";
 import {
   readStoredMapPreviewEnabled,
   readStoredZoomColorsEnabled,
+  readStoredMagneticPolarityEnabled,
+  writeStoredMagneticPolarityEnabled,
   writeStoredZoomColorsEnabled,
   readStoredSidebarOpen,
   writeStoredMapPreviewEnabled,
@@ -13,6 +15,7 @@ import {
 type TimelineUiState = {
   isCosmicCalendarMode: boolean;
   isZoomColorsEnabled: boolean;
+  isMagneticPolarityEnabled: boolean;
   isKeyboardHelpOpen: boolean;
   isMapPreviewEnabled: boolean;
   isSearchOpen: boolean;
@@ -23,6 +26,7 @@ type TimelineUiState = {
 
 type TimelineUiActions = {
   setIsZoomColorsEnabled: (value: boolean) => void;
+  setIsMagneticPolarityEnabled: (value: boolean) => void;
   closeKeyboardHelp: () => void;
   resolveInitialSidebarVisibility: (width: number, height: number) => void;
   setIsCosmicCalendarMode: (
@@ -69,6 +73,11 @@ function shouldStartWithSidebarOpen() {
 export const useTimelineUiStore = create<TimelineUiStore>((set, get) => ({
   hasResolvedInitialSidebarVisibility: false,
   isCosmicCalendarMode: false,
+  isMagneticPolarityEnabled: readStoredMagneticPolarityEnabled(),
+  setIsMagneticPolarityEnabled: (value) => {
+    writeStoredMagneticPolarityEnabled(value);
+    set({ isMagneticPolarityEnabled: value });
+  },
   isZoomColorsEnabled: readStoredZoomColorsEnabled(),
   setIsZoomColorsEnabled: (value) => {
     writeStoredZoomColorsEnabled(value);

@@ -387,3 +387,13 @@ export function writeStoredZoomColorsEnabled(value: boolean) {
   state.ui = { ...(state.ui ?? {}), zoomColorsEnabled: value };
   writeLayerStorageState(state);
 }
+
+export function readStoredMagneticPolarityEnabled(): boolean {
+  return readLayerStorageState().ui?.magneticPolarityEnabled === true;
+}
+
+export function writeStoredMagneticPolarityEnabled(value: boolean) {
+  const state = readLayerStorageState();
+  state.ui = { ...(state.ui ?? {}), magneticPolarityEnabled: value };
+  writeLayerStorageState(state);
+}

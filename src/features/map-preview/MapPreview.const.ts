@@ -1,6 +1,5 @@
 export const MAP_WIDTH = 360;
 export const MAP_HEIGHT = 180;
-export const MAX_POINTS_PER_RING = 170;
 export const MAX_RENDERED_SLICE_CACHE_SIZE = 6;
 export const MAP_WINDOW_STORAGE_KEY = "timeline:map-preview-window:v1";
 export const MAP_WINDOW_MIN_WIDTH = 260;

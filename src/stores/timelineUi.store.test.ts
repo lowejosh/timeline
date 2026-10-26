@@ -33,3 +33,18 @@ it("still toggles when browser storage is unavailable", () => {
   useTimelineUiStore.getState().setIsZoomColorsEnabled(true);
   expect(useTimelineUiStore.getState().isZoomColorsEnabled).toBe(true);
 });
+
+it("keeps the magnetic ribbon opt-in and persists its switch independently", async () => {
+  const { readStoredMagneticPolarityEnabled } = await import("@/lib/app/timelineSetStorage");
+  const storage = new Map<string, string>();
+  vi.stubGlobal("window", { localStorage: {
+    getItem: (key: string) => storage.get(key) ?? null,
+    setItem: (key: string, value: string) => storage.set(key, value),
+  } });
+  expect(readStoredMagneticPolarityEnabled()).toBe(false);
+  useTimelineUiStore.getState().setIsMagneticPolarityEnabled(true);
+  expect(readStoredMagneticPolarityEnabled()).toBe(true);
+  expect(readStoredZoomColorsEnabled()).toBe(false);
+  useTimelineUiStore.getState().setIsMagneticPolarityEnabled(false);
+  expect(readStoredMagneticPolarityEnabled()).toBe(false);
+});

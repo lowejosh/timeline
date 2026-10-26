@@ -1,3 +1,4 @@
+import { drawMagneticPolarity } from "@/features/magnetic-polarity/drawMagneticPolarity";
 import { drawGuidedCursor } from "@/lib/rendering/canvas/draw/drawGuidedCursor";
 import { drawChart, drawChartReadouts, type ChartRenderState } from "@/features/timeline-charts/drawChart";
 import type { ChartAxisMotion } from "@/features/timeline-charts/chartAxisMotion";
@@ -102,6 +103,7 @@ export type DrawTimelineCanvasFrameArgs = {
   guidedFocus?: GuidedTimelineFocus;
   isCosmicCalendarMode: boolean;
   isZoomColorsEnabled?: boolean;
+  isMagneticPolarityEnabled?: boolean;
   isTouchTooltipPinned: boolean;
   isViewportInteractionActive: boolean;
   lastPointer: LastPointerState | null;
@@ -134,6 +136,7 @@ export function drawTimelineCanvasFrame({
   invalidateReasons,
   isCosmicCalendarMode,
   isZoomColorsEnabled = false,
+  isMagneticPolarityEnabled = false,
   guidedFocus,
   isTouchTooltipPinned,
   isViewportInteractionActive,
@@ -478,6 +481,7 @@ export function drawTimelineCanvasFrame({
   const chartProjections = !isCosmicCalendarMode ? chartStates.map(state => drawChart(cx, state, chartAxisMotion, chartReducedMotion)) : [];
   markPerf("overlayMs");
   drawAxis(cx);
+  if (isMagneticPolarityEnabled && !isCosmicCalendarMode) drawMagneticPolarity(cx);
   markPerf("axisMs");
   const resolvedMarkerStates = drawMarkers(cx);
   drawGuidedCursor(cx);
