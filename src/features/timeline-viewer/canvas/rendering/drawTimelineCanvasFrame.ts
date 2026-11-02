@@ -1,3 +1,4 @@
+import { shouldUseMobileTimelineDrawer } from "@/lib/app/layout";
 import { drawMagneticPolarity } from "@/features/magnetic-polarity/drawMagneticPolarity";
 import { drawGuidedCursor } from "@/lib/rendering/canvas/draw/drawGuidedCursor";
 import { drawChart, drawChartReadouts, type ChartRenderState } from "@/features/timeline-charts/drawChart";
@@ -19,7 +20,7 @@ import { resolveExpandedOverlayLayout } from "@/lib/rendering/expandedOverlayLay
 import { drawBackground } from "@/lib/rendering/canvas/draw/drawBackground";
 import { drawEras } from "@/lib/rendering/canvas/draw/drawEras";
 import { drawOverlays } from "@/lib/rendering/canvas/draw/drawOverlays";
-import { drawAxis } from "@/lib/rendering/canvas/draw/drawAxis";
+import { drawAxis, drawTimelineHeading } from "@/lib/rendering/canvas/draw/drawAxis";
 import { drawMarkers } from "@/lib/rendering/canvas/draw/drawMarkers";
 import type {
   CanvasDrawContext,
@@ -476,11 +477,14 @@ export function drawTimelineCanvasFrame({
   drawBackground(cx);
   drawEras(cx);
   markPerf("eraMs");
+  const mobileHeading = !guidedFocus && shouldUseMobileTimelineDrawer(sceneWidth, sceneHeight);
+  // Clear the floating button row; bands can still scroll over this heading.
+  if (mobileHeading) drawTimelineHeading(cx, 48);
   drawOverlays(cx);
   chartAxisMotion?.retain(isCosmicCalendarMode ? [] : chartStates.map(state => state.chart.id));
   const chartProjections = !isCosmicCalendarMode ? chartStates.map(state => drawChart(cx, state, chartAxisMotion, chartReducedMotion)) : [];
   markPerf("overlayMs");
-  drawAxis(cx);
+  drawAxis(cx, { showHeading: !mobileHeading });
   if (isMagneticPolarityEnabled && !isCosmicCalendarMode) drawMagneticPolarity(cx);
   markPerf("axisMs");
   const resolvedMarkerStates = drawMarkers(cx);

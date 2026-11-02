@@ -22,7 +22,7 @@ import {
 import { TimelineView } from "@/pages/TimelineView/TimelineView";
 import { getPrimaryShortcutModifierLabel } from "@/lib/app/timelineKeyboard";
 import { useChartStore } from "@/features/timeline-charts/chartStore";
-import { PwaInstallPrompt } from "@/components/misc";
+import { MobileWelcomeTip, useMobileWelcomeTip } from "@/components/misc";
 
 function App() {
   const [experience, setExperience] = useState<GuidedExperience | null>(null);
@@ -43,6 +43,11 @@ function App() {
     isOverviewVisible: app.isOverviewVisible,
     width: app.stageSize.width,
   });
+  const isChartMenuOpen = useChartStore((state) => state.isMenuOpen);
+  const mobileWelcome = useMobileWelcomeTip(
+    activeView === "timeline" && !experience && !isSidebarOpen &&
+    !isSearchOpen && !isSettingsOpen && !isKeyboardHelpOpen && !isChartMenuOpen,
+  );
   const shortcutUiEnabled =
     activeView === "timeline" && !layout.shouldUseMobileDrawer;
   const shouldUseMobileSearchDialog = layout.shouldUsePortraitMobileLayout;
@@ -100,6 +105,7 @@ function App() {
     <main
       className="app-shell fixed inset-0 flex w-full items-stretch overflow-hidden overscroll-none bg-background text-foreground"
       data-active-view={activeView}
+      data-mobile-welcome={mobileWelcome.isOpen ? "true" : "false"}
       data-sidebar-mode={layout.shouldUseMobileDrawer ? "drawer" : "popup"}
       data-sidebar-open={isSidebarOpen ? "true" : "false"}
     >
@@ -221,7 +227,7 @@ function App() {
         modifierLabel={shortcutModifierLabel}
         onClose={actions.closeKeyboardHelp}
       />
-      <PwaInstallPrompt />
+      <MobileWelcomeTip {...mobileWelcome} />
       {experience && (
         <GuidedExperienceView
           key={experience.id}

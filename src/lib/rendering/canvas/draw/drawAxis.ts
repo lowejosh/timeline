@@ -41,7 +41,59 @@ import {
 } from "@/lib/catalog/sets/cosmic/index";
 import type { CanvasDrawContext } from "./drawContext";
 
-export function drawAxis(cx: CanvasDrawContext): void {
+// The heading can sit beneath overlay bands without moving their layout or clip bounds.
+export function drawTimelineHeading(cx: CanvasDrawContext, topOffset = 0): void {
+  const {
+    context, sceneWidth, pad, sceneViewport, layout, labelColor,
+    breadcrumbChain, sceneActiveEra, fromX, fontSans,
+  } = cx;
+  const breadcrumbY = layout.breadcrumbY + topOffset;
+  const projectLabel = "a timeline project";
+  const centralEra = cx.guidedFocus ? findEraAtYear(sceneActiveEra.children ?? [], sceneViewport.centerYear) : undefined;
+  const rootLabel = centralEra?.name ?? breadcrumbChain[0]?.name ?? sceneActiveEra.name;
+  const trailLabel = breadcrumbChain
+    .slice(1)
+    .map((era) => era.name)
+    .join(" • ");
+  const trailText = !cx.guidedFocus && trailLabel ? ` • ${trailLabel}` : "";
+  const breadcrumbFont = `500 12px ${fontSans}`;
+
+  context.save();
+  context.font = `600 9px ${fontSans}`;
+  context.fillStyle = labelColor;
+  context.textAlign = "center";
+  context.textBaseline = "top";
+  context.globalAlpha = 0.7;
+  context.fillText(projectLabel, sceneWidth / 2, PROJECT_LABEL_TOP + topOffset);
+
+  context.font = breadcrumbFont;
+  context.fillStyle = labelColor;
+  context.textAlign = "left";
+  context.textBaseline = "top";
+  const rootWidth = measureAxisText(context, rootLabel);
+  const trailWidth = trailText ? measureAxisText(context, trailText) : 0;
+  const startX = sceneWidth / 2 - (rootWidth + trailWidth) / 2;
+
+  context.globalAlpha = breadcrumbChain.length > 1 ? 0.9 : 0.76;
+  context.fillText(rootLabel, startX, breadcrumbY);
+
+  if (trailText) {
+    context.globalAlpha = 0.8;
+    context.fillText(trailText, startX + rootWidth, breadcrumbY);
+  }
+
+  context.font = `10px ${fontSans}`;
+  context.textAlign = "center";
+  context.globalAlpha = 0.5;
+  const span = subtractPreciseTimelineYears(fromX(sceneWidth - pad), fromX(pad));
+  context.fillText(formatMeasuredSpan(span), sceneWidth / 2, breadcrumbY + 19);
+  context.restore();
+}
+
+export function drawAxis(
+  cx: CanvasDrawContext,
+  { showHeading = true }: { showHeading?: boolean } = {},
+): void {
   const {
     context,
     sceneWidth,
@@ -52,8 +104,6 @@ export function drawAxis(cx: CanvasDrawContext): void {
     line,
     labelColor,
     resolvedAxisTickStates,
-    breadcrumbChain,
-    sceneActiveEra,
     toX,
     fromX,
     fontSans,
@@ -62,49 +112,7 @@ export function drawAxis(cx: CanvasDrawContext): void {
   const SUBYEAR_PRIMARY_FONT = subyearPrimaryFont(fontSans);
   const SUBYEAR_SECONDARY_FONT = subyearSecondaryFont(fontSans);
 
-  // --- Breadcrumb ---
-  {
-    const projectLabel = "a timeline project";
-    const centralEra = cx.guidedFocus ? findEraAtYear(sceneActiveEra.children ?? [], sceneViewport.centerYear) : undefined;
-    const rootLabel = centralEra?.name ?? breadcrumbChain[0]?.name ?? sceneActiveEra.name;
-    const trailLabel = breadcrumbChain
-      .slice(1)
-      .map((era) => era.name)
-      .join(" • ");
-    const trailText = !cx.guidedFocus && trailLabel ? ` • ${trailLabel}` : "";
-    const breadcrumbFont = `500 12px ${fontSans}`;
-
-    context.save();
-    context.font = `600 9px ${fontSans}`;
-    context.fillStyle = labelColor;
-    context.textAlign = "center";
-    context.textBaseline = "top";
-    context.globalAlpha = 0.7;
-    context.fillText(projectLabel, sceneWidth / 2, PROJECT_LABEL_TOP);
-
-    context.font = breadcrumbFont;
-    context.fillStyle = labelColor;
-    context.textAlign = "left";
-    context.textBaseline = "top";
-    const rootWidth = measureAxisText(context, rootLabel);
-    const trailWidth = trailText ? measureAxisText(context, trailText) : 0;
-    const startX = sceneWidth / 2 - (rootWidth + trailWidth) / 2;
-
-    context.globalAlpha = breadcrumbChain.length > 1 ? 0.9 : 0.76;
-    context.fillText(rootLabel, startX, layout.breadcrumbY);
-
-    if (trailText) {
-      context.globalAlpha = 0.8;
-      context.fillText(trailText, startX + rootWidth, layout.breadcrumbY);
-    }
-
-    context.font = `10px ${fontSans}`;
-    context.textAlign = "center";
-    context.globalAlpha = 0.5;
-    const span = subtractPreciseTimelineYears(fromX(sceneWidth - pad), fromX(pad));
-    context.fillText(formatMeasuredSpan(span), sceneWidth / 2, layout.breadcrumbY + 19);
-    context.restore();
-  }
+  if (showHeading) drawTimelineHeading(cx);
 
   // --- Axis baseline ---
   context.strokeStyle = line;

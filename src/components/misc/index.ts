@@ -1,1 +1,1 @@
-export { PwaInstallPrompt } from "./PwaInstallPrompt";
+export { MobileWelcomeTip, useMobileWelcomeTip } from "./MobileWelcomeTip";

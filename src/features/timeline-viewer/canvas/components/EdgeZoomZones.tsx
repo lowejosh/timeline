@@ -116,7 +116,7 @@ export function EdgeZoomZones({
             />
             <div
               className={cn(
-                "pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 text-muted-foreground/50 opacity-25 transition-[color,opacity,transform] duration-200",
+                "edge-zoom-cue pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 text-muted-foreground/50 opacity-25 transition-[color,opacity,transform] duration-200",
                 isActive && "text-muted-foreground opacity-60",
                 isDragging && "scale-[1.02]",
               )}
